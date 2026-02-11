@@ -1,0 +1,21 @@
+# OMEGA RQSDK Configuration
+# Mode: simulation (local) | production (rqdatac)
+mode: simulation
+
+# Data Paths
+bundle_path: "d:/OMEGA/rq/data/bundle"
+h5_source: "d:/OMEGA/rq/data/bundle/ticks"
+
+# Quota Management
+quota_limit_mb: 3000
+quota_reserve_mb: 50
+
+# Maxwell v24.00 Physics Constants
+physics:
+  gamma: 50.0
+  lookback: 120
+  input_channels: 5
+
+# Feature Engineering
+features:
+  frozen_stats_path: "d:/OMEGA/rq/data/frozen_stats.json"

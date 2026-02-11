@@ -1,0 +1,14 @@
+hardware:
+  profile_name: 32Core_Hybrid_Storage
+  schema_version: '1.0'
+  storage:
+    source_root: E:/data/level2
+    stage_root: D:/Omega_frames/v50/stage
+    output_root: D:/Omega_frames/v50/output
+    io_slots: 4
+    disable_indexing: true
+  compute:
+    framing_workers: 48
+    training_workers: 30
+    backtest_workers: 28
+    memory_threshold_percent: 88.0

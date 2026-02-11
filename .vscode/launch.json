@@ -1,0 +1,28 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "OMEGA L2 Audit (v3 Core)",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/run_l2_audit.py",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder};D:\\迅投极速交易终端睿智融科版\\bin.x64\\Lib\\site-packages"
+            },
+            "args": []
+        },
+        {
+            "name": "OMEGA Current File",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder};D:\\迅投极速交易终端睿智融科版\\bin.x64\\Lib\\site-packages"
+            }
+        }
+    ]
+}

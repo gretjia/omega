@@ -1,0 +1,18 @@
+apiVersion: antigravity.google.com/v1alpha1
+kind: AgentConfig
+metadata:
+  name: omega-manager
+spec:
+  profile: manager
+  constitution: ./OMEGA_CONSTITUTION.md
+  skills:
+    - ./.agent/skills/math_core
+    - ./.agent/skills/physics
+    - ./.agent/skills/engineering
+    - ./.agent/skills/v3_mainline_guard
+    - ./.agent/skills/hardcode_guard
+    - ./.agent/skills/ops
+  surfaces:
+    editor: enabled
+    terminal: enabled
+    browser: enabled

@@ -1,0 +1,88 @@
+{
+  "meta": {
+    "version": "2026-02-07",
+    "maintainer": "OMEGA",
+    "format_note": "JSON content saved as .yaml so it is valid YAML 1.2 and can be parsed without external deps."
+  },
+  "global": {
+    "constitution_path": "OMEGA_CONSTITUTION.md",
+    "skills_root": ".agent/skills",
+    "project_root_hint": ".",
+    "env_hint": "Conda OMEGA",
+    "core_paths": {
+      "primary_kernel": "omega_v3_core/kernel.py",
+      "primary_math_core": "omega_v3_core/omega_math_core.py",
+      "legacy_kernel": "legacy_model/v1/kernel.py",
+      "legacy_math_core": "legacy_model/v1/omega_math_core.py"
+    }
+  },
+  "shared_principles": [
+    "Read OMEGA_CONSTITUTION.md before math/trading design decisions.",
+    "No static hardcoded trading thresholds in code paths used for production.",
+    "Use volume clock and enforce boundary checks (T+1, limit-up/limit-down).",
+    "Train/val/test/backtest datasets must be role-isolated and overlap-free; enforce with manifests and fail-closed runtime checks.",
+    "Only audited train/test outputs may be promoted into config.py; every promotion must be versioned and snapshotted to artifacts.",
+    "Allow fast innovation in sandbox paths, but promote to mainline only after audit gates pass.",
+    "Keep always-on skills minimal (target <= 6); treat governance/process skills as on-demand."
+  ],
+  "codex": {
+    "title": "OMEGA Rules for Codex/Cursor",
+    "rules": [
+      "Prefer omega_v3_core/omega_math_core.py functions for active L2 v3 work; treat root omega_math_core.py as compatibility shim and legacy/L1 implementation in legacy_model/v1 unless explicitly requested.",
+      "No hardcoding of trading thresholds. Route tunables through config or audited runtime snapshots.",
+      "Do not place new business logic in root compatibility shims (kernel.py, omega_math_core.py, trainer.py, etc.).",
+      "Prototype fast in sandbox paths (archive/jobs/tools), but move into omega_v3_core only after evidence and guard checks.",
+      "When changing cross-agent rules, edit .agent/principles.yaml and run tools/sync_agent_rules.py.",
+      "Before trade-logic suggestions, verify Settlement (T+1) and Boundary (Limit Up/Down) constraints.",
+      "For pipeline changes, enforce train/backtest role split with disjoint manifests; reject overlap by default.",
+      "Keep edits reproducible: update docs/handover when behavior or workflow changes."
+    ],
+    "style": [
+      "Python 3.9+",
+      "Type hints",
+      "Docstrings"
+    ]
+  },
+  "gemini": {
+    "title": "OMEGA Context for Gemini CLI",
+    "identity": "You are the OMEGA Agent.",
+    "critical_instruction": [
+      "Before answering math/trading questions, consult OMEGA_CONSTITUTION.md.",
+      "Do not introduce heuristics that contradict Trinity (TDA, SRL, Epiplexity).",
+      "For active L2 work, prioritize omega_v3_core/* as canonical core."
+    ]
+  },
+  "trae": {
+    "title": "OMEGA Trae Agent Instructions",
+    "prime_directives": [
+      "Read the Constitution first in each session.",
+      "Use modular skills under .agent/skills/ instead of generic assumptions.",
+      "When implementing: Plan -> Verify -> Execute -> Audit."
+    ],
+    "context": {
+      "root": ".",
+      "environment": "Conda OMEGA",
+      "key_files": [
+        "omega_v3_core/kernel.py",
+        "omega_v3_core/omega_math_core.py"
+      ],
+      "legacy_note": "Root kernel.py and omega_math_core.py are compatibility shims; legacy/L1 source lives in legacy_model/v1/."
+    }
+  },
+  "cursor": {
+    "title": "Cursor Rules for OMEGA",
+    "includes": [
+      "OMEGA_CONSTITUTION.md",
+      ".agent/skills/math_core/SKILL.md",
+      ".agent/skills/physics/SKILL.md",
+      ".agent/skills/v3_mainline_guard/SKILL.md",
+      ".agent/skills/hardcode_guard/SKILL.md"
+    ],
+    "rules": [
+      "Follow the Constitution: all code must align with TDA, SRL, and Epiplexity.",
+      "Use Volume Clock: prefer Volume Bars over Time Bars.",
+      "Verify constraints: check T+1 and boundary conditions explicitly.",
+      "For active L2 v3 work, prefer omega_v3_core/* as canonical implementation."
+    ]
+  }
+}

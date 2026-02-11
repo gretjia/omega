@@ -1,0 +1,26 @@
+# Python cache / env
+__pycache__/
+*.py[cod]
+.venv/
+
+# Secrets / local env
+.env
+
+# Large mutable data (keep out of VCS)
+data/
+artifacts/
+archive/
+C:/
+tools/MinGit/
+audit/backtest_results/
+audit/*.log
+audit/*.err
+audit/*.pkl
+audit/v40_runtime/
+*.pid
+
+# OS/editor noise
+.DS_Store
+
+# Local private bare remote
+.local_remote/

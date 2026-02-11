@@ -1,0 +1,9 @@
+{
+  "gateway": {
+    "mode": "remote",
+    "remote": {
+      "url": "ws://43.139.33.186:18789",
+      "token": "d6282d767c8498b9d22c83bbb22c66ab"
+    }
+  }
+}
