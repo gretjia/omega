@@ -1,15 +1,17 @@
 """
 run_parallel_v31.py
 
-High-performance Parallel Trainer for OMEGA v3.1.
-Strictly adheres to v3.1 math/logic while parallelizing the 'apply_recursive_physics' bottleneck.
+High-performance Parallel Trainer for OMEGA v5.0 (Holographic Damper).
+(Filename retained for pipeline compatibility; Logic aligned with v5.0)
+
+Strictly adheres to v5.0 math/logic while parallelizing the 'apply_recursive_physics' bottleneck.
 
 Architecture:
 - Producer (Workers): Load Parquet -> Apply Recursive Physics (CPU intensive) -> Label Engineering -> Return Vectors
 - Consumer (Main): Aggregates vectors -> SGD Partial Fit (Single Threaded)
 
 Compatibility:
-- Reads/Writes the EXACT SAME checkpoint format as `omega_v3_core/trainer.py`.
+- Reads/Writes the EXACT SAME checkpoint format as `omega_core/trainer.py`.
 - Can resume directly from `artifacts/checkpoint_rows_*.pkl`.
 """
 

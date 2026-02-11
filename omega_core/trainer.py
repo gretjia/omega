@@ -11,7 +11,7 @@ import time
 import os
 import shutil
 from pathlib import Path
-from typing import Dict
+from typing import Dict, List
 
 import numpy as np
 import polars as pl
@@ -21,6 +21,7 @@ from sklearn.preprocessing import StandardScaler
 
 from config import L2PipelineConfig
 from omega_core.kernel import apply_recursive_physics
+from omega_core.omega_math_core import topo_snr_from_traces
 from tools.multi_dir_loader import discover_l2_dirs
 
 def check_memory_safe(threshold=85.0, sleep_sec=10):
@@ -78,6 +79,8 @@ class OmegaTrainerV3:
                 return expr.over("symbol")
             return expr
 
+        # Calculate Forward Returns (Label Generation)
+        # MUST be per-symbol
         df = df.with_columns([
             (_over_symbol(pl.col("close").shift(-horizon)) - pl.col("close")).alias("fwd_change")
         ]).with_columns([
@@ -142,3 +145,58 @@ class OmegaTrainerV3:
         with open(path, "wb") as f:
             pickle.dump({"model": self.model, "scaler": self.scaler, "features": self.feature_cols}, f)
         print(f"Model saved: {path}")
+
+
+def evaluate_frames(df: pl.DataFrame, cfg: L2PipelineConfig) -> Dict[str, float]:
+    """
+    Compute physics audit metrics (SNR, Orthogonality, Alignment).
+    Safe for multi-symbol data because metrics are distributional.
+    """
+    # 1. Topo SNR
+    if "trace" in df.columns:
+        # Sample for speed (1000 traces is enough for SNR)
+        sample_size = min(df.height, 1000)
+        # Use simple random sampling
+        sample_df = df.sample(sample_size, seed=42)
+        traces = sample_df["trace"].to_list()
+        
+        snr = topo_snr_from_traces(traces, cfg.topo_snr, cfg.epiplexity)
+    else:
+        snr = float("nan")
+
+    # 2. Orthogonality (Epi vs Residual)
+    if "epiplexity" in df.columns and "srl_resid" in df.columns:
+        valid = df.filter(pl.col("epiplexity").is_finite() & pl.col("srl_resid").is_finite())
+        if valid.height > 10:
+            orth = np.corrcoef(valid["epiplexity"].to_numpy(), valid["srl_resid"].abs().to_numpy())[0, 1]
+        else:
+            orth = 0.0
+    else:
+        orth = float("nan")
+
+    # 3. Vector Alignment (Price vs OFI)
+    if "price_change" in df.columns and "net_ofi" in df.columns:
+        valid = df.filter(pl.col("price_change").is_finite() & pl.col("net_ofi").is_finite())
+        if valid.height > 10:
+            align = np.corrcoef(valid["price_change"].to_numpy(), valid["net_ofi"].to_numpy())[0, 1]
+        else:
+            align = 0.0
+    else:
+        align = float("nan")
+
+    return {
+        "Topo_SNR": float(snr),
+        "Orthogonality": float(orth),
+        "Vector_Alignment": float(align)
+    }
+
+
+def evaluate_dod(metrics: Dict[str, float], cfg: L2PipelineConfig) -> bool:
+    """
+    Check Definition of Done.
+    """
+    val = cfg.validation
+    if metrics.get("Topo_SNR", 0) < float(val.topo_snr_min): return False
+    if abs(metrics.get("Orthogonality", 1)) > float(val.orthogonality_max_abs): return False
+    if metrics.get("Vector_Alignment", 0) < float(val.vector_alignment_min): return False
+    return True

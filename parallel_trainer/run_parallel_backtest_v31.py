@@ -1,8 +1,10 @@
 """
 run_parallel_backtest_v31.py
 
-High-performance Parallel Backtest Driver for OMEGA v3.1.
-Executes the "Shadow Mode" Audit on Out-of-Sample data (2025) using the trained policy.
+High-performance Parallel Backtest Driver for OMEGA v5.0 (Holographic Damper).
+(Filename retained for pipeline compatibility; Logic aligned with v5.0)
+
+Executes the "Shadow Mode" Audit on Out-of-Sample data using the trained policy.
 
 Architecture:
 - Loads the trained `checkpoint_rows_*.pkl`.
