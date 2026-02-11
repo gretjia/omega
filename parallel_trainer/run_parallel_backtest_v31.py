@@ -518,6 +518,21 @@ class ParallelBacktester:
                 if d.exists():
                     all_files.extend(list(d.rglob("*.parquet")))
             all_files = sorted(all_files)
+            
+            # Enforce Test Split
+            split = self.cfg.split
+            allowed_years = [str(y) for y in getattr(split, "test_years", [])]
+            allowed_months = [str(m) for m in getattr(split, "test_year_months", [])]
+            
+            if allowed_years or allowed_months:
+                def is_test_file(path: Path) -> bool:
+                    name = path.name
+                    if any(name.startswith(y) for y in allowed_years): return True
+                    if any(name.startswith(m) for m in allowed_months): return True
+                    return False
+                all_files = [f for f in all_files if is_test_file(f)]
+                print(f"[Plan] Enforcing Test Split: Years {allowed_years}, Months {allowed_months}. Files: {len(all_files)}", flush=True)
+
             if self.max_files is not None:
                 all_files = all_files[: max(0, int(self.max_files))]
             tasks_files = [p for p in all_files if p.name not in self.processed_files]

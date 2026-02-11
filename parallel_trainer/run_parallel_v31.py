@@ -489,6 +489,13 @@ class ParallelTrainerV31:
             for d in dirs:
                 all_files.extend(sorted(list(d.rglob("*.parquet"))))
             files_total = len(all_files)
+            
+            # Enforce Train Split
+            if self.cfg.split.train_years:
+                allowed = [str(y) for y in self.cfg.split.train_years]
+                all_files = [f for f in all_files if any(f.name.startswith(y) for y in allowed)]
+                print(f"[Plan] Enforcing Train Split: Years {allowed}. Files remaining: {len(all_files)}", flush=True)
+            
             tasks = [f for f in all_files if f.name not in self.processed_files]
             if self.max_files is not None:
                 tasks = tasks[: max(0, int(self.max_files))]
