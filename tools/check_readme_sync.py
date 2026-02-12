@@ -20,8 +20,10 @@ from typing import List, Sequence
 
 ROOT = Path(__file__).resolve().parent.parent
 ROOT_README = ROOT / "README.md"
+CORE_README = ROOT / "omega_core" / "README.md"
+LEGACY_CORE_README = ROOT / "omega_v3_core" / "README.md"
 SUB_READMES = [
-    ROOT / "omega_v3_core" / "README.md",
+    CORE_README if CORE_README.exists() else LEGACY_CORE_README,
     ROOT / "parallel_trainer" / "README.md",
     ROOT / "rq" / "README.md",
 ]

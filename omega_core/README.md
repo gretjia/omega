@@ -1,5 +1,7 @@
 # OMEGA Core (v5.0)
 
+Global index and cross-module navigation: [`../README.md`](../README.md).
+
 **Code Name:** Holographic Damper
 **Role:** Mathematical Kernel
 

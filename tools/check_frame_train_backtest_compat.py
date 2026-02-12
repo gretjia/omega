@@ -139,7 +139,7 @@ def run_check(
         return 2
 
     from config import load_l2_pipeline_config
-    from omega_v3_core.trainer import OmegaTrainerV3
+    from omega_core.trainer import OmegaTrainerV3
 
     cfg = load_l2_pipeline_config()
     trainer = OmegaTrainerV3(cfg)

@@ -1,6 +1,8 @@
 # OMEGA Parallel Trainer (`parallel_trainer`)
 
 > Last updated: 2026-02-11 (v5.0 Holographic Damper Integration)
+>
+> Global index and cross-module navigation: [`../README.md`](../README.md).
 
 ## v5.0 Integration Status
 This module is fully integrated into the OMEGA v5.0 Pipeline. 
