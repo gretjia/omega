@@ -1,0 +1,9 @@
+{
+  "id": "full_pipeline_optimization",
+  "name": "Full Pipeline Resource & Speed Optimization",
+  "status": "in-progress",
+  "created_at": "2026-02-12",
+  "updated_at": "2026-02-12",
+  "description": "Architectural optimization of the OMEGA v5.0 pipeline using RAM Disks and Ryzen AI core balancing to achieve <90s/day framing speed.",
+  "owner": "Gemini-CLI"
+}

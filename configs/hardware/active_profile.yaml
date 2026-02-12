@@ -8,7 +8,7 @@ hardware:
     io_slots: 4
     disable_indexing: true
   compute:
-    framing_workers: 48
+    framing_workers: 40
     training_workers: 30
     backtest_workers: 28
-    memory_threshold_percent: 88.0
+    memory_threshold_percent: 85.0

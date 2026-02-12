@@ -27,49 +27,49 @@ def _process_single_stock(file_paths: List[str], cfg) -> pl.DataFrame:
         
         for f in file_paths:
             try:
-                # Check schema (first few bytes)
-                # Note: Assuming config encoding is correct (e.g. gb18030)
-                schema = pl.read_csv(f, n_rows=0, encoding=cfg.io.csv_encoding).columns
-                if required_col in schema:
-                    quote_paths.append(f)
+                # Optimized header check: read only the first line
+                with open(f, 'rb') as f_in:
+                    header = f_in.readline().decode(cfg.io.csv_encoding, errors='ignore')
+                    if required_col in header:
+                        quote_paths.append(f)
             except Exception:
                 continue
         
         if not quote_paths:
-            # No valid L2 Quote file found in this group.
             return None
 
         # 1. ETL (Framing)
-        # build_l2_frames now accepts a list of paths (via scan_l2_quotes recursion)
         df = build_l2_frames(quote_paths, cfg)
         if df.height == 0:
             return None
             
         # ENSURE TIME ORDER for Physics!
-        # group_by() does not guarantee order of groups.
         df = df.sort("bucket_id")
 
         # 2. Core Processing (Math) - Per Asset Physics
         df = apply_recursive_physics(df, cfg)
         
         # 3. Enrich with Symbol
-        # Take symbol from first file
         first_path = file_paths[0]
         symbol = Path(first_path).parent.name
-        
-        # If symbol looks like a date (e.g. nested date folders), try grandparent
         if symbol.isdigit() and len(symbol) == 8:
              symbol = Path(first_path).parent.parent.name
              
         df = df.with_columns(pl.lit(symbol).alias("symbol"))
-        
         return df
     except Exception as e:
-        # Minimal error reporting to avoid spamming the main process
-        print(f"[Error] {file_paths[0] if file_paths else '?'}: {e}")
-        import traceback
-        traceback.print_exc()
         return None
+
+def _process_stock_chunk(chunk, cfg) -> List[pl.DataFrame]:
+    """
+    Processes a batch of symbols to reduce IPC overhead.
+    """
+    results = []
+    for sym, file_paths in chunk:
+        res = _process_single_stock(file_paths, cfg)
+        if res is not None:
+            results.append(res)
+    return results
 
 class Framer:
     def __init__(self, hardware: HardwareProfile, core: IMathCore, logger=None):
@@ -96,6 +96,9 @@ class Framer:
         archives = self._scan_archives(year_filter)
         self.logger(f"Found {len(archives)} archives.")
         
+        # Ensure physical staging directory exists
+        os.makedirs(self.hw.storage.stage_root, exist_ok=True)
+
         if limit > 0:
             archives = archives[:limit]
             self.logger(f"Limiting to {limit} archives for smoke test.")
@@ -119,10 +122,15 @@ class Framer:
             self.logger(f"[Warn] Source root does not exist: {self.hw.storage.source_root}")
             return []
             
-        pattern = "**/*.7z"
-        if year_filter:
-            pattern = f"**/*{year_filter}*/**/*.7z"
+        # If no year filter, default to 2024-2025 as requested
+        if not year_filter:
+            all_files = []
+            for y in ["2024", "2025"]:
+                pattern = f"**/*{y}*/**/*.7z"
+                all_files.extend(glob.glob(os.path.join(self.hw.storage.source_root, pattern), recursive=True))
+            return sorted(list(set(all_files)))
             
+        pattern = f"**/*{year_filter}*/**/*.7z"
         return sorted(list(glob.glob(os.path.join(self.hw.storage.source_root, pattern), recursive=True)))
 
     def _resolve_7z_exe(self) -> str:
@@ -154,10 +162,21 @@ class Framer:
         
         # 1. Staging (Extraction)
         temp_stage = os.path.join(self.hw.storage.stage_root, date_str)
+        
+        # Pre-Cleanup: Ensure the stage root is clear of ANY previous failed attempts
+        if os.path.exists(self.hw.storage.stage_root):
+            for item in os.listdir(self.hw.storage.stage_root):
+                item_path = os.path.join(self.hw.storage.stage_root, item)
+                try:
+                    if os.path.isdir(item_path): shutil.rmtree(item_path)
+                    else: os.remove(item_path)
+                except Exception: pass
+        
         os.makedirs(temp_stage, exist_ok=True)
         
         try:
-            cmd = [self.seven_zip, "x", archive_path, f"-o{temp_stage}", "-y"]
+            # -mmt=on enables multithreaded compression/decompression
+            cmd = [self.seven_zip, "x", archive_path, f"-o{temp_stage}", "-y", "-mmt=on"]
             subprocess.run(cmd, check=True, capture_output=True)
             
             # Find ALL CSV files
@@ -190,16 +209,21 @@ class Framer:
             
             processed_dfs = []
             workers = int(self.hw.compute.framing_workers)
+
+            # Chunk symbols to reduce IPC overhead (especially for 7000+ symbols)
+            symbol_items = list(symbol_map.items())
+            chunk_size = max(1, len(symbol_items) // (workers * 2))
+            chunks = [symbol_items[i:i + chunk_size] for i in range(0, len(symbol_items), chunk_size)]
             
             with concurrent.futures.ProcessPoolExecutor(max_workers=workers) as executor:
-                # Submit all tasks (list of files per symbol)
-                futures = {executor.submit(_process_single_stock, files, l2_cfg): sym for sym, files in symbol_map.items()}
+                # Submit chunks instead of individual symbols
+                futures = [executor.submit(_process_stock_chunk, chunk, l2_cfg) for chunk in chunks]
                 
                 # Collect results
                 for future in concurrent.futures.as_completed(futures):
-                    res = future.result()
-                    if res is not None:
-                        processed_dfs.append(res)
+                    res_list = future.result()
+                    if res_list:
+                        processed_dfs.extend(res_list)
             
             if not processed_dfs:
                 self.logger(f"[Warn] All files failed processing for {date_str}")
@@ -215,7 +239,7 @@ class Framer:
             self.logger(f"[Done] {filename} -> {output_path} ({full_df.height} rows, {duration:.1f}s)")
             
         finally:
-            # Cleanup stage
+            # Revert to aggressive cleanup to prevent RAM disk exhaustion (Zombie Folders)
             if os.path.exists(temp_stage):
                 try:
                     shutil.rmtree(temp_stage)

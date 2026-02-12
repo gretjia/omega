@@ -66,6 +66,16 @@ def main():
     # 3. Execution
     print(f"\n[Engine] Starting Stage: {args.stage.upper()}")
     
+    # Use physical SSD for all stages (Stability First)
+    hw_profile.compute.max_workers = {
+        "frame": hw_profile.compute.framing_workers,
+        "train": hw_profile.compute.training_workers,
+        "backtest": hw_profile.compute.backtest_workers,
+        "all": hw_profile.compute.framing_workers
+    }.get(args.stage, hw_profile.compute.framing_workers)
+    
+    log(f"Resource Config: Physical SSD Staging (Workers: {hw_profile.compute.max_workers})")
+
     if args.stage in ["frame", "all"]:
         framer = Framer(hw_profile, core, logger=log)
         limit = 1 if args.smoke else 0
