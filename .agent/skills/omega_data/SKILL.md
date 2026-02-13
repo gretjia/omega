@@ -1,47 +1,36 @@
 ---
 name: omega_data
-description: Understanding the OMEGA data structure and file formats
+description: Top-level design guidance for this skill domain.
 ---
 
-# OMEGA Data Structure
+# Skill: omega_data
 
-The OMEGA project stores market data in `./data/`.
+## Intent
+Top-level design guidance for this skill domain.
 
-## Directory Layout
+## When To Use
+- Use when the task clearly falls into this skill domain.
+- Prioritize this skill over ad-hoc instructions in the same domain.
+- Combine with other skills only when responsibilities are non-overlapping.
 
-### `history_ticks` (Aggregated Tick Data)
-- **Path**: `data/history_ticks/`
-- **Format**: `{stock_code}.csv` (e.g., `000032.csv`)
-- **Description**: Contains aggregated tick data for a stock across multiple days. Primary source for backtesting.
-- **Schema**:
-  - `time` (int64): Timestamp in milliseconds
-  - `price` (float): Last price
-  - `open`, `high`, `low` (float): OHLC data
-  - `vol` (float): Volume
-  - `amount` (float): Turnover
+## Core Principles
+- Keep the guidance abstract and reusable across versions, environments, and machines.
+- Prefer safe, incremental, and verifiable execution.
+- Separate policy decisions from implementation details.
+- Preserve consistency with project-wide governance and audit expectations.
 
-### `history_ticks_full` (Daily Tick Data)
-- **Path**: `data/history_ticks_full/`
-- **Format**: `{stock_code}_{date}.csv` (e.g., `000004_20250813.csv`)
-- **Description**: Raw tick data for a single stock on a single day. Used for Maxwell model training.
+## Standard Workflow
+1. Clarify task objective, constraints, and acceptance criteria.
+2. Assess current state and identify key risks.
+3. Choose the minimum viable approach for forward progress.
+4. Execute changes in small steps and validate outcomes.
+5. Summarize decisions, evidence, and follow-up actions.
 
-### `level2` (L2 High-Frequency Archives)
-- **Path**: `data/level2/`
-- **Format**: `.7z` compressed archives by date
-- **Description**: Level-2 tick-by-tick data. Very large (~2TB total). Do NOT decompress fully.
+## Expected Output
+- A concise decision summary with assumptions.
+- A traceable list of actions taken and validation results.
+- Explicit risks, tradeoffs, and next-step recommendations.
 
-### `level2_frames_*` (L2 Training Output)
-- **Path**: `data/level2_frames_win2023/`, `data/level2_frames_mac2024/`
-- **Format**: `.parquet`
-- **Description**: Processed L2 frames from parallel training. Rebuildable.
-
-### `binary_ticks` (High-Speed Cache)
-- **Path**: `data/binary_ticks/`
-- **Format**: `.npy` (memory-mapped)
-- **Description**: High-speed cache converted from `history_ticks`. Rebuildable via `tools/bake_ticks.py`.
-
-## Usage Guidelines
-- For long-term analysis/training: use `history_ticks` or `level2_frames_*`
-- For debugging specific dates: check `history_ticks_full`
-- For L2 data: use streaming tools (`tools/level2_7z_reader.py`)
-- See `data/README.md` for cleanup policies
+## Boundaries
+- Do not hardcode version-specific paths, one-off commands, or runtime-local artifacts in this top-level skill file.
+- Put implementation details in task-specific docs/scripts, not in the skill definition.

@@ -1,35 +1,36 @@
 ---
 name: engineering
-description: Engineering and adapter practices for OMEGA v3, including config usage, data-frame hygiene, and external SDK integration.
+description: Top-level design guidance for this skill domain.
 ---
 
-# Skill: Engineering & Adapter
+# Skill: engineering
 
-## Description
-Handles implementation details for Python engineering, adapter boundaries, and data IO safety.
+## Intent
+Top-level design guidance for this skill domain.
 
-## Capabilities
+## When To Use
+- Use when the task clearly falls into this skill domain.
+- Prioritize this skill over ad-hoc instructions in the same domain.
+- Combine with other skills only when responsibilities are non-overlapping.
 
-### 1. Adapter layer discipline
-- Keep external SDK calls (`qmt`, `rq`) in adapter modules, not in `omega_v3_core/*`.
-- Normalize symbol formats at boundaries (`600000` -> `600000.XSHG` or `600000.SH`).
-- Ensure retries/timeouts for network-style SDK calls.
+## Core Principles
+- Keep the guidance abstract and reusable across versions, environments, and machines.
+- Prefer safe, incremental, and verifiable execution.
+- Separate policy decisions from implementation details.
+- Preserve consistency with project-wide governance and audit expectations.
 
-### 2. Python engineering
-- Prefer vectorized `numpy`/`pandas`/`polars` paths over row loops.
-- Keep explicit types for public functions and dataclasses.
-- Add guards for NaN/Inf and empty frames before core math calls.
-- For large parquet corpora, avoid unbounded wildcard `collect()` in chain-critical paths; use bounded sampling/chunking.
+## Standard Workflow
+1. Clarify task objective, constraints, and acceptance criteria.
+2. Assess current state and identify key risks.
+3. Choose the minimum viable approach for forward progress.
+4. Execute changes in small steps and validate outcomes.
+5. Summarize decisions, evidence, and follow-up actions.
 
-### 3. Configuration handling
-- **Read**: use `config.py` dataclasses and `load_l2_pipeline_config()`.
-- **Write**: never write runtime state back to `config.py`.
-- **State**: save trained/frozen state to artifacts (for example `artifacts/*.pkl`).
-- **Split contract**: training/backtest file lists must be role-filtered manifests with overlap checks (fail closed by default).
+## Expected Output
+- A concise decision summary with assumptions.
+- A traceable list of actions taken and validation results.
+- Explicit risks, tradeoffs, and next-step recommendations.
 
-## Verification protocol
-- [ ] External SDK calls are wrapped and failures are explicit.
-- [ ] DataFrame columns/index/order are validated before compute.
-- [ ] NaN/Inf/shape guards are present around critical transforms.
-- [ ] No runtime path writes into `config.py`.
-- [ ] Train/backtest manifests are role-isolated (no overlap).
+## Boundaries
+- Do not hardcode version-specific paths, one-off commands, or runtime-local artifacts in this top-level skill file.
+- Put implementation details in task-specific docs/scripts, not in the skill definition.

@@ -1,81 +1,36 @@
 ---
 name: evidence_based_reasoning
-description: A protocol for validating claims and making decisions based strictly on local project artifacts (Logs, Code, Results) to minimize hallucination and external reliance.
+description: Top-level design guidance for this skill domain.
 ---
 
-# Evidence-Based Reasoning (Contextual Forensics)
+# Skill: evidence_based_reasoning
 
-## Core Philosophy
-**"The Project state is the only Truth."**
+## Intent
+Top-level design guidance for this skill domain.
 
-AI agents must prioritize *observed reality* (logs, results) over *intended reality* (code, docs) or *general knowledge* (training data). When debating a design choice or justifying a decision, you must cite **Local Evidence**.
+## When To Use
+- Use when the task clearly falls into this skill domain.
+- Prioritize this skill over ad-hoc instructions in the same domain.
+- Combine with other skills only when responsibilities are non-overlapping.
 
-## The "Local Truth" Hierarchy
+## Core Principles
+- Keep the guidance abstract and reusable across versions, environments, and machines.
+- Prefer safe, incremental, and verifiable execution.
+- Separate policy decisions from implementation details.
+- Preserve consistency with project-wide governance and audit expectations.
 
-When verifying a fact, prioritize sources in this order:
+## Standard Workflow
+1. Clarify task objective, constraints, and acceptance criteria.
+2. Assess current state and identify key risks.
+3. Choose the minimum viable approach for forward progress.
+4. Execute changes in small steps and validate outcomes.
+5. Summarize decisions, evidence, and follow-up actions.
 
-1.  **Runtime Artifacts (The "What Happened")**
-    *   **Files**: `*.log`, `*_results.csv`, `_audit_state.jsonl`, `*.parquet`
-    *   **Value**: Irrefutable proof of system behavior.
-    *   *Example*: "Training completed 242 archives because `_audit_state.jsonl` has 242 entries."
+## Expected Output
+- A concise decision summary with assumptions.
+- A traceable list of actions taken and validation results.
+- Explicit risks, tradeoffs, and next-step recommendations.
 
-2.  **Source Code (The "How It Works")**
-    *   **Files**: `*.py`, `config.py`, `omega_v3_core/kernel.py`
-    *   **Value**: Defines the logic and computation.
-    *   *Example*: "The feature uses Z-score because `omega_v3_core/kernel.py` line 150 calls `zscore()`."
-
-3.  **Documentation & Plans (The "Why It Exists")**
-    *   **Files**: `OMEGA_CONSTITUTION.md`, `audit/*.md`, `README.md`
-    *   **Value**: Provides intent, principles, and strategic context.
-    *   *Example*: "Dynamic thresholds are required per `OMEGA_CONSTITUTION.md` Article II."
-
-4.  **External Knowledge (The "General Theory")**
-    *   **Source**: Training data, web search.
-    *   **Value**: Weakest evidence. Use only when internal artifacts are missing.
-    *   *Example*: "Square-Root Law is a known market impact model." (Use sparingly)
-
-## The Verification Workflow
-
-### 1. The Challenge
-User asks: *"Why did you make this decision?"* or *"Are you sure this works?"*
-
-### 2. The Artifact Hunt
-Do **NOT** answer from memory. Use tools to find physical evidence:
-*   `grep_search`: Find where the concept appears in the codebase.
-*   `find_by_name`: Locate relevant log files or result CSVs.
-*   `view_file`: Read the actual content.
-
-### 3. The Citation
-Construct your argument using **Direct Citations**:
-*   "In `omega_v3_core/kernel.py` at line 100..."
-*   "According to `_audit_state.jsonl`, 242 files were processed..."
-*   "Per `OMEGA_CONSTITUTION.md` Article II..."
-
-### 4. The Synthesis
-Combine multiple data points to form a solid conclusion.
-*   *Pattern*: "Code Intention (Code) + Execution Proof (Log) + Principle (Constitution) = Validated Fact."
-
-## Example: Justifying a Design Decision
-
-**Context**: User asks why dynamic thresholds are used instead of fixed values.
-
-**AI Response Structure**:
-1.  **Constitution Principle**:
-    *   *Evidence*: `OMEGA_CONSTITUTION.md` Article II states "There are NO static parameters."
-    *   *Conclusion*: "Fixed thresholds violate Constitution."
-
-2.  **Code Implementation**:
-    *   *Evidence*: `omega_v3_core/kernel.py` computes `threshold = quantile(history, 0.95)`.
-    *   *Conclusion*: "Implementation follows Constitution."
-
-3.  **Runtime Verification**:
-    *   *Evidence*: Log shows threshold adapting from 1.1 to 1.4 over time.
-    *   *Conclusion*: "Dynamic behavior confirmed in production."
-
-## Checklist for AI Agents
-
-- [ ] Did I search the `audit/` or `data/` directory before answering?
-- [ ] Can I point to a specific line of code or log entry?
-- [ ] Did I cite `OMEGA_CONSTITUTION.md` for principle-based claims?
-- [ ] Did I rely on the file system rather than my "intuition"?
-- [ ] If guessing, did I explicitly state "INFERENCE: ..."?
+## Boundaries
+- Do not hardcode version-specific paths, one-off commands, or runtime-local artifacts in this top-level skill file.
+- Put implementation details in task-specific docs/scripts, not in the skill definition.

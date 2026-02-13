@@ -1,46 +1,36 @@
 ---
 name: v3_mainline_guard
-description: Enforce omega_v3_core as the default mainline and keep root-level legacy files as compatibility shims only.
+description: Top-level design guidance for this skill domain.
 ---
 
-# v3 Mainline Guard
+# Skill: v3_mainline_guard
 
-Use this skill whenever a task touches trading logic, math kernels, trainers, adapters, or project architecture.
+## Intent
+Top-level design guidance for this skill domain.
 
-## Canonical Routing
+## When To Use
+- Use when the task clearly falls into this skill domain.
+- Prioritize this skill over ad-hoc instructions in the same domain.
+- Combine with other skills only when responsibilities are non-overlapping.
 
-- Active mainline:
-  - `omega_v3_core/kernel.py`
-  - `omega_v3_core/omega_math_core.py`
-  - `omega_v3_core/trainer.py`
-- Legacy source:
-  - `legacy_model/v1/*`
-- Compatibility shims only:
-  - root `kernel.py`, `omega_math_core.py`, `trainer.py`, `feature_extractor.py`, `data_adapter.py`, `artifact_loader.py`
+## Core Principles
+- Keep the guidance abstract and reusable across versions, environments, and machines.
+- Prefer safe, incremental, and verifiable execution.
+- Separate policy decisions from implementation details.
+- Preserve consistency with project-wide governance and audit expectations.
 
-Default rule:
-- If user does not explicitly request v1 maintenance, implement in `omega_v3_core/*`.
+## Standard Workflow
+1. Clarify task objective, constraints, and acceptance criteria.
+2. Assess current state and identify key risks.
+3. Choose the minimum viable approach for forward progress.
+4. Execute changes in small steps and validate outcomes.
+5. Summarize decisions, evidence, and follow-up actions.
 
-## Mandatory Workflow
+## Expected Output
+- A concise decision summary with assumptions.
+- A traceable list of actions taken and validation results.
+- Explicit risks, tradeoffs, and next-step recommendations.
 
-1. Classify request target:
-   - `v3` by default
-   - `v1` only when explicitly requested
-2. Apply edits only in the chosen mainline.
-3. If root shim files are touched:
-   - keep them as thin forwarding wrappers only
-   - do not add business logic there
-4. Keep docs/rules aligned with v3 core paths.
-
-## Quick Verification
-
-```bash
-python3 tools/sync_agent_rules.py --check
-```
-
-```bash
-grep -nE "versions/v1300|qmt_v1300" \
-  README.md .vscode/launch.json .codex/rules.md .gemini/context.md .trae/instruction.md .cursorrules
-```
-
-Any hit in active docs/rules is a migration drift and must be resolved.
+## Boundaries
+- Do not hardcode version-specific paths, one-off commands, or runtime-local artifacts in this top-level skill file.
+- Put implementation details in task-specific docs/scripts, not in the skill definition.

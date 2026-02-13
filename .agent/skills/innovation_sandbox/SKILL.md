@@ -1,48 +1,36 @@
 ---
 name: innovation_sandbox
-description: Enable high-freedom strategy experimentation in isolated sandbox paths while enforcing strict gates before promotion to mainline.
+description: Top-level design guidance for this skill domain.
 ---
 
-# Innovation Sandbox
+# Skill: innovation_sandbox
 
-Use this skill when exploring new ideas, model heuristics, or architecture experiments that are not yet production-ready.
+## Intent
+Top-level design guidance for this skill domain.
 
-## Objective
+## When To Use
+- Use when the task clearly falls into this skill domain.
+- Prioritize this skill over ad-hoc instructions in the same domain.
+- Combine with other skills only when responsibilities are non-overlapping.
 
-Preserve creative freedom without contaminating mainline.
+## Core Principles
+- Keep the guidance abstract and reusable across versions, environments, and machines.
+- Prefer safe, incremental, and verifiable execution.
+- Separate policy decisions from implementation details.
+- Preserve consistency with project-wide governance and audit expectations.
 
-## Sandbox Boundary
+## Standard Workflow
+1. Clarify task objective, constraints, and acceptance criteria.
+2. Assess current state and identify key risks.
+3. Choose the minimum viable approach for forward progress.
+4. Execute changes in small steps and validate outcomes.
+5. Summarize decisions, evidence, and follow-up actions.
 
-- Allowed sandbox locations:
-  - `archive/`
-  - `jobs/`
-  - ad-hoc drivers under `tools/`
-- Mainline protected paths:
-  - `omega_v3_core/*`
-  - `config.py`
-  - generated rule files (`.codex/rules.md`, `.gemini/context.md`, `.trae/instruction.md`, `.cursorrules`)
+## Expected Output
+- A concise decision summary with assumptions.
+- A traceable list of actions taken and validation results.
+- Explicit risks, tradeoffs, and next-step recommendations.
 
-Rule:
-- Fast prototypes can use temporary simplifications in sandbox files.
-- Production paths cannot absorb those simplifications directly.
-
-## Mandatory Workflow
-
-1. Hypothesis first:
-   - write one-sentence hypothesis and success metric.
-2. Isolated implementation:
-   - keep prototype code outside protected mainline paths.
-3. Evidence capture:
-   - record commands, dataset window, metrics, and artifacts.
-4. Decision:
-   - promote, iterate, or discard.
-5. Promotion (if selected):
-   - pass `hardcode_guard`
-   - pass `config_promotion_protocol` if config fields change
-   - then merge into `omega_v3_core/*`
-
-## Quick Checklist
-
-- [ ] Prototype code is isolated from mainline.
-- [ ] Metrics and evidence are stored under `audit/` or artifacts.
-- [ ] Promotion path and rollback are defined before merge.
+## Boundaries
+- Do not hardcode version-specific paths, one-off commands, or runtime-local artifacts in this top-level skill file.
+- Put implementation details in task-specific docs/scripts, not in the skill definition.

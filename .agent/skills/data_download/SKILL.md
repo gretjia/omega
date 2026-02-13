@@ -1,24 +1,36 @@
 ---
 name: data_download
-description: Compatibility shim. Data download guidance has been merged into qmtsdk and rqsdk.
+description: Top-level design guidance for this skill domain.
 ---
 
-# Data Download (Compatibility Shim)
+# Skill: data_download
 
-## Status
-Deprecated as a standalone skill (merged on 2026-02-07).
+## Intent
+Top-level design guidance for this skill domain.
 
-Use:
-- `qmtsdk` for QMT/xtquant data sync and diagnostics
-- `rqsdk` for RiceQuant data retrieval/materialization
+## When To Use
+- Use when the task clearly falls into this skill domain.
+- Prioritize this skill over ad-hoc instructions in the same domain.
+- Combine with other skills only when responsibilities are non-overlapping.
 
-## Quick Routing
+## Core Principles
+- Keep the guidance abstract and reusable across versions, environments, and machines.
+- Prefer safe, incremental, and verifiable execution.
+- Separate policy decisions from implementation details.
+- Preserve consistency with project-wide governance and audit expectations.
 
-- QMT path:
-  - `python tools/omega_qmt_daily_sync.py --start YYYYMMDD --end YYYYMMDD`
-  - `python tools/check_qmt_status.py`
-- RQ path:
-  - use `rqdatac.get_price(...)`, `rqdatac.get_ticks(...)`
-  - save to `./data/...` with audit metadata
+## Standard Workflow
+1. Clarify task objective, constraints, and acceptance criteria.
+2. Assess current state and identify key risks.
+3. Choose the minimum viable approach for forward progress.
+4. Execute changes in small steps and validate outcomes.
+5. Summarize decisions, evidence, and follow-up actions.
 
-Keep this file only for backward compatibility with old triggers.
+## Expected Output
+- A concise decision summary with assumptions.
+- A traceable list of actions taken and validation results.
+- Explicit risks, tradeoffs, and next-step recommendations.
+
+## Boundaries
+- Do not hardcode version-specific paths, one-off commands, or runtime-local artifacts in this top-level skill file.
+- Put implementation details in task-specific docs/scripts, not in the skill definition.

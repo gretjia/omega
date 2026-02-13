@@ -1,48 +1,36 @@
 ---
 name: config_promotion_protocol
-description: Govern promotion of train/test-discovered parameters into config.py with audit evidence, approval gates, and reproducibility guarantees.
+description: Top-level design guidance for this skill domain.
 ---
 
-# Config Promotion Protocol
+# Skill: config_promotion_protocol
 
-Use this skill when someone proposes moving discovered parameters from experiments or artifacts into `config.py`.
+## Intent
+Top-level design guidance for this skill domain.
 
-## Core Principle
+## When To Use
+- Use when the task clearly falls into this skill domain.
+- Prioritize this skill over ad-hoc instructions in the same domain.
+- Combine with other skills only when responsibilities are non-overlapping.
 
-- `config.py` is baseline configuration, not a runtime write target.
-- Promotion into `config.py` is allowed only as an audited, explicit governance action.
+## Core Principles
+- Keep the guidance abstract and reusable across versions, environments, and machines.
+- Prefer safe, incremental, and verifiable execution.
+- Separate policy decisions from implementation details.
+- Preserve consistency with project-wide governance and audit expectations.
 
-## Promotion Gates (all required)
+## Standard Workflow
+1. Clarify task objective, constraints, and acceptance criteria.
+2. Assess current state and identify key risks.
+3. Choose the minimum viable approach for forward progress.
+4. Execute changes in small steps and validate outcomes.
+5. Summarize decisions, evidence, and follow-up actions.
 
-1. Evidence:
-   - baseline vs candidate metrics are documented
-   - data window and evaluation method are documented
-2. Reproducibility:
-   - candidate values exist in a versioned artifact snapshot
-   - exact commands/config used for discovery are recorded
-3. Risk review:
-   - no violation of T+1, boundary, or volume-clock constraints
-   - no hidden hardcoded thresholds left outside config/artifact loading
-4. Approval:
-   - explicit user approval before editing `config.py`
+## Expected Output
+- A concise decision summary with assumptions.
+- A traceable list of actions taken and validation results.
+- Explicit risks, tradeoffs, and next-step recommendations.
 
-## Mandatory Workflow
-
-1. Create a proposal note in `audit/`, for example:
-   - `audit/vXXXX_config_promotion.md`
-2. Include:
-   - fields to promote
-   - current value, proposed value, rationale
-   - baseline and candidate metrics
-   - rollback plan
-3. Keep discovered values in artifacts first.
-4. After approval, patch `config.py` in one focused change.
-5. Update handover with:
-   - promoted fields
-   - evidence path
-   - affected modules
-
-## Prohibited
-
-- Writing to `config.py` during training/backtest runtime.
-- Promoting parameters without audit evidence and explicit approval.
+## Boundaries
+- Do not hardcode version-specific paths, one-off commands, or runtime-local artifacts in this top-level skill file.
+- Put implementation details in task-specific docs/scripts, not in the skill definition.

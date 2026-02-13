@@ -1,20 +1,36 @@
 ---
 name: omega_engineering
-description: Compatibility shim. Meta engineering guardrails have been merged into omega_development.
+description: Top-level design guidance for this skill domain.
 ---
 
-# OMEGA Engineering (Compatibility Shim)
+# Skill: omega_engineering
 
-## Status
-Deprecated as a standalone skill (merged on 2026-02-07).
+## Intent
+Top-level design guidance for this skill domain.
 
-Primary source now:
-- `.agent/skills/omega_development/SKILL.md`
+## When To Use
+- Use when the task clearly falls into this skill domain.
+- Prioritize this skill over ad-hoc instructions in the same domain.
+- Combine with other skills only when responsibilities are non-overlapping.
 
-Merged coverage includes:
-- Physics-first engineering constraints
-- Resumable long-job protocol
-- Immutable baseline and artifact-first inference
-- Plan -> Execute -> Audit -> Fix development loop
+## Core Principles
+- Keep the guidance abstract and reusable across versions, environments, and machines.
+- Prefer safe, incremental, and verifiable execution.
+- Separate policy decisions from implementation details.
+- Preserve consistency with project-wide governance and audit expectations.
 
-Keep this file only for backward compatibility with legacy triggers.
+## Standard Workflow
+1. Clarify task objective, constraints, and acceptance criteria.
+2. Assess current state and identify key risks.
+3. Choose the minimum viable approach for forward progress.
+4. Execute changes in small steps and validate outcomes.
+5. Summarize decisions, evidence, and follow-up actions.
+
+## Expected Output
+- A concise decision summary with assumptions.
+- A traceable list of actions taken and validation results.
+- Explicit risks, tradeoffs, and next-step recommendations.
+
+## Boundaries
+- Do not hardcode version-specific paths, one-off commands, or runtime-local artifacts in this top-level skill file.
+- Put implementation details in task-specific docs/scripts, not in the skill definition.

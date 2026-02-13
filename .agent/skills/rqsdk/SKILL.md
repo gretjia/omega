@@ -1,59 +1,36 @@
 ---
 name: rqsdk
-description: Utility for interacting with RiceQuant SDK (RQSDK) and RQData.
+description: Top-level design guidance for this skill domain.
 ---
 
-# RQSDK Skill
+# Skill: rqsdk
 
-## Overview
-This skill provides instructions and patterns for using the RiceQuant SDK (RQSDK) and RQData Python API within the OMEGA project.
+## Intent
+Top-level design guidance for this skill domain.
 
-## Scope
-- Use this skill for RiceQuant-side data acquisition/validation workflows.
-- For QMT/XTQuant syncing, use `qmtsdk`.
-- This skill now includes the RQ-related part of legacy `data_download`.
+## When To Use
+- Use when the task clearly falls into this skill domain.
+- Prioritize this skill over ad-hoc instructions in the same domain.
+- Combine with other skills only when responsibilities are non-overlapping.
 
-## Initialization
-In the `omega` Conda environment, `rqdatac` or `rqsdk` can be used. Always ensure the license is configured.
+## Core Principles
+- Keep the guidance abstract and reusable across versions, environments, and machines.
+- Prefer safe, incremental, and verifiable execution.
+- Separate policy decisions from implementation details.
+- Preserve consistency with project-wide governance and audit expectations.
 
-```python
-import rqdatac
-# Ensure initialization if required by the environment
-# rqdatac.init() 
-```
+## Standard Workflow
+1. Clarify task objective, constraints, and acceptance criteria.
+2. Assess current state and identify key risks.
+3. Choose the minimum viable approach for forward progress.
+4. Execute changes in small steps and validate outcomes.
+5. Summarize decisions, evidence, and follow-up actions.
 
-## Data Retrieval Patterns
+## Expected Output
+- A concise decision summary with assumptions.
+- A traceable list of actions taken and validation results.
+- Explicit risks, tradeoffs, and next-step recommendations.
 
-### Get Real-time Price
-```python
-import rqdatac
-price = rqdatac.current_snapshot('000001.SZ').last
-```
-
-### Get Historical Daily Bars
-```python
-import rqdatac
-df = rqdatac.get_price('000001.SZ', start_date='20230101', end_date='20231231', frequency='1d')
-```
-
-### Get Tick Data
-```python
-import rqdatac
-ticks = rqdatac.get_ticks('000001.SZ', start_dt='2023-01-01', end_dt='2023-01-02')
-```
-
-## Download/Materialization Practice
-
-When materializing data for OMEGA pipelines:
-1. Query with `rqdatac` / `rqsdk`.
-2. Save outputs under project-relative `./data/...`.
-3. Record date window, symbol universe, and command in audit/handover notes.
-
-## Documentation Lookup
-Primary index:
-- `.agent/knowledge/ricequant-doc-index.md`
-
-Compatibility fallback:
-- `.claude/knowledge/ricequant-doc-index.md`
-
-Use the index to find the correct deep-link for specific API needs (Stocks, Futures, Factors, etc.).
+## Boundaries
+- Do not hardcode version-specific paths, one-off commands, or runtime-local artifacts in this top-level skill file.
+- Put implementation details in task-specific docs/scripts, not in the skill definition.

@@ -1,29 +1,36 @@
 ---
 name: physics
-description: Realizability checks for OMEGA strategies: settlement constraints, boundary conditions, and volume-clock consistency.
+description: Top-level design guidance for this skill domain.
 ---
 
-# Skill: Physics Engine (Realizability)
+# Skill: physics
 
-## Description
-Ensures all strategies and trades obey market physics and exchange constraints.
+## Intent
+Top-level design guidance for this skill domain.
 
-## Capabilities
+## When To Use
+- Use when the task clearly falls into this skill domain.
+- Prioritize this skill over ad-hoc instructions in the same domain.
+- Combine with other skills only when responsibilities are non-overlapping.
 
-### 1. Settlement constraints
-- Check T+1 explicitly: `sellable_volume <= yesterday_holdings`.
-- Reject physically impossible plans (`trade.sell_amount > sellable_volume`).
-- Treat T+1 as hard constraint (per Constitution Article IV), not a tunable heuristic.
+## Core Principles
+- Keep the guidance abstract and reusable across versions, environments, and machines.
+- Prefer safe, incremental, and verifiable execution.
+- Separate policy decisions from implementation details.
+- Preserve consistency with project-wide governance and audit expectations.
 
-### 2. Boundary conditions
-- Validate limit-up/limit-down proximity before execution.
-- If boundary state is active, disable assumptions of continuous liquidity.
+## Standard Workflow
+1. Clarify task objective, constraints, and acceptance criteria.
+2. Assess current state and identify key risks.
+3. Choose the minimum viable approach for forward progress.
+4. Execute changes in small steps and validate outcomes.
+5. Summarize decisions, evidence, and follow-up actions.
 
-### 3. Volume clock consistency
-- Ensure SRL and impact logic run in volume-clock-consistent representation.
-- Reject logic that infers impact only from wall-clock granularity.
+## Expected Output
+- A concise decision summary with assumptions.
+- A traceable list of actions taken and validation results.
+- Explicit risks, tradeoffs, and next-step recommendations.
 
-## Verification protocol
-- [ ] No selling beyond settleable inventory.
-- [ ] No infinite-liquidity assumption at boundary prices.
-- [ ] Volume-clock assumptions are consistent end-to-end.
+## Boundaries
+- Do not hardcode version-specific paths, one-off commands, or runtime-local artifacts in this top-level skill file.
+- Put implementation details in task-specific docs/scripts, not in the skill definition.

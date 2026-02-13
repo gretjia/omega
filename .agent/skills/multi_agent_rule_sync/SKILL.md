@@ -1,34 +1,36 @@
 ---
 name: multi_agent_rule_sync
-description: Keep Codex, Gemini, Trae, and Cursor rules synchronized from a single source of truth.
+description: Top-level design guidance for this skill domain.
 ---
 
-# Multi-Agent Rule Sync
+# Skill: multi_agent_rule_sync
 
-Use this skill when changing cross-agent rules, core path definitions, or governance principles.
+## Intent
+Top-level design guidance for this skill domain.
 
-## Single Source of Truth
+## When To Use
+- Use when the task clearly falls into this skill domain.
+- Prioritize this skill over ad-hoc instructions in the same domain.
+- Combine with other skills only when responsibilities are non-overlapping.
 
-- Source: `.agent/principles.yaml`
-- Generated targets:
-  - `.codex/rules.md`
-  - `.gemini/context.md`
-  - `.trae/instruction.md`
-  - `.cursorrules`
+## Core Principles
+- Keep the guidance abstract and reusable across versions, environments, and machines.
+- Prefer safe, incremental, and verifiable execution.
+- Separate policy decisions from implementation details.
+- Preserve consistency with project-wide governance and audit expectations.
 
-Do not manually edit generated targets unless there is an emergency hotfix.
+## Standard Workflow
+1. Clarify task objective, constraints, and acceptance criteria.
+2. Assess current state and identify key risks.
+3. Choose the minimum viable approach for forward progress.
+4. Execute changes in small steps and validate outcomes.
+5. Summarize decisions, evidence, and follow-up actions.
 
-## Mandatory Workflow
+## Expected Output
+- A concise decision summary with assumptions.
+- A traceable list of actions taken and validation results.
+- Explicit risks, tradeoffs, and next-step recommendations.
 
-1. Edit only `.agent/principles.yaml`.
-2. Sync:
-   - `python3 tools/sync_agent_rules.py`
-3. Validate:
-   - `python3 tools/sync_agent_rules.py --check`
-4. Confirm targets contain the auto-generated header and no drift remains.
-5. Record changes in handover/audit notes when behavior changes.
-
-## Failure Handling
-
-- If sync fails due permission errors on hidden files, rerun the same command with elevated permission.
-- If target format is changed, update `tools/sync_agent_rules.py` and re-sync immediately.
+## Boundaries
+- Do not hardcode version-specific paths, one-off commands, or runtime-local artifacts in this top-level skill file.
+- Put implementation details in task-specific docs/scripts, not in the skill definition.

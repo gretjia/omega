@@ -1,44 +1,36 @@
 ---
 name: hardcode_guard
-description: Prevent hardcoded strategy thresholds in production paths and enforce config/artifact-driven parameterization.
+description: Top-level design guidance for this skill domain.
 ---
 
-# Hardcode Guard
+# Skill: hardcode_guard
 
-Use this skill whenever code changes may introduce numeric thresholds, gates, stops, scaling factors, or decision cutoffs.
+## Intent
+Top-level design guidance for this skill domain.
 
-## Policy
+## When To Use
+- Use when the task clearly falls into this skill domain.
+- Prioritize this skill over ad-hoc instructions in the same domain.
+- Combine with other skills only when responsibilities are non-overlapping.
 
-Forbidden in production paths (`omega_v3_core/*`, active adapters, active strategy logic):
-- Direct hardcoded trading thresholds such as `x > 0.5`, fixed stop-loss/take-profit, static trigger floors.
+## Core Principles
+- Keep the guidance abstract and reusable across versions, environments, and machines.
+- Prefer safe, incremental, and verifiable execution.
+- Separate policy decisions from implementation details.
+- Preserve consistency with project-wide governance and audit expectations.
 
-Required:
-- Put tunables in `config.py` dataclasses.
-- Or load audited values from frozen artifacts/snapshots.
+## Standard Workflow
+1. Clarify task objective, constraints, and acceptance criteria.
+2. Assess current state and identify key risks.
+3. Choose the minimum viable approach for forward progress.
+4. Execute changes in small steps and validate outcomes.
+5. Summarize decisions, evidence, and follow-up actions.
 
-Allowed exceptions:
-- Numerical stability constants (`1e-12`, denominator floors) with explicit naming and comments.
-- Exchange constraints (for example T+1 and limit-up/down) when they are physical rules, not model tuning.
-- Unit-test fixtures in test-only files.
+## Expected Output
+- A concise decision summary with assumptions.
+- A traceable list of actions taken and validation results.
+- Explicit risks, tradeoffs, and next-step recommendations.
 
-## Mandatory Workflow
-
-1. Detect literals in decision logic.
-2. Promote tunables into config/artifact fields.
-3. Thread those fields through function boundaries.
-4. For train/test-discovered promotions into `config.py`:
-   - require audit evidence
-   - require versioned artifact snapshot
-   - require explicit approval before merge
-
-## Quick Scan
-
-```bash
-grep -R -nE "(threshold|floor|gate|ratio|stop|take|alpha|beta)[[:space:]]*=[[:space:]]*-?[0-9]+(\\.[0-9]+)?" omega_v3_core rq tools
-```
-
-```bash
-grep -R -nE "[<>]=?[[:space:]]*-?[0-9]+(\\.[0-9]+)?" omega_v3_core rq
-```
-
-Review hits manually to separate legitimate constants from policy violations.
+## Boundaries
+- Do not hardcode version-specific paths, one-off commands, or runtime-local artifacts in this top-level skill file.
+- Put implementation details in task-specific docs/scripts, not in the skill definition.
