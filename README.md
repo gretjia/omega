@@ -106,6 +106,16 @@ python parallel_trainer/run_parallel_v31.py --stage-dir D:/Omega_train_stage
 python parallel_trainer/run_parallel_backtest_v31.py
 ```
 
+### 5.1 命名治理与归档入口（2026-02-13）
+- 命名治理方案：`audit/filesystem_naming_archive_plan_2026-02-13.md`
+- v5 运行期未使用文件归档索引：`audit/v5_runtime/windows/ARCHIVE_INDEX.md`
+- 归档根路径：`archive/legacy/2026-02-13/v5_runtime_unused/`
+
+说明：
+- 未来活跃文件命名不再包含版本号（如 `v31` / `v5`）。
+- 版本信息改放在元数据、审计文档与 `archive/legacy/...` 路径层级。
+- 当前 `run_parallel_v31.py` / `run_parallel_backtest_v31.py` 仍保留为兼容入口，后续按治理方案迁移为无版本入口。
+
 ### 6. Mac 主控 SSH（Windows_1）
 已验证可从 Mac 无交互连接 Windows_1（仅连通 smoke，不触发 framing/train/backtest）。
 
@@ -134,34 +144,34 @@ ssh windows1-w1 "hostname && whoami"
 
 说明：当前 Mac 存在双网卡同网段场景，需绑定源地址（`BindAddress 192.168.3.49`）以避免偶发 `No route to host`。
 
-### 7. Windows_1 后台训练与实时监控（v5）
-当前已固化 detached 训练脚本：`audit/v5_runtime/windows/train/run_train_detached.ps1`。
+### 7. Windows_1 后台全链路（训练+回测）执行与监控（v5）
+当前 detached 主入口：`audit/v5_runtime/windows/run_full_noresume_detached.ps1`。
 
 1) 在 Mac 侧同步脚本到 Windows_1：
 ```bash
-scp audit/v5_runtime/windows/train/run_train_detached.ps1 windows1-w1:/C:/Omega_vNext/audit/v5_runtime/windows/train/run_train_detached.ps1
+scp audit/v5_runtime/windows/run_full_noresume_detached.ps1 windows1-w1:/C:/Omega_vNext/audit/v5_runtime/windows/run_full_noresume_detached.ps1
 ```
 
 2) 首次创建计划任务（只需一次）：
 ```bash
-ssh windows1-w1 "cmd /c schtasks /Create /TN OmegaTrainDetached /SC ONCE /ST 00:00 /TR \"powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\\Omega_vNext\\audit\\v5_runtime\\windows\\train\\run_train_detached.ps1\" /RL HIGHEST /F"
+ssh windows1-w1 "cmd /c schtasks /Create /TN OmegaFullNoResumeDetached /SC ONCE /ST 00:00 /TR \"powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\\Omega_vNext\\audit\\v5_runtime\\windows\\run_full_noresume_detached.ps1\" /RL HIGHEST /F"
 ```
 
-3) 每次启动训练（脱离 SSH 会话）：
+3) 每次启动全链路（脱离 SSH 会话）：
 ```bash
-ssh windows1-w1 "cmd /c schtasks /Run /TN OmegaTrainDetached"
+ssh windows1-w1 "cmd /c schtasks /Run /TN OmegaFullNoResumeDetached"
 ```
 
-4) 监控进度（Mac 侧随时执行）：
+4) 监控训练/回测进度（Mac 侧随时执行）：
 ```bash
 ssh windows1-w1 "powershell -NoProfile -Command \"Get-Content 'C:\\Omega_vNext\\audit\\v5_runtime\\windows\\train\\train_status.json'\""
-ssh windows1-w1 "powershell -NoProfile -Command \"Get-Content 'C:\\Omega_vNext\\audit\\v5_runtime\\windows\\train\\train.log' -Tail 40\""
-ssh windows1-w1 "powershell -NoProfile -Command \"Get-Process -Name python -ErrorAction SilentlyContinue | Select-Object Id,StartTime,CPU,WorkingSet64 | Format-Table -AutoSize\""
+ssh windows1-w1 "powershell -NoProfile -Command \"Get-Content 'C:\\Omega_vNext\\audit\\v5_runtime\\windows\\backtest\\backtest_status.json'\""
+ssh windows1-w1 "powershell -NoProfile -Command \"Get-Content 'C:\\Omega_vNext\\audit\\v5_runtime\\windows\\pipeline\\full_noresume.log' -Tail 60\""
 ```
 
 5) 快速判定是否异常退出：
 ```bash
-ssh windows1-w1 "powershell -NoProfile -Command \"if (Test-Path 'C:\\Omega_vNext\\audit\\v5_runtime\\windows\\train\\train_exit_code.txt') { Get-Content 'C:\\Omega_vNext\\audit\\v5_runtime\\windows\\train\\train_exit_code.txt' } else { 'RUNNING' }\""
+ssh windows1-w1 "powershell -NoProfile -Command \"if (Test-Path 'C:\\Omega_vNext\\audit\\v5_runtime\\windows\\pipeline\\full_noresume_exit_code.txt') { Get-Content 'C:\\Omega_vNext\\audit\\v5_runtime\\windows\\pipeline\\full_noresume_exit_code.txt' } else { 'RUNNING' }\""
 ```
 
 6) 已验证的稳定参数（CPU 训练）：
@@ -173,32 +183,7 @@ ssh windows1-w1 "powershell -NoProfile -Command \"if (Test-Path 'C:\\Omega_vNext
 - `stage_copy_workers=4`
 - 断点续跑开启（不使用 `--no-resume`）
 
-### 8. Windows_1 后台回测与实时监控（v5）
-当前已固化 detached 回测脚本：`audit/v5_runtime/windows/backtest/run_backtest_detached.ps1`。
-
-1) 在 Mac 侧同步脚本到 Windows_1：
-```bash
-scp audit/v5_runtime/windows/backtest/run_backtest_detached.ps1 windows1-w1:/C:/Omega_vNext/audit/v5_runtime/windows/backtest/run_backtest_detached.ps1
-```
-
-2) 首次创建计划任务（只需一次）：
-```bash
-ssh windows1-w1 "cmd /c schtasks /Create /TN OmegaBacktestDetached /SC ONCE /ST 00:00 /TR \"powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\\Omega_vNext\\audit\\v5_runtime\\windows\\backtest\\run_backtest_detached.ps1\" /RL HIGHEST /F"
-```
-
-3) 每次启动回测（脱离 SSH 会话）：
-```bash
-ssh windows1-w1 "cmd /c schtasks /Run /TN OmegaBacktestDetached"
-```
-
-4) 监控回测进度：
-```bash
-ssh windows1-w1 "powershell -NoProfile -Command \"Get-Content 'C:\\Omega_vNext\\audit\\v5_runtime\\windows\\backtest\\backtest_status.json'\""
-ssh windows1-w1 "powershell -NoProfile -Command \"Get-Content 'C:\\Omega_vNext\\audit\\v5_runtime\\windows\\backtest\\backtest.log' -Tail 60\""
-ssh windows1-w1 "powershell -NoProfile -Command \"if (Test-Path 'C:\\Omega_vNext\\audit\\v5_runtime\\windows\\backtest\\backtest_exit_code.txt') { Get-Content 'C:\\Omega_vNext\\audit\\v5_runtime\\windows\\backtest\\backtest_exit_code.txt' } else { 'RUNNING' }\""
-```
-
-5) 审计门控说明：
+### 8. 审计门控说明（回测阶段）
 - 默认 `fail_on_audit_failed=true`。
 - 若最终 `FINAL AUDIT STATUS: FAILED`，进程会以 `exit code 1` 退出（属于策略审计失败，不是进程崩溃）。
 - 若希望回测始终产出报告但不因审计失败返回非零，可在脚本参数中加入 `--allow-audit-failed`。
@@ -285,6 +270,8 @@ powershell -ExecutionPolicy Bypass -File tools\git_sync\windows_update_from_hub.
 ## 关键文档 (Documentation)
 
 *   **[audit/v5_explain.md](audit/v5_explain.md)**: v5.0 的详细解释文档（理论背景与代码实现）。
+*   **[audit/filesystem_naming_archive_plan_2026-02-13.md](audit/filesystem_naming_archive_plan_2026-02-13.md)**: 文件命名去版本号与归档迁移方案（分阶段执行）。
+*   **[audit/v5_runtime/windows/ARCHIVE_INDEX.md](audit/v5_runtime/windows/ARCHIVE_INDEX.md)**: 本次 v5 未使用文件归档映射（原路径 -> archive 路径）。
 *   **[audit/OMEGA_NextGen_Architecture_Plan.md](audit/OMEGA_NextGen_Architecture_Plan.md)**: 未来架构演进路线图。
 *   **[audit/v40_storage_estimation_2020_2026.md](audit/v40_storage_estimation_2020_2026.md)**: 存储规划指南。
 *   **[docs/git_multi_machine_hub.md](docs/git_multi_machine_hub.md)**: Mac + Windows1 + Windows2 代码同步/发布规范（避免手工复制粘贴）。
