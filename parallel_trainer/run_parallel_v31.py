@@ -1,4 +1,4 @@
-"""
+﻿"""
 run_parallel_v31.py
 
 High-performance Parallel Trainer for OMEGA v5.0 (Holographic Damper).
@@ -38,7 +38,10 @@ from sklearn.preprocessing import StandardScaler
 sys.path.append(str(Path(__file__).parent.parent))
 
 from config import load_l2_pipeline_config, L2PipelineConfig
-from omega_core.trainer import OmegaTrainerV3
+try:
+    from omega_core.trainer_v51 import OmegaTrainerV3
+except ImportError:
+    from omega_core.trainer import OmegaTrainerV3
 from tools.multi_dir_loader import discover_l2_dirs
 
 
@@ -217,7 +220,7 @@ class ParallelTrainerV31:
         self.max_worker_errors = max(0, int(max_worker_errors))
         self.status_json = status_json
         self.stage_local = bool(stage_local)
-        self.stage_dir = stage_dir if stage_dir is not None else Path("C:/Omega_train_stage")
+        self.stage_dir = stage_dir if stage_dir is not None else Path("D:/Omega_train_stage")
         self.stage_chunk_files = max(1, int(stage_chunk_files))
         self.stage_copy_workers = max(1, int(stage_copy_workers))
         self.cleanup_stage = bool(cleanup_stage)
@@ -677,6 +680,10 @@ class ParallelTrainerV31:
             self.total_rows += rows_in_buf
             self.save_checkpoint()
 
+        # v5.1 C6: always flush a final checkpoint if tail updates are newer than last checkpoint.
+        if self.total_rows > self.last_checkpoint_rows:
+            self.save_checkpoint()
+
         hard_errors = files_schema_errors + files_worker_errors
         if hard_errors > self.max_worker_errors:
             msg = (
@@ -731,7 +738,7 @@ def parse_args() -> argparse.Namespace:
     stage_group = p.add_mutually_exclusive_group()
     stage_group.add_argument("--stage-local", dest="stage_local", action="store_true")
     stage_group.add_argument("--no-stage-local", dest="stage_local", action="store_false")
-    p.add_argument("--stage-dir", type=str, default="C:/Omega_train_stage")
+    p.add_argument("--stage-dir", type=str, default="D:/Omega_train_stage")
     p.add_argument("--stage-chunk-files", type=int, default=24)
     p.add_argument("--stage-copy-workers", type=int, default=1)
     p.add_argument("--no-cleanup-stage", action="store_true")
@@ -764,3 +771,4 @@ if __name__ == "__main__":
     if not args.no_resume:
         trainer.load_latest_checkpoint()
     trainer.train()
+

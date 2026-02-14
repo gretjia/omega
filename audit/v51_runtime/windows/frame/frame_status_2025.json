@@ -1,0 +1,33 @@
+{
+  "stage": "frame",
+  "timestamp": "2026-02-13 11:10:11",
+  "status": "running",
+  "archives_total": 243,
+  "archives_done_historical": 0,
+  "archives_run_now": 243,
+  "archives_completed_in_run": 15,
+  "archives_remaining_in_run": 228,
+  "parquet_files_written_in_run": 80269,
+  "timing_totals": {
+    "copy_sec": 97.28426051139832,
+    "extract_sec": 3415.8113141059875,
+    "kernel_sec": 8220.028034448624,
+    "write_sec": 566.0936625003815,
+    "io_wait_sec": 5101.272624969482
+  },
+  "csv_counts": {
+    "csv_total": 264666,
+    "csv_quote": 88222
+  },
+  "worker_error_count": 0,
+  "archives_per_hour": 26.947390822194677,
+  "workers": 22,
+  "output_dir": "D:\\Omega_frames\\v50\\output",
+  "state_file": "D:\\Omega_frames\\v50\\output\\_audit_state.jsonl",
+  "copy_to_local": true,
+  "seven_zip_threads": 1,
+  "io_slots": 4,
+  "extract_csv_only": true,
+  "stage_dir": "C:\\Omega_level2_stage",
+  "cleanup_stage": true
+}

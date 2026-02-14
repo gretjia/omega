@@ -52,9 +52,9 @@ class HardwareProfile:
         return cls(
             profile_name="32Core_Hybrid_Storage",
             storage=StorageConfig(
-                source_root="F:/Data/Level2_Archives", # Placeholder for USB4
-                stage_root="D:/Omega_stage",           # Internal NVMe
-                output_root="D:/Omega_vNext/data/level2_frames_v40_win"
+                source_root="E:/data/level2",                 # USB4 external archive source
+                stage_root="D:/Omega_frames/v50/stage",       # High-IOPS NVMe staging
+                output_root="D:/Omega_frames/v50/output"      # Framing output
             ),
             compute=ComputeConfig(
                 framing_workers=22, # Tuned for C: limit, can go higher on D:

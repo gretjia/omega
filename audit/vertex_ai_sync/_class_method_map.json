@@ -1,0 +1,145 @@
+{
+  "omega_core/trainer.cpython-39.pyc": {
+    "classes": {
+      "OmegaTrainerV3": [
+        "__init__",
+        "_signed_log1p",
+        "_winsorize",
+        "_prepare_frames",
+        "train",
+        "save"
+      ]
+    },
+    "top_level_funcs": [
+      "check_memory_safe",
+      "evaluate_frames",
+      "evaluate_dod"
+    ]
+  },
+  "omega_core/trainer_v51.cpython-39.pyc": {
+    "classes": {
+      "OmegaTrainerV3": [
+        "__init__",
+        "_signed_log1p",
+        "_winsorize",
+        "_prepare_frames",
+        "train",
+        "save"
+      ]
+    },
+    "top_level_funcs": [
+      "check_memory_safe",
+      "_safe_corr",
+      "_vector_alignment",
+      "_collect_traces",
+      "evaluate_frames",
+      "evaluate_dod",
+      "run_l2_audit",
+      "write_audit_report"
+    ]
+  },
+  "omega_core/physics_auditor.cpython-39.pyc": {
+    "classes": {
+      "OmegaPhysicsAuditor": [
+        "__init__",
+        "_rng",
+        "_load_debug_frames",
+        "run_continuous_calibration",
+        "derive_market_priors",
+        "run_renormalization_scan",
+        "_generate_epistemic_report",
+        "_export_config",
+        "_corr"
+      ]
+    },
+    "top_level_funcs": []
+  },
+  "parallel_trainer/parallel_trainer.cpython-39.pyc": {
+    "classes": {
+      "TrainedArtifacts": [],
+      "ParallelOmegaTrainer": [
+        "__init__",
+        "_iter_stage_files",
+        "calibrate_thresholds",
+        "_build_model_and_scaler",
+        "_probe_feature_space",
+        "_partial_fit",
+        "fit",
+        "save_artifacts"
+      ]
+    },
+    "top_level_funcs": [
+      "_task_build_calibration",
+      "_task_build_samples",
+      "_ordered_prefetch_map",
+      "_CheckpointProgress",
+      "_atomic_write_pickle",
+      "_load_checkpoint"
+    ]
+  },
+  "parallel_trainer/run_parallel_v31.cpython-39.pyc": {
+    "classes": {
+      "ParallelTrainerV31": [
+        "__init__",
+        "_emit_status",
+        "load_latest_checkpoint",
+        "save_checkpoint",
+        "_copy_to_stage",
+        "_stage_chunk",
+        "_cleanup_chunk",
+        "_iter_manifest_task_chunks",
+        "train"
+      ]
+    },
+    "top_level_funcs": [
+      "_sanitize_for_json",
+      "_write_json_atomic",
+      "_memory_guard",
+      "worker_init",
+      "process_file_v31",
+      "parse_args"
+    ]
+  },
+  "parallel_trainer/run_parallel_backtest_v31.cpython-39.pyc": {
+    "classes": {
+      "ParallelBacktester": [
+        "__init__",
+        "_emit_status",
+        "_load_state",
+        "_save_state",
+        "_copy_to_stage",
+        "_stage_chunk",
+        "_cleanup_chunk",
+        "_iter_file_list_chunks",
+        "run"
+      ]
+    },
+    "top_level_funcs": [
+      "_sanitize_for_json",
+      "_write_json_atomic",
+      "_memory_guard",
+      "worker_init",
+      "get_worker_policy",
+      "process_backtest_file",
+      "parse_args",
+      "<lambda>",
+      "<listcomp>",
+      "<listcomp>"
+    ]
+  },
+  "pipeline/engine/framer.cpython-39.pyc": {
+    "classes": {
+      "Framer": [
+        "__init__",
+        "run",
+        "_scan_archives",
+        "_resolve_7z_exe",
+        "_process_archive"
+      ]
+    },
+    "top_level_funcs": [
+      "_process_single_stock",
+      "_process_stock_chunk"
+    ]
+  }
+}

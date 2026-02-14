@@ -201,12 +201,14 @@ def _apply_recursive_physics(
             (
                 (pl.col("is_energy_active") == True)
                 & (pl.col("epiplexity") > peace_threshold) 
-                & (pl.col("srl_resid") < -float(sig.srl_resid_sigma_mult) * pl.col("sigma_eff"))
-                & (pl.col("topo_area") > float(sig.topo_area_min_abs))
+                # v5.1 P0: symmetric triggering for both overbought/oversold excursions
+                & (pl.col("srl_resid").abs() > float(sig.srl_resid_sigma_mult) * pl.col("sigma_eff"))
+                & (pl.col("topo_area").abs() > float(sig.topo_area_min_abs))
                 & (pl.col("topo_energy") > pl.col("sigma_eff") * topo_energy_sigma_mult)
                 & (pl.col("spoof_ratio") < spoofing_ratio_max)
             ).alias("is_signal"),
-            pl.col("topo_area").sign().alias("direction"),
+            # v5.1 P0: damper restitution direction, opposite to SRL residual
+            (-pl.col("srl_resid").sign()).alias("direction"),
         ]
     )
     return res_df

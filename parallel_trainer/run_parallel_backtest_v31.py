@@ -1,4 +1,4 @@
-"""
+﻿"""
 run_parallel_backtest_v31.py
 
 High-performance Parallel Backtest Driver for OMEGA v5.0 (Holographic Damper).
@@ -34,7 +34,10 @@ import shutil
 sys.path.append(str(Path(__file__).parent.parent))
 
 from config import L2PipelineConfig, load_l2_pipeline_config
-from omega_core.trainer import OmegaTrainerV3, evaluate_frames, evaluate_dod
+try:
+    from omega_core.trainer_v51 import OmegaTrainerV3, evaluate_frames, evaluate_dod
+except ImportError:
+    from omega_core.trainer import OmegaTrainerV3, evaluate_frames, evaluate_dod
 
 
 def _sanitize_for_json(value):
@@ -260,7 +263,7 @@ class ParallelBacktester:
         self.fail_on_audit_failed = bool(fail_on_audit_failed)
         self.ret_clip_abs_override = ret_clip_abs_override
         self.stage_local = bool(stage_local)
-        self.stage_dir = stage_dir if stage_dir is not None else Path("C:/Omega_backtest_stage")
+        self.stage_dir = stage_dir if stage_dir is not None else Path("D:/Omega_backtest_stage")
         self.stage_chunk_files = max(1, int(stage_chunk_files))
         self.stage_copy_workers = max(1, int(stage_copy_workers))
         self.cleanup_stage = bool(cleanup_stage)
@@ -685,7 +688,13 @@ class ParallelBacktester:
         print("\n" + "="*50, flush=True)
         print("OMEGA v3.1 PARALLEL BACKTEST REPORT", flush=True)
         print("="*50, flush=True)
-        print(f"Data Sources: {[str(d) for d in self.data_roots]}", flush=True)
+        if self.file_list_path is not None:
+            print("Data Source Mode: manifest(file-list)", flush=True)
+            print(f"Manifest Path: {self.file_list_path}", flush=True)
+            print(f"Manifest Selected Files: {self.total_tasks}", flush=True)
+            print(f"Configured Data Roots: {[str(d) for d in self.data_roots]}", flush=True)
+        else:
+            print(f"Data Sources: {[str(d) for d in self.data_roots]}", flush=True)
         print(f"Total Rows  : {self.total_rows:,}", flush=True)
         print(f"Total Trades: {self.total_trades:,}", flush=True)
         print(f"Total PnL   : {self.total_pnl:.6f} (Unit: Return k)", flush=True)
@@ -751,7 +760,7 @@ def parse_args() -> argparse.Namespace:
     stage_group = p.add_mutually_exclusive_group()
     stage_group.add_argument("--stage-local", dest="stage_local", action="store_true")
     stage_group.add_argument("--no-stage-local", dest="stage_local", action="store_false")
-    p.add_argument("--stage-dir", type=str, default="C:/Omega_backtest_stage")
+    p.add_argument("--stage-dir", type=str, default="D:/Omega_backtest_stage")
     p.add_argument("--stage-chunk-files", type=int, default=24)
     p.add_argument("--stage-copy-workers", type=int, default=1)
     p.add_argument("--no-cleanup-stage", action="store_true")
@@ -825,3 +834,4 @@ if __name__ == "__main__":
         except Exception:
             pass
         raise
+

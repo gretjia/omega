@@ -179,13 +179,34 @@ class OmegaPhysicsAuditor:
         null_std = float(np.std(null_vals)) + 1e-9
         snr = (real_mean - null_mean) / null_std
 
-        epi = df["epiplexity"].to_numpy()
-        resid = df["srl_resid"].abs().to_numpy()
-        ortho = self._corr(epi, resid)
+        epi = np.asarray(df["epiplexity"].to_numpy(), dtype=float)
+        srl_resid_raw = np.asarray(df["srl_resid"].to_numpy(), dtype=float)
+        ortho = self._corr(epi, np.abs(srl_resid_raw))
+
+        # v5.1 A1: Damper vector alignment under visible structure regimes.
+        vector_align = float("nan")
+        if "future_ret" in df.columns and epi.size > 0:
+            future_ret = np.asarray(df["future_ret"].to_numpy(), dtype=float)
+            finite_epi = epi[np.isfinite(epi)]
+            if finite_epi.size > 0:
+                epi_q = float(np.quantile(finite_epi, 0.8))
+                mask = (
+                    np.isfinite(epi)
+                    & np.isfinite(srl_resid_raw)
+                    & np.isfinite(future_ret)
+                    & (epi >= epi_q)
+                )
+                if np.any(mask):
+                    dir_sign = -np.sign(srl_resid_raw[mask])
+                    fwd_sign = np.sign(future_ret[mask])
+                    valid_signs = (dir_sign != 0.0) & (fwd_sign != 0.0)
+                    if np.any(valid_signs):
+                        vector_align = float(np.mean(dir_sign[valid_signs] == fwd_sign[valid_signs]))
 
         return {
             "Topo_SNR": float(snr),
             "Orthogonality": float(ortho),
+            "Vector_Alignment": float(vector_align),
             "FINAL_Y": float(final_y),
         }
 
@@ -198,7 +219,7 @@ class OmegaPhysicsAuditor:
                 "ANCHOR_Y": priors.get("ANCHOR_Y")
             },
             "METRICS": metrics,
-            "NOTE": "OMEGA v5.0 Auditor (Holographic Damper)"
+            "NOTE": "OMEGA v5.1 Auditor (Calibrated Damper)"
         }
         with (self.output_dir / "production_config.json").open("w") as f:
             json.dump(conf, f, indent=4)

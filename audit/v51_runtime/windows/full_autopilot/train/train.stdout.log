@@ -1,0 +1,110 @@
+[Plan] loading file list (stream mode): C:\Omega_vNext\audit\v51_runtime\windows\full_autopilot\manifests\train_files.txt
+[Start] Launching 6 workers...
+[Plan] file-list stream selected first chunk. scanned=16, selected=16
+[Stage] chunk=0, files=16, elapsed=0.4s, copy_workers=4, dir=D:\Omega_train_stage_v51_full\chunk_000000
+  Files: 10/16 | Rows(total): 0 | Rows(buf): 318,296 | Speed: 0.0 rows/s
+[Stage] chunk=1, files=16, elapsed=0.4s, copy_workers=4, dir=D:\Omega_train_stage_v51_full\chunk_000001
+  Files: 20/32 | Rows(total): 0 | Rows(buf): 638,886 | Speed: 0.0 rows/s
+  Rows: 778,087 | Speed: 4387.8 rows/s | Files: 24
+  Files: 30/32 | Rows(total): 778,087 | Rows(buf): 216,822 | Speed: 3685.7 rows/s
+[Stage] chunk=2, files=16, elapsed=0.4s, copy_workers=4, dir=D:\Omega_train_stage_v51_full\chunk_000002
+  Files: 40/48 | Rows(total): 778,087 | Rows(buf): 545,709 | Speed: 2757.0 rows/s
+  Rows: 1,555,761 | Speed: 4903.6 rows/s | Files: 47
+[Checkpoint] Saved checkpoint_rows_1555761.pkl (Rows: 1,555,761)
+[Stage] chunk=3, files=16, elapsed=0.4s, copy_workers=4, dir=D:\Omega_train_stage_v51_full\chunk_000003
+  Files: 50/64 | Rows(total): 1,555,761 | Rows(buf): 96,112 | Speed: 4391.5 rows/s
+  Files: 60/64 | Rows(total): 1,555,761 | Rows(buf): 433,183 | Speed: 3946.9 rows/s
+[Stage] chunk=4, files=16, elapsed=0.5s, copy_workers=4, dir=D:\Omega_train_stage_v51_full\chunk_000004
+  Files: 70/80 | Rows(total): 1,555,761 | Rows(buf): 754,518 | Speed: 3353.6 rows/s
+  Rows: 2,310,279 | Speed: 4974.6 rows/s | Files: 70
+  Files: 80/80 | Rows(total): 2,310,279 | Rows(buf): 321,575 | Speed: 4327.4 rows/s
+[Stage] chunk=5, files=16, elapsed=0.5s, copy_workers=4, dir=D:\Omega_train_stage_v51_full\chunk_000005
+  Files: 90/96 | Rows(total): 2,310,279 | Rows(buf): 635,144 | Speed: 3821.3 rows/s
+  Rows: 3,070,044 | Speed: 4813.9 rows/s | Files: 94
+[Checkpoint] Saved checkpoint_rows_3070044.pkl (Rows: 3,070,044)
+[Stage] chunk=6, files=16, elapsed=0.5s, copy_workers=4, dir=D:\Omega_train_stage_v51_full\chunk_000006
+  Files: 100/112 | Rows(total): 3,070,044 | Rows(buf): 194,918 | Speed: 4540.0 rows/s
+  Files: 110/112 | Rows(total): 3,070,044 | Rows(buf): 532,706 | Speed: 4127.7 rows/s
+[Stage] chunk=7, files=16, elapsed=0.5s, copy_workers=4, dir=D:\Omega_train_stage_v51_full\chunk_000007
+  Rows: 3,827,426 | Speed: 4888.5 rows/s | Files: 117
+  Files: 120/128 | Rows(total): 3,827,426 | Rows(buf): 90,541 | Speed: 4707.4 rows/s
+[Stage] chunk=8, files=16, elapsed=0.5s, copy_workers=4, dir=D:\Omega_train_stage_v51_full\chunk_000008
+  Files: 130/144 | Rows(total): 3,827,426 | Rows(buf): 391,172 | Speed: 4359.8 rows/s
+  Files: 140/144 | Rows(total): 3,827,426 | Rows(buf): 702,630 | Speed: 4179.9 rows/s
+  Rows: 4,591,400 | Speed: 4872.0 rows/s | Files: 142
+[Checkpoint] Saved checkpoint_rows_4591400.pkl (Rows: 4,591,400)
+[Stage] chunk=9, files=16, elapsed=0.5s, copy_workers=4, dir=D:\Omega_train_stage_v51_full\chunk_000009
+  Files: 150/160 | Rows(total): 4,591,400 | Rows(buf): 245,345 | Speed: 4688.6 rows/s
+  Files: 160/160 | Rows(total): 4,591,400 | Rows(buf): 565,953 | Speed: 4386.5 rows/s
+[Stage] chunk=10, files=16, elapsed=0.5s, copy_workers=4, dir=D:\Omega_train_stage_v51_full\chunk_000010
+  Rows: 5,371,691 | Speed: 4806.0 rows/s | Files: 167
+  Files: 170/176 | Rows(total): 5,371,691 | Rows(buf): 110,333 | Speed: 4792.4 rows/s
+[Stage] chunk=11, files=16, elapsed=0.5s, copy_workers=4, dir=D:\Omega_train_stage_v51_full\chunk_000011
+  Files: 180/192 | Rows(total): 5,371,691 | Rows(buf): 463,243 | Speed: 4490.8 rows/s
+  Rows: 6,149,452 | Speed: 4861.8 rows/s | Files: 189
+[Checkpoint] Saved checkpoint_rows_6149452.pkl (Rows: 6,149,452)
+  Files: 190/192 | Rows(total): 6,149,452 | Rows(buf): 32,535 | Speed: 4861.7 rows/s
+[Stage] chunk=12, files=16, elapsed=0.6s, copy_workers=4, dir=D:\Omega_train_stage_v51_full\chunk_000012
+  Files: 200/208 | Rows(total): 6,149,452 | Rows(buf): 383,979 | Speed: 4569.2 rows/s
+[Stage] chunk=13, files=16, elapsed=0.5s, copy_workers=4, dir=D:\Omega_train_stage_v51_full\chunk_000013
+  Files: 210/224 | Rows(total): 6,149,452 | Rows(buf): 722,218 | Speed: 4320.9 rows/s
+  Rows: 6,906,497 | Speed: 4850.0 rows/s | Files: 211
+  Files: 220/224 | Rows(total): 6,906,497 | Rows(buf): 319,381 | Speed: 4719.5 rows/s
+[Stage] chunk=14, files=16, elapsed=0.5s, copy_workers=4, dir=D:\Omega_train_stage_v51_full\chunk_000014
+  Files: 230/240 | Rows(total): 6,906,497 | Rows(buf): 682,186 | Speed: 4478.9 rows/s
+  Rows: 7,676,106 | Speed: 4869.7 rows/s | Files: 233
+[Checkpoint] Saved checkpoint_rows_7676106.pkl (Rows: 7,676,106)
+  Files: 240/240 | Rows(total): 7,676,106 | Rows(buf): 257,267 | Speed: 4760.5 rows/s
+[Stage] chunk=15, files=16, elapsed=0.6s, copy_workers=4, dir=D:\Omega_train_stage_v51_full\chunk_000015
+  Files: 250/256 | Rows(total): 7,676,106 | Rows(buf): 623,252 | Speed: 4534.9 rows/s
+  Rows: 8,449,988 | Speed: 4886.9 rows/s | Files: 254
+[Stage] chunk=16, files=16, elapsed=0.6s, copy_workers=4, dir=D:\Omega_train_stage_v51_full\chunk_000016
+  Files: 260/272 | Rows(total): 8,449,988 | Rows(buf): 234,651 | Speed: 4745.3 rows/s
+  Files: 270/272 | Rows(total): 8,449,988 | Rows(buf): 615,800 | Speed: 4560.4 rows/s
+[Stage] chunk=17, files=16, elapsed=0.7s, copy_workers=4, dir=D:\Omega_train_stage_v51_full\chunk_000017
+  Rows: 9,216,485 | Speed: 4843.4 rows/s | Files: 274
+[Checkpoint] Saved checkpoint_rows_9216485.pkl (Rows: 9,216,485)
+  Files: 280/288 | Rows(total): 9,216,485 | Rows(buf): 249,837 | Speed: 4743.8 rows/s
+[Stage] chunk=18, files=16, elapsed=0.6s, copy_workers=4, dir=D:\Omega_train_stage_v51_full\chunk_000018
+  Files: 290/304 | Rows(total): 9,216,485 | Rows(buf): 631,536 | Speed: 4546.8 rows/s
+  Rows: 10,002,817 | Speed: 4927.4 rows/s | Files: 294
+  Files: 300/304 | Rows(total): 10,002,817 | Rows(buf): 235,465 | Speed: 4832.2 rows/s
+[Stage] chunk=19, files=16, elapsed=0.6s, copy_workers=4, dir=D:\Omega_train_stage_v51_full\chunk_000019
+  Files: 310/320 | Rows(total): 10,002,817 | Rows(buf): 596,083 | Speed: 4654.5 rows/s
+  Rows: 10,769,277 | Speed: 4923.4 rows/s | Files: 315
+[Checkpoint] Saved checkpoint_rows_10769277.pkl (Rows: 10,769,277)
+  Files: 320/320 | Rows(total): 10,769,277 | Rows(buf): 180,359 | Speed: 4837.8 rows/s
+[Stage] chunk=20, files=16, elapsed=0.6s, copy_workers=4, dir=D:\Omega_train_stage_v51_full\chunk_000020
+  Files: 330/336 | Rows(total): 10,769,277 | Rows(buf): 531,043 | Speed: 4674.1 rows/s
+  Rows: 11,524,226 | Speed: 4920.5 rows/s | Files: 336
+[Stage] chunk=21, files=16, elapsed=0.5s, copy_workers=4, dir=D:\Omega_train_stage_v51_full\chunk_000021
+  Files: 340/352 | Rows(total): 11,524,226 | Rows(buf): 137,213 | Speed: 4841.9 rows/s
+  Files: 350/352 | Rows(total): 11,524,226 | Rows(buf): 492,238 | Speed: 4694.0 rows/s
+[Stage] chunk=22, files=16, elapsed=0.5s, copy_workers=4, dir=D:\Omega_train_stage_v51_full\chunk_000022
+  Rows: 12,315,408 | Speed: 4917.8 rows/s | Files: 358
+[Checkpoint] Saved checkpoint_rows_12315408.pkl (Rows: 12,315,408)
+  Files: 360/368 | Rows(total): 12,315,408 | Rows(buf): 66,329 | Speed: 4860.9 rows/s
+[Stage] chunk=23, files=16, elapsed=0.5s, copy_workers=4, dir=D:\Omega_train_stage_v51_full\chunk_000023
+  Files: 370/384 | Rows(total): 12,315,408 | Rows(buf): 418,541 | Speed: 4714.4 rows/s
+  Files: 380/384 | Rows(total): 12,315,408 | Rows(buf): 759,759 | Speed: 4643.4 rows/s
+  Rows: 13,075,167 | Speed: 4928.9 rows/s | Files: 380
+[Stage] chunk=24, files=16, elapsed=0.5s, copy_workers=4, dir=D:\Omega_train_stage_v51_full\chunk_000024
+  Files: 390/400 | Rows(total): 13,075,167 | Rows(buf): 344,147 | Speed: 4780.6 rows/s
+  Files: 400/400 | Rows(total): 13,075,167 | Rows(buf): 670,686 | Speed: 4672.5 rows/s
+[Stage] chunk=25, files=16, elapsed=0.5s, copy_workers=4, dir=D:\Omega_train_stage_v51_full\chunk_000025
+  Rows: 13,842,608 | Speed: 4882.1 rows/s | Files: 403
+[Checkpoint] Saved checkpoint_rows_13842608.pkl (Rows: 13,842,608)
+  Files: 410/416 | Rows(total): 13,842,608 | Rows(buf): 241,834 | Speed: 4819.4 rows/s
+[Stage] chunk=26, files=16, elapsed=0.7s, copy_workers=4, dir=D:\Omega_train_stage_v51_full\chunk_000026
+  Files: 420/432 | Rows(total): 13,842,608 | Rows(buf): 579,853 | Speed: 4692.5 rows/s
+  Rows: 14,604,310 | Speed: 4879.2 rows/s | Files: 424
+  Files: 430/432 | Rows(total): 14,604,310 | Rows(buf): 244,118 | Speed: 4810.5 rows/s
+[Stage] chunk=27, files=16, elapsed=0.7s, copy_workers=4, dir=D:\Omega_train_stage_v51_full\chunk_000027
+  Files: 440/448 | Rows(total): 14,604,310 | Rows(buf): 651,386 | Speed: 4640.6 rows/s
+  Rows: 15,372,816 | Speed: 4876.9 rows/s | Files: 443
+[Checkpoint] Saved checkpoint_rows_15372816.pkl (Rows: 15,372,816)
+[Stage] chunk=28, files=8, elapsed=0.3s, copy_workers=4, dir=D:\Omega_train_stage_v51_full\chunk_000028
+  Files: 450/456 | Rows(total): 15,372,816 | Rows(buf): 275,173 | Speed: 4756.2 rows/s
+[Plan] file-list mode complete: scanned=456, selected=456
+[Checkpoint] Saved checkpoint_rows_15880921.pkl (Rows: 15,880,921)
+=== Training Complete ===

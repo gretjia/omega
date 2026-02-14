@@ -1,0 +1,19 @@
+{
+  "profile_name": "32Core_Hybrid_Storage",
+  "storage": {
+    "source_root": "E:/data/level2",
+    "stage_root": "D:/Omega_frames/v50/stage",
+    "output_root": "D:/Omega_frames/v50/output",
+    "io_slots": 4,
+    "disable_indexing": true,
+    "check_defender_exclusion": true
+  },
+  "compute": {
+    "framing_workers": 22,
+    "training_workers": 26,
+    "backtest_workers": 20,
+    "numa_pinning": false,
+    "memory_threshold_percent": 88.0
+  },
+  "schema_version": "1.0"
+}

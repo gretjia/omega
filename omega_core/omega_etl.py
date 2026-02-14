@@ -232,7 +232,9 @@ def build_l2_frames(path: str, cfg: L2PipelineConfig, target_frames: float | Non
         # Avoid div/0 at opening: clamp elapsed time to min 1 min (60000 ms)
         # Ensure elapsed is safe
         elapsed = (pl.col("time") - session_start).clip(lower_bound=60000)
-        time_fraction = (elapsed / total_duration).clip(lower_bound=0.01, upper_bound=1.0)
+        # v5.1 P4: morning spike extrapolation guard.
+        # Raise lower bound from 0.01 to 0.05 to avoid explosive early-session projection.
+        time_fraction = (elapsed / total_duration).clip(lower_bound=0.05, upper_bound=1.0)
         
         # 2. Causal Extrapolation
         # If we are 10% into the day and have 1M vol, we project 10M total.
