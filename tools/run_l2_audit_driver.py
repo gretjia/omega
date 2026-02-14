@@ -2,7 +2,7 @@
 run_l2_audit_driver.py
 
 Orchestrates the Level-2 (v3) Audit by:
-1. Batch-extracting .7z archives to a temporary stage (C: drive).
+1. Batch-extracting .7z archives to a temporary stage directory.
 2. Running the v3 Kernel (Polars) on extracted CSVs.
 3. Saving intermediate frame results (Parquet).
 4. Aggregating metrics for the Audit Report.
@@ -38,7 +38,8 @@ from tools.level2_batch_extract import _find_7z_exe
 
 # Use a dynamic stage root that supports per-process isolation
 if os.name == 'nt':
-    DEFAULT_STAGE_ROOT = Path("C:/Omega_level2_stage")
+    # Prefer D: to avoid filling the system disk; fallback to C: when D: is unavailable.
+    DEFAULT_STAGE_ROOT = Path("D:/Omega_level2_stage") if Path("D:/").exists() else Path("C:/Omega_level2_stage")
 else:
     # On Mac/Linux, use a local temp directory in user home to ensure write access and space
     DEFAULT_STAGE_ROOT = Path(os.path.expanduser("~/omega_level2_stage"))

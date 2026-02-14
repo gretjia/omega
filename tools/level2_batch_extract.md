@@ -44,7 +44,6 @@ python tools/level2_batch_extract.py --batch-count 2 --verify-crc --strict-size 
 
 - `--src-root`：默认 `./data/level2`
 - `--dest-root`：默认 `./data/leve2_csv`
-- `--stage-root`：默认 `C:\Omega_level2_stage`（中转盘）
+- `--stage-root`：默认 `D:\Omega_level2_stage`（优先非系统盘，避免 C 盘膨胀；无 D 盘时回退 C 盘）
 - `--batch-count`：一次处理多少个 `.7z`（仍是逐个执行，失败会停止）
 - `--min-free-c-gb / --min-free-d-gb`：安全余量阈值（默认 30GB）
-

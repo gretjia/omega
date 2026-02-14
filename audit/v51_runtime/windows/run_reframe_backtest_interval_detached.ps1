@@ -4,7 +4,7 @@ param(
     [int]$SevenZipThreads = 1,
     [double]$MemoryThreshold = 88.0,
     [string]$OutputDir = "D:/Omega_frames/v50/output",
-    [string]$StageDir = "C:/Omega_level2_stage",
+    [string]$StageDir = "D:/Omega_frames/v50/stage",
     [string]$Root = "C:\Omega_vNext",
     [string]$ProfilePath = "configs/hardware/active_profile.yaml",
     [switch]$NoResume = $false,

@@ -355,9 +355,10 @@ def _load_done_set(state_path: Path) -> Dict[str, str]:
 
 def main(argv: Optional[List[str]] = None) -> int:
     ap = argparse.ArgumentParser()
+    default_stage_root = r"D:\Omega_level2_stage" if (os.name == "nt" and Path(r"D:\\").exists()) else r"C:\Omega_level2_stage"
     ap.add_argument("--src-root", default="./data/level2")
     ap.add_argument("--dest-root", default="./data/leve2_csv")
-    ap.add_argument("--stage-root", default=r"C:\Omega_level2_stage")
+    ap.add_argument("--stage-root", default=default_stage_root)
     ap.add_argument("--seven-zip", default=None)
     ap.add_argument("--batch-count", type=int, default=1)
     ap.add_argument("--state-jsonl", default=None)
