@@ -4,6 +4,7 @@ import time
 import shutil
 import subprocess
 import concurrent.futures
+import multiprocessing as mp
 from typing import List, Dict, Tuple
 from pathlib import Path
 import polars as pl
@@ -110,31 +111,38 @@ class Framer:
             archives = archives[:limit]
             self._log(f"Limiting to {limit} archives for smoke test.")
 
+        # IMPORTANT (Linux): Avoid repeated fork() after Polars has initialized its runtime threads.
+        # Reuse a single ProcessPool across archives, and use spawn to prevent deadlocks.
+        l2_cfg = load_l2_pipeline_config()
+        workers = max(1, int(self.hw.compute.framing_workers))
+        ctx = mp.get_context("spawn")
+
         # 2. Execution
         success_count = 0
-        for i, archive in enumerate(archives):
-            try:
-                res = self._process_archive(archive)
-                status = "success" if res else "failed"
-                if res:
-                    success_count += 1
-                    
-                # Progress Logging
-                prog = {
-                    "archive": os.path.basename(archive),
-                    "status": status,
-                    "index": i + 1,
-                    "total": len(archives),
-                    "timestamp": time.time()
-                }
-                with open("framer_progress.jsonl", "a") as pf:
-                    json.dump(prog, pf)
-                    pf.write("\n")
-                    
-            except Exception as e:
-                self._log(f"[Error] Failed to process {archive}: {e}")
-                import traceback
-                traceback.print_exc()
+        with concurrent.futures.ProcessPoolExecutor(max_workers=workers, mp_context=ctx) as executor:
+            for i, archive in enumerate(archives):
+                try:
+                    res = self._process_archive(archive, executor=executor, l2_cfg=l2_cfg)
+                    status = "success" if res else "failed"
+                    if res:
+                        success_count += 1
+
+                    # Progress Logging
+                    prog = {
+                        "archive": os.path.basename(archive),
+                        "status": status,
+                        "index": i + 1,
+                        "total": len(archives),
+                        "timestamp": time.time()
+                    }
+                    with open("framer_progress.jsonl", "a") as pf:
+                        json.dump(prog, pf)
+                        pf.write("\n")
+
+                except Exception as e:
+                    self._log(f"[Error] Failed to process {archive}: {e}")
+                    import traceback
+                    traceback.print_exc()
 
         self._log(f"--- [Framer v5.2] Complete. Processed {success_count} archives. ---")
 
@@ -163,19 +171,26 @@ class Framer:
             archives = list(archives)[:limit]
             self._log(f"Limiting to {limit} archives for smoke test.")
 
+        # IMPORTANT (Linux): Avoid repeated fork() after Polars has initialized its runtime threads.
+        # Reuse a single ProcessPool across archives, and use spawn to prevent deadlocks.
+        l2_cfg = load_l2_pipeline_config()
+        workers = max(1, int(self.hw.compute.framing_workers))
+        ctx = mp.get_context("spawn")
+
         success_count = 0
-        for archive in archives:
-            if not os.path.exists(archive):
-                self._log(f"[Skip] File not found: {archive}")
-                continue
-            try:
-                res = self._process_archive(archive)
-                if res:
-                    success_count += 1
-            except Exception as e:
-                self._log(f"[Error] Failed to process {archive}: {e}")
-                import traceback
-                traceback.print_exc()
+        with concurrent.futures.ProcessPoolExecutor(max_workers=workers, mp_context=ctx) as executor:
+            for archive in archives:
+                if not os.path.exists(archive):
+                    self._log(f"[Skip] File not found: {archive}")
+                    continue
+                try:
+                    res = self._process_archive(archive, executor=executor, l2_cfg=l2_cfg)
+                    if res:
+                        success_count += 1
+                except Exception as e:
+                    self._log(f"[Error] Failed to process {archive}: {e}")
+                    import traceback
+                    traceback.print_exc()
 
         self._log(f"--- [Framer v5.2] Complete. Processed {success_count}/{len(archives)} archives. ---")
 
@@ -212,7 +227,12 @@ class Framer:
                 return c
         return "7z" # Fallback to path
 
-    def _process_archive(self, archive_path: str) -> str:
+    def _process_archive(
+        self,
+        archive_path: str,
+        executor: concurrent.futures.ProcessPoolExecutor,
+        l2_cfg,
+    ) -> str:
         filename = os.path.basename(archive_path)
         date_str = filename.split(".")[0]
         
@@ -271,25 +291,22 @@ class Framer:
             self._log(f"       Found {len(all_files)} files. Grouped into {len(symbol_map)} symbols.")
 
             # 2. Parallel Processing (Map-Reduce)
-            l2_cfg = load_l2_pipeline_config()
-            
             processed_dfs = []
-            workers = int(self.hw.compute.framing_workers)
+            workers = max(1, int(self.hw.compute.framing_workers))
 
             symbol_items = list(symbol_map.items())
             chunk_size = max(1, len(symbol_items) // (workers * 2))
             chunks = [symbol_items[i:i + chunk_size] for i in range(0, len(symbol_items), chunk_size)]
-            
-            with concurrent.futures.ProcessPoolExecutor(max_workers=workers) as executor:
-                futures = [executor.submit(_process_stock_chunk, chunk, l2_cfg) for chunk in chunks]
-                
-                for future in concurrent.futures.as_completed(futures):
-                    try:
-                        res_list = future.result()
-                        if res_list:
-                            processed_dfs.extend(res_list)
-                    except Exception as e:
-                        print(f"Worker Error: {e}", flush=True)
+
+            futures = [executor.submit(_process_stock_chunk, chunk, l2_cfg) for chunk in chunks]
+
+            for future in concurrent.futures.as_completed(futures):
+                try:
+                    res_list = future.result()
+                    if res_list:
+                        processed_dfs.extend(res_list)
+                except Exception as e:
+                    print(f"Worker Error: {e}", flush=True)
             
             if not processed_dfs:
                 self._log(f"[Warn] No valid dataframes generated for {date_str} (Check logs for schema rejections)")
