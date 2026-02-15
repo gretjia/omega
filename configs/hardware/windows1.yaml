@@ -1,0 +1,18 @@
+hardware:
+  profile_name: windows1_v52
+  schema_version: "1.0"
+  storage:
+    # Raw .7z archive root (USB4 SSD). Raw data must never enter Git.
+    source_root: E:/data/level2
+    # Extracted CSV staging (fast internal NVMe).
+    stage_root: D:/Omega_frames/v52/stage_windows1
+    # Parquet frames output (host-isolated to avoid collisions).
+    output_root: D:/Omega_frames/v52/frames/host=windows1
+    io_slots: 4
+    disable_indexing: true
+  compute:
+    framing_workers: 28
+    training_workers: 24
+    backtest_workers: 24
+    memory_threshold_percent: 85.0
+

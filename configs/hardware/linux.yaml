@@ -1,0 +1,18 @@
+hardware:
+  profile_name: linux1_v52
+  schema_version: "1.0"
+  storage:
+    # Raw .7z archive root (ZFS dataset). Raw data must never enter Git.
+    source_root: /omega_pool/raw_7z_archives
+    # Extracted CSV staging (prefer fast internal NVMe under /home).
+    stage_root: /home/zepher/Omega_frames/v52/stage_linux
+    # Parquet frames output (host-isolated to avoid collisions).
+    output_root: /omega_pool/parquet_data/v52/frames/host=linux1
+    io_slots: 4
+    disable_indexing: true
+  compute:
+    framing_workers: 28
+    training_workers: 24
+    backtest_workers: 24
+    memory_threshold_percent: 85.0
+

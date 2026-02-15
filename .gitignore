@@ -31,7 +31,10 @@ audit/v40_runtime/
 *.csv
 *.log
 *.err
+*.done
+*.meta.json
 integrity_check.log
+framer_progress.jsonl
 
 # OS/editor noise
 .DS_Store
