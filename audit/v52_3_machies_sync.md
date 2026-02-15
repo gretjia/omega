@@ -57,9 +57,26 @@ This section defines the "Manual" operations for the Controller.
 5. **Mac:** Setup Bare Origin (`mkdir -p ~/git/Omega_vNext.git && git init --bare`).
 6. **Mac:** Push to local bare `origin`.
 
+### Transport Options (Pick One)
+
+Workers need a way to fetch from the Mac bare origin.
+
+1. **Option A: SSH (requires enabling Remote Login on macOS)**
+   - Enable: System Settings -> General -> Sharing -> Remote Login (SSH).
+   - Worker clone URL (example): `ssh://<mac_user>@<mac_ip>/Users/<mac_user>/git/Omega_vNext.git`
+
+2. **Option B: `git://` daemon (read-only, no admin required)**
+   - On Mac (controller), serve the bare repo for fetch/clone:
+     ```bash
+     touch ~/git/Omega_vNext.git/git-daemon-export-ok
+     git daemon --reuseaddr --base-path=$HOME/git --listen=0.0.0.0 --port=9418 $HOME/git/Omega_vNext.git
+     ```
+   - Worker clone URL (example): `git://<mac_ip>/Omega_vNext.git`
+   - Note: `git://` is read-only and unauthenticated. Use on trusted LAN only.
+
 ### Phase B: Worker Setup (One-Time)
 
-1. **Win/Lin:** `ssh-keygen` & `ssh-copy-id` to Mac.
+1. **Win/Lin:** Setup credentials if using SSH (or skip for `git://`).
 2. **Win/Lin:** `git clone <mac_url>`.
 3. **Win/Lin:** Install `pre-commit` hook (Physical Block).
 
