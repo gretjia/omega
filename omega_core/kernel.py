@@ -12,6 +12,7 @@ Implements:
 from __future__ import annotations
 
 import math
+import os
 import numpy as np
 import polars as pl
 
@@ -138,7 +139,8 @@ def _apply_recursive_physics(
     
     current_y = float(srl.y_coeff) if initial_y is None else float(initial_y)
 
-    print(f"    Running Recursive Physics on {n_rows} rows...", flush=True)
+    if os.environ.get("OMEGA_KERNEL_VERBOSE") == "1":
+        print(f"    Running Recursive Physics on {n_rows} rows...", flush=True)
     
     for i in range(n_rows):
         # Universal SRL (Delta=0.5)
