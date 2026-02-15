@@ -10,6 +10,10 @@ __pycache__/
 data/
 artifacts/
 archive/
+pipeline/output/
+models/
+checkpoints/
+logs/
 C:/
 tools/MinGit/
 audit/backtest_results/
@@ -18,6 +22,16 @@ audit/*.err
 audit/*.pkl
 audit/v40_runtime/
 *.pid
+
+# Archive / dataset formats (never commit)
+*.7z
+*.parquet
+*.joblib
+*.model
+*.csv
+*.log
+*.err
+integrity_check.log
 
 # OS/editor noise
 .DS_Store

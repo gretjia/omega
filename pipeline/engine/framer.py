@@ -7,7 +7,8 @@ import concurrent.futures
 from typing import List, Dict, Tuple
 from pathlib import Path
 import polars as pl
-
+import json
+import hashlib
 from pipeline.config.hardware import HardwareProfile
 from pipeline.interfaces.math_core import IMathCore
 from omega_core.omega_etl import build_l2_frames
@@ -83,6 +84,11 @@ class Framer:
         self.logger = logger or print
         self.seven_zip = self._resolve_7z_exe()
 
+    def _get_git_hash(self) -> str:
+        try:
+            return subprocess.check_output(["git", "rev-parse", "--short", "HEAD"], text=True).strip()
+        except Exception:
+            return "nohash"
     def run(self, year_filter: str = None, limit: int = 0):
         """
         Main entry point for the Framing Stage.
@@ -106,7 +112,62 @@ class Framer:
 
         # 2. Execution
         success_count = 0
+        for i, archive in enumerate(archives):
+            try:
+                res = self._process_archive(archive)
+                status = "success" if res else "failed"
+                if res:
+                    success_count += 1
+                    
+                # Progress Logging
+                prog = {
+                    "archive": os.path.basename(archive),
+                    "status": status,
+                    "index": i + 1,
+                    "total": len(archives),
+                    "timestamp": time.time()
+                }
+                with open("framer_progress.jsonl", "a") as pf:
+                    json.dump(prog, pf)
+                    pf.write("\n")
+                    
+            except Exception as e:
+                self._log(f"[Error] Failed to process {archive}: {e}")
+                import traceback
+                traceback.print_exc()
+
+        self._log(f"--- [Framer v5.2] Complete. Processed {success_count} archives. ---")
+
+    def run_archives(self, archives: List[str], limit: int = 0):
+        """
+        Run framing on an explicit list of archive paths.
+
+        This is the worker-safe mode for distributed framing: the controller
+        generates `shard_*.txt` lists (relative paths), workers resolve and
+        process them without moving raw data across machines.
+        """
+        self._log(f"--- [Framer v5.2] Starting (Explicit Archive List) ---")
+        self._log(f"Source: {self.hw.storage.source_root}")
+        self._log(f"Stage : {self.hw.storage.stage_root}")
+        self._log(f"Output: {self.hw.storage.output_root}")
+        self._log(f"Workers: {self.hw.compute.framing_workers}")
+
+        os.makedirs(self.hw.storage.stage_root, exist_ok=True)
+        os.makedirs(self.hw.storage.output_root, exist_ok=True)
+
+        if not archives:
+            self._log("[Warn] No archives provided.")
+            return
+
+        if limit > 0:
+            archives = list(archives)[:limit]
+            self._log(f"Limiting to {limit} archives for smoke test.")
+
+        success_count = 0
         for archive in archives:
+            if not os.path.exists(archive):
+                self._log(f"[Skip] File not found: {archive}")
+                continue
             try:
                 res = self._process_archive(archive)
                 if res:
@@ -116,7 +177,7 @@ class Framer:
                 import traceback
                 traceback.print_exc()
 
-        self._log(f"--- [Framer v5.2] Complete. Processed {success_count} archives. ---")
+        self._log(f"--- [Framer v5.2] Complete. Processed {success_count}/{len(archives)} archives. ---")
 
     def _log(self, msg: str):
         if self.logger == print:
@@ -154,10 +215,16 @@ class Framer:
     def _process_archive(self, archive_path: str) -> str:
         filename = os.path.basename(archive_path)
         date_str = filename.split(".")[0]
-        output_path = os.path.join(self.hw.storage.output_root, f"{date_str}.parquet")
         
-        if os.path.exists(output_path):
-            self._log(f"[Skip] {filename} already exists at {output_path}")
+        # Idempotency: Git Hash & Done File
+        git_hash = self._get_git_hash()
+        out_name = f"{date_str}_{git_hash}.parquet"
+        output_path = os.path.join(self.hw.storage.output_root, out_name)
+        done_path = output_path + ".done"
+        meta_path = output_path + ".meta.json"
+        
+        if os.path.exists(done_path) and os.path.exists(output_path):
+            self._log(f"[Skip] {out_name} already done.")
             return filename
 
         self._log(f"[Job] Processing {filename}...")
@@ -238,6 +305,21 @@ class Framer:
                 return None
 
             full_df.write_parquet(output_path)
+            
+            # Metadata & Done Marker
+            meta = {
+                "source": filename,
+                "rows": full_df.height,
+                "columns": list(full_df.columns),
+                "schema_fingerprint": str(full_df.schema),
+                "git_hash": git_hash,
+                "timestamp": time.time()
+            }
+            with open(meta_path, "w") as f:
+                json.dump(meta, f, indent=2)
+                
+            Path(done_path).touch()
+            
             duration = time.time() - start_time
             self._log(f"[Done] {filename} -> {output_path} ({full_df.height} rows, {duration:.1f}s)")
             
