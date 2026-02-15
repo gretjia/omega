@@ -1,8 +1,11 @@
 # OMEGA v5.2 (v52) Before Full Run Notes / Checklist
 
 **Date:** 2026-02-15  
-**Run ID / Tag:** `v52-run-20260215-frame01`  
-**Pinned Commit:** `9d25914cc3c227bb7d178a973fbc6e8f27346415` (git short: `9d25914`)
+**Run ID / Tag:** `v52-run-20260215-frame02`  
+**Pinned Commit:** `4f9c78631428d5fd76b6e95e5f4bf01e3571ab3b` (git short: `4f9c786`)
+
+> 注：`v52-run-20260215-frame01` 在 Linux 上出现 “第二个 archive 卡死” 的现象（与 `fork` + Polars runtime 线程相关）。
+> `frame02` 通过将 framing 的 `ProcessPoolExecutor` 改为 **spawn + 全 run 复用同一个 pool** 修复该问题，并已重新完成 smoke gate 后开跑全量。
 
 本文件用于记录 **v52 全量开跑前** 必须锁定的口径、分工、产物路径、smoke gate、以及多机并行 framing/training/backtest 的执行与质量保障策略。目标是在 **提速** 的同时 **不降低数据处理质量**，并尽量避免“跑到一半发现口径不一致导致重做”。
 
@@ -11,7 +14,7 @@
 ## 0. 不可妥协原则（v52 运行纪律）
 
 1. **全链路必须 pin 到同一个 git tag/commit。**
-   - Worker 端跑 framing 的工作区必须是：`git checkout v52-run-20260215-frame01`
+   - Worker 端跑 framing 的工作区必须是：`git checkout v52-run-20260215-frame02`
    - **运行中禁止 `git pull` / 修改代码**（避免产物混入不同逻辑版本）。
 2. **Data 不进 Git。**
    - raw `.7z`、frames `.parquet`、model artifacts 一律不提交。
@@ -33,10 +36,10 @@
 
 ### 1.2 本次全量 framing 的 pin 点
 
-- Tag: `v52-run-20260215-frame01`
-- Commit: `9d25914cc3c227bb7d178a973fbc6e8f27346415`
+- Tag: `v52-run-20260215-frame02`
+- Commit: `4f9c78631428d5fd76b6e95e5f4bf01e3571ab3b`
 
-**重要：** framing 输出文件名包含 git short（例如 `20230104_9d25914.parquet`）。后续所有质量检查/进度统计都应 **只统计 `*_9d25914*`**，避免把旧 smoke hash 的 `.done` 混进去。
+**重要：** framing 输出文件名包含 git short（例如 `20230104_4f9c786.parquet`）。后续所有质量检查/进度统计都应 **只统计 `*_4f9c786*`**，避免把旧 smoke hash 的 `.done` 混进去。
 
 ---
 
@@ -69,8 +72,8 @@
 
 产物：
 
-- frames：`D:\Omega_frames\v52\frames\host=windows1\YYYYMMDD_9d25914.parquet`
-- 进度标记：同目录下 `YYYYMMDD_9d25914.parquet.done`、`*.meta.json`
+- frames：`D:\Omega_frames\v52\frames\host=windows1\YYYYMMDD_4f9c786.parquet`
+- 进度标记：同目录下 `YYYYMMDD_4f9c786.parquet.done`、`*.meta.json`
 - 运行日志：`D:\work\Omega_vNext\audit\_pipeline_frame.log`
 - PID 文件：`D:\work\Omega_vNext\artifacts\runtime\v52\frame_windows1.pid`
 
@@ -84,8 +87,8 @@
 
 产物：
 
-- frames：`/omega_pool/parquet_data/v52/frames/host=linux1/YYYYMMDD_9d25914.parquet`
-- 进度标记：同目录下 `YYYYMMDD_9d25914.parquet.done`、`*.meta.json`
+- frames：`/omega_pool/parquet_data/v52/frames/host=linux1/YYYYMMDD_4f9c786.parquet`
+- 进度标记：同目录下 `YYYYMMDD_4f9c786.parquet.done`、`*.meta.json`
 - 运行日志：`/home/zepher/work/Omega_vNext/audit/_pipeline_frame.log`
 - PID 文件：`/home/zepher/work/Omega_vNext/artifacts/runtime/v52/frame_linux1.pid`
 
@@ -123,8 +126,8 @@
 Windows1 / Linux 都必须：
 
 1. `git fetch --tags`
-2. `git checkout v52-run-20260215-frame01`
-3. 确认 `git rev-parse HEAD` == `9d25914...`
+2. `git checkout v52-run-20260215-frame02`
+3. 确认 `git rev-parse HEAD` == `4f9c786...`
 
 ### 5.2 正式 framing 命令
 
@@ -153,7 +156,7 @@ C:\Python314\python.exe -u D:\work\Omega_vNext\pipeline_runner.py `
 Task Scheduler（PowerShell）示例：
 
 ```powershell
-$task = "Omega_v52_frame01"
+$task = "Omega_v52_frame02"
 $action = New-ScheduledTaskAction `
   -Execute "C:\Python314\python.exe" `
   -Argument "-u D:\work\Omega_vNext\pipeline_runner.py --stage frame --config D:\work\Omega_vNext\configs\hardware\windows1.yaml --archive-list D:\work\Omega_vNext\audit\runtime\v52\shard_windows1.txt" `
@@ -176,17 +179,17 @@ Get-ScheduledTaskInfo -TaskName $task | Select LastRunTime,LastTaskResult
 ### 6.1 进度以 `.done` 为准
 
 - Windows1：
-  - `D:\Omega_frames\v52\frames\host=windows1\*_9d25914.parquet.done`
+  - `D:\Omega_frames\v52\frames\host=windows1\*_4f9c786.parquet.done`
 - Linux1：
-  - `/omega_pool/parquet_data/v52/frames/host=linux1/*_9d25914.parquet.done`
+  - `/omega_pool/parquet_data/v52/frames/host=linux1/*_4f9c786.parquet.done`
 
-**注意：** 只统计 `*_9d25914*`，避免把 smoke 产物的 `.done` 混入。
+**注意：** 只统计 `*_4f9c786*`，避免把 smoke 产物的 `.done` 混入。
 
 ### 6.2 若 framing 异常退出（避免重做/避免脏 staging）
 
 1. 先看 `audit/_pipeline_frame.log` 最后一条 `[Job]` / `[Done]` 对应的 archive。
 2. **清理该 archive 的 staging 目录**（避免复用半解压残留导致口径污染）。
-3. 确认 output 目录里没有同名 `YYYYMMDD_9d25914.parquet`（或先移走），再重跑。
+3. 确认 output 目录里没有同名 `YYYYMMDD_4f9c786.parquet`（或先移走），再重跑。
 
 ---
 
@@ -196,7 +199,7 @@ Get-ScheduledTaskInfo -TaskName $task | Select LastRunTime,LastTaskResult
 
 - 两台机器输出在不同 `host=...` 子目录，不会互相覆盖。
 - 训练/回测只需要一个“files list/manifest”：
-  - 以 `*_9d25914.parquet` 为准，收集两端路径列表，排序去重后生成 `train_files.txt` / `backtest_files.txt`。
+  - 以 `*_4f9c786.parquet` 为准，收集两端路径列表，排序去重后生成 `train_files.txt` / `backtest_files.txt`。
 
 ### 7.2 training 是否可两机拆分？
 
