@@ -1,8 +1,132 @@
-# OMEGA v5.0: The Holographic Damper
+# OMEGA v5.2: The Epistemic Release (Distributed Controller-Worker)
 
 > **"Physics is invariant. Structure is emergent. The observer is bounded."**
 
-OMEGA v5.0 represents the convergence of **Universal Market Physics** (Sato 2025) and **Computational Information Theory** (Finzi 2026). It abandons empirical parameter tuning in favor of deriving trading signals from first principles: the universality of the Square-Root Law and the compressibility of market data.
+OMEGA v5.2 represents the convergence of **Universal Market Physics** (Sato 2025) and **Computational Information Theory** (Finzi 2026), plus a hard engineering pivot:
+- **DoD 指标换轨**：`Vector Alignment (Physics)` -> `Model_Alignment (Epistemic)`，并保留 `Phys_Alignment` 作为基线对照。
+- **内存/吞吐换轨**：禁用 `to_dicts()` 行级展开；核心算子张量化/向量化；仅保留严格因果的轻量 IIR 递推。
+- **分布式执行换轨**：Mac 作为 **Controller（代码与配置权威）**；Windows1 + Linux 作为 **Workers（只拉代码、跑 framing）**；原始 `.7z` 数据不进 Git。
+
+---
+
+## 当前执行方式（2026-02-15，必须读）
+
+你现在的实际环境是：
+- **Mac**：Codex IDE 所在机，负责“改代码/写文档/发版本/分片编排”。
+- **Windows1 + Linux**：各自外挂 `USB4 8T NVMe SSD`，两块盘内原始 `.7z` 数据完全一致；因此 **不需要内网搬运 raw 数据**，只需要同步代码与分片清单。
+
+对应的落地文件/入口：
+- 分布式总纲：`audit/v52_3_machies_sync.md`
+- v52 后续实施总计划：`audit/v52_final_implementation_plan.md`
+- 运行元信息模板：`audit/runtime/v52/run_meta.template.json`
+
+### 强制纪律（否则会踩坑）
+
+1. **禁止在 SMB/磁盘映射目录里当主工作区改代码**（会和 worker 跑任务互相污染）。
+   - Controller（Mac）必须在本机磁盘持有完整 repo（例如 `~/work/Omega_vNext`）。
+2. **Workers 永远只读拉取代码**（不要 push；不要在 worker 上改核心逻辑）。
+3. **任何 framing/training/run 必须 pin 到明确的 Git commit 或 tag**，并写入 `run_meta.json`（由 `run_meta.template.json` 复制）。
+4. `.gitignore` 负责隔离：`.7z` / `.parquet` / artifacts / logs 一律不进 Git。
+
+---
+
+## v5.2 分布式同步与运行（推荐路径）
+
+### 1) Mac Controller：本地 clone + 本地 bare origin
+
+推荐目录约定（示例）：
+- 控制工作区（可编辑）：`~/work/Omega_vNext`
+- 局域网 origin（bare repo，仅存 git objects）：`~/git/Omega_vNext.git`
+
+> 注意：如果你无法在 macOS 开启 SSH（Remote Login），也可以走只读 `git://`（见下文）。
+
+### 2) Workers：从 Mac 拉代码（两种传输方式选一个）
+
+#### Option A：SSH（安全，需开启 macOS Remote Login）
+- URL 形如：`ssh://<mac_user>@<mac_ip>/Users/<mac_user>/git/Omega_vNext.git`
+
+#### Option B：`git://` daemon（只读，免管理员权限）
+Controller（Mac）启动方式（一次性/或由 LaunchAgent 常驻）：
+```bash
+touch ~/git/Omega_vNext.git/git-daemon-export-ok
+git daemon --reuseaddr --base-path=$HOME/git --listen=0.0.0.0 --port=9418 $HOME/git/Omega_vNext.git
+```
+Worker clone URL：
+```bash
+git clone git://<mac_ip>/Omega_vNext.git
+```
+验证连通：
+```bash
+git ls-remote git://<mac_ip>/Omega_vNext.git
+```
+安全提示：`git://` 无鉴权，仅限可信内网使用。
+
+---
+
+## 并行 framing（Windows1 + Linux 同时跑，零 raw 传输）
+
+### 1) 生成分片清单（在任意一台“有 raw .7z”的机器上执行）
+
+> 因为 Windows1 与 Linux 的 raw 盘内容完全一致，所以分片清单在哪台生成都一样。
+
+```bash
+python tools/build_7z_shards.py --root <RAW_ROOT> --out-dir audit/runtime/v52 --rule date_mod2
+```
+
+输出：
+- `audit/runtime/v52/archive_manifest_7z.txt`
+- `audit/runtime/v52/shard_windows1.txt`
+- `audit/runtime/v52/shard_linux.txt`
+
+将这 3 个小文件同步回 Mac Controller 的 repo 后，由 Mac 提交并 push（Workers 只 pull）。
+
+### 2) Workers 各跑各的 shard（核心入口：`--archive-list`）
+
+Windows1：
+```bash
+python pipeline_runner.py --stage frame --config configs/hardware/windows1.yaml --archive-list audit/runtime/v52/shard_windows1.txt
+```
+
+Linux：
+```bash
+python pipeline_runner.py --stage frame --config configs/hardware/linux.yaml --archive-list audit/runtime/v52/shard_linux.txt
+```
+
+`--archive-list` 支持：
+- 清单内为相对路径（相对 `storage.source_root`）
+- 或绝对路径（Windows/Linux 都可）
+
+### 3) staging 与输出目录建议（重要）
+
+- `RAW_ROOT`：USB4 盘（顺序读为主）
+- `STAGE_ROOT`：尽量走内置 NVMe（解压/IO 压力大）
+- `OUTPUT_ROOT`（frames parquet）：USB4 盘或内置大盘均可，但两台机器不要写同一目录（避免覆盖）
+
+---
+
+## 原始数据双备份同步机制（未来 raw data 变更时）
+
+目标：当 raw `.7z` 有新增/修正时，能快速确认 Windows1 与 Linux 两份 raw 是否一致，并只补齐差异。
+
+### 1) 各自生成 raw manifest（不进 Git）
+```bash
+python tools/gen_raw_manifest.py --root <RAW_ROOT> --ext .7z --out raw_manifest_<host>.jsonl
+```
+
+怀疑静默损坏时用强校验（慢）：
+```bash
+python tools/gen_raw_manifest.py --root <RAW_ROOT> --ext .7z --hash sha256 --out raw_manifest_<host>.jsonl
+```
+
+### 2) 比对 manifest，生成差异清单
+```bash
+python tools/compare_raw_manifests.py \
+  --a raw_manifest_source.jsonl \
+  --b raw_manifest_mirror.jsonl \
+  --out-missing-in-b raw_missing_or_changed.txt
+```
+
+然后用 `rsync/rclone/robocopy` 按清单复制缺失/变更文件；复制后两边重新生成 manifest 再 compare 复核。
 
 ---
 
@@ -72,9 +196,9 @@ graph TD
 
 ## 快速开始 (Quick Start)
 
-多机代码发布入口（Mac 一键推送并触发 Windows1/Windows2 更新）：
-- `tools/git_sync/mac_publish_and_rollout.sh`
-- 细则见下方 `9. Mac 一键代码发布到 Windows1/Windows2`
+v5.2 多机（Mac Controller + Windows1/Linux Workers）优先按本 README 上方 “分布式同步与运行 / 并行 framing” 执行。
+
+下方历史章节（Windows Hub / 计划任务 / v5 runtime）仅保留为参考，不再作为 v5.2 推荐路径。
 
 ### 1. 配置硬件
 OMEGA v5.0 自动检测硬件配置。首次运行会自动生成默认配置：
