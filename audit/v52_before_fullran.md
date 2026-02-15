@@ -220,7 +220,7 @@ Get-ScheduledTaskInfo -TaskName $task | Select LastRunTime,LastTaskResult
 策略：
 
 1. 固定同一个 `checkpoint_rows_*.pkl`（同一份 policy）。
-2. 将 backtest 的 files list 按日期或 hash 分成两份（Windows/Linus 各跑一份）。
+2. 将 backtest 的 files list 按日期或 hash 分成两份（Windows/Linux 各跑一份）。
 3. 两台机器分别输出 `backtest_status.json` / `backtest_state.json` / summary（或我们补一个 merge 工具）。
 4. 合并方式：按 rows/trades 进行加权汇总（或以 per-file 结果再聚合）。
 
