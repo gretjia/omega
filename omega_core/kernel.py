@@ -198,9 +198,11 @@ def _apply_recursive_physics(
         pl.lit(float(sigma_gate)).alias("sigma_gate"),
     ])
     
+    # Emit all manifold features (including micro). `topo_area` is the canonical
+    # alias (kept for backward compatibility), but training expects explicit
+    # `topo_micro/topo_classic/topo_trend` columns as configured in `config.py`.
     for m_name, m_arr in out_manifolds.items():
-        if m_name != str(topo_cfg.micro_feature):
-            columns_to_add.append(pl.Series(m_name, m_arr))
+        columns_to_add.append(pl.Series(m_name, m_arr))
             
     res_df = frames.with_columns(columns_to_add)
 
