@@ -1,0 +1,4 @@
+interface:
+  display_name: "Omega Run Ops"
+  short_description: "Distributed Omega_vNext run ops"
+  default_prompt: "Run and monitor Omega_vNext across Windows/Linux workers with pinned tags, smoke gates, Task Scheduler/nohup, and low-overhead status checks."
