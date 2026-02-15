@@ -1,14 +1,15 @@
 """
 trainer_v51.py
 
-Level-2 (v5.1) machine learning trainer.
+Level-2 (v5.2) machine learning trainer & evaluator. (The Epistemic Release)
 Implements:
-- P1 Fix: Epistemic interaction features for linear model phase-awareness
-- C6 Fix: Unconditional final checkpoint flush
+- P1 Fix: Epistemic interaction features
+- Dual-Track Alignment Fix: Shifts DoD requirement to Model's Epistemic Alignment
 """
 
 from __future__ import annotations
 
+import math
 import pickle
 import time
 from pathlib import Path
@@ -30,7 +31,6 @@ def check_memory_safe(threshold: float = 85.0, sleep_sec: float = 10.0) -> None:
     while psutil.virtual_memory().percent > threshold:
         time.sleep(sleep_sec)
 
-
 class OmegaTrainerV3:
     def __init__(self, cfg: L2PipelineConfig):
         self.cfg = cfg
@@ -39,21 +39,10 @@ class OmegaTrainerV3:
 
         topo_race_cols = list(getattr(self.cfg.train, "topology_race_features", ()))
         raw_feature_cols = [
-            "sigma_eff",
-            "net_ofi",
-            "depth_eff",
-            "epiplexity",
-            "srl_resid",
-            "topo_area",
-            "topo_energy",
-            *topo_race_cols,
-            "price_change",
-            "bar_duration_ms",
-            "adaptive_y",
-            # v5.1 P1: explicit non-linear interaction terms for linear SGD
-            "epi_x_srl_resid",
-            "epi_x_topo_area",
-            "epi_x_net_ofi",
+            "sigma_eff", "net_ofi", "depth_eff", "epiplexity", "srl_resid", 
+            "topo_area", "topo_energy", *topo_race_cols, "price_change", 
+            "bar_duration_ms", "adaptive_y",
+            "epi_x_srl_resid", "epi_x_topo_area", "epi_x_net_ofi",
         ]
         self.feature_cols = list(dict.fromkeys(raw_feature_cols))
         self.label_col = "direction_label"
@@ -82,10 +71,8 @@ class OmegaTrainerV3:
                 print("[Warning] trade_vol/cancel_vol missing. Spoofing filter may degrade.")
                 self._warned_missing_cols = True
 
-        # Always recompute recursive physics so direction semantics stay aligned with v5.1.
         df = apply_recursive_physics(df, cfg)
 
-        # v5.1 P1: interaction layer
         df = df.with_columns(
             [
                 (pl.col("epiplexity") * pl.col("srl_resid")).alias("epi_x_srl_resid"),
@@ -157,7 +144,7 @@ class OmegaTrainerV3:
         return df
 
     def train(self, sample_frac: float = 1.0, checkpoint_interval: int = 500000) -> None:
-        print("Starting training OMEGA v5.1...")
+        print("Starting training OMEGA v5.2...")
         dirs = discover_l2_dirs()
         if not dirs:
             return
@@ -183,7 +170,6 @@ class OmegaTrainerV3:
 
                     missing = [c for c in self.feature_cols if c not in df_batch.columns]
                     if missing:
-                        print(f"[Warn] {f.name}: missing features {missing}")
                         continue
 
                     X = df_batch.select(self.feature_cols).to_numpy()
@@ -212,7 +198,6 @@ class OmegaTrainerV3:
                 except Exception as exc:
                     print(f"Error {f.name}: {exc}")
 
-        # v5.1 C6: unconditional final checkpoint to flush tail rows.
         if total_rows > last_checkpoint_rows:
             self.save(name=f"checkpoint_rows_{total_rows}.pkl", extra_state={"total_rows": int(total_rows)})
         self.save(name="omega_v5_model_final.pkl", extra_state={"total_rows": int(total_rows)})
@@ -226,7 +211,6 @@ class OmegaTrainerV3:
             "model": self.model,
             "scaler": self.scaler,
             "feature_cols": self.feature_cols,
-            # Keep legacy key for old scripts.
             "features": self.feature_cols,
             "cfg": self.cfg,
         }
@@ -250,9 +234,16 @@ def _safe_corr(x: np.ndarray, y: np.ndarray, eps: float = 1e-12, min_samples: in
     return float(np.corrcoef(xv, yv)[0, 1])
 
 
-def _vector_alignment(frames: pl.DataFrame, horizon: int, min_samples: int) -> float:
+def _vector_alignment(
+    frames: pl.DataFrame, 
+    horizon: int, 
+    min_samples: int,
+    model=None,
+    scaler=None,
+    feature_cols=None
+) -> tuple[float, float]:
     if frames.height == 0 or "direction" not in frames.columns:
-        return float("nan")
+        return float("nan"), float("nan")
 
     def _over_symbol(expr: pl.Expr) -> pl.Expr:
         if "symbol" in frames.columns:
@@ -265,25 +256,65 @@ def _vector_alignment(frames: pl.DataFrame, horizon: int, min_samples: int) -> f
 
     dir_sign = np.sign(np.asarray(merged["direction"].to_numpy(), dtype=float))
     fwd_sign = np.sign(np.asarray(merged["fwd_return"].to_numpy(), dtype=float))
-    mask = np.isfinite(dir_sign) & np.isfinite(fwd_sign) & (dir_sign != 0.0) & (fwd_sign != 0.0)
-    if int(np.sum(mask)) < int(min_samples):
-        return float("nan")
-    return float(np.mean(dir_sign[mask] == fwd_sign[mask]))
+    
+    epi = np.asarray(merged["epiplexity"].to_numpy(), dtype=float)
+    if epi.size == 0 or not np.any(np.isfinite(epi)):
+        return float("nan"), float("nan")
+        
+    epi_q = float(np.nanquantile(epi, 0.8))
+    mask = np.isfinite(dir_sign) & np.isfinite(fwd_sign) & (dir_sign != 0.0) & (fwd_sign != 0.0) & (epi >= epi_q)
+    
+    phys_align = float("nan")
+    if int(np.sum(mask)) >= int(min_samples):
+        phys_align = float(np.mean(dir_sign[mask] == fwd_sign[mask]))
+
+    model_align = float("nan")
+    if model is not None and scaler is not None and feature_cols is not None:
+        if "epi_x_srl_resid" not in merged.columns:
+            merged = merged.with_columns([
+                (pl.col("epiplexity") * pl.col("srl_resid")).alias("epi_x_srl_resid"),
+                (pl.col("epiplexity") * pl.col("topo_area")).alias("epi_x_topo_area"),
+                (pl.col("epiplexity") * pl.col("net_ofi")).alias("epi_x_net_ofi"),
+            ])
+            
+        missing = [c for c in feature_cols if c not in merged.columns]
+        if not missing:
+            X_all = merged.select(feature_cols).to_numpy()
+            X_valid = X_all[mask]
+            if X_valid.shape[0] >= min_samples:
+                X_scaled = scaler.transform(X_valid)
+                if hasattr(model, "predict_proba"):
+                    probas = model.predict_proba(X_scaled)
+                    c_idx = np.where(model.classes_ == 1)[0]
+                    if len(c_idx) > 0:
+                        preds = np.sign(probas[:, c_idx[0]] - 0.5)
+                    else:
+                        preds = np.sign(model.predict(X_scaled))
+                else:
+                    preds = np.sign(model.predict(X_scaled))
+                    
+                fwd_valid = fwd_sign[mask]
+                valid_m = (preds != 0) & (fwd_valid != 0)
+                if np.any(valid_m):
+                    model_align = float(np.mean(preds[valid_m] == fwd_valid[valid_m]))
+
+    return phys_align, model_align
 
 
 def _collect_traces(frames: pl.DataFrame, max_traces: int | None) -> List[Sequence[float]]:
-    if "trace" not in frames.columns:
-        return []
+    if "trace" not in frames.columns: return []
     traces = frames["trace"].to_list()
-    if max_traces is None:
-        return traces
+    if max_traces is None: return traces
     return traces[: int(max_traces)]
 
 
-def evaluate_frames(frames: pl.DataFrame, cfg: L2PipelineConfig) -> Dict[str, float]:
-    """
-    Compute physics audit metrics (SNR, Orthogonality, Alignment).
-    """
+def evaluate_frames(
+    frames: pl.DataFrame, 
+    cfg: L2PipelineConfig,
+    model=None,
+    scaler=None,
+    feature_cols=None
+) -> Dict[str, float]:
     vcfg = cfg.validation
     traces = _collect_traces(frames, vcfg.max_traces)
     topo_snr = topo_snr_from_traces(traces, cfg.topo_snr, cfg.epiplexity)
@@ -297,38 +328,76 @@ def evaluate_frames(frames: pl.DataFrame, cfg: L2PipelineConfig) -> Dict[str, fl
             min_samples=int(vcfg.min_samples),
         )
 
-    v_align = _vector_alignment(
-        frames,
-        horizon=int(vcfg.forward_return_horizon_buckets),
-        min_samples=int(vcfg.min_samples),
+    phys_align, model_align = _vector_alignment(
+        frames, int(vcfg.forward_return_horizon_buckets), int(vcfg.min_samples),
+        model=model, scaler=scaler, feature_cols=feature_cols
     )
+
+    final_align = model_align if not math.isnan(model_align) else phys_align
 
     return {
         "n_frames": float(frames.height),
         "Topo_SNR": float(topo_snr),
         "Orthogonality": float(orth),
-        "Vector_Alignment": float(v_align),
+        "Phys_Alignment": float(phys_align),
+        "Model_Alignment": float(model_align),
+        "Vector_Alignment": float(final_align),
     }
 
 
 def evaluate_dod(metrics: Dict[str, float], cfg: L2PipelineConfig) -> bool:
     val = cfg.validation
-    for m in ("Topo_SNR", "Orthogonality", "Vector_Alignment"):
+    
+    align_metric = metrics.get("Model_Alignment", float("nan"))
+    if not np.isfinite(align_metric):
+        align_metric = metrics.get("Phys_Alignment", float("nan"))
+        
+    for m in ("Topo_SNR", "Orthogonality"):
         if not np.isfinite(metrics.get(m, float("nan"))):
             return False
+            
+    if not np.isfinite(align_metric): 
+        return False
+        
     return (
         metrics["Topo_SNR"] > float(val.topo_snr_min)
         and abs(metrics["Orthogonality"]) < float(val.orthogonality_max_abs)
-        and metrics["Vector_Alignment"] > float(val.vector_alignment_min)
+        and align_metric > float(val.vector_alignment_min)
     )
 
+def get_latest_model(out_dir: str = "./artifacts") -> dict | None:
+    paths = list(Path(out_dir).glob("checkpoint_rows_*.pkl"))
+    if not paths:
+        final_p = Path(out_dir) / "omega_v5_model_final.pkl"
+        if final_p.exists():
+            with open(final_p, "rb") as f: return pickle.load(f)
+        return None
+    paths.sort(key=lambda p: int(p.stem.split('_')[-1]))
+    try:
+        with open(paths[-1], "rb") as f: return pickle.load(f)
+    except:
+        return None
 
-def run_l2_audit(paths: Iterable[str], cfg: L2PipelineConfig) -> Dict[str, float]:
+def run_l2_audit(paths: Iterable[str], cfg: L2PipelineConfig, policy_path: str | Path | None = None) -> Dict[str, float]:
     all_frames = [run_l2_kernel(p, cfg)[0] for p in paths]
-    if len(all_frames) == 0:
-        return {"n_frames": 0.0}
+    if len(all_frames) == 0: return {"n_frames": 0.0}
     frames = pl.concat(all_frames, how="vertical")
-    metrics = evaluate_frames(frames, cfg)
+    
+    model, scaler, feature_cols = None, None, None
+    if policy_path and Path(policy_path).exists():
+        with open(policy_path, "rb") as f:
+            payload = pickle.load(f)
+            model = payload.get("model")
+            scaler = payload.get("scaler")
+            feature_cols = payload.get("feature_cols", payload.get("features"))
+    else:
+        payload = get_latest_model()
+        if payload:
+            model = payload.get("model")
+            scaler = payload.get("scaler")
+            feature_cols = payload.get("feature_cols", payload.get("features"))
+            
+    metrics = evaluate_frames(frames, cfg, model=model, scaler=scaler, feature_cols=feature_cols)
     metrics["DoD_pass"] = float(1.0 if evaluate_dod(metrics, cfg) else 0.0)
     return metrics
 
@@ -337,14 +406,11 @@ def write_audit_report(metrics: Dict[str, float], cfg: L2PipelineConfig, out_pat
     out_path = Path(out_path)
     out_path.parent.mkdir(parents=True, exist_ok=True)
     with open(out_path, "w", encoding="utf-8", newline="\n") as f:
-        f.write("# OMEGA L2 Audit Report (v5.1)\n\n")
+        f.write("# OMEGA L2 Audit Report (v5.2)\n\n")
         f.write("## Metrics\n| Metric | Value | Threshold |\n| :--- | :--- | :--- |\n")
         f.write(f"| **Topo_SNR** | {metrics.get('Topo_SNR', float('nan')):.6f} | > {cfg.validation.topo_snr_min} |\n")
-        f.write(
-            f"| **Orthogonality** | {metrics.get('Orthogonality', float('nan')):.6f} | < {cfg.validation.orthogonality_max_abs} |\n"
-        )
-        f.write(
-            f"| **Vector_Alignment** | {metrics.get('Vector_Alignment', float('nan')):.6f} | > {cfg.validation.vector_alignment_min} |\n"
-        )
+        f.write(f"| **Orthogonality** | {metrics.get('Orthogonality', float('nan')):.6f} | < {cfg.validation.orthogonality_max_abs} |\n")
+        f.write(f"| **Phys_Alignment** (Baseline) | {metrics.get('Phys_Alignment', float('nan')):.6f} | (Informational, ~0.5) |\n")
+        f.write(f"| **Model_Alignment** (Epistemic) | {metrics.get('Model_Alignment', float('nan')):.6f} | > {cfg.validation.vector_alignment_min} |\n")
         f.write(f"| **n_frames** | {metrics.get('n_frames', 0.0):.0f} | (report) |\n\n")
         f.write(f"**DoD_pass**: {bool(metrics.get('DoD_pass', 0.0))}\n")

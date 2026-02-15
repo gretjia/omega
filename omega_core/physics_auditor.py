@@ -1,7 +1,8 @@
 """
-physics_auditor.py
+physics_auditor.py (OMEGA v5.2)
 
-OMEGA v5 Physics Auditor.
+OMEGA v5.2 Physics Auditor.
+- Dual-Track Manifold Baseline Implementation.
 """
 
 from __future__ import annotations
@@ -17,7 +18,7 @@ import polars as pl
 
 from config import L2PipelineConfig
 from omega_core.kernel import OmegaKernel, apply_recursive_physics
-from omega_core.omega_math_core import calc_epiplexity
+from omega_core.trainer_v51 import get_latest_model, evaluate_frames
 
 
 class OmegaPhysicsAuditor:
@@ -27,6 +28,7 @@ class OmegaPhysicsAuditor:
         self.output_dir.mkdir(parents=True, exist_ok=True)
         self.cfg = cfg or L2PipelineConfig()
         self.files = sorted(self.data_dir.glob("*.parquet"))
+        self.model_payload = get_latest_model(out_dir=str(self.output_dir.parent / "artifacts"))
 
     def _rng(self, salt: int = 0) -> random.Random:
         seed = int(getattr(self.cfg.epiplexity, "prior_random_seed", 42))
@@ -66,28 +68,17 @@ class OmegaPhysicsAuditor:
             if sample_frac < 1.0:
                 daily_df = daily_df.sample(fraction=float(sample_frac), seed=42)
 
-            daily_df = daily_df.with_columns(
-                (pl.col("close").shift(-1) - pl.col("close")).alias("future_ret")
-            ).drop_nulls()
-
-            audit_frames.append(
-                daily_df.select(
-                    [
-                        "epiplexity",
-                        "srl_resid",
-                        "topo_area",
-                        "topo_energy",
-                        "adaptive_y",
-                        "future_ret",
-                        "trace"
-                    ]
-                )
-            )
+            audit_frames.append(daily_df)
 
         if not audit_frames:
             return {"status": "no_data"}
 
-        full_df = pl.concat(audit_frames)
+        full_df = pl.concat(audit_frames, how="diagonal_relaxed")
+        
+        # Inject future_ret if missing
+        if "future_ret" not in full_df.columns and "close" in full_df.columns:
+            full_df = full_df.with_columns((pl.col("close").shift(-1) - pl.col("close")).alias("future_ret")).drop_nulls()
+
         metrics = self._generate_epistemic_report(full_df, final_y=last_y_state)
         metrics.update(
             {
@@ -107,16 +98,10 @@ class OmegaPhysicsAuditor:
         
         all_sigmas = []
         all_implied_y = []
-        
-        # Universal Exponent = 0.5
         lane_exp = 0.5
 
         for f_path in sample_files:
-            df = self._load_debug_frames(
-                f_path,
-                initial_y=float(self.cfg.srl.anchor_y),
-                target_frames=None,
-            )
+            df = self._load_debug_frames(f_path, initial_y=float(self.cfg.srl.anchor_y), target_frames=None)
             if df.is_empty():
                 continue
 
@@ -125,11 +110,7 @@ class OmegaPhysicsAuditor:
             if sigma.size:
                 all_sigmas.extend(sigma.tolist())
 
-            if "price_change" in df.columns:
-                price_change = df["price_change"].to_numpy()
-            else:
-                price_change = (df["close"] - df["open"]).to_numpy()
-
+            price_change = df["price_change"].to_numpy() if "price_change" in df.columns else (df["close"] - df["open"]).to_numpy()
             net_ofi = np.asarray(df["net_ofi"].to_numpy(), dtype=float)
             depth_eff = np.asarray(df["depth_eff"].to_numpy(), dtype=float)
             sigma_eff = np.asarray(df["sigma_eff"].to_numpy(), dtype=float)
@@ -158,55 +139,17 @@ class OmegaPhysicsAuditor:
         return self.run_continuous_calibration(target_frames=None, sample_frac=1.0)
 
     def _generate_epistemic_report(self, df: pl.DataFrame, final_y: float) -> dict:
-        traces = df["trace"].to_list()
-        if not traces:
-            return {"status": "no_traces"}
-
-        # Sample traces for SNR calc
-        sample_n = min(len(traces), 1000)
-        rng = self._rng(salt=303)
-        sample_traces = rng.sample(traces, sample_n)
-
-        real_vals = [calc_epiplexity(t, self.cfg.epiplexity) for t in sample_traces]
-        null_vals = []
-        for t in sample_traces:
-            arr = list(t)
-            rng.shuffle(arr)
-            null_vals.append(calc_epiplexity(arr, self.cfg.epiplexity))
-
-        real_mean = float(np.mean(real_vals))
-        null_mean = float(np.mean(null_vals))
-        null_std = float(np.std(null_vals)) + 1e-9
-        snr = (real_mean - null_mean) / null_std
-
-        epi = np.asarray(df["epiplexity"].to_numpy(), dtype=float)
-        srl_resid_raw = np.asarray(df["srl_resid"].to_numpy(), dtype=float)
-        ortho = self._corr(epi, np.abs(srl_resid_raw))
-
-        # v5.1 A1: Damper vector alignment under visible structure regimes.
-        vector_align = float("nan")
-        if "future_ret" in df.columns and epi.size > 0:
-            future_ret = np.asarray(df["future_ret"].to_numpy(), dtype=float)
-            finite_epi = epi[np.isfinite(epi)]
-            if finite_epi.size > 0:
-                epi_q = float(np.quantile(finite_epi, 0.8))
-                mask = (
-                    np.isfinite(epi)
-                    & np.isfinite(srl_resid_raw)
-                    & np.isfinite(future_ret)
-                    & (epi >= epi_q)
-                )
-                if np.any(mask):
-                    dir_sign = -np.sign(srl_resid_raw[mask])
-                    fwd_sign = np.sign(future_ret[mask])
-                    valid_signs = (dir_sign != 0.0) & (fwd_sign != 0.0)
-                    if np.any(valid_signs):
-                        vector_align = float(np.mean(dir_sign[valid_signs] == fwd_sign[valid_signs]))
-
+        model = self.model_payload.get("model") if self.model_payload else None
+        scaler = self.model_payload.get("scaler") if self.model_payload else None
+        feature_cols = self.model_payload.get("feature_cols", self.model_payload.get("features")) if self.model_payload else None
+        
+        base_metrics = evaluate_frames(df, self.cfg, model=model, scaler=scaler, feature_cols=feature_cols)
+        
         return {
-            "Topo_SNR": float(snr),
-            "Orthogonality": float(ortho),
-            "Vector_Alignment": float(vector_align),
+            "Topo_SNR": base_metrics.get("Topo_SNR", float("nan")),
+            "Orthogonality": base_metrics.get("Orthogonality", float("nan")),
+            "Phys_Alignment": base_metrics.get("Phys_Alignment", float("nan")),
+            "Model_Alignment": base_metrics.get("Model_Alignment", float("nan")),
             "FINAL_Y": float(final_y),
         }
 
@@ -219,7 +162,7 @@ class OmegaPhysicsAuditor:
                 "ANCHOR_Y": priors.get("ANCHOR_Y")
             },
             "METRICS": metrics,
-            "NOTE": "OMEGA v5.1 Auditor (Calibrated Damper)"
+            "NOTE": "OMEGA v5.2 Auditor (Epistemic Metric Manifold)"
         }
         with (self.output_dir / "production_config.json").open("w") as f:
             json.dump(conf, f, indent=4)

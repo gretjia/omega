@@ -4,7 +4,7 @@ import time
 import shutil
 import subprocess
 import concurrent.futures
-from typing import List
+from typing import List, Dict, Tuple
 from pathlib import Path
 import polars as pl
 
@@ -14,59 +14,64 @@ from omega_core.omega_etl import build_l2_frames
 from omega_core.kernel import apply_recursive_physics
 from config import load_l2_pipeline_config
 
-def _process_single_stock(file_paths: List[str], cfg) -> pl.DataFrame:
+def _validate_is_quote_file(file_path: str, cfg) -> bool:
+    """
+    Validates if a file is a Quote (Snapshot) file and not a Tick file.
+    Checks for the existence of Bid Price 1 column.
+    """
+    required_col = f"{cfg.mapping.bid_price_prefix}1"
+    try:
+        with open(file_path, 'rb') as f:
+            # Read first 4KB to cover header even with weird encoding
+            chunk = f.read(4096)
+            header = chunk.decode(cfg.io.csv_encoding, errors='ignore').split('\n')[0]
+            return required_col in header
+    except Exception:
+        return False
+
+def _process_single_stock(symbol: str, file_paths: List[str], cfg) -> pl.DataFrame:
     """
     Worker task to process a single stock (all slices).
     Runs ETL -> Physics -> Metadata.
     """
     try:
-        # Filter for Quotes files (Snapshot Level 2)
-        quote_paths = []
-        # Required column: Bid Price 1 (e.g., "申买价1")
-        required_col = f"{cfg.mapping.bid_price_prefix}1"
-        
-        for f in file_paths:
-            try:
-                # Optimized header check: read only the first line
-                with open(f, 'rb') as f_in:
-                    header = f_in.readline().decode(cfg.io.csv_encoding, errors='ignore')
-                    if required_col in header:
-                        quote_paths.append(f)
-            except Exception:
-                continue
+        # 1. Schema Validation (Filter Ticks)
+        quote_paths = [f for f in file_paths if _validate_is_quote_file(f, cfg)]
         
         if not quote_paths:
+            # print(f"  [Skip] {symbol}: No valid quote files found.", flush=True)
             return None
 
-        # 1. ETL (Framing)
+        # 2. ETL (Framing)
+        # build_l2_frames handles loading CSVs and mapping columns
         df = build_l2_frames(quote_paths, cfg)
         if df.height == 0:
             return None
             
-        # ENSURE TIME ORDER for Physics!
+        # 3. Causal Sorting (CRITICAL for v5.2 Physics)
+        # Physics state (adaptive_y) depends on strict time ordering.
+        # Merging slices often disrupts order.
         df = df.sort("bucket_id")
 
-        # 2. Core Processing (Math) - Per Asset Physics
+        # 4. Core Processing (Math) - Per Asset Physics
+        # This applies SRL, Epiplexity, and Adaptive Y
         df = apply_recursive_physics(df, cfg)
         
-        # 3. Enrich with Symbol
-        first_path = file_paths[0]
-        symbol = Path(first_path).parent.name
-        if symbol.isdigit() and len(symbol) == 8:
-             symbol = Path(first_path).parent.parent.name
-             
-        df = df.with_columns(pl.lit(symbol).alias("symbol"))
+        # 5. Enrich with Symbol
+        df = df.with_columns(pl.lit(str(symbol)).cast(pl.Utf8).alias("symbol"))
+        
         return df
     except Exception as e:
+        print(f"  [Error] {symbol}: {e}", flush=True)
         return None
 
-def _process_stock_chunk(chunk, cfg) -> List[pl.DataFrame]:
+def _process_stock_chunk(chunk: List[Tuple[str, List[str]]], cfg) -> List[pl.DataFrame]:
     """
     Processes a batch of symbols to reduce IPC overhead.
     """
     results = []
     for sym, file_paths in chunk:
-        res = _process_single_stock(file_paths, cfg)
+        res = _process_single_stock(sym, file_paths, cfg)
         if res is not None:
             results.append(res)
     return results
@@ -82,55 +87,54 @@ class Framer:
         """
         Main entry point for the Framing Stage.
         """
-        self.logger(f"--- [Framer] Starting (Multi-Process V5) ---")
-        self.logger(f"Source: {self.hw.storage.source_root}")
-        self.logger(f"Stage : {self.hw.storage.stage_root}")
-        self.logger(f"Output: {self.hw.storage.output_root}")
-        self.logger(f"Workers: {self.hw.compute.framing_workers}")
+        self._log(f"--- [Framer v5.2] Starting ---")
+        self._log(f"Source: {self.hw.storage.source_root}")
+        self._log(f"Stage : {self.hw.storage.stage_root}")
+        self._log(f"Output: {self.hw.storage.output_root}")
+        self._log(f"Workers: {self.hw.compute.framing_workers}")
         
-        # Ensure directories
         os.makedirs(self.hw.storage.stage_root, exist_ok=True)
         os.makedirs(self.hw.storage.output_root, exist_ok=True)
 
         # 1. Discovery
         archives = self._scan_archives(year_filter)
-        self.logger(f"Found {len(archives)} archives.")
+        self._log(f"Found {len(archives)} archives.")
         
-        # Ensure physical staging directory exists
-        os.makedirs(self.hw.storage.stage_root, exist_ok=True)
-
         if limit > 0:
             archives = archives[:limit]
-            self.logger(f"Limiting to {limit} archives for smoke test.")
+            self._log(f"Limiting to {limit} archives for smoke test.")
 
         # 2. Execution
-        results = []
+        success_count = 0
         for archive in archives:
             try:
                 res = self._process_archive(archive)
                 if res:
-                    results.append(res)
+                    success_count += 1
             except Exception as e:
-                self.logger(f"[Error] Failed to process {archive}: {e}")
+                self._log(f"[Error] Failed to process {archive}: {e}")
                 import traceback
-                self.logger(traceback.format_exc())
+                traceback.print_exc()
 
-        self.logger(f"--- [Framer] Complete. Processed {len(results)} archives. ---")
+        self._log(f"--- [Framer v5.2] Complete. Processed {success_count} archives. ---")
+
+    def _log(self, msg: str):
+        if self.logger == print:
+            print(msg, flush=True)
+        else:
+            self.logger(msg)
 
     def _scan_archives(self, year_filter: str) -> List[str]:
         if not os.path.exists(self.hw.storage.source_root):
-            self.logger(f"[Warn] Source root does not exist: {self.hw.storage.source_root}")
+            self._log(f"[Warn] Source root does not exist: {self.hw.storage.source_root}")
             return []
             
-        # If no year filter, default to 2024-2025 as requested
+        # If no year filter, default scan
         if not year_filter:
-            all_files = []
-            for y in ["2024", "2025"]:
-                pattern = f"**/*{y}*/**/*.7z"
-                all_files.extend(glob.glob(os.path.join(self.hw.storage.source_root, pattern), recursive=True))
-            return sorted(list(set(all_files)))
+            pattern = "**/*.7z"
+        else:
+            pattern = f"**/*{year_filter}*/**/*.7z"
             
-        pattern = f"**/*{year_filter}*/**/*.7z"
         return sorted(list(glob.glob(os.path.join(self.hw.storage.source_root, pattern), recursive=True)))
 
     def _resolve_7z_exe(self) -> str:
@@ -152,57 +156,52 @@ class Framer:
         date_str = filename.split(".")[0]
         output_path = os.path.join(self.hw.storage.output_root, f"{date_str}.parquet")
         
-        # Check if already processed
         if os.path.exists(output_path):
-            self.logger(f"[Skip] {filename} already exists at {output_path}")
+            self._log(f"[Skip] {filename} already exists at {output_path}")
             return filename
 
-        self.logger(f"[Job] Processing {filename}...")
+        self._log(f"[Job] Processing {filename}...")
         start_time = time.time()
         
         # 1. Staging (Extraction)
         temp_stage = os.path.join(self.hw.storage.stage_root, date_str)
         
-        # Pre-Cleanup: Ensure the stage root is clear of ANY previous failed attempts
-        if os.path.exists(self.hw.storage.stage_root):
-            for item in os.listdir(self.hw.storage.stage_root):
-                item_path = os.path.join(self.hw.storage.stage_root, item)
-                try:
-                    if os.path.isdir(item_path): shutil.rmtree(item_path)
-                    else: os.remove(item_path)
-                except Exception: pass
-        
+        # Pre-Cleanup
+        if os.path.exists(temp_stage):
+            try:
+                shutil.rmtree(temp_stage)
+            except Exception: pass
         os.makedirs(temp_stage, exist_ok=True)
         
         try:
-            # -mmt=on enables multithreaded compression/decompression
+            # Extract
             cmd = [self.seven_zip, "x", archive_path, f"-o{temp_stage}", "-y", "-mmt=on"]
             subprocess.run(cmd, check=True, capture_output=True)
             
-            # Find ALL CSV files
-            csv_files = glob.glob(os.path.join(temp_stage, "**/*.csv"), recursive=True)
-            if not csv_files:
-                 # Try Parquet if CSV not found
-                 csv_files = glob.glob(os.path.join(temp_stage, "**/*.parquet"), recursive=True)
+            # Find Files
+            all_files = glob.glob(os.path.join(temp_stage, "**/*.csv"), recursive=True)
+            if not all_files:
+                 all_files = glob.glob(os.path.join(temp_stage, "**/*.parquet"), recursive=True)
                  
-            if not csv_files:
-                self.logger(f"[Warn] No data files found in {archive_path}")
+            if not all_files:
+                self._log(f"[Warn] No data files found in {archive_path}")
                 return None
             
-            self.logger(f"       Found {len(csv_files)} files. Grouping by symbol...")
-
             # Group by Symbol
             symbol_map = {}
-            for f in csv_files:
+            for f in all_files:
                 p = Path(f)
+                # Heuristic: Symbol is usually the parent folder name
+                # Structure: YYYYMMDD/Symbol/Symbol_YYYYMMDD_slice.csv
                 symbol = p.parent.name
-                if symbol.isdigit() and len(symbol) == 8:
+                if symbol.isdigit() and len(symbol) == 8: # If parent is date, go up one
                      symbol = p.parent.parent.name
+                
                 if symbol not in symbol_map:
                     symbol_map[symbol] = []
                 symbol_map[symbol].append(str(p))
 
-            self.logger(f"       Processing {len(symbol_map)} symbols...")
+            self._log(f"       Found {len(all_files)} files. Grouped into {len(symbol_map)} symbols.")
 
             # 2. Parallel Processing (Map-Reduce)
             l2_cfg = load_l2_pipeline_config()
@@ -210,40 +209,47 @@ class Framer:
             processed_dfs = []
             workers = int(self.hw.compute.framing_workers)
 
-            # Chunk symbols to reduce IPC overhead (especially for 7000+ symbols)
             symbol_items = list(symbol_map.items())
             chunk_size = max(1, len(symbol_items) // (workers * 2))
             chunks = [symbol_items[i:i + chunk_size] for i in range(0, len(symbol_items), chunk_size)]
             
             with concurrent.futures.ProcessPoolExecutor(max_workers=workers) as executor:
-                # Submit chunks instead of individual symbols
                 futures = [executor.submit(_process_stock_chunk, chunk, l2_cfg) for chunk in chunks]
                 
-                # Collect results
                 for future in concurrent.futures.as_completed(futures):
-                    res_list = future.result()
-                    if res_list:
-                        processed_dfs.extend(res_list)
+                    try:
+                        res_list = future.result()
+                        if res_list:
+                            processed_dfs.extend(res_list)
+                    except Exception as e:
+                        print(f"Worker Error: {e}", flush=True)
             
             if not processed_dfs:
-                self.logger(f"[Warn] All files failed processing for {date_str}")
+                self._log(f"[Warn] No valid dataframes generated for {date_str} (Check logs for schema rejections)")
                 return None
 
-            # 3. Concatenation
-            self.logger(f"       Concatenating {len(processed_dfs)} frames...")
+            # 3. Concatenation & Output
+            self._log(f"       Concatenating {len(processed_dfs)} asset frames...")
             full_df = pl.concat(processed_dfs)
             
-            # 4. Output
+            # Final Schema Check
+            if "symbol" not in full_df.columns:
+                self._log("[Error] 'symbol' column missing in output!")
+                return None
+
             full_df.write_parquet(output_path)
             duration = time.time() - start_time
-            self.logger(f"[Done] {filename} -> {output_path} ({full_df.height} rows, {duration:.1f}s)")
+            self._log(f"[Done] {filename} -> {output_path} ({full_df.height} rows, {duration:.1f}s)")
             
+        except subprocess.CalledProcessError as e:
+             self._log(f"[Error] 7-Zip failed: {e}")
+             return None
         finally:
-            # Revert to aggressive cleanup to prevent RAM disk exhaustion (Zombie Folders)
+            # Cleanup
             if os.path.exists(temp_stage):
                 try:
                     shutil.rmtree(temp_stage)
                 except Exception as e:
-                    self.logger(f"[Warn] Failed to cleanup stage {temp_stage}: {e}")
+                    self._log(f"[Warn] Failed to cleanup stage {temp_stage}: {e}")
                 
         return filename
