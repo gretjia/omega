@@ -799,6 +799,7 @@ class L2PipelineConfig:
     topo_snr: L2TopoSNRConfig = field(default_factory=L2TopoSNRConfig)
     signal: L2SignalConfig = field(default_factory=L2SignalConfig)
     validation: L2ValidationConfig = field(default_factory=L2ValidationConfig)
+    model: ModelConfig = field(default_factory=ModelConfig)
     train: L2TrainConfig = field(default_factory=L2TrainConfig)
 
     # Training plan
