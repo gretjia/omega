@@ -144,6 +144,8 @@ def cmd_sync_gcs(args: argparse.Namespace) -> None:
         cmd.extend(["--host", args.host])
     if args.year:
         cmd.extend(["--year", args.year])
+    if args.hash:
+        cmd.extend(["--hash", args.hash])
     _run(cmd, dry_run=args.dry_run)
 
 
@@ -179,6 +181,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_sync.add_argument("--bucket", default="gs://omega_v52")
     p_sync.add_argument("--host", default=None, help="Optional: linux1 or windows1")
     p_sync.add_argument("--year", default=None, help="Optional: year filter (e.g. 2025)")
+    p_sync.add_argument("--hash", default="", help="Frame git short hash (optional)")
     p_sync.add_argument("--dry-run", action="store_true")
     p_sync.set_defaults(func=cmd_sync_gcs)
 

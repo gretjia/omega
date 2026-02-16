@@ -31,6 +31,7 @@ def _install_dependencies() -> None:
             "xgboost",
             "scikit-learn",
             "google-cloud-storage",
+            "psutil",
         ]
     )
 

@@ -53,6 +53,20 @@ HOSTS = {
     }
 }
 
+
+def detect_git_hash() -> str:
+    """Best-effort local git short hash detection."""
+    try:
+        res = subprocess.run(
+            ["git", "rev-parse", "--short", "HEAD"],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        return res.stdout.strip()
+    except Exception:
+        return ""
+
 def check_dependencies():
     """Ensure gcloud, scp/ssh are available."""
     if not shutil.which("gcloud"):
@@ -72,37 +86,70 @@ def get_ssh_cmd(target, command):
 def get_scp_download_cmd(target, remote_path, local_path):
     return ["scp", "-F", "/dev/null", "-o", "StrictHostKeyChecking=no", "-i", str(IDENTITY_FILE), "-q", f"{target}:{remote_path}", str(local_path)]
 
-def get_remote_file_list(host_config, year_filter=None):
+def get_remote_file_list(host_config, git_hash, year_filter=None):
     """
-    Lists COMPLETED parquet files on the remote host.
+    Lists completed parquet files (`*.parquet` with matching `.done`) on the remote host.
     Returns a list of (filename, size_bytes).
     """
+    if not git_hash:
+        raise ValueError("git_hash is required")
+
     target = host_config["ssh_target"]
     path = host_config["source_path"]
-    print(f"[*] Scanning {target}:{path} for completed frames" + (f" (Year: {year_filter})" if year_filter else "") + "...")
+    print(
+        f"[*] Scanning {target}:{path} for completed frames (hash: {git_hash})"
+        + (f" (Year: {year_filter})" if year_filter else "")
+        + "..."
+    )
 
     files = []
     
     try:
+        hash_pat = f"*_{git_hash}.parquet"
+        done_pat = f"*_{git_hash}.parquet.done"
         if "windows" in target.lower() or "jiazi" in target.lower():
-            # Windows PowerShell command
+            # Windows PowerShell: emit tagged lines so we can intersect parquet + done safely.
             win_path = path.replace('/', '\\')
-            filter_str = f"*{year_filter}*_4f9c786.parquet" if year_filter else "*_4f9c786.parquet"
-            ps_cmd = f"Get-ChildItem -Path '{win_path}' -Filter '{filter_str}' | Select-Object Name, Length | ForEach-Object {{ $_.Name + ',' + $_.Length }}"
+            ps_cmd = (
+                f"Get-ChildItem -Path '{win_path}' -Filter '{hash_pat}' "
+                f"| ForEach-Object {{ 'P,' + $_.Name + ',' + $_.Length }}; "
+                f"Get-ChildItem -Path '{win_path}' -Filter '{done_pat}' "
+                f"| ForEach-Object {{ 'D,' + $_.Name }}"
+            )
             cmd = get_ssh_cmd(target, f"powershell -NoProfile -Command \"{ps_cmd}\"")
         else:
-            # Linux find command
-            name_pattern = f"*{year_filter}*_4f9c786.parquet" if year_filter else "*_4f9c786.parquet"
-            cmd = get_ssh_cmd(target, f"find {path} -name '{name_pattern}' -printf '%f,%s\\n'")
+            # Linux shell: emit tagged lines so we can intersect parquet + done safely.
+            shell_cmd = (
+                f"find {path} -maxdepth 1 -type f -name '{hash_pat}' -printf 'P,%f,%s\\n'; "
+                f"find {path} -maxdepth 1 -type f -name '{done_pat}' -printf 'D,%f\\n'"
+            )
+            cmd = get_ssh_cmd(target, shell_cmd)
 
         result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        parquet_sizes = {}
+        done_set = set()
         for line in result.stdout.splitlines():
-            if "," in line:
+            raw = line.strip()
+            if not raw:
+                continue
+            parts = raw.split(",")
+            tag = parts[0].strip() if parts else ""
+            if tag == "P" and len(parts) >= 3:
+                name = parts[1].strip()
                 try:
-                    name, size = line.split(",")
-                    files.append((name.strip(), int(size.strip())))
+                    parquet_sizes[name] = int(parts[2].strip())
                 except ValueError:
                     continue
+            elif tag == "D" and len(parts) >= 2:
+                done_name = parts[1].strip()
+                if done_name.endswith(".done"):
+                    done_set.add(done_name[:-5])
+
+        for name, size in sorted(parquet_sizes.items()):
+            if year_filter and str(year_filter) not in name:
+                continue
+            if name in done_set:
+                files.append((name, size))
 
     except subprocess.CalledProcessError as e:
         print(f"[!] Error listing files on {target}: {e}")
@@ -169,7 +216,7 @@ def sync_batch(host_key, files_to_sync, gcs_bucket):
     local_batch_dir.mkdir(parents=True, exist_ok=True)
     print("[+] Batch complete.\n")
 
-def run_sync(bucket_name, target_host=None, year_filter=None):
+def run_sync(bucket_name, git_hash, target_host=None, year_filter=None):
     check_dependencies()
     
     hosts_to_sync = [target_host] if target_host else HOSTS.keys()
@@ -180,7 +227,7 @@ def run_sync(bucket_name, target_host=None, year_filter=None):
             continue
             
         print(f"=== Starting Sync for {host_key} ===")
-        files = get_remote_file_list(HOSTS[host_key], year_filter)
+        files = get_remote_file_list(HOSTS[host_key], git_hash=git_hash, year_filter=year_filter)
         
         current_batch = []
         current_batch_size = 0
@@ -202,14 +249,21 @@ if __name__ == "__main__":
     parser.add_argument("--bucket", default="gs://omega_v52", help="GCS Bucket Name (default: gs://omega_v52)")
     parser.add_argument("--host", help="Specific host to sync (linux1 or windows1)")
     parser.add_argument("--year", help="Filter by year (e.g., 2025)")
+    parser.add_argument("--hash", default="", help="Frame git short hash suffix (default: local HEAD short hash)")
     args = parser.parse_args()
     
     if not args.bucket.startswith("gs://"):
         print("[!] Bucket must start with gs://")
         sys.exit(1)
 
+    git_hash = args.hash.strip() or detect_git_hash()
+    if not git_hash:
+        print("[!] Could not determine git short hash. Pass --hash explicitly.")
+        sys.exit(1)
+
     try:
-        run_sync(args.bucket, args.host, args.year)
+        print(f"[*] Using frame hash filter: {git_hash}")
+        run_sync(args.bucket, git_hash=git_hash, target_host=args.host, year_filter=args.year)
     except KeyboardInterrupt:
         print("\n[!] Sync interrupted by user.")
         sys.exit(1)

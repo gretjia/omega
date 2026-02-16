@@ -14,6 +14,7 @@ import argparse
 import sys
 import shutil
 import os
+import zipfile
 import warnings
 # Suppress annoying Google Cloud Python 3.9 deprecation warnings
 warnings.filterwarnings("ignore", ".*Python version 3.9 past its end of life.*")
@@ -29,12 +30,44 @@ REGION = "us-west1"
 STAGING_BUCKET = "gs://omega_v52/staging"
 CODE_BUCKET_PATH = "gs://omega_v52/staging/code/omega_core.zip"
 
-def zip_and_upload_code(source_dir, gcs_uri):
-    """Zips a directory and uploads to GCS."""
-    print(f"[*] Packaging code from: {source_dir}")
-    
-    zip_filename = "omega_core"
-    archive_path = shutil.make_archive(zip_filename, 'zip', source_dir)
+def zip_and_upload_code(repo_root, gcs_uri):
+    """
+    Builds a self-contained bundle with the modules required by cloud payloads.
+    Includes:
+      - omega_core/
+      - tools/
+      - config.py
+      - config_v6.py (if present)
+    """
+    print(f"[*] Packaging code from repo root: {repo_root}")
+
+    include_paths = ["omega_core", "tools", "config.py", "config_v6.py"]
+    archive_path = os.path.join(repo_root, "omega_core.zip")
+    if os.path.exists(archive_path):
+        os.remove(archive_path)
+
+    with zipfile.ZipFile(archive_path, "w", compression=zipfile.ZIP_DEFLATED) as zf:
+        for rel in include_paths:
+            abs_path = os.path.join(repo_root, rel)
+            if not os.path.exists(abs_path):
+                if rel == "config_v6.py":
+                    continue
+                print(f"[!] Warning: missing bundle path: {abs_path}")
+                continue
+
+            if os.path.isdir(abs_path):
+                for dirpath, _, filenames in os.walk(abs_path):
+                    for fn in filenames:
+                        if fn.endswith((".pyc", ".pyo")):
+                            continue
+                        if fn == ".DS_Store":
+                            continue
+                        full = os.path.join(dirpath, fn)
+                        arcname = os.path.relpath(full, repo_root)
+                        zf.write(full, arcname=arcname)
+            else:
+                zf.write(abs_path, arcname=rel)
+
     print(f"    Created archive: {archive_path}")
     
     # Upload
@@ -54,11 +87,11 @@ def zip_and_upload_code(source_dir, gcs_uri):
     # Cleanup local zip
     os.remove(archive_path)
 
-def submit_job(script_path, machine_type="c2-standard-60", script_args=None):
+def submit_job(script_path, machine_type="c2-standard-60", script_args=None, sync=False):
     """Submits the job."""
     if script_args is None:
         script_args = []
-    if not script_args:
+    if not script_args and os.path.basename(script_path) == "run_optuna_sweep.py":
         script_args = ["--n-trials", "50"]
     
     aiplatform.init(
@@ -67,7 +100,8 @@ def submit_job(script_path, machine_type="c2-standard-60", script_args=None):
         staging_bucket=STAGING_BUCKET
     )
 
-    job_name = f"omega-v52-optuna-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
+    script_stem = os.path.splitext(os.path.basename(script_path))[0]
+    job_name = f"omega-v60-{script_stem}-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
     
     print(f"[*] Submitting Custom Job: {job_name}")
 
@@ -80,10 +114,11 @@ def submit_job(script_path, machine_type="c2-standard-60", script_args=None):
         args=script_args,
     )
 
-    job.run(sync=False)
+    job.run(sync=bool(sync))
     
     print(f"\n[+] Job submitted! Check Cloud Console.")
     print(f"    Dashboard: {job.dashboard_uri}")
+    print(f"    Resource : {job.resource_name}")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -95,6 +130,7 @@ if __name__ == "__main__":
         default=[],
         help="Argument forwarded to payload script (repeatable).",
     )
+    parser.add_argument("--sync", action="store_true", help="Wait until Vertex job completes")
     args = parser.parse_args()
 
     # 1. Inject Code
@@ -107,7 +143,7 @@ if __name__ == "__main__":
         print(f"[!] Error: omega_core not found at {code_path}")
         sys.exit(1)
         
-    zip_and_upload_code(code_path, CODE_BUCKET_PATH)
+    zip_and_upload_code(repo_root, CODE_BUCKET_PATH)
 
     # 2. Submit Job
-    submit_job(args.script, args.machine_type, script_args=args.script_arg)
+    submit_job(args.script, args.machine_type, script_args=args.script_arg, sync=args.sync)
