@@ -238,3 +238,34 @@ Get-ScheduledTaskInfo -TaskName $task | Select LastRunTime,LastTaskResult
 
 - 当前阶段 I/O/解压或串行扫描占主导，CPU 不会持续满载；
 - 或者进程已退出（此时 `log mtime` 不再更新，`.done` 不增长）。
+
+---
+
+## 9. 2026-02-16 补跑与完成态结论（最新）
+
+### 9.1 本次补跑目标与结果
+
+- 目标：修复 quarantine 损坏 `.7z` 导致的 framing 缺口（2025-12-26 / 2025-12-29 / 2025-12-31）。
+- 处理：
+  - Windows1 以同日非 quarantine 原包覆盖 `quarantine/` 中损坏包并 `7z t` 复检通过。
+  - Linux1 同步修复包到 `/omega_pool/raw_7z_archives/2025/202512/quarantine/` 并 `7z t` 通过。
+  - 两机按 `--archive-list` 做最小补跑，不重跑全量。
+- 结果：
+  - Windows1：`Processed 1/1 archives`，`*_4f9c786.parquet.done = 359`
+  - Linux1：`Processed 2/2 archives`，`*_4f9c786.parquet.done = 392`
+  - 对照 shard 期望：Windows `358 -> 0 missing`，Linux `392 -> 0 missing`
+
+### 9.2 当前运行态（不是 smoke）
+
+- 两机当前执行的是 **正式 framing 的缺口补跑**（`Smoke: False`）。
+- 相关任务/进程均已结束：
+  - Windows 计划任务状态 `Ready`
+  - Linux 无 `pipeline_runner.py --stage frame` 活跃进程
+
+### 9.3 现阶段是否可进入下一阶段
+
+- 结论：**可以**。以 `4f9c786` 为口径的 framing shard 已齐全，可进入训练基线与云端同步准备。
+- 建议顺序（降低重做风险）：
+  1. 先做一次“frames 清单快照”与去重校验（两 host 合并 file-list，固定 run_meta）。
+  2. 用 30-60 交易日先跑一轮训练基线（本地或 Vertex smoke）验证 DoD 口径。
+  3. 再开启全量训练；backtest 放到训练后、使用同一 checkpoint 做分片并行。
