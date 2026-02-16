@@ -91,6 +91,14 @@ def _apply_recursive_physics(
     # --- Vectorized Pre-computation (Batch) ---
     out_is_active = (not sigma_gate_enabled) | (sigma_eff >= sigma_gate)
     
+    # v6.0: A-Share Singularity Mask
+    if "has_singularity" in frames.columns:
+        has_singularity = frames.get_column("has_singularity").fill_null(False).to_numpy()
+        # Disable physics active state during singularity
+        out_is_active = out_is_active & (~has_singularity)
+    else:
+        has_singularity = np.zeros(n_rows, dtype=bool)
+    
     # Calculate Epiplexity in ONE GO
     out_epi = calc_epiplexity_vectorized(trace_col, min_len=int(epi_cfg.min_trace_len), fallback=float(epi_cfg.fallback_value))
     # Apply gate mask (zero out inactive)
@@ -172,6 +180,11 @@ def _apply_recursive_physics(
         current_y = float(np.clip(current_y, clip_lo, clip_hi))
         out_y[i] = current_y
 
+    # v6.0: Mask Singularity Residuals
+    # Force residuals to 0 where singularity was detected to prevent math explosion
+    if "has_singularity" in frames.columns:
+        out_srl_resid[has_singularity] = 0.0
+
     # --- Assembly ---
     # Overwrite topo_area with micro feature if present
     if str(topo_cfg.micro_feature) in out_manifolds:
@@ -197,6 +210,7 @@ def _apply_recursive_physics(
         pl.Series("adaptive_y", out_y),
         pl.Series("spoof_ratio", out_spoof),
         pl.Series("is_energy_active", out_is_active),
+        pl.Series("is_physics_valid", ~has_singularity),
         pl.lit(float(sigma_gate)).alias("sigma_gate"),
     ])
     

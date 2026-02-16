@@ -404,9 +404,10 @@ class ModelConfig:
     """
     Model configuration.
 
-    Default uses sklearn SGDClassifier for streaming training.
+    v6 default uses XGBoost for non-linear manifold learning.
+    Legacy SGD remains available for compatibility.
     """
-    model_type: str = "sgd_logistic"  # {"sgd_logistic", "sgd_regression"}
+    model_type: str = "xgboost"  # {"xgboost", "sgd_logistic", "sgd_regression"}
 
     # SGD hyperparameters (sklearn-style)
     loss: str = "log_loss"
@@ -427,6 +428,15 @@ class ModelConfig:
 
     # Probability to act (evaluation) margin
     decision_margin: float = 0.05
+
+    # XGBoost (v6 default)
+    xgb_objective: str = "binary:logistic"
+    xgb_eval_metric: str = "logloss"
+    xgb_max_depth: int = 6
+    xgb_eta: float = 0.1
+    xgb_subsample: float = 0.9
+    xgb_colsample_bytree: float = 0.9
+    xgb_num_boost_round: int = 60
 
 
 @dataclass(frozen=True)
@@ -743,12 +753,41 @@ class L2TrainConfig:
 
 
 @dataclass(frozen=True)
+class AShareSessionConfig:
+    """
+    A-Share session timings (Milliseconds from 00:00:00).
+    Morning: 09:30 - 11:30
+    Afternoon: 13:00 - 15:00
+    """
+    morning_start_ms: int = 34200000   # 09:30:00
+    morning_end_ms: int = 41400000     # 11:30:00
+    afternoon_start_ms: int = 46800000 # 13:00:00
+    afternoon_end_ms: int = 54000000   # 15:00:00
+    
+    @property
+    def total_duration_ms(self) -> float:
+        return float((self.morning_end_ms - self.morning_start_ms) + 
+                     (self.afternoon_end_ms - self.afternoon_start_ms))
+
+@dataclass(frozen=True)
+class AShareMicrostructureConfig:
+    """
+    A-Share specific microstructure limits.
+    """
+    # Limit Up/Down Singularity Threshold (Depth -> 0)
+    limit_singularity_eps: float = 1e-5
+    # T+1 Horizon (Days)
+    t_plus_1_horizon_days: int = 1
+
+@dataclass(frozen=True)
 class L2PipelineConfig:
     """
-    Full L2 pipeline configuration bundle (v3).
+    Full L2 pipeline configuration bundle (v3/v6).
     """
     mapping: L2MappingConfig = field(default_factory=L2MappingConfig)
     session: L2SessionConfig = field(default_factory=L2SessionConfig)
+    ashare_session: AShareSessionConfig = field(default_factory=AShareSessionConfig) # v6.0
+    micro: AShareMicrostructureConfig = field(default_factory=AShareMicrostructureConfig) # v6.0
     io: L2IOConfig = field(default_factory=L2IOConfig)
     volume_clock: L2VolumeClockConfig = field(default_factory=L2VolumeClockConfig)
     quality: L2QualityConfig = field(default_factory=L2QualityConfig)

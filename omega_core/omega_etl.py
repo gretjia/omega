@@ -97,12 +97,64 @@ def _apply_session_filter(lf: pl.LazyFrame, cfg: L2PipelineConfig) -> pl.LazyFra
     s = cfg.session
     if not s.enable_session_filter or s.allow_auction:
         return lf
-    cond = (
+    cond_hhmmssmmm = (
         (pl.col("time") >= int(s.session_1_start)) & (pl.col("time") <= int(s.session_1_end))
     ) | (
         (pl.col("time") >= int(s.session_2_start)) & (pl.col("time") <= int(s.session_2_end))
     )
-    return lf.filter(cond)
+    ashare = cfg.ashare_session
+    t_ms = _time_of_day_ms_expr("time")
+    cond_ms = (
+        (t_ms >= int(ashare.morning_start_ms)) & (t_ms <= int(ashare.morning_end_ms))
+    ) | (
+        (t_ms >= int(ashare.afternoon_start_ms)) & (t_ms <= int(ashare.afternoon_end_ms))
+    )
+    return lf.filter(cond_hhmmssmmm | cond_ms)
+
+
+def _hhmmssmmm_to_ms_expr(time_expr: pl.Expr) -> pl.Expr:
+    t = time_expr.cast(pl.Int64, strict=False)
+    hh = t // 10_000_000
+    mm = (t // 100_000) % 100
+    ss = (t // 1_000) % 100
+    ms = t % 1_000
+    return ((((hh * 60) + mm) * 60 + ss) * 1_000 + ms).cast(pl.Int64, strict=False)
+
+
+def _time_of_day_ms_expr(time_col: str = "time") -> pl.Expr:
+    """
+    Normalize mixed time formats to milliseconds since midnight.
+    Supported inputs:
+    - HHMMSSmmm (e.g. 93000000)
+    - ms-of-day (0~86400000)
+    - epoch ms/us
+    """
+    t = pl.col(time_col).cast(pl.Int64, strict=False)
+    hhmmssmmm_ms = _hhmmssmmm_to_ms_expr(t)
+    return (
+        pl.when(t.is_null())
+        .then(None)
+        .when(t >= 1_000_000_000_000_000)
+        .then((t // 1_000) % 86_400_000)  # epoch microseconds
+        .when(t >= 100_000_000_000)
+        .then(t % 86_400_000)  # epoch milliseconds
+        .when((t >= 10_000_000) & (t <= 235_959_999))
+        .then(hhmmssmmm_ms)  # HHMMSSmmm
+        .otherwise(t)  # already ms-of-day
+        .cast(pl.Int64, strict=False)
+    )
+
+
+def _ashare_elapsed_expr(t_ms: pl.Expr, cfg: L2PipelineConfig) -> pl.Expr:
+    ashare = cfg.ashare_session
+    morning_len = int(ashare.morning_end_ms - ashare.morning_start_ms)
+    return (
+        pl.when(t_ms <= int(ashare.morning_end_ms))
+        .then(t_ms - int(ashare.morning_start_ms))
+        .when(t_ms >= int(ashare.afternoon_start_ms))
+        .then((t_ms - int(ashare.afternoon_start_ms)) + morning_len)
+        .otherwise(morning_len)
+    ).clip(lower_bound=0)
 
 
 def _apply_quality_filter(lf: pl.LazyFrame, cfg: L2PipelineConfig) -> pl.LazyFrame:
@@ -214,63 +266,54 @@ def build_l2_frames(path: str, cfg: L2PipelineConfig, target_frames: float | Non
         lf = lf.filter(pl.col("microprice") > float(cfg.quality.min_frame_price))
     lf = lf.with_columns(_ofi_expr(cfg))
     lf = lf.with_columns(_lob_flux_expr())
+    lf = lf.with_columns(_time_of_day_ms_expr("time").alias("__time_ms"))
 
     vc = cfg.volume_clock
 
-    # --- v5.0 Fix: Causal Volume Projection ---
-    # Replace global .sum().over(1) (Paradox 3) with Causal Extrapolation.
-    # Est_Daily_Vol = Current_Cum_Vol / Fraction_Of_Day_Passed
-    
     if getattr(vc, "dynamic_bucket_size", False) or target_frames is not None:
         frames_target = float(target_frames) if target_frames is not None else float(vc.daily_volume_proxy_div)
-        
-        # 1. Calculate Time Fraction
-        session_start = int(cfg.session.session_1_start)
-        session_end = int(cfg.session.session_2_end)
-        total_duration = max(1.0, float(session_end - session_start))
-        
-        # Avoid div/0 at opening: clamp elapsed time to min 1 min (60000 ms)
-        # Ensure elapsed is safe
-        elapsed = (pl.col("time") - session_start).clip(lower_bound=60000)
-        # v5.1 P4: morning spike extrapolation guard.
-        # Raise lower bound from 0.01 to 0.05 to avoid explosive early-session projection.
-        time_fraction = (elapsed / total_duration).clip(lower_bound=0.05, upper_bound=1.0)
-        
-        # 2. Causal Extrapolation
-        # If we are 10% into the day and have 1M vol, we project 10M total.
+
+        elapsed = _ashare_elapsed_expr(pl.col("__time_ms"), cfg)
+        time_fraction = (elapsed / float(cfg.ashare_session.total_duration_ms)).clip(
+            lower_bound=0.05, upper_bound=1.0
+        )
+
         cum_vol_expr = pl.col("vol_tick").cum_sum()
         est_daily_vol = cum_vol_expr / time_fraction
-        
-        # 3. Dynamic Bucket Size
         target_bucket_size = est_daily_vol / frames_target
-        
         bucket_size_expr = (
             pl.when(target_bucket_size > float(vc.min_bucket_size))
             .then(target_bucket_size)
             .otherwise(float(vc.min_bucket_size))
         )
-        
+
         lf = lf.with_columns(
             [
                 cum_vol_expr.alias("cum_vol"),
-                bucket_size_expr.alias("dynamic_bucket_sz")
+                bucket_size_expr.alias("dynamic_bucket_sz"),
             ]
         )
-        
-        # Integral Bucket Sizing
-        # We integrate 1/BucketSize to find BucketID. This naturally adapts to volatility.
         lf = lf.with_columns(
-            (pl.col("vol_tick") / pl.col("dynamic_bucket_sz")).cum_sum().cast(pl.Int64).alias("bucket_id")
+            (pl.col("vol_tick") / pl.col("dynamic_bucket_sz"))
+            .cum_sum()
+            .cast(pl.Int64)
+            .alias("bucket_id")
         )
-        
     else:
-        # Static bucket mode
+        lf = lf.with_columns(pl.col("vol_tick").cum_sum().alias("cum_vol"))
         lf = lf.with_columns(
-            [pl.col("vol_tick").cum_sum().alias("cum_vol")]
+            (pl.col("cum_vol") // float(vc.bucket_size)).cast(pl.Int64).alias("bucket_id")
         )
-        lf = lf.with_columns(
-            [(pl.col("cum_vol") // float(vc.bucket_size)).cast(pl.Int64).alias("bucket_id")]
-        )
+
+    schema_names = set(lf.collect_schema().names())
+    if {"bid_v1", "ask_v1"}.issubset(schema_names):
+        singularity_eps = float(cfg.micro.limit_singularity_eps)
+        singularity_expr = (
+            (pl.col("bid_v1") <= singularity_eps) | (pl.col("ask_v1") <= singularity_eps)
+        ).alias("is_singularity")
+    else:
+        singularity_expr = pl.lit(False).alias("is_singularity")
+    lf = lf.with_columns(singularity_expr)
 
     frames = lf.group_by("bucket_id").agg(
         [
@@ -284,13 +327,14 @@ def build_l2_frames(path: str, cfg: L2PipelineConfig, target_frames: float | Non
             pl.col("v_ofi").cum_sum().alias("ofi_trace"),
             pl.col("vol_tick").alias("vol_list"),
             pl.col("vol_tick").cum_sum().alias("vol_trace"),
-            (pl.col("time") - pl.col("time").first()).alias("time_trace"),
-            pl.col("time").first().alias("time_start"),
-            pl.col("time").last().alias("time_end"),
+            (pl.col("__time_ms") - pl.col("__time_ms").first()).alias("time_trace"),
+            pl.col("__time_ms").first().alias("time_start"),
+            pl.col("__time_ms").last().alias("time_end"),
             pl.col("date").first().alias("date"),
-            pl.count().alias("n_ticks"),
+            pl.len().alias("n_ticks"),
             pl.col("vol_tick").sum().alias("trade_vol"),
             pl.col("lob_flux").sum().alias("cancel_vol"),
+            pl.col("is_singularity").max().alias("has_singularity"),
         ],
         maintain_order=True,
     )
@@ -302,6 +346,9 @@ def build_l2_frames(path: str, cfg: L2PipelineConfig, target_frames: float | Non
             (pl.col("open") > min_frame_px) & (pl.col("close") > min_frame_px)
         )
     frames = frames.with_columns(
-        (pl.col("time_end") - pl.col("time_start")).alias("bar_duration_ms")
+        [
+            (pl.col("time_end") - pl.col("time_start")).alias("bar_duration_ms"),
+            (~pl.col("has_singularity")).alias("is_physics_valid"),
+        ]
     )
     return frames.collect()
