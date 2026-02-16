@@ -106,6 +106,20 @@ Escalate only if `*.done` is not increasing and log `LastWriteTime` stops moving
 2. Check staging directory growth (I/O bound vs stuck).
 3. On Linux, if it stalls after the first archive and processes sit in `futex_`, suspect `fork` + Polars runtime deadlock; use a tag that enforces `spawn` + pool reuse.
 
+## Completion and Stale PID Hygiene
+
+Use this order to mark a run as completed:
+
+1. Log tail contains `Complete. Processed X/X archives.`
+2. `*.done` count matches expected shard cardinality (or explicit rerun list size).
+3. Runtime launcher state is terminal:
+   - Windows Task Scheduler state is `Ready` (not `Running`)
+   - Linux has no `pipeline_runner.py --stage frame` process
+
+Important:
+- Do not treat a PID file alone as liveness. PID files can be stale after normal completion.
+- Keep status checks low-overhead (log tail + done count + scheduler/process existence) and avoid WMI/perf polling loops.
+
 ## Resources
 
 - `scripts/ssh_ps.py`: run PowerShell scripts over SSH safely (EncodedCommand).

@@ -38,7 +38,7 @@ def install_dependencies():
     logger.info("Installing dependencies...")
     subprocess.check_call([
         sys.executable, "-m", "pip", "install", 
-        "optuna", "polars", "gcsfs", "fsspec", "scikit-learn", "numpy", "pandas", "google-cloud-storage"
+        "optuna", "polars", "gcsfs", "fsspec", "scikit-learn", "numpy", "pandas", "google-cloud-storage", "psutil"
     ])
 
 def bootstrap_codebase():
@@ -91,16 +91,22 @@ def run_optimization(n_trials, output_uri):
 
     logger.info(f"Found {len(train_files)} training files (2023-2024).")
 
-    # Sample 20 random files for the study (stochastic approximation)
-    selected_files = np.random.choice(train_files, size=min(len(train_files), 20), replace=False)
+    # Sample 1 random file for the study to prevent OOM on n1-standard-4 (15GB Limit)
+    # We rely on Swarm Diversity (many workers = many different files) rather than 1 worker loading many.
+    selected_files = np.random.choice(train_files, size=1, replace=False)
     selected_files = ["gs://" + f for f in selected_files]
-    logger.info(f"Loaded {len(selected_files)} files for study.")
+    logger.info(f"Loaded 1 file for study: {selected_files[0]}")
     
-    # Pre-load data into memory (if fits)
-    df_raw = pl.scan_parquet(selected_files).collect()
-    logger.info(f"Data Loaded: {df_raw.height} rows.")
+    # Pre-load data into memory (Lazy -> Sample -> Collect)
+    # Downsample to 10k rows MAX to fit in RAM.
+    # Vectorized physics (pad_traces) expands (N, L) dense matrix.
+    # 10k rows * 5000 ticks * 8 bytes = ~400MB. Safe.
+    # 200k rows was ~8GB -> OOM.
+    df_raw = pl.scan_parquet(selected_files).head(10000).collect()
+    logger.info(f"Data Loaded: {df_raw.height} rows (capped at 10k).")
 
     def objective(trial):
+        import gc
         # Suggest Params
         y_ema_alpha = trial.suggest_float("y_ema_alpha", 0.01, 0.2)
         peace_threshold = trial.suggest_float("peace_threshold", 0.3, 0.9)
@@ -162,6 +168,9 @@ def run_optimization(n_trials, output_uri):
         except Exception as e:
             # logger.warning(f"Trial failed: {e}")
             return -1.0
+        finally:
+            del df_proc
+            gc.collect()
 
     # Run Study
     study = optuna.create_study(direction="maximize")
@@ -178,12 +187,32 @@ def run_optimization(n_trials, output_uri):
         "timestamp": time.time()
     }
     
+    # Print Result as Backup (so we can recover from logs if GCS upload fails)
+    print("--- OPTIMIZATION RESULT JSON START ---")
+    print(json.dumps(result))
+    print("--- OPTIMIZATION RESULT JSON END ---")
+
     # Save to GCS
     if output_uri:
-        with open("best_params.json", "w") as f:
-            json.dump(result, f)
-        subprocess.check_call(["gsutil", "cp", "best_params.json", output_uri])
-        logger.info(f"Result uploaded to {output_uri}")
+        try:
+            # Use Python API instead of gsutil
+            from google.cloud import storage
+            client = storage.Client()
+            
+            # Parse gs://bucket/path/to/blob
+            uri = output_uri
+            if uri.startswith("gs://"):
+                uri = uri[5:]
+            
+            bucket_name, blob_name = uri.split("/", 1)
+            bucket = client.bucket(bucket_name)
+            blob = bucket.blob(blob_name)
+            
+            blob.upload_from_string(json.dumps(result, indent=2))
+            logger.info(f"Result uploaded to gs://{bucket_name}/{blob_name}")
+        except Exception as e:
+            logger.error(f"Failed to upload result to GCS: {e}")
+            # Do not exit with error, we printed the result already.
 
 def main():
     parser = argparse.ArgumentParser()

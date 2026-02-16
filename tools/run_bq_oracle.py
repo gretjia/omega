@@ -82,9 +82,9 @@ SQL_EXPLAIN = f"""
 SELECT
   *
 FROM
-  ML.GLOBAL_EXPLAIN(MODEL `{DATASET}.oracle_v1`)
+  ML.FEATURE_IMPORTANCE(MODEL `{DATASET}.oracle_v1`)
 ORDER BY
-  attribution DESC;
+  importance_weight DESC;
 """
 
 SQL_RADAR = f"""
@@ -153,7 +153,7 @@ def main():
         if res:
             print("\n--- ORACLE FEATURE IMPORTANCE ---")
             for row in res:
-                print(f"{row.feature:<30} | {row.attribution:.4f}")
+                print(f"{row.feature:<30} | {row.importance_weight:.4f}")
 
     if args.radar:
         res = run_query(client, SQL_RADAR, "Scanning Market Radar")

@@ -26,7 +26,7 @@ IMAGE_URI = "python:3.10" # Use 3.10 for better compatibility
 MACHINE_TYPE = "n1-standard-4"
 
 def submit_job(worker_id):
-    job_name = f"swarm-v52-w{worker_id:02d}"
+    job_name = f"swarm-v52i-w{worker_id:02d}"
     output_uri = f"gs://{BUCKET_NAME}/staging/results/best_params_{job_name}.json"
     
     # The command to run inside the container
