@@ -12,6 +12,7 @@
 
 ## 2. Backtest Results (2025-2026)
 **Data:** 130 files (Out-of-Sample).
+**Coverage:** **Partial (~50%)**. Only `windows1` host data was available (Linux1 storage offline).
 **Sample Size:** 100,000 rows (OOM Safe Mode).
 
 | Metric | Value | Threshold | Result |
