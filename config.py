@@ -593,7 +593,7 @@ class L2SRLConfig:
     # Adaptive Y recursion bounds
     y_min: float = 0.1
     y_max: float = 5.0
-    y_ema_alpha: float = 0.05
+    y_ema_alpha: float = 0.1494  # Optimized (Hero Run)
     # v40 patch_02: anchor prior learned from market-wide implied Y distribution
     anchor_y: float = 0.75
     anchor_weight: float = 0.01
@@ -668,7 +668,7 @@ class L2SignalConfig:
     Signal synthesis thresholds.
     """
     epiplexity_min: float = 0.4
-    peace_threshold: float = 0.35
+    peace_threshold: float = 0.8799  # Optimized (Hero Run)
     srl_resid_sigma_mult: float = 2.0
     topo_area_min_abs: float = 1e-9
     topo_energy_sigma_mult: float = 10.0
