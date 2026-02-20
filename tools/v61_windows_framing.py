@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-v61 Linux Framing Agent (SHARDED).
+v61 Windows Framing Agent (SHARDED).
 Processes raw 7z archives -> Parquet Frames.
 Supports 2023-2026 data.
 """
@@ -14,14 +14,14 @@ from pathlib import Path
 from multiprocessing import Pool
 
 # Add project root to sys.path
-sys.path.append("/home/zepher/work/Omega_vNext")
+sys.path.append(r"C:\Omega_vNext")
 
 from config import load_l2_pipeline_config
 from omega_core.omega_etl import build_l2_frames
 
-RAW_ROOT = Path("/omega_pool/raw_7z_archives")
-OUTPUT_ROOT = Path("/omega_pool/parquet_data/v52/frames/host=linux1")
-SEVEN_ZIP = "/usr/bin/7z"
+RAW_ROOT = Path(r"E:\data\level2")
+OUTPUT_ROOT = Path(r"D:\Omega_frames\v61\host=windows1")
+SEVEN_ZIP = r"C:\Program Files\7-Zip\7z.exe"
 
 def get_shard(filename, total_shards):
     h = hashlib.md5(filename.encode()).hexdigest()
@@ -33,27 +33,34 @@ def process_day(args):
     
     filename = day_path.name
     if get_shard(filename, total_shards) != shard_index:
-        return None # Silent skip for sharding
+        return None
         
+    os.chdir(r"C:\Omega_vNext")
     cfg = load_l2_pipeline_config()
     date_str = day_path.stem
     try:
-        hash_str = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"], cwd="/home/zepher/work/Omega_vNext").decode().strip()
+        hash_str = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"], cwd=r"C:\Omega_vNext").decode().strip()
     except:
         hash_str = "unknown"
-        
+
     out_path = OUTPUT_ROOT / f"{date_str}_{hash_str}.parquet"
     done_path = OUTPUT_ROOT / f"{date_str}_{hash_str}.parquet.done"
     
     if done_path.exists():
-        return f"Skipped {date_str} (Already Done)"
+        return f"Skipped {date_str} (Done)"
         
     print(f"[{date_str}] Starting processing (Shard {shard_index}/{total_shards})...", flush=True)
     
     import uuid
     unique_id = uuid.uuid4().hex
-    tmp_dir = Path(f"/omega_pool/temp_framing/{date_str}_{unique_id}")
-    tmp_dir.mkdir(parents=True, exist_ok=True)
+    tmp_dir = Path(f"D:/tmp/framing/{date_str}_{unique_id}")
+    
+    try:
+        if tmp_dir.exists():
+            subprocess.run(["rmdir", "/s", "/q", str(tmp_dir)], shell=True, check=False)
+        tmp_dir.mkdir(parents=True, exist_ok=True)
+    except Exception as e:
+        return f"Setup Error {date_str}: {e}"
     
     try:
         cmd = [SEVEN_ZIP, "x", str(day_path), f"-o{tmp_dir}", "-y"]
@@ -61,7 +68,7 @@ def process_day(args):
         
         csvs = list(tmp_dir.glob("**/*.csv"))
         if not csvs:
-            return f"Error {date_str}: No CSVs found in 7z"
+            return f"Error {date_str}: No CSVs found"
             
         frames = build_l2_frames([str(p) for p in csvs], cfg)
         
@@ -70,19 +77,22 @@ def process_day(args):
             done_path.touch()
             return f"Completed {date_str}: {frames.height} rows"
         else:
-            return f"Error {date_str}: Empty frames generated"
+            return f"Error {date_str}: Empty frames"
             
     except Exception as e:
         return f"CRITICAL Error {date_str}: {e}"
     finally:
-        if tmp_dir.exists():
-            subprocess.run(["rm", "-rf", str(tmp_dir)], check=False)
+        try:
+            if tmp_dir.exists():
+                subprocess.run(["rmdir", "/s", "/q", str(tmp_dir)], shell=True, check=False)
+        except:
+            pass
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--years", default="2023,2024,2025,2026")
     ap.add_argument("--workers", type=int, default=4)
-    ap.add_argument("--shard", type=int, default=0, help="Shard index (0 to N-1)")
+    ap.add_argument("--shard", type=int, default=1, help="Shard index (0 to N-1)")
     ap.add_argument("--total-shards", type=int, default=2, help="Total number of shards")
     args = ap.parse_args()
     
@@ -94,15 +104,14 @@ def main():
     for year in years:
         year_path = RAW_ROOT / year
         if year_path.exists():
-            all_files.extend(list(year_path.rglob("*.7z")))
-            all_files.extend(list(year_path.rglob("*.rar")))
+             for p in year_path.rglob("*.7z"):
+                 all_files.append(p)
         
-        # Check for YearMonth style folders (e.g. 202601)
         for sub in RAW_ROOT.glob(f"{year}*"):
             if sub.is_dir() and sub.name != year:
-                all_files.extend(list(sub.rglob("*.7z")))
+                 for p in sub.rglob("*.7z"):
+                     all_files.append(p)
 
-    # Filter by shard BEFORE spawning Pool to save memory/time
     tasks = []
     skipped_by_shard = 0
     for f in all_files:
@@ -114,7 +123,7 @@ def main():
     print(f"Total files found: {len(all_files)}")
     print(f"Files assigned to this shard ({args.shard}/{args.total_shards}): {len(tasks)}")
     print(f"Files skipped by sharding: {skipped_by_shard}")
-    
+
     if not tasks:
         print("Nothing to do for this shard. Exiting.")
         return
