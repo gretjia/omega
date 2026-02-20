@@ -1,8 +1,132 @@
-# OMEGA v5.0: The Holographic Damper
+# OMEGA v5.2: The Epistemic Release (Distributed Controller-Worker)
 
 > **"Physics is invariant. Structure is emergent. The observer is bounded."**
 
-OMEGA v5.0 represents the convergence of **Universal Market Physics** (Sato 2025) and **Computational Information Theory** (Finzi 2026). It abandons empirical parameter tuning in favor of deriving trading signals from first principles: the universality of the Square-Root Law and the compressibility of market data.
+OMEGA v5.2 represents the convergence of **Universal Market Physics** (Sato 2025) and **Computational Information Theory** (Finzi 2026), plus a hard engineering pivot:
+- **DoD 指标换轨**：`Vector Alignment (Physics)` -> `Model_Alignment (Epistemic)`，并保留 `Phys_Alignment` 作为基线对照。
+- **内存/吞吐换轨**：禁用 `to_dicts()` 行级展开；核心算子张量化/向量化；仅保留严格因果的轻量 IIR 递推。
+- **分布式执行换轨**：Mac 作为 **Controller（代码与配置权威）**；Windows1 + Linux 作为 **Workers（只拉代码、跑 framing）**；原始 `.7z` 数据不进 Git。
+
+---
+
+## 当前执行方式（2026-02-15，必须读）
+
+你现在的实际环境是：
+- **Mac**：Codex IDE 所在机，负责“改代码/写文档/发版本/分片编排”。
+- **Windows1 + Linux**：各自外挂 `USB4 8T NVMe SSD`，两块盘内原始 `.7z` 数据完全一致；因此 **不需要内网搬运 raw 数据**，只需要同步代码与分片清单。
+
+对应的落地文件/入口：
+- 分布式总纲：`audit/v52_3_machies_sync.md`
+- v52 后续实施总计划：`audit/v52_final_implementation_plan.md`
+- 运行元信息模板：`audit/runtime/v52/run_meta.template.json`
+
+### 强制纪律（否则会踩坑）
+
+1. **禁止在 SMB/磁盘映射目录里当主工作区改代码**（会和 worker 跑任务互相污染）。
+   - Controller（Mac）必须在本机磁盘持有完整 repo（例如 `~/work/Omega_vNext`）。
+2. **Workers 永远只读拉取代码**（不要 push；不要在 worker 上改核心逻辑）。
+3. **任何 framing/training/run 必须 pin 到明确的 Git commit 或 tag**，并写入 `run_meta.json`（由 `run_meta.template.json` 复制）。
+4. `.gitignore` 负责隔离：`.7z` / `.parquet` / artifacts / logs 一律不进 Git。
+
+---
+
+## v5.2 分布式同步与运行（推荐路径）
+
+### 1) Mac Controller：本地 clone + 本地 bare origin
+
+推荐目录约定（示例）：
+- 控制工作区（可编辑）：`~/work/Omega_vNext`
+- 局域网 origin（bare repo，仅存 git objects）：`~/git/Omega_vNext.git`
+
+> 注意：如果你无法在 macOS 开启 SSH（Remote Login），也可以走只读 `git://`（见下文）。
+
+### 2) Workers：从 Mac 拉代码（两种传输方式选一个）
+
+#### Option A：SSH（安全，需开启 macOS Remote Login）
+- URL 形如：`ssh://<mac_user>@<mac_ip>/Users/<mac_user>/git/Omega_vNext.git`
+
+#### Option B：`git://` daemon（只读，免管理员权限）
+Controller（Mac）启动方式（一次性/或由 LaunchAgent 常驻）：
+```bash
+touch ~/git/Omega_vNext.git/git-daemon-export-ok
+git daemon --reuseaddr --base-path=$HOME/git --listen=0.0.0.0 --port=9418 $HOME/git/Omega_vNext.git
+```
+Worker clone URL：
+```bash
+git clone git://<mac_ip>/Omega_vNext.git
+```
+验证连通：
+```bash
+git ls-remote git://<mac_ip>/Omega_vNext.git
+```
+安全提示：`git://` 无鉴权，仅限可信内网使用。
+
+---
+
+## 并行 framing（Windows1 + Linux 同时跑，零 raw 传输）
+
+### 1) 生成分片清单（在任意一台“有 raw .7z”的机器上执行）
+
+> 因为 Windows1 与 Linux 的 raw 盘内容完全一致，所以分片清单在哪台生成都一样。
+
+```bash
+python tools/build_7z_shards.py --root <RAW_ROOT> --out-dir audit/runtime/v52 --rule date_mod2
+```
+
+输出：
+- `audit/runtime/v52/archive_manifest_7z.txt`
+- `audit/runtime/v52/shard_windows1.txt`
+- `audit/runtime/v52/shard_linux.txt`
+
+将这 3 个小文件同步回 Mac Controller 的 repo 后，由 Mac 提交并 push（Workers 只 pull）。
+
+### 2) Workers 各跑各的 shard（核心入口：`--archive-list`）
+
+Windows1：
+```bash
+python pipeline_runner.py --stage frame --config configs/hardware/windows1.yaml --archive-list audit/runtime/v52/shard_windows1.txt
+```
+
+Linux：
+```bash
+python pipeline_runner.py --stage frame --config configs/hardware/linux.yaml --archive-list audit/runtime/v52/shard_linux.txt
+```
+
+`--archive-list` 支持：
+- 清单内为相对路径（相对 `storage.source_root`）
+- 或绝对路径（Windows/Linux 都可）
+
+### 3) staging 与输出目录建议（重要）
+
+- `RAW_ROOT`：USB4 盘（顺序读为主）
+- `STAGE_ROOT`：尽量走内置 NVMe（解压/IO 压力大）
+- `OUTPUT_ROOT`（frames parquet）：USB4 盘或内置大盘均可，但两台机器不要写同一目录（避免覆盖）
+
+---
+
+## 原始数据双备份同步机制（未来 raw data 变更时）
+
+目标：当 raw `.7z` 有新增/修正时，能快速确认 Windows1 与 Linux 两份 raw 是否一致，并只补齐差异。
+
+### 1) 各自生成 raw manifest（不进 Git）
+```bash
+python tools/gen_raw_manifest.py --root <RAW_ROOT> --ext .7z --out raw_manifest_<host>.jsonl
+```
+
+怀疑静默损坏时用强校验（慢）：
+```bash
+python tools/gen_raw_manifest.py --root <RAW_ROOT> --ext .7z --hash sha256 --out raw_manifest_<host>.jsonl
+```
+
+### 2) 比对 manifest，生成差异清单
+```bash
+python tools/compare_raw_manifests.py \
+  --a raw_manifest_source.jsonl \
+  --b raw_manifest_mirror.jsonl \
+  --out-missing-in-b raw_missing_or_changed.txt
+```
+
+然后用 `rsync/rclone/robocopy` 按清单复制缺失/变更文件；复制后两边重新生成 manifest 再 compare 复核。
 
 ---
 
@@ -72,9 +196,9 @@ graph TD
 
 ## 快速开始 (Quick Start)
 
-多机代码发布入口（Mac 一键推送并触发 Windows1/Windows2 更新）：
-- `tools/git_sync/mac_publish_and_rollout.sh`
-- 细则见下方 `9. Mac 一键代码发布到 Windows1/Windows2`
+v5.2 多机（Mac Controller + Windows1/Linux Workers）优先按本 README 上方 “分布式同步与运行 / 并行 framing” 执行。
+
+下方历史章节（Windows Hub / 计划任务 / v5 runtime）仅保留为参考，不再作为 v5.2 推荐路径。
 
 ### 1. 配置硬件
 OMEGA v5.0 自动检测硬件配置。首次运行会自动生成默认配置：
@@ -116,15 +240,22 @@ python parallel_trainer/run_parallel_backtest_v31.py
 - 版本信息改放在元数据、审计文档与 `archive/legacy/...` 路径层级。
 - 当前 `run_parallel_v31.py` / `run_parallel_backtest_v31.py` 仍保留为兼容入口，后续按治理方案迁移为无版本入口。
 
-### 6. Mac 主控 SSH（Windows_1）
-已验证可从 Mac 无交互连接 Windows_1（仅连通 smoke，不触发 framing/train/backtest）。
+### 6. 主机登录信息与 v52 职能分工
 
-Windows_1:
+#### 6.1 windows1-w1（Windows_1）
+- Alias: `windows1-w1`
 - Hostname: `DESKTOP-41JIDL2`
 - User: `jiazi`
 - IP: `192.168.3.112`
+- Auth: `~/.ssh/id_ed25519`（publickey）
+- RepoPath: `C:\\Omega_vNext`
+- GitBranch: `v52`
+- 连接验证：
+```bash
+ssh windows1-w1 "hostname && whoami"
+```
 
-Mac `~/.ssh/config` 固化条目：
+Mac `~/.ssh/config`：
 ```sshconfig
 Host windows1-w1
     HostName 192.168.3.112
@@ -137,12 +268,96 @@ Host windows1-w1
     ConnectTimeout 8
 ```
 
-连通 smoke:
+#### 6.2 linux1-lx（Linux / zepher-linux）
+- Alias: `linux1-lx`
+- Hostname: `zepher-linux`
+- User: `zepher`
+- IP: `192.168.3.113`
+- Auth: `~/.ssh/id_ed25519`（publickey, Mac -> Linux 已配置免密，2026-02-15）
+- Notes: Mac 是中央控制器；若遇到 `Connection refused` / 连接极慢，通常是 Mac 多网卡导致源 IP 选错，使用 `BindAddress=192.168.3.49` 或命令行 `ssh -b 192.168.3.49 ...`。
+- Notes: 远程执行需要 `sudo` 时，建议用 `ssh -tt linux1-lx 'sudo ...'`（避免无 TTY 导致 sudo 失败）。
+- 连接验证：
 ```bash
-ssh windows1-w1 "hostname && whoami"
+ssh -b 192.168.3.49 linux1-lx "hostname && whoami"
+ssh -o BatchMode=yes -b 192.168.3.49 linux1-lx "hostname && whoami"
 ```
 
-说明：当前 Mac 存在双网卡同网段场景，需绑定源地址（`BindAddress 192.168.3.49`）以避免偶发 `No route to host`。
+Mac `~/.ssh/config` 建议条目：
+```sshconfig
+Host linux1-lx
+    HostName 192.168.3.113
+    User zepher
+    BindAddress 192.168.3.49
+    IdentityFile ~/.ssh/id_ed25519
+    IdentitiesOnly yes
+    PreferredAuthentications publickey
+    StrictHostKeyChecking accept-new
+    ConnectTimeout 8
+```
+
+#### 6.3 v52 规划下两台主机后续职能
+- `windows1-w1`：Edge/Execution 节点。负责 Windows/QMT 侧执行、订单通道与盘中监控；保留生产运行日志与回测验收结果。
+- `linux1-lx`：Alchemy/Compute 节点。负责大规模 ETL（压缩包处理、特征提取、Parquet 化）、训练前数据治理、脚本开发验证；作为连接 Vertex AI 的主要离线计算与任务提交节点。
+- 协同边界：Linux 产出模型与配置（如 `omega_v5_model_final.pkl` / `production_config.json`）后同步到 Windows。
+- 协同边界：Windows 仅负责执行与监控，不承担重 ETL/训练任务，避免资源争抢。
+
+#### 6.4 Linux 8TB ZFS 数据池（omega_pool）
+目标：把 8TB 盘转成 ZFS 池，稳定挂载到 `/omega_pool`，避免 `/etc/fstab` 风险，并为后续 CSV/Parquet IO 提供可控压缩策略。
+
+- 8TB 盘：Great Wall GW7000 8TB（`/dev/nvme2n1`）
+- ZFS pool：`omega_pool`（by-id：`/dev/disk/by-id/nvme-Great_Wall_GW7000_8TB_2025091105000028`）
+- 挂载点：`/omega_pool`
+- Dataset：`omega_pool/raw_7z_archives`（`compression=off`）
+- Dataset：`omega_pool/parquet_data`（`compression=off`）
+- Dataset：`omega_pool/csv_data`（`compression=lz4`）
+- TRIM：`zpool set autotrim=on omega_pool`
+- TRIM：`systemctl status fstrim.timer` 应为 `active (waiting)`
+
+数据回迁（进行中，2026-02-15）：
+- 源：`/home/zepher/data/level2/`（2.6TB `.7z` 备份已确认在 4TB 盘）
+- 目标：`/omega_pool/raw_7z_archives/`
+- 后台命令（已执行）：
+```bash
+nohup rsync -a --info=progress2 --remove-source-files \
+  /home/zepher/data/level2/ /omega_pool/raw_7z_archives/ \
+  > /home/zepher/move_level2_to_omega_pool_2026-02-15_153001.log 2>&1 &
+```
+- 进度查看（Mac 侧）：
+```bash
+ssh -b 192.168.3.49 linux1-lx "pgrep -a rsync || true"
+ssh -b 192.168.3.49 linux1-lx "tail -n 50 /home/zepher/move_level2_to_omega_pool_2026-02-15_153001.log"
+ssh -b 192.168.3.49 linux1-lx "du -sh /home/zepher/data/level2 /omega_pool/raw_7z_archives || true"
+```
+- 完成后收尾：
+```bash
+ssh -tt -b 192.168.3.49 linux1-lx "find /home/zepher/data/level2 -type d -empty -delete"
+```
+
+#### 6.5 v52 审计文件研究（按创建时间）与 Handover 后计划
+v52 文件（`./audit`，按创建时间升序）：
+- 2026-02-14 19:17:32 `audit/v52.md`
+- 2026-02-14 19:24:39 `audit/v52_code.md`
+- 2026-02-14 19:25:49 `audit/v52_vertex.md`
+- 2026-02-14 19:51:17 `audit/v52_vertex_audit.md`
+- 2026-02-14 21:04:17 `audit/v52_vertex_audit_reviewed.md`
+- 2026-02-14 21:24:08 `audit/v52_implementation_plan.md`
+- 2026-02-15 10:04:44 `audit/v52_vectorization_impact.md`
+- 2026-02-15 10:06:34 `audit/v52_good_engineering_practice.md`
+- 2026-02-15 11:05:53 `audit/v52_implementation_status.md`
+
+要点摘录（只保留可执行信息）：
+- `audit/v52.md`：定位“物理阻尼 vs 智能主力”的度量错配；建议把 DoD 从单一 `Vector Alignment` 改为双轨：`Phys_Alignment`（对照组）+ `Model_Alignment`（验收指标）。
+- `audit/v52_code.md`：明确落地路径：`kernel.py` 去 `to_dicts()`，保留 IIR 标量递推，其他全部张量化；并提供 `trainer_v52.py` / `physics_auditor.py` 的双轨对齐实现方向。
+- `audit/v52_implementation_plan.md`：三机杠铃架构：Mac 控制塔 + Linux 炼金 ETL + Vertex 云端训练/寻优 + Windows QMT 边缘执行。
+- `audit/v52_vectorization_impact.md` + `audit/v52_good_engineering_practice.md`：确认“向量化等价但更稳”，速度/内存收益来自张量化 + 混合循环（递推留在标量循环里）。
+- `audit/v52_implementation_status.md`：代码面 smoke test 已跑通；下一步重点是生成并落地 `audit/v52_vertex.md` 所需的云端提交脚本与数据上传路径。
+
+Handover 后准备计划（按依赖顺序）：
+1) 存储层收尾：等待 rsync 迁移完成，确认 `.7z` 全部落在 `/omega_pool/raw_7z_archives/`，源目录清空并删除空目录。
+2) ETL/数据湖：在 `linux1-lx` 实现并验证 `etl_forge.py`（读取 `.7z` -> 产出 Parquet -> 写入 `/omega_pool/parquet_data/`，必要时增量上传至 GCS）。
+3) Vertex 提交脚本：按 `audit/v52_vertex.md` 生成/实现 `submit_vertex_job.py` 与（可选）`submit_vertex_sweep.py`，统一从 Mac 控制塔提交任务，训练数据从 GCS 读取，产物回写到 GCS。
+4) Edge 部署：把云端产出的模型解体为 `weights.json`（Scaler mean/scale + coef/intercept），在 Windows/QMT 侧仅做轻量前向推理，避免环境依赖冲突。
+5) 审计门控：以 `Model_Alignment` 作为验收门槛（`> 0.6`），保留 `Phys_Alignment` 作为 null hypothesis 证据；把每日盘后审计作为“漂移熔断”触发条件之一。
 
 ### 7. Windows_1 后台全链路（训练+回测）执行与监控（v5）
 当前 detached 主入口：`audit/v5_runtime/windows/run_full_noresume_detached.ps1`。
@@ -215,14 +430,24 @@ git remote rename origin hub
 ```
 
 #### 9.2 SSH 主机别名（Mac `~/.ssh/config`）
-
-至少配置两个目标主机（示例）：
+建议至少配置以下主机（示例）：
 ```sshconfig
 Host windows1-w1
     HostName 192.168.3.112
     User jiazi
+    BindAddress 192.168.3.49
     IdentityFile ~/.ssh/id_ed25519
     IdentitiesOnly yes
+    PreferredAuthentications publickey
+    StrictHostKeyChecking accept-new
+
+Host linux1-lx
+    HostName 192.168.3.113
+    User zepher
+    BindAddress 192.168.3.49
+    IdentityFile ~/.ssh/id_ed25519
+    IdentitiesOnly yes
+    PreferredAuthentications publickey
     StrictHostKeyChecking accept-new
 
 Host windows2-w2

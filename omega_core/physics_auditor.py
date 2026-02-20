@@ -18,7 +18,7 @@ import polars as pl
 
 from config import L2PipelineConfig
 from omega_core.kernel import OmegaKernel, apply_recursive_physics
-from omega_core.trainer_v51 import get_latest_model, evaluate_frames
+from omega_core.trainer import get_latest_model, evaluate_frames
 
 
 class OmegaPhysicsAuditor:

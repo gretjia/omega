@@ -17,13 +17,11 @@ import polars as pl
 
 from config import L2PipelineConfig, load_l2_pipeline_config
 from omega_core.omega_etl import build_l2_frames
-from omega_core.omega_math_core import (
-    calc_srl_state,
-)
 from omega_core.omega_math_vectorized import (
     calc_epiplexity_vectorized,
     calc_topology_area_vectorized,
-    calc_holographic_topology_vectorized
+    calc_holographic_topology_vectorized,
+    calc_srl_recursion_loop
 )
 
 def _apply_recursive_physics(
@@ -131,44 +129,43 @@ def _apply_recursive_physics(
             arr_x, arr_y, x_scale, y_scale, float(topo_cfg.green_coeff)
         )
 
-    # --- Sequential Recursion (Scalar Loop - Fast) ---
-    out_srl_resid = np.zeros(n_rows, dtype=np.float64)
-    out_y = np.zeros(n_rows, dtype=np.float64)
-    out_spoof = np.zeros(n_rows, dtype=np.float64)
-    
-    current_y = float(srl.y_coeff) if initial_y is None else float(initial_y)
+    # --- Sequential Recursion (Vectorized/JIT) ---
+    initial_y_val = float(srl.y_coeff) if initial_y is None else float(initial_y)
 
-    print(f"    Running Recursive Physics on {n_rows} rows...", flush=True)
+    # Prioritize contiguous float64 for Numba speed
+    pc_arr = np.ascontiguousarray(price_change, dtype=np.float64)
+    sigma_arr = np.ascontiguousarray(sigma_eff, dtype=np.float64)
+    ofi_arr = np.ascontiguousarray(net_ofi, dtype=np.float64)
+    depth_arr = np.ascontiguousarray(depth_eff, dtype=np.float64)
+    cancel_arr = np.ascontiguousarray(cancel_vol, dtype=np.float64)
+    trade_arr = np.ascontiguousarray(trade_vol, dtype=np.float64)
+    active_arr = np.ascontiguousarray(out_is_active, dtype=bool)
+    epi_arr = np.ascontiguousarray(out_epi, dtype=np.float64)
     
-    for i in range(n_rows):
-        # Universal SRL (Delta=0.5)
-        # Manually inlined for speed or call func? Func is fine for scalar ops.
-        # But for 100k rows, avoiding func call overhead is better.
-        # Let's keep calc_srl_state for correctness unless profiling demands it.
-        
-        resid, imp_y, eff_d, spoof = calc_srl_state(
-            price_change=price_change[i],
-            sigma=sigma_eff[i],
-            net_ofi=net_ofi[i],
-            depth=depth_eff[i],
-            current_y=current_y,
-            cfg=srl,
-            cancel_vol=cancel_vol[i],
-            trade_vol=trade_vol[i],
-        )
-        out_srl_resid[i] = resid
-        out_spoof[i] = spoof
-        
-        # Adaptive Y Update
-        if out_is_active[i] and out_epi[i] > peace_threshold and abs(net_ofi[i]) > min_ofi_for_y:
-            new_y = float(np.clip(imp_y, y_min, y_max))
-            current_y = (1.0 - y_alpha) * current_y + y_alpha * new_y
-            
-        if anchor_w > 0.0:
-            current_y = (1.0 - anchor_w) * current_y + anchor_w * anchor_y
-            
-        current_y = float(np.clip(current_y, clip_lo, clip_hi))
-        out_y[i] = current_y
+    print(f"    Running Recursive Physics (JIT) on {n_rows} rows...", flush=True)
+    
+    out_srl_resid, out_y, out_spoof = calc_srl_recursion_loop(
+        n_rows,
+        pc_arr, sigma_arr, ofi_arr, depth_arr, cancel_arr, trade_arr,
+        initial_y_val,
+        # Params
+        float(getattr(srl, "depth_floor", 1.0)), 
+        float(getattr(srl, "sigma_floor", 0.01)), 
+        float(getattr(srl, "spoof_ratio_eps", 1e-9)), 
+        float(getattr(srl, "spoof_penalty_gamma", 0.5)),
+        float(getattr(srl, "implied_y_min_impact", 1e-9)), 
+        float(getattr(srl, "implied_y_min_penalty", 0.5)),
+        float(getattr(srl, "y_min", 0.1)), 
+        float(getattr(srl, "y_max", 5.0)), 
+        float(getattr(srl, "y_ema_alpha", 0.05)), 
+        float(getattr(srl, "anchor_y", srl.y_coeff)), 
+        float(anchor_w),
+        float(clip_lo), 
+        float(clip_hi),
+        active_arr, epi_arr, 
+        float(peace_threshold), 
+        float(min_ofi_for_y)
+    )
 
     # --- Assembly ---
     # Overwrite topo_area with micro feature if present
@@ -183,7 +180,7 @@ def _apply_recursive_physics(
     
     # Vectorized Depth Eff
     spoof_gamma = float(getattr(srl, "spoof_penalty_gamma", 0.0))
-    depth_eff_arr = depth_eff * np.exp(-spoof_gamma * out_spoof)
+    depth_eff_arr = np.maximum(depth_eff * np.exp(-spoof_gamma * out_spoof), float(srl.depth_floor))
     columns_to_add.append(pl.Series("depth_eff", depth_eff_arr))
 
     columns_to_add.extend([

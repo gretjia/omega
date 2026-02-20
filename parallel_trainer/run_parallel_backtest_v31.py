@@ -34,10 +34,7 @@ import shutil
 sys.path.append(str(Path(__file__).parent.parent))
 
 from config import L2PipelineConfig, load_l2_pipeline_config
-try:
-    from omega_core.trainer_v51 import OmegaTrainerV3, evaluate_frames, evaluate_dod
-except ImportError:
-    from omega_core.trainer import OmegaTrainerV3, evaluate_frames, evaluate_dod
+from omega_core.trainer import OmegaTrainerV3, evaluate_frames, evaluate_dod
 
 
 def _sanitize_for_json(value):

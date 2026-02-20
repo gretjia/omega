@@ -13,7 +13,7 @@ sys.path.append(os.getcwd())
 from config import load_l2_pipeline_config, replace, L2IOConfig, L2TrainConfig
 from pipeline.engine.framer import Framer
 from pipeline.config.hardware import HardwareProfile
-from omega_core.trainer_v51 import OmegaTrainerV3, evaluate_frames
+from omega_core.trainer import OmegaTrainerV3, evaluate_frames
 
 # Paths
 SMOKE_ROOT = Path("data/smoke_v52")

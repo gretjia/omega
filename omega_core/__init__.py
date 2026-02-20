@@ -1,16 +1,6 @@
 """
-omega_core package bootstrap.
+omega_core package bootstrap (OMEGA v5.2).
 
-Note:
-- `omega_core/trainer.py` is temporarily file-locked on the current workspace volume.
-- We expose v5.1 trainer implementation through `omega_core.trainer` via module alias
-  to preserve all existing imports.
+The canonical trainer now lives in `trainer.py` (renamed from `trainer_v51.py`).
+`import omega_core.trainer` resolves directly via standard Python module resolution.
 """
-
-from __future__ import annotations
-
-import sys as _sys
-
-from . import trainer_v51 as _trainer_v51
-
-_sys.modules[__name__ + ".trainer"] = _trainer_v51
