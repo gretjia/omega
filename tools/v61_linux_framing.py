@@ -147,10 +147,9 @@ def main():
         print("Nothing to do for this shard. Exiting.")
         return
 
-    # maxtasksperchild=1: Force worker death after each 7z+ETL cycle.
-    # Polars/Rust jemalloc hoards 7-15GB per worker and won't release to OS.
-    # Worker restart forces OS Ring-0 page reclaim.
-    with Pool(args.workers, maxtasksperchild=1) as p:
+    # maxtasksperchild=5: Balance between jemalloc memory release and cold-start cost.
+    # Worker restarts every 5 files to return hoarded pages to OS Ring-0.
+    with Pool(args.workers, maxtasksperchild=5) as p:
         for res in p.imap_unordered(process_day, tasks):
             if res:
                 print(res, flush=True)
