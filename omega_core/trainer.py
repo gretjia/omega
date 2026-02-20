@@ -436,7 +436,13 @@ def _vector_alignment(
             return expr.over("symbol")
         return expr
 
-    merged = frames.with_columns(
+    # Explicitly sort by causal time order before applying shift
+    # to avoid data bleeding between concatenated files/symbols.
+    sort_cols = ["time_end"]
+    if "symbol" in frames.columns:
+        sort_cols = ["symbol", "time_end"]
+    
+    merged = frames.sort(sort_cols).with_columns(
         (_over_symbol(pl.col("close").shift(-int(horizon))) - pl.col("close")).alias("fwd_return")
     )
 

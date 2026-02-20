@@ -38,11 +38,12 @@ def process_day(args):
         
     print(f"Processing {date_str}...", flush=True)
     
-    # Temp extract dir
-    tmp_dir = Path(f"/tmp/omega_framing/{date_str}")
+    # Unique Temp extract dir to avoid collisions
+    import uuid
+    unique_id = uuid.uuid4().hex
+    tmp_dir = Path(f"/omega_pool/temp_framing/{date_str}_{unique_id}")
     if tmp_dir.exists():
-        import shutil
-        shutil.rmtree(tmp_dir)
+        subprocess.run(["rm", "-rf", str(tmp_dir)], check=False)
     tmp_dir.mkdir(parents=True, exist_ok=True)
     
     # Extract 7z
@@ -77,8 +78,7 @@ def process_day(args):
     finally:
         # Cleanup
         if tmp_dir.exists():
-            import shutil
-            shutil.rmtree(tmp_dir)
+            subprocess.run(["rm", "-rf", str(tmp_dir)], check=False)
 
 def main():
     ap = argparse.ArgumentParser()

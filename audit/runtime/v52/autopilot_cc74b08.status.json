@@ -1,9 +1,9 @@
 {
-  "started_at": "2026-02-20 14:11:33",
-  "git_hash": "e5b6115",
+  "started_at": "2026-02-20 14:22:39",
+  "git_hash": "cc74b08",
   "bucket": "gs://omega_v52",
   "windows_expected": 263,
-  "linux_expected": 484,
+  "linux_expected": 267,
   "stage": "monitor_frame",
   "frame": {
     "linux_done": -1,
@@ -12,7 +12,7 @@
     "probe_linux": -1,
     "probe_windows": 0,
     "probe_ok": false,
-    "updated_at": "2026-02-20 14:14:55"
+    "updated_at": "2026-02-20 14:22:50"
   },
   "upload": {},
   "optimization": {},

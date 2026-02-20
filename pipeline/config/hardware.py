@@ -17,6 +17,9 @@ class StorageConfig:
     # OS Optimization
     disable_indexing: bool = True
     check_defender_exclusion: bool = True
+    
+    # Tool Paths
+    seven_zip_exe: str = "7z"
 
 @dataclass
 class ComputeConfig:

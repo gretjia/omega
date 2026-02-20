@@ -249,7 +249,9 @@ def main() -> int:
             if n > 0:
                 global_stats["n_frames"] += n
                 for k, v in res["weighted_metrics"].items():
-                    if k in global_stats:
+                    # V61 Fix: Prevent metric pollution. 
+                    # Do not sum "n_frames" from weighted_metrics (which is n*n), as we handled it above.
+                    if k in global_stats and k != "n_frames":
                         # Handle NaNs in partials? evaluate_frames returns NaNs if undefined.
                         # Assuming 0 contribution if NaN for sum
                         if np.isfinite(v):

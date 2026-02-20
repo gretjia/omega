@@ -182,16 +182,27 @@ def _apply_recursive_physics(
         )
 
     # --- Sequential Recursion (Scalar Loop - Fast) ---
+    # Extract symbols for boundary detection
+    if "symbol" in frames.columns:
+        syms = frames.get_column("symbol").cast(pl.String).fill_null("").to_numpy()
+    else:
+        syms = np.full(n_rows, "", dtype=object)
+
     out_srl_resid = np.zeros(n_rows, dtype=np.float64)
     out_y = np.zeros(n_rows, dtype=np.float64)
     out_spoof = np.zeros(n_rows, dtype=np.float64)
     
-    current_y = float(srl.y_coeff) if initial_y is None else float(initial_y)
+    base_y = float(srl.y_coeff) if initial_y is None else float(initial_y)
+    current_y = base_y
 
     if os.environ.get("OMEGA_KERNEL_VERBOSE") == "1":
         print(f"    Running Recursive Physics on {n_rows} rows...", flush=True)
     
     for i in range(n_rows):
+        # FAST BOUNDARY DETECT: Reset physics state if we cross into a new symbol's manifold
+        if i > 0 and syms[i] != syms[i-1]:
+            current_y = base_y
+
         # Universal SRL (Delta=0.5)
         # Manually inlined for speed or call func? Func is fine for scalar ops.
         # But for 100k rows, avoiding func call overhead is better.

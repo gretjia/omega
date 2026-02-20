@@ -255,7 +255,17 @@ def _lob_flux_expr() -> pl.Expr:
 
 def build_l2_frames(path: str, cfg: L2PipelineConfig, target_frames: float | None = None) -> pl.DataFrame:
     lf = scan_l2_quotes(path, cfg)
-    lf = lf.sort(["date", "time"])
+    
+    # Check for symbol column to enable multi-symbol isolation
+    schema_names = lf.collect_schema().names()
+    group_col = "symbol" if "symbol" in schema_names else None
+
+    # Sort strictly by symbol then time (Causal Ordering)
+    sort_cols = ["date", "time"]
+    if group_col:
+        sort_cols = [group_col, "date", "time"]
+    lf = lf.sort(sort_cols)
+    
     lf = _apply_session_filter(lf, cfg)
     lf = _apply_quality_filter(lf, cfg)
 
@@ -269,10 +279,17 @@ def build_l2_frames(path: str, cfg: L2PipelineConfig, target_frames: float | Non
     lf = lf.with_columns(_time_of_day_ms_expr("time").alias("__time_ms"))
 
     # Phase 1: 3-second snapshot aggregation handling (Anti-Aliasing Low-Pass Filter)
-    lf = lf.with_columns([
-        pl.col("v_ofi").rolling_mean(window_size=3, min_samples=1).alias("v_ofi"),
-        pl.col("depth").rolling_mean(window_size=3, min_samples=1).alias("depth")
-    ])
+    # Must group by symbol if present to avoid cross-contamination
+    if group_col:
+        lf = lf.with_columns([
+            pl.col("v_ofi").rolling_mean(window_size=3, min_periods=1).over(group_col).alias("v_ofi"),
+            pl.col("depth").rolling_mean(window_size=3, min_periods=1).over(group_col).alias("depth")
+        ])
+    else:
+        lf = lf.with_columns([
+            pl.col("v_ofi").rolling_mean(window_size=3, min_periods=1).alias("v_ofi"),
+            pl.col("depth").rolling_mean(window_size=3, min_periods=1).alias("depth")
+        ])
 
     vc = cfg.volume_clock
 
@@ -284,7 +301,12 @@ def build_l2_frames(path: str, cfg: L2PipelineConfig, target_frames: float | Non
             lower_bound=0.05, upper_bound=1.0
         )
 
-        cum_vol_expr = pl.col("vol_tick").cum_sum()
+        # Cumulative volume must be per-symbol
+        if group_col:
+            cum_vol_expr = pl.col("vol_tick").cum_sum().over(group_col)
+        else:
+            cum_vol_expr = pl.col("vol_tick").cum_sum()
+            
         est_daily_vol = cum_vol_expr / time_fraction
         target_bucket_size = est_daily_vol / frames_target
         bucket_size_expr = (
@@ -299,14 +321,28 @@ def build_l2_frames(path: str, cfg: L2PipelineConfig, target_frames: float | Non
                 bucket_size_expr.alias("dynamic_bucket_sz"),
             ]
         )
-        lf = lf.with_columns(
-            (pl.col("vol_tick") / pl.col("dynamic_bucket_sz"))
-            .cum_sum()
-            .cast(pl.Int64)
-            .alias("bucket_id")
-        )
+        
+        # Bucket ID Calculation
+        if group_col:
+            lf = lf.with_columns(
+                (pl.col("vol_tick") / pl.col("dynamic_bucket_sz"))
+                .cum_sum().over(group_col)
+                .cast(pl.Int64)
+                .alias("bucket_id")
+            )
+        else:
+            lf = lf.with_columns(
+                (pl.col("vol_tick") / pl.col("dynamic_bucket_sz"))
+                .cum_sum()
+                .cast(pl.Int64)
+                .alias("bucket_id")
+            )
     else:
-        lf = lf.with_columns(pl.col("vol_tick").cum_sum().alias("cum_vol"))
+        if group_col:
+            lf = lf.with_columns(pl.col("vol_tick").cum_sum().over(group_col).alias("cum_vol"))
+        else:
+            lf = lf.with_columns(pl.col("vol_tick").cum_sum().alias("cum_vol"))
+            
         lf = lf.with_columns(
             (pl.col("cum_vol") // float(vc.bucket_size)).cast(pl.Int64).alias("bucket_id")
         )
@@ -321,7 +357,12 @@ def build_l2_frames(path: str, cfg: L2PipelineConfig, target_frames: float | Non
         singularity_expr = pl.lit(False).alias("is_singularity")
     lf = lf.with_columns(singularity_expr)
 
-    frames = lf.group_by("bucket_id").agg(
+    # Group By (Must include Symbol if present)
+    group_keys = ["bucket_id"]
+    if group_col:
+        group_keys = [group_col, "bucket_id"]
+
+    frames = lf.group_by(group_keys).agg(
         [
             pl.col("microprice").first().alias("open"),
             pl.col("microprice").last().alias("close"),
