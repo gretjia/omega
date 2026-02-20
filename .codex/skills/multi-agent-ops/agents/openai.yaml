@@ -1,0 +1,4 @@
+version: 1
+display_name: Multi-Agent Ops
+short_description: Deploy/check/switch stable Omega multi-agent profiles with auto debug-scribe ledger updates and dual recursive audits
+default_prompt: Deploy or validate stable multi-agent setup, auto-maintain debug lessons from live context, then run independent Gemini and Codex recursive audits if requested.

@@ -1,0 +1,37 @@
+{
+  "createTime": "2026-02-19T13:02:53.695929Z",
+  "displayName": "omega-v60-run_cloud_backtest-20260219-210249",
+  "endTime": "2026-02-19T13:10:02Z",
+  "error": {
+    "code": 8,
+    "message": "Replicas low on memory: workerpool0. Specify a machine with larger memory and try again."
+  },
+  "jobSpec": {
+    "workerPoolSpecs": [
+      {
+        "containerSpec": {
+          "args": [
+            "set -euxo pipefail\npython3 -m pip install --quiet google-cloud-storage\npython3 - <<'PY'\nfrom google.cloud import storage\nimport shutil\n\ndef dl(uri: str, out: str) -> None:\n    clean = uri.replace(\"gs://\", \"\", 1)\n    bucket, blob = clean.split(\"/\", 1)\n    storage.Client().bucket(bucket).blob(blob).download_to_filename(out)\n\ndl(\"gs://omega_v52_central/omega/staging/code/omega_core_20260219-125410_78e36d9.zip\", \"omega_core.zip\")\ndl(\"gs://omega_v52/staging/code/payloads/omega-v60-run_cloud_backtest-20260219-210249_run_cloud_backtest.py\", \"payload.py\")\nshutil.unpack_archive(\"omega_core.zip\", extract_dir=\".\")\nPY\npython3 -u payload.py --code-bundle-uri=gs://omega_v52_central/omega/staging/code/omega_core_20260219-125410_78e36d9.zip '--data-pattern=gs://omega_v52_central/omega/omega/v52/frames/host=*/*_aa8abb7.parquet' --test-years=2025,2026 --test-ym=2025,202601 --max-files=0 --max-rows-per-file=0 --workers=3 --workers-min=2 --workers-max=4 --workers-start=2 --model-uri=gs://omega_v52_central/omega/staging/models/v6/20260219-125410_78e36d9/omega_v6_xgb_final.pkl --output-uri=gs://omega_v52_central/omega/staging/backtest/v6/20260219-125410_78e36d9/backtest_metrics_retry_mem16.json --peace-threshold=0.5253567667772991 --srl-resid-sigma-mult=1.9773888188507172 --topo-energy-sigma-mult=5.427559578121958\n"
+          ],
+          "command": [
+            "/bin/bash",
+            "-lc"
+          ],
+          "imageUri": "us-docker.pkg.dev/vertex-ai/training/tf-cpu.2-17.py310:latest"
+        },
+        "diskSpec": {
+          "bootDiskSizeGb": 100,
+          "bootDiskType": "pd-ssd"
+        },
+        "machineSpec": {
+          "machineType": "n2-standard-16"
+        },
+        "replicaCount": "1"
+      }
+    ]
+  },
+  "name": "projects/269018079180/locations/us-central1/customJobs/4665024890858897408",
+  "startTime": "2026-02-19T13:04:30Z",
+  "state": "JOB_STATE_FAILED",
+  "updateTime": "2026-02-19T13:10:02.963882Z"
+}

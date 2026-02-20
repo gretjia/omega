@@ -1,0 +1,3754 @@
+[
+  {
+    "insertId": "1soq5ygd5hdq",
+    "labels": {
+      "ml.googleapis.com/endpoint": "",
+      "ml.googleapis.com/job_state": "QUEUED"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/ml.googleapis.com%2F8392580415252070400",
+    "receiveTimestamp": "2026-02-19T03:16:01.349395082Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "gen-lang-client-0250995579",
+        "task_name": "service"
+      },
+      "type": "ml_job"
+    },
+    "severity": "INFO",
+    "textPayload": "Waiting for job to be provisioned.",
+    "timestamp": "2026-02-19T03:16:00.287559609Z"
+  },
+  {
+    "insertId": "1soq5ygd5hdr",
+    "labels": {
+      "ml.googleapis.com/endpoint": ""
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/ml.googleapis.com%2F8392580415252070400",
+    "receiveTimestamp": "2026-02-19T03:16:01.349395082Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "gen-lang-client-0250995579",
+        "task_name": "service"
+      },
+      "type": "ml_job"
+    },
+    "severity": "INFO",
+    "textPayload": "Vertex AI is provisioning job running framework. First time usage might take couple of minutes, and subsequent runs can be much faster.",
+    "timestamp": "2026-02-19T03:16:00.299146205Z"
+  },
+  {
+    "insertId": "1soq5ygd5hds",
+    "labels": {
+      "ml.googleapis.com/endpoint": ""
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/ml.googleapis.com%2F8392580415252070400",
+    "receiveTimestamp": "2026-02-19T03:16:01.349395082Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "gen-lang-client-0250995579",
+        "task_name": "service"
+      },
+      "type": "ml_job"
+    },
+    "severity": "INFO",
+    "textPayload": "Vertex AI is setting up this job.",
+    "timestamp": "2026-02-19T03:16:00.310101523Z"
+  },
+  {
+    "insertId": "1soq5ygd5hdt",
+    "labels": {
+      "ml.googleapis.com/endpoint": ""
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/ml.googleapis.com%2F8392580415252070400",
+    "receiveTimestamp": "2026-02-19T03:16:01.349395082Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "gen-lang-client-0250995579",
+        "task_name": "service"
+      },
+      "type": "ml_job"
+    },
+    "severity": "INFO",
+    "textPayload": "Waiting for training program to start.",
+    "timestamp": "2026-02-19T03:16:00.310185822Z"
+  },
+  {
+    "insertId": "1soq5ygd5hdx",
+    "labels": {
+      "ml.googleapis.com/endpoint": "",
+      "ml.googleapis.com/job_state": "PREPARING"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/ml.googleapis.com%2F8392580415252070400",
+    "receiveTimestamp": "2026-02-19T03:16:02.353390303Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "gen-lang-client-0250995579",
+        "task_name": "service"
+      },
+      "type": "ml_job"
+    },
+    "severity": "INFO",
+    "textPayload": "Job is preparing.",
+    "timestamp": "2026-02-19T03:16:01.172579229Z"
+  },
+  {
+    "insertId": "1oiyjlxf8d7yob",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:49.605908193Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.",
+    "timestamp": "2026-02-19T03:19:46.284671443Z"
+  },
+  {
+    "insertId": "1oiyjlxf8d7yoc",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:49.605908193Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "google-cloud-datastore 1.15.5 requires protobuf<4.0.0dev, but you have protobuf 4.25.8 which is incompatible.",
+    "timestamp": "2026-02-19T03:19:46.285395211Z"
+  },
+  {
+    "insertId": "1oiyjlxf8d7yod",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:49.605908193Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.",
+    "timestamp": "2026-02-19T03:19:46.285400201Z"
+  },
+  {
+    "insertId": "1oiyjlxf8d7yoe",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:49.605908193Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "+ python3 -",
+    "timestamp": "2026-02-19T03:19:46.684678028Z"
+  },
+  {
+    "insertId": "1oiyjlxf8d7yof",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:49.605908193Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "/opt/conda/lib/python3.10/site-packages/google/api_core/_python_version_support.py:275: FutureWarning: You are using a Python version (3.10.18) which Google will stop supporting in new releases of google.api_core once it reaches its end of life (2026-10-04). Please upgrade to the latest Python version, or at least Python 3.11, to continue receiving updates for google.api_core past that date.",
+    "timestamp": "2026-02-19T03:19:49.483775744Z"
+  },
+  {
+    "insertId": "1oiyjlxf8d7yog",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:49.605908193Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "warnings.warn(message, FutureWarning)",
+    "timestamp": "2026-02-19T03:19:49.483790036Z"
+  },
+  {
+    "insertId": "1soq5ygd5hvl",
+    "labels": {
+      "ml.googleapis.com/endpoint": "",
+      "ml.googleapis.com/job_state": "RUNNING"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/ml.googleapis.com%2F8392580415252070400",
+    "receiveTimestamp": "2026-02-19T03:19:51.599732505Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "gen-lang-client-0250995579",
+        "task_name": "service"
+      },
+      "type": "ml_job"
+    },
+    "severity": "INFO",
+    "textPayload": "Job is running.",
+    "timestamp": "2026-02-19T03:19:50.639199766Z"
+  },
+  {
+    "insertId": "1g5yjwhfa1nq63",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:54.603080680Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "+ python3 -u payload.py --bootstrap-code --install-deps --base-matrix-uri=gs://omega_v52_central/omega/staging/base_matrix/v60/resume_aa8abb7/base_matrix.parquet --n-trials=50 --min-samples=2000 --seed=42 --output-uri=gs://omega_v52_central/omega/staging/optimization/v60/20260219-030000_aa8abb7/swarm_best.json",
+    "timestamp": "2026-02-19T03:19:51.684472990Z"
+  },
+  {
+    "insertId": "8nbbsff9be6ba",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:55.199692691Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Collecting optuna",
+    "timestamp": "2026-02-19T03:19:54.684749075Z"
+  },
+  {
+    "insertId": "8nbbsff9be6bb",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:55.199692691Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Downloading optuna-4.7.0-py3-none-any.whl.metadata (17 kB)",
+    "timestamp": "2026-02-19T03:19:54.684757434Z"
+  },
+  {
+    "insertId": "8nbbsff9be6bc",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:55.199692691Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Requirement already satisfied: xgboost in /opt/conda/lib/python3.10/site-packages (2.1.3)",
+    "timestamp": "2026-02-19T03:19:54.884038247Z"
+  },
+  {
+    "insertId": "8nbbsff9be6bd",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:55.199692691Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Requirement already satisfied: numpy in /opt/conda/lib/python3.10/site-packages (1.26.4)",
+    "timestamp": "2026-02-19T03:19:54.884050587Z"
+  },
+  {
+    "insertId": "8nbbsff9be6be",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:55.199692691Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Collecting polars",
+    "timestamp": "2026-02-19T03:19:55.083961205Z"
+  },
+  {
+    "insertId": "8nbbsff9be6bf",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:55.199692691Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Downloading polars-1.38.1-py3-none-any.whl.metadata (10 kB)",
+    "timestamp": "2026-02-19T03:19:55.083975924Z"
+  },
+  {
+    "insertId": "bdtsirf8vmnym",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:55.610600272Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Requirement already satisfied: google-cloud-storage in /opt/conda/lib/python3.10/site-packages (2.19.0)",
+    "timestamp": "2026-02-19T03:19:55.284072946Z"
+  },
+  {
+    "insertId": "bdtsirf8vmnyn",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:55.610600272Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Requirement already satisfied: gcsfs in /opt/conda/lib/python3.10/site-packages (2025.5.1)",
+    "timestamp": "2026-02-19T03:19:55.284083486Z"
+  },
+  {
+    "insertId": "bdtsirf8vmnyo",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:55.610600272Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Requirement already satisfied: fsspec in /opt/conda/lib/python3.10/site-packages (2025.5.1)",
+    "timestamp": "2026-02-19T03:19:55.284085799Z"
+  },
+  {
+    "insertId": "bdtsirf8vmnyp",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:55.610600272Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Collecting psutil",
+    "timestamp": "2026-02-19T03:19:55.284088330Z"
+  },
+  {
+    "insertId": "bdtsirf8vmnyq",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:55.610600272Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Downloading psutil-7.2.2-cp36-abi3-manylinux2010_x86_64.manylinux_2_12_x86_64.manylinux_2_28_x86_64.whl.metadata (22 kB)",
+    "timestamp": "2026-02-19T03:19:55.483955881Z"
+  },
+  {
+    "insertId": "bdtsirf8vmnyr",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:55.610600272Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Collecting alembic>=1.5.0 (from optuna)",
+    "timestamp": "2026-02-19T03:19:55.483964859Z"
+  },
+  {
+    "insertId": "bdtsirf8vmnys",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:55.610600272Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Downloading alembic-1.18.4-py3-none-any.whl.metadata (7.2 kB)",
+    "timestamp": "2026-02-19T03:19:55.483967387Z"
+  },
+  {
+    "insertId": "1acalz5fakvh2p",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:56.207461829Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Collecting colorlog (from optuna)",
+    "timestamp": "2026-02-19T03:19:55.684621013Z"
+  },
+  {
+    "insertId": "1acalz5fakvh2q",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:56.207461829Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Downloading colorlog-6.10.1-py3-none-any.whl.metadata (11 kB)",
+    "timestamp": "2026-02-19T03:19:55.684629929Z"
+  },
+  {
+    "insertId": "1acalz5fakvh2r",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:56.207461829Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Requirement already satisfied: packaging>=20.0 in /opt/conda/lib/python3.10/site-packages (from optuna) (25.0)",
+    "timestamp": "2026-02-19T03:19:55.684631858Z"
+  },
+  {
+    "insertId": "1acalz5fakvh2s",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:56.207461829Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Collecting sqlalchemy>=1.4.2 (from optuna)",
+    "timestamp": "2026-02-19T03:19:56.102037685Z"
+  },
+  {
+    "insertId": "1acalz5fakvh2t",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:56.207461829Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Downloading sqlalchemy-2.0.46-cp310-cp310-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (9.5 kB)",
+    "timestamp": "2026-02-19T03:19:56.102046071Z"
+  },
+  {
+    "insertId": "13ysiilf8nzxhn",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:56.398153007Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Requirement already satisfied: tqdm in /opt/conda/lib/python3.10/site-packages (from optuna) (4.67.1)",
+    "timestamp": "2026-02-19T03:19:56.284751348Z"
+  },
+  {
+    "insertId": "13ysiilf8nzxho",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:56.398153007Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Collecting PyYAML (from optuna)",
+    "timestamp": "2026-02-19T03:19:56.284758613Z"
+  },
+  {
+    "insertId": "13ysiilf8nzxhp",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:56.398153007Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Downloading pyyaml-6.0.3-cp310-cp310-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (2.4 kB)",
+    "timestamp": "2026-02-19T03:19:56.284760380Z"
+  },
+  {
+    "insertId": "13ysiilf8nzxhq",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:56.398153007Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Requirement already satisfied: nvidia-nccl-cu12 in /opt/conda/lib/python3.10/site-packages (from xgboost) (2.19.3)",
+    "timestamp": "2026-02-19T03:19:56.284764922Z"
+  },
+  {
+    "insertId": "13ysiilf8nzxhr",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:56.398153007Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Requirement already satisfied: scipy in /opt/conda/lib/python3.10/site-packages (from xgboost) (1.15.3)",
+    "timestamp": "2026-02-19T03:19:56.284766506Z"
+  },
+  {
+    "insertId": "hiaro2f9obf8a",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:56.598866005Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Collecting polars-runtime-32==1.38.1 (from polars)",
+    "timestamp": "2026-02-19T03:19:56.484766527Z"
+  },
+  {
+    "insertId": "hiaro2f9obf8b",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:56.598866005Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Downloading polars_runtime_32-1.38.1-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (1.5 kB)",
+    "timestamp": "2026-02-19T03:19:56.484776898Z"
+  },
+  {
+    "insertId": "hiaro2f9obf8c",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:56.598866005Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Requirement already satisfied: google-auth<3.0dev,>=2.26.1 in /opt/conda/lib/python3.10/site-packages (from google-cloud-storage) (2.40.3)",
+    "timestamp": "2026-02-19T03:19:56.484781945Z"
+  },
+  {
+    "insertId": "hiaro2f9obf8d",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:56.598866005Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Requirement already satisfied: google-api-core<3.0.0dev,>=2.15.0 in /opt/conda/lib/python3.10/site-packages (from google-cloud-storage) (2.30.0)",
+    "timestamp": "2026-02-19T03:19:56.484784864Z"
+  },
+  {
+    "insertId": "hiaro2f9obf8e",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:56.598866005Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Requirement already satisfied: google-cloud-core<3.0dev,>=2.3.0 in /opt/conda/lib/python3.10/site-packages (from google-cloud-storage) (2.4.3)",
+    "timestamp": "2026-02-19T03:19:56.484787219Z"
+  },
+  {
+    "insertId": "hiaro2f9obf8f",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:56.598866005Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Requirement already satisfied: google-resumable-media>=2.7.2 in /opt/conda/lib/python3.10/site-packages (from google-cloud-storage) (2.7.2)",
+    "timestamp": "2026-02-19T03:19:56.484789765Z"
+  },
+  {
+    "insertId": "hiaro2f9obf8g",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:56.598866005Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Requirement already satisfied: requests<3.0.0dev,>=2.18.0 in /opt/conda/lib/python3.10/site-packages (from google-cloud-storage) (2.32.4)",
+    "timestamp": "2026-02-19T03:19:56.484793158Z"
+  },
+  {
+    "insertId": "hiaro2f9obf8h",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:56.598866005Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Requirement already satisfied: google-crc32c<2.0dev,>=1.0 in /opt/conda/lib/python3.10/site-packages (from google-cloud-storage) (1.7.1)",
+    "timestamp": "2026-02-19T03:19:56.484795388Z"
+  },
+  {
+    "insertId": "hiaro2f9obf8i",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:56.598866005Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Requirement already satisfied: googleapis-common-protos<2.0.0,>=1.56.3 in /opt/conda/lib/python3.10/site-packages (from google-api-core<3.0.0dev,>=2.15.0->google-cloud-storage) (1.56.4)",
+    "timestamp": "2026-02-19T03:19:56.484797706Z"
+  },
+  {
+    "insertId": "hiaro2f9obf8j",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:56.598866005Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Requirement already satisfied: protobuf<7.0.0,>=4.25.8 in /opt/conda/lib/python3.10/site-packages (from google-api-core<3.0.0dev,>=2.15.0->google-cloud-storage) (4.25.8)",
+    "timestamp": "2026-02-19T03:19:56.484799992Z"
+  },
+  {
+    "insertId": "hiaro2f9obf8k",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:56.598866005Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Requirement already satisfied: proto-plus<2.0.0,>=1.22.3 in /opt/conda/lib/python3.10/site-packages (from google-api-core<3.0.0dev,>=2.15.0->google-cloud-storage) (1.26.1)",
+    "timestamp": "2026-02-19T03:19:56.484802378Z"
+  },
+  {
+    "insertId": "hiaro2f9obf8l",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:56.598866005Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Requirement already satisfied: cachetools<6.0,>=2.0.0 in /opt/conda/lib/python3.10/site-packages (from google-auth<3.0dev,>=2.26.1->google-cloud-storage) (5.5.2)",
+    "timestamp": "2026-02-19T03:19:56.484804759Z"
+  },
+  {
+    "insertId": "hiaro2f9obf8m",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:56.598866005Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Requirement already satisfied: pyasn1-modules>=0.2.1 in /opt/conda/lib/python3.10/site-packages (from google-auth<3.0dev,>=2.26.1->google-cloud-storage) (0.4.2)",
+    "timestamp": "2026-02-19T03:19:56.484807226Z"
+  },
+  {
+    "insertId": "hiaro2f9obf8n",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:56.598866005Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Requirement already satisfied: rsa<5,>=3.1.4 in /opt/conda/lib/python3.10/site-packages (from google-auth<3.0dev,>=2.26.1->google-cloud-storage) (4.9.1)",
+    "timestamp": "2026-02-19T03:19:56.484810361Z"
+  },
+  {
+    "insertId": "hiaro2f9obf8o",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:56.598866005Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Requirement already satisfied: charset_normalizer<4,>=2 in /opt/conda/lib/python3.10/site-packages (from requests<3.0.0dev,>=2.18.0->google-cloud-storage) (3.4.2)",
+    "timestamp": "2026-02-19T03:19:56.484813191Z"
+  },
+  {
+    "insertId": "hiaro2f9obf8p",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:56.598866005Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Requirement already satisfied: idna<4,>=2.5 in /opt/conda/lib/python3.10/site-packages (from requests<3.0.0dev,>=2.18.0->google-cloud-storage) (3.10)",
+    "timestamp": "2026-02-19T03:19:56.484815416Z"
+  },
+  {
+    "insertId": "hiaro2f9obf8q",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:56.598866005Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Requirement already satisfied: urllib3<3,>=1.21.1 in /opt/conda/lib/python3.10/site-packages (from requests<3.0.0dev,>=2.18.0->google-cloud-storage) (2.5.0)",
+    "timestamp": "2026-02-19T03:19:56.484817714Z"
+  },
+  {
+    "insertId": "hiaro2f9obf8r",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:56.598866005Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Requirement already satisfied: certifi>=2017.4.17 in /opt/conda/lib/python3.10/site-packages (from requests<3.0.0dev,>=2.18.0->google-cloud-storage) (2025.6.15)",
+    "timestamp": "2026-02-19T03:19:56.484819993Z"
+  },
+  {
+    "insertId": "hiaro2f9obf8s",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:56.598866005Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Requirement already satisfied: pyasn1>=0.1.3 in /opt/conda/lib/python3.10/site-packages (from rsa<5,>=3.1.4->google-auth<3.0dev,>=2.26.1->google-cloud-storage) (0.6.1)",
+    "timestamp": "2026-02-19T03:19:56.484822274Z"
+  },
+  {
+    "insertId": "hiaro2f9obf8t",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:56.598866005Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Requirement already satisfied: aiohttp!=4.0.0a0,!=4.0.0a1 in /opt/conda/lib/python3.10/site-packages (from gcsfs) (3.12.13)",
+    "timestamp": "2026-02-19T03:19:56.484824623Z"
+  },
+  {
+    "insertId": "hiaro2f9obf8u",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:56.598866005Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Requirement already satisfied: decorator>4.1.2 in /opt/conda/lib/python3.10/site-packages (from gcsfs) (5.2.1)",
+    "timestamp": "2026-02-19T03:19:56.484827086Z"
+  },
+  {
+    "insertId": "hiaro2f9obf8v",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:56.598866005Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Requirement already satisfied: google-auth-oauthlib in /opt/conda/lib/python3.10/site-packages (from gcsfs) (1.2.2)",
+    "timestamp": "2026-02-19T03:19:56.484829633Z"
+  },
+  {
+    "insertId": "1oj60n5f8rsahx",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:56.802697164Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Requirement already satisfied: aiohappyeyeballs>=2.5.0 in /opt/conda/lib/python3.10/site-packages (from aiohttp!=4.0.0a0,!=4.0.0a1->gcsfs) (2.6.1)",
+    "timestamp": "2026-02-19T03:19:56.684300125Z"
+  },
+  {
+    "insertId": "1oj60n5f8rsahy",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:56.802697164Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Requirement already satisfied: aiosignal>=1.1.2 in /opt/conda/lib/python3.10/site-packages (from aiohttp!=4.0.0a0,!=4.0.0a1->gcsfs) (1.4.0)",
+    "timestamp": "2026-02-19T03:19:56.684311344Z"
+  },
+  {
+    "insertId": "1oj60n5f8rsahz",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:56.802697164Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Requirement already satisfied: async-timeout<6.0,>=4.0 in /opt/conda/lib/python3.10/site-packages (from aiohttp!=4.0.0a0,!=4.0.0a1->gcsfs) (5.0.1)",
+    "timestamp": "2026-02-19T03:19:56.684313962Z"
+  },
+  {
+    "insertId": "1oj60n5f8rsai0",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:56.802697164Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Requirement already satisfied: attrs>=17.3.0 in /opt/conda/lib/python3.10/site-packages (from aiohttp!=4.0.0a0,!=4.0.0a1->gcsfs) (25.3.0)",
+    "timestamp": "2026-02-19T03:19:56.684316257Z"
+  },
+  {
+    "insertId": "1oj60n5f8rsai1",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:56.802697164Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Requirement already satisfied: frozenlist>=1.1.1 in /opt/conda/lib/python3.10/site-packages (from aiohttp!=4.0.0a0,!=4.0.0a1->gcsfs) (1.7.0)",
+    "timestamp": "2026-02-19T03:19:56.684318270Z"
+  },
+  {
+    "insertId": "1oj60n5f8rsai2",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:56.802697164Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Requirement already satisfied: multidict<7.0,>=4.5 in /opt/conda/lib/python3.10/site-packages (from aiohttp!=4.0.0a0,!=4.0.0a1->gcsfs) (6.6.3)",
+    "timestamp": "2026-02-19T03:19:56.684320976Z"
+  },
+  {
+    "insertId": "1oj60n5f8rsai3",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:56.802697164Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Requirement already satisfied: propcache>=0.2.0 in /opt/conda/lib/python3.10/site-packages (from aiohttp!=4.0.0a0,!=4.0.0a1->gcsfs) (0.3.2)",
+    "timestamp": "2026-02-19T03:19:56.684323371Z"
+  },
+  {
+    "insertId": "1oj60n5f8rsai4",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:56.802697164Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Requirement already satisfied: yarl<2.0,>=1.17.0 in /opt/conda/lib/python3.10/site-packages (from aiohttp!=4.0.0a0,!=4.0.0a1->gcsfs) (1.20.1)",
+    "timestamp": "2026-02-19T03:19:56.684325657Z"
+  },
+  {
+    "insertId": "1oj60n5f8rsai5",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:56.802697164Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Requirement already satisfied: typing-extensions>=4.1.0 in /opt/conda/lib/python3.10/site-packages (from multidict<7.0,>=4.5->aiohttp!=4.0.0a0,!=4.0.0a1->gcsfs) (4.14.1)",
+    "timestamp": "2026-02-19T03:19:56.684328154Z"
+  },
+  {
+    "insertId": "1oj60n5f8rsai6",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:56.802697164Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Collecting Mako (from alembic>=1.5.0->optuna)",
+    "timestamp": "2026-02-19T03:19:56.684336737Z"
+  },
+  {
+    "insertId": "1oj60n5f8rsai7",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:56.802697164Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Downloading mako-1.3.10-py3-none-any.whl.metadata (2.9 kB)",
+    "timestamp": "2026-02-19T03:19:56.684339804Z"
+  },
+  {
+    "insertId": "fjo50pfar6v5m",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:57.198707509Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Collecting tomli (from alembic>=1.5.0->optuna)",
+    "timestamp": "2026-02-19T03:19:56.884130451Z"
+  },
+  {
+    "insertId": "fjo50pfar6v5n",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:57.198707509Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Downloading tomli-2.4.0-py3-none-any.whl.metadata (10 kB)",
+    "timestamp": "2026-02-19T03:19:56.884141960Z"
+  },
+  {
+    "insertId": "fjo50pfar6v5o",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:57.198707509Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Collecting greenlet>=1 (from sqlalchemy>=1.4.2->optuna)",
+    "timestamp": "2026-02-19T03:19:57.084147767Z"
+  },
+  {
+    "insertId": "fjo50pfar6v5p",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:57.198707509Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Downloading greenlet-3.3.1-cp310-cp310-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl.metadata (3.7 kB)",
+    "timestamp": "2026-02-19T03:19:57.084159456Z"
+  },
+  {
+    "insertId": "fjo50pfar6v5q",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:57.198707509Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Requirement already satisfied: requests-oauthlib>=0.7.0 in /opt/conda/lib/python3.10/site-packages (from google-auth-oauthlib->gcsfs) (2.0.0)",
+    "timestamp": "2026-02-19T03:19:57.084162424Z"
+  },
+  {
+    "insertId": "fjo50pfar6v5r",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:57.198707509Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Requirement already satisfied: oauthlib>=3.0.0 in /opt/conda/lib/python3.10/site-packages (from requests-oauthlib>=0.7.0->google-auth-oauthlib->gcsfs) (3.3.1)",
+    "timestamp": "2026-02-19T03:19:57.084164441Z"
+  },
+  {
+    "insertId": "fjo50pfar6v5s",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:57.198707509Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Requirement already satisfied: MarkupSafe>=0.9.2 in /opt/conda/lib/python3.10/site-packages (from Mako->alembic>=1.5.0->optuna) (3.0.2)",
+    "timestamp": "2026-02-19T03:19:57.084166864Z"
+  },
+  {
+    "insertId": "1h0fdctfaj270z",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:58.001617263Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Downloading optuna-4.7.0-py3-none-any.whl (413 kB)",
+    "timestamp": "2026-02-19T03:19:57.284413664Z"
+  },
+  {
+    "insertId": "1h0fdctfaj2710",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:58.001617263Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Downloading polars-1.38.1-py3-none-any.whl (810 kB)",
+    "timestamp": "2026-02-19T03:19:57.284423372Z"
+  },
+  {
+    "insertId": "1h0fdctfaj2711",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:58.001617263Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 810.4/810.4 kB 17.0 MB/s eta 0:00:00",
+    "timestamp": "2026-02-19T03:19:57.284426153Z"
+  },
+  {
+    "insertId": "1h0fdctfaj2712",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:58.001617263Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Downloading polars_runtime_32-1.38.1-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (45.8 MB)",
+    "timestamp": "2026-02-19T03:19:57.284429199Z"
+  },
+  {
+    "insertId": "1h0fdctfaj2713",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:58.001617263Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 45.8/45.8 MB 84.1 MB/s eta 0:00:00",
+    "timestamp": "2026-02-19T03:19:57.883961757Z"
+  },
+  {
+    "insertId": "1h0fdctfaj2714",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:58.001617263Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Downloading psutil-7.2.2-cp36-abi3-manylinux2010_x86_64.manylinux_2_12_x86_64.manylinux_2_28_x86_64.whl (155 kB)",
+    "timestamp": "2026-02-19T03:19:57.883972395Z"
+  },
+  {
+    "insertId": "1h0fdctfaj2715",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:58.001617263Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Downloading alembic-1.18.4-py3-none-any.whl (263 kB)",
+    "timestamp": "2026-02-19T03:19:57.883974288Z"
+  },
+  {
+    "insertId": "c8tx7afa0l0sm",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:58.399182028Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Downloading sqlalchemy-2.0.46-cp310-cp310-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (3.2 MB)",
+    "timestamp": "2026-02-19T03:19:58.084837903Z"
+  },
+  {
+    "insertId": "c8tx7afa0l0sn",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:58.399182028Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.2/3.2 MB 35.9 MB/s eta 0:00:00",
+    "timestamp": "2026-02-19T03:19:58.084846565Z"
+  },
+  {
+    "insertId": "c8tx7afa0l0so",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:58.399182028Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Downloading greenlet-3.3.1-cp310-cp310-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl (586 kB)",
+    "timestamp": "2026-02-19T03:19:58.084848458Z"
+  },
+  {
+    "insertId": "c8tx7afa0l0sp",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:58.399182028Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 587.0/587.0 kB 6.5 MB/s eta 0:00:00",
+    "timestamp": "2026-02-19T03:19:58.284887733Z"
+  },
+  {
+    "insertId": "c8tx7afa0l0sq",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:58.399182028Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Downloading colorlog-6.10.1-py3-none-any.whl (11 kB)",
+    "timestamp": "2026-02-19T03:19:58.284896429Z"
+  },
+  {
+    "insertId": "c8tx7afa0l0sr",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:19:58.399182028Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Downloading mako-1.3.10-py3-none-any.whl (78 kB)",
+    "timestamp": "2026-02-19T03:19:58.284898151Z"
+  },
+  {
+    "insertId": "9ps2q9f9xi7d7",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:20:03.405343046Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Downloading pyyaml-6.0.3-cp310-cp310-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (770 kB)",
+    "timestamp": "2026-02-19T03:19:58.684364825Z"
+  },
+  {
+    "insertId": "9ps2q9f9xi7d8",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:20:03.405343046Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 770.3/770.3 kB 8.4 MB/s eta 0:00:00",
+    "timestamp": "2026-02-19T03:19:58.684377973Z"
+  },
+  {
+    "insertId": "9ps2q9f9xi7d9",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:20:03.405343046Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Downloading tomli-2.4.0-py3-none-any.whl (14 kB)",
+    "timestamp": "2026-02-19T03:19:58.684380840Z"
+  },
+  {
+    "insertId": "9ps2q9f9xi7da",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:20:03.405343046Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Installing collected packages: tomli, PyYAML, psutil, polars-runtime-32, Mako, greenlet, colorlog, sqlalchemy, polars, alembic, optuna",
+    "timestamp": "2026-02-19T03:19:59.884463398Z"
+  },
+  {
+    "insertId": "1v6m0s1f90ekrb",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:20:07.398533732Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19T03:20:06.183793432Z stdout F",
+    "timestamp": "2026-02-19T03:20:06.284132694Z"
+  },
+  {
+    "insertId": "1v6m0s1f90ekrc",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:20:07.398533732Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Successfully installed Mako-1.3.10 PyYAML-6.0.3 alembic-1.18.4 colorlog-6.10.1 greenlet-3.3.1 optuna-4.7.0 polars-1.38.1 polars-runtime-32-1.38.1 psutil-7.2.2 sqlalchemy-2.0.46 tomli-2.4.0",
+    "timestamp": "2026-02-19T03:20:06.483684583Z"
+  },
+  {
+    "insertId": "1v6m0s1f90ekrd",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:20:07.398533732Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.",
+    "timestamp": "2026-02-19T03:20:06.483719900Z"
+  },
+  {
+    "insertId": "1v6m0s1f90ekre",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:20:07.398533732Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Error in sitecustomize; set PYTHONVERBOSE for traceback:",
+    "timestamp": "2026-02-19T03:20:07.284945978Z"
+  },
+  {
+    "insertId": "1v6m0s1f90ekrf",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:20:07.398533732Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "ModuleNotFoundError: No module named 'pythonjsonlogger'",
+    "timestamp": "2026-02-19T03:20:07.284958829Z"
+  },
+  {
+    "insertId": "cj4qxsf9rk9im",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:20:12.404268678Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Error in sitecustomize; set PYTHONVERBOSE for traceback:",
+    "timestamp": "2026-02-19T03:20:10.084666555Z"
+  },
+  {
+    "insertId": "cj4qxsf9rk9in",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:20:12.404268678Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "ModuleNotFoundError: No module named 'pythonjsonlogger'",
+    "timestamp": "2026-02-19T03:20:10.084676136Z"
+  },
+  {
+    "insertId": "ld5coff9uezwu",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:20:15.801921143Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Copying gs://omega_v52/staging/code/omega_core.zip...",
+    "timestamp": "2026-02-19T03:20:14.086058383Z"
+  },
+  {
+    "insertId": "ld5coff9uezwv",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:20:15.801921143Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "/ [0 files][    0.0 B/202.0 KiB]                                                \r/ [1 files][202.0 KiB/202.0 KiB]",
+    "timestamp": "2026-02-19T03:20:14.684072714Z"
+  },
+  {
+    "insertId": "ld5coff9uezww",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:20:15.801921143Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Operation completed over 1 objects/202.0 KiB.",
+    "timestamp": "2026-02-19T03:20:14.684084426Z"
+  },
+  {
+    "insertId": "ld5coff9uezwx",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:20:15.801921143Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Error in sitecustomize; set PYTHONVERBOSE for traceback:",
+    "timestamp": "2026-02-19T03:20:15.684276499Z"
+  },
+  {
+    "insertId": "ld5coff9uezwy",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:20:15.801921143Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "ModuleNotFoundError: No module named 'pythonjsonlogger'",
+    "timestamp": "2026-02-19T03:20:15.684287344Z"
+  },
+  {
+    "insertId": "50xvknf981wft",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:20:20.805535163Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Error in sitecustomize; set PYTHONVERBOSE for traceback:",
+    "timestamp": "2026-02-19T03:20:16.910589326Z"
+  },
+  {
+    "insertId": "50xvknf981wfu",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:20:20.805535163Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "ModuleNotFoundError: No module named 'pythonjsonlogger'",
+    "timestamp": "2026-02-19T03:20:16.910605176Z"
+  },
+  {
+    "insertId": "50xvknf981wfv",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:20:20.805535163Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Copying gs://omega_v52_central/omega/staging/base_matrix/v60/resume_aa8abb7/base_matrix.parquet...",
+    "timestamp": "2026-02-19T03:20:18.884760159Z"
+  },
+  {
+    "insertId": "1xe9s9ufa4ndub",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:20:45.802738957Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "/ [0 files][    0.0 B/925.7 MiB]                                                \r-\r- [0 files][ 13.9 MiB/925.7 MiB]                                                \r\\\r|\r| [0 files][ 47.4 MiB/925.7 MiB]                                                \r/\r-\r- [0 files][ 81.2 MiB/925.7 MiB]                                                \r\\\r\\ [0 files][116.3 MiB/925.7 MiB]                                                \r|\r/\r/ [0 files][155.0 MiB/925.7 MiB]                                                \r-\r- [0 files][190.0 MiB/925.7 MiB]                                                \r\\\r|\r| [0 files][228.4 MiB/925.7 MiB]                                                \r/\r-\r- [0 files][269.9 MiB/925.7 MiB]                                                \r\\\r\\ [0 files][310.4 MiB/925.7 MiB]                                                \r|\r/\r/ [0 files][346.8 MiB/925.7 MiB]                                                \r-\r\\\r\\ [0 files][385.7 MiB/925.7 MiB]   38.8 MiB/s                                   \r|\r| [0 files][420.0 MiB/925.7 MiB]   38.1 MiB/s                                   \r/\r-\r- [0 files][454.8 MiB/925.7 MiB]   36.6 MiB/s                                   \r\\\r|\r| [0 files][496.0 MiB/925.7 MiB]   36.8 MiB/s                                   \r/\r/ [0 files][537.8 MiB/925.7 MiB]   37.9 MiB/s                                   \r-\r\\\r\\ [0 files][573.4 MiB/925.7 MiB]   37.4 MiB/s                                   \r|\r/\r/ [0 files][610.5 MiB/925.7 MiB]   38.7 MiB/s                                   \r-\r- [0 files][634.7 MiB/925.7 MiB]   35.7 MiB/s                                   \r\\\r|\r| [0 files][663.6 MiB/925.7 MiB]   33.3 MiB/s                                   \r/\r-\r- [0 files][699.7 MiB/925.7 MiB]   32.2 MiB/s                                   \r\\\r\\ [0 files][742.8 MiB/925.7 MiB]   33.5 MiB/s                                   \r|\r/\r/ [0 files][786.3 MiB/925.7 MiB]   35.1 MiB/s                                   \r-\r\\\r\\ [0 files][830.9 MiB/925.7 MiB]   39.2 MiB/s                                   \r|\r| [0 files][873.4 MiB/925.7 MiB]   41.8 MiB/s                                   \r/\r-\r- [0 files][925.7 MiB/925.7 MiB]   44.8 MiB/s                                   \r- [1 files][925.7 MiB/925.7 MiB]   44.8 MiB/s",
+    "timestamp": "2026-02-19T03:20:44.084522440Z"
+  },
+  {
+    "insertId": "1xe9s9ufa4nduc",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:20:45.802738957Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Operation completed over 1 objects/925.7 MiB.",
+    "timestamp": "2026-02-19T03:20:44.084544226Z"
+  },
+  {
+    "insertId": "1xe9s9ufa4ndud",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:20:45.802738957Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Loading Base Matrix into RAM: /base_matrix.parquet",
+    "timestamp": "2026-02-19T03:20:44.684636877Z"
+  },
+  {
+    "insertId": "1xe9s9ufa4ndue",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:20:45.802738957Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "[I 2026-02-19 03:20:45,607] A new study created in memory with name: no-name-4080d100-a975-4caf-b539-8f7e8363d85d",
+    "timestamp": "2026-02-19T03:20:45.684229143Z"
+  },
+  {
+    "insertId": "csrqkafa8y29s",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:20:50.198987308Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "[I 2026-02-19 03:20:49,721] Trial 0 pruned. Physics collapse too severe. Insufficient signals.",
+    "timestamp": "2026-02-19T03:20:49.883913947Z"
+  },
+  {
+    "insertId": "csrqkafa8y29t",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:20:50.198987308Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "[I 2026-02-19 03:20:49,817] Trial 1 pruned. Physics collapse too severe. Insufficient signals.",
+    "timestamp": "2026-02-19T03:20:49.883926325Z"
+  },
+  {
+    "insertId": "csrqkafa8y29u",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:20:50.198987308Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "[I 2026-02-19 03:20:49,914] Trial 2 pruned. Physics collapse too severe. Insufficient signals.",
+    "timestamp": "2026-02-19T03:20:50.110562012Z"
+  },
+  {
+    "insertId": "csrqkafa8y29v",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:20:50.198987308Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "[I 2026-02-19 03:20:50,007] Trial 3 pruned. Physics collapse too severe. Insufficient signals.",
+    "timestamp": "2026-02-19T03:20:50.110574028Z"
+  },
+  {
+    "insertId": "csrqkafa8y29w",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:20:50.198987308Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "[I 2026-02-19 03:20:50,103] Trial 4 pruned. Physics collapse too severe. Insufficient signals.",
+    "timestamp": "2026-02-19T03:20:50.110575734Z"
+  },
+  {
+    "insertId": "qxbc9pf9qqqnf",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:20:50.799400696Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "[I 2026-02-19 03:20:50,189] Trial 5 pruned. Physics collapse too severe. Insufficient signals.",
+    "timestamp": "2026-02-19T03:20:50.283944144Z"
+  },
+  {
+    "insertId": "qxbc9pf9qqqng",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:20:50.799400696Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "[I 2026-02-19 03:20:50,283] Trial 6 pruned. Physics collapse too severe. Insufficient signals.",
+    "timestamp": "2026-02-19T03:20:50.483765473Z"
+  },
+  {
+    "insertId": "qxbc9pf9qqqnh",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:20:50.799400696Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "[I 2026-02-19 03:20:50,374] Trial 7 pruned. Physics collapse too severe. Insufficient signals.",
+    "timestamp": "2026-02-19T03:20:50.483773663Z"
+  },
+  {
+    "insertId": "qxbc9pf9qqqni",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:20:50.799400696Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "[I 2026-02-19 03:20:50,467] Trial 8 pruned. Physics collapse too severe. Insufficient signals.",
+    "timestamp": "2026-02-19T03:20:50.483775871Z"
+  },
+  {
+    "insertId": "qxbc9pf9qqqnj",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:20:50.799400696Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "[I 2026-02-19 03:20:50,560] Trial 9 pruned. Physics collapse too severe. Insufficient signals.",
+    "timestamp": "2026-02-19T03:20:50.684473219Z"
+  },
+  {
+    "insertId": "7il8yre2ejas",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:20:55.803889599Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "[I 2026-02-19 03:20:52,408] Trial 10 finished with value: 0.5654896532764886 and parameters: {'peace_threshold': 0.3373677907759919, 'srl_resid_sigma_mult': 1.3326356014894118, 'topo_energy_sigma_mult': 3.0383511234389857, 'max_depth': 7, 'learning_rate': 0.015817566588447754, 'subsample': 0.9927930003170996, 'colsample_bytree': 0.6054983291789089}. Best is trial 10 with value: 0.5654896532764886.",
+    "timestamp": "2026-02-19T03:20:52.484007126Z"
+  },
+  {
+    "insertId": "7il8yre2ejat",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:20:55.803889599Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "[I 2026-02-19 03:20:55,531] Trial 11 finished with value: 0.5607162584318046 and parameters: {'peace_threshold': 0.30160439148356666, 'srl_resid_sigma_mult': 1.3164962156190987, 'topo_energy_sigma_mult': 2.6368238389261625, 'max_depth': 7, 'learning_rate': 0.015867957910748354, 'subsample': 0.9936961443368941, 'colsample_bytree': 0.6029641975778192}. Best is trial 10 with value: 0.5654896532764886.",
+    "timestamp": "2026-02-19T03:20:55.684232792Z"
+  },
+  {
+    "insertId": "ktioysf9rlhqm",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:21:00.806428320Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "[I 2026-02-19 03:20:58,444] Trial 12 finished with value: 0.5553998263153069 and parameters: {'peace_threshold': 0.3227636748411618, 'srl_resid_sigma_mult': 1.073016449716213, 'topo_energy_sigma_mult': 2.070428523717874, 'max_depth': 7, 'learning_rate': 0.012049787974989136, 'subsample': 0.6070111455018068, 'colsample_bytree': 0.6119345013948678}. Best is trial 10 with value: 0.5654896532764886.",
+    "timestamp": "2026-02-19T03:20:58.483856072Z"
+  },
+  {
+    "insertId": "ktioysf9rlhqn",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:21:00.806428320Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "[I 2026-02-19 03:21:00,102] Trial 13 finished with value: 0.5563715978790658 and parameters: {'peace_threshold': 0.44491900137501084, 'srl_resid_sigma_mult': 2.4972315391927644, 'topo_energy_sigma_mult': 2.231624223307584, 'max_depth': 7, 'learning_rate': 0.015326537291711722, 'subsample': 0.9920859173337643, 'colsample_bytree': 0.6006721659817366}. Best is trial 10 with value: 0.5654896532764886.",
+    "timestamp": "2026-02-19T03:21:00.283975779Z"
+  },
+  {
+    "insertId": "ktioysf9rlhqo",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:21:00.806428320Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "[I 2026-02-19 03:21:00,195] Trial 14 pruned. Physics collapse too severe. Insufficient signals.",
+    "timestamp": "2026-02-19T03:21:00.283984496Z"
+  },
+  {
+    "insertId": "1acalz5fakxajy",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:21:02.200600358Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "[I 2026-02-19 03:21:00,831] Trial 15 finished with value: 0.5752291664850757 and parameters: {'peace_threshold': 0.5655631326200726, 'srl_resid_sigma_mult': 1.8196476786009002, 'topo_energy_sigma_mult': 4.329754095342601, 'max_depth': 6, 'learning_rate': 0.007600940347097257, 'subsample': 0.9259783624244668, 'colsample_bytree': 0.6706508128403437}. Best is trial 15 with value: 0.5752291664850757.",
+    "timestamp": "2026-02-19T03:21:00.884310263Z"
+  },
+  {
+    "insertId": "1acalz5fakxajz",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:21:02.200600358Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "[I 2026-02-19 03:21:00,918] Trial 16 pruned. Physics collapse too severe. Insufficient signals.",
+    "timestamp": "2026-02-19T03:21:01.084159247Z"
+  },
+  {
+    "insertId": "1acalz5fakxak0",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:21:02.200600358Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "[I 2026-02-19 03:21:01,768] Trial 17 finished with value: 0.56734888940245 and parameters: {'peace_threshold': 0.419872717379817, 'srl_resid_sigma_mult': 1.9827471258358362, 'topo_energy_sigma_mult': 4.347412579100048, 'max_depth': 6, 'learning_rate': 0.008516173055229209, 'subsample': 0.8812921477523739, 'colsample_bytree': 0.7348050246485016}. Best is trial 15 with value: 0.5752291664850757.",
+    "timestamp": "2026-02-19T03:21:01.884680919Z"
+  },
+  {
+    "insertId": "1acalz5fakxak1",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:21:02.200600358Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "[I 2026-02-19 03:21:01,862] Trial 18 pruned. Physics collapse too severe. Insufficient signals.",
+    "timestamp": "2026-02-19T03:21:01.884712439Z"
+  },
+  {
+    "insertId": "1acalz5fakxak2",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:21:02.200600358Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "[I 2026-02-19 03:21:01,952] Trial 19 pruned. Physics collapse too severe. Insufficient signals.",
+    "timestamp": "2026-02-19T03:21:02.083799322Z"
+  },
+  {
+    "insertId": "1xo6fkhf16a0pt",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:21:04.002845825Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "[I 2026-02-19 03:21:02,402] Trial 20 finished with value: 0.6012326440752094 and parameters: {'peace_threshold': 0.524462975533486, 'srl_resid_sigma_mult': 1.932811994113962, 'topo_energy_sigma_mult': 5.502560436609094, 'max_depth': 5, 'learning_rate': 0.0055209943891839355, 'subsample': 0.9439688178671944, 'colsample_bytree': 0.7990851784951422}. Best is trial 20 with value: 0.6012326440752094.",
+    "timestamp": "2026-02-19T03:21:02.484184270Z"
+  },
+  {
+    "insertId": "1xo6fkhf16a0pu",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:21:04.002845825Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "[I 2026-02-19 03:21:03,599] Trial 21 finished with value: 0.6101452643370191 and parameters: {'peace_threshold': 0.5253567667772991, 'srl_resid_sigma_mult': 1.9773888188507172, 'topo_energy_sigma_mult': 5.427559578121958, 'max_depth': 5, 'learning_rate': 0.006525909043483982, 'subsample': 0.9382970275902356, 'colsample_bytree': 0.7855991276821759}. Best is trial 21 with value: 0.6101452643370191.",
+    "timestamp": "2026-02-19T03:21:03.684349897Z"
+  },
+  {
+    "insertId": "1xo6fkhf16a0pv",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:21:04.002845825Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "[I 2026-02-19 03:21:03,690] Trial 22 pruned. Physics collapse too severe. Insufficient signals.",
+    "timestamp": "2026-02-19T03:21:03.884232372Z"
+  },
+  {
+    "insertId": "1xo6fkhf16a0pw",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:21:04.002845825Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "[I 2026-02-19 03:21:03,781] Trial 23 pruned. Physics collapse too severe. Insufficient signals.",
+    "timestamp": "2026-02-19T03:21:03.884245691Z"
+  },
+  {
+    "insertId": "1xo6fkhf16a0px",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:21:04.002845825Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "[I 2026-02-19 03:21:03,879] Trial 24 pruned. Physics collapse too severe. Insufficient signals.",
+    "timestamp": "2026-02-19T03:21:03.884248550Z"
+  },
+  {
+    "insertId": "9r6eh1f9linl4",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:21:06.398259564Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "[I 2026-02-19 03:21:05,353] Trial 25 finished with value: 0.5832707394445412 and parameters: {'peace_threshold': 0.5376513364979117, 'srl_resid_sigma_mult': 1.683472211891521, 'topo_energy_sigma_mult': 3.551148127793395, 'max_depth': 4, 'learning_rate': 0.01092045340022711, 'subsample': 0.9650004377940051, 'colsample_bytree': 0.8400441446733931}. Best is trial 21 with value: 0.6101452643370191.",
+    "timestamp": "2026-02-19T03:21:05.484295837Z"
+  },
+  {
+    "insertId": "9r6eh1f9linl5",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:21:06.398259564Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "[I 2026-02-19 03:21:05,799] Trial 26 finished with value: 0.577982337148635 and parameters: {'peace_threshold': 0.5197802023643474, 'srl_resid_sigma_mult': 2.3594819652649806, 'topo_energy_sigma_mult': 3.4355670325539664, 'max_depth': 4, 'learning_rate': 0.011443536258559225, 'subsample': 0.9613069928116433, 'colsample_bytree': 0.8368291567510833}. Best is trial 21 with value: 0.6101452643370191.",
+    "timestamp": "2026-02-19T03:21:05.884504327Z"
+  },
+  {
+    "insertId": "9r6eh1f9linl6",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:21:06.398259564Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "[I 2026-02-19 03:21:05,888] Trial 27 pruned. Physics collapse too severe. Insufficient signals.",
+    "timestamp": "2026-02-19T03:21:06.084739098Z"
+  },
+  {
+    "insertId": "9r6eh1f9linl7",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:21:06.398259564Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "[I 2026-02-19 03:21:05,974] Trial 28 pruned. Physics collapse too severe. Insufficient signals.",
+    "timestamp": "2026-02-19T03:21:06.084751074Z"
+  },
+  {
+    "insertId": "9r6eh1f9linl8",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:21:06.398259564Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "[I 2026-02-19 03:21:06,219] Trial 29 pruned. Insufficient finite weighted samples.",
+    "timestamp": "2026-02-19T03:21:06.283801637Z"
+  },
+  {
+    "insertId": "9r5xr1fb3ntl2",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:21:08.201793881Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "[I 2026-02-19 03:21:06,310] Trial 30 pruned. Physics collapse too severe. Insufficient signals.",
+    "timestamp": "2026-02-19T03:21:06.484287025Z"
+  },
+  {
+    "insertId": "9r5xr1fb3ntl3",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:21:08.201793881Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "[I 2026-02-19 03:21:06,763] Trial 31 finished with value: 0.5787813013254397 and parameters: {'peace_threshold': 0.5411381055528347, 'srl_resid_sigma_mult': 2.353905838224071, 'topo_energy_sigma_mult': 3.2530754820201193, 'max_depth': 4, 'learning_rate': 0.010722563104855408, 'subsample': 0.9723781006908048, 'colsample_bytree': 0.840960454428765}. Best is trial 21 with value: 0.6101452643370191.",
+    "timestamp": "2026-02-19T03:21:06.883830788Z"
+  },
+  {
+    "insertId": "9r5xr1fb3ntl4",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:21:08.201793881Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "[I 2026-02-19 03:21:07,331] Trial 32 finished with value: 0.5770745064948583 and parameters: {'peace_threshold': 0.5367691220117053, 'srl_resid_sigma_mult': 1.602581525166121, 'topo_energy_sigma_mult': 3.6937471614298216, 'max_depth': 4, 'learning_rate': 0.020237961375009873, 'subsample': 0.9419222707278063, 'colsample_bytree': 0.8391943527647294}. Best is trial 21 with value: 0.6101452643370191.",
+    "timestamp": "2026-02-19T03:21:07.484632799Z"
+  },
+  {
+    "insertId": "9r5xr1fb3ntl5",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:21:08.201793881Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "[I 2026-02-19 03:21:07,420] Trial 33 pruned. Physics collapse too severe. Insufficient signals.",
+    "timestamp": "2026-02-19T03:21:07.484641211Z"
+  },
+  {
+    "insertId": "9r5xr1fb3ntl6",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:21:08.201793881Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "[I 2026-02-19 03:21:07,945] Trial 34 finished with value: 0.5696158601453958 and parameters: {'peace_threshold': 0.5994101832554032, 'srl_resid_sigma_mult': 2.116579497153857, 'topo_energy_sigma_mult': 3.7573513068964486, 'max_depth': 4, 'learning_rate': 0.0401362435423388, 'subsample': 0.8628614045177675, 'colsample_bytree': 0.8871814952752444}. Best is trial 21 with value: 0.6101452643370191.",
+    "timestamp": "2026-02-19T03:21:08.084661102Z"
+  },
+  {
+    "insertId": "9r5xr1fb3ntl7",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:21:08.201793881Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "[I 2026-02-19 03:21:08,034] Trial 35 pruned. Physics collapse too severe. Insufficient signals.",
+    "timestamp": "2026-02-19T03:21:08.084670755Z"
+  },
+  {
+    "insertId": "skuexlf9krpl7",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:21:09.799400507Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "[I 2026-02-19 03:21:09,176] Trial 36 finished with value: 0.5646217327051859 and parameters: {'peace_threshold': 0.3991734264867689, 'srl_resid_sigma_mult': 1.4548065502818956, 'topo_energy_sigma_mult': 2.9270727602125866, 'max_depth': 4, 'learning_rate': 0.00312643605432872, 'subsample': 0.896287552435244, 'colsample_bytree': 0.8510690149277331}. Best is trial 21 with value: 0.6101452643370191.",
+    "timestamp": "2026-02-19T03:21:09.284199455Z"
+  },
+  {
+    "insertId": "skuexlf9krpl8",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:21:09.799400507Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "[I 2026-02-19 03:21:09,272] Trial 37 pruned. Physics collapse too severe. Insufficient signals.",
+    "timestamp": "2026-02-19T03:21:09.284211710Z"
+  },
+  {
+    "insertId": "skuexlf9krpl9",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:21:09.799400507Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "[I 2026-02-19 03:21:09,370] Trial 38 pruned. Physics collapse too severe. Insufficient signals.",
+    "timestamp": "2026-02-19T03:21:09.484289697Z"
+  },
+  {
+    "insertId": "skuexlf9krpla",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:21:09.799400507Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "[I 2026-02-19 03:21:09,477] Trial 39 pruned. Physics collapse too severe. Insufficient signals.",
+    "timestamp": "2026-02-19T03:21:09.484300787Z"
+  },
+  {
+    "insertId": "skuexlf9krplb",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:21:09.799400507Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "[I 2026-02-19 03:21:09,568] Trial 40 pruned. Physics collapse too severe. Insufficient signals.",
+    "timestamp": "2026-02-19T03:21:09.684129598Z"
+  },
+  {
+    "insertId": "mal4feym45d",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:21:12.796643816Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "[I 2026-02-19 03:21:10,611] Trial 41 finished with value: 0.5851915734937709 and parameters: {'peace_threshold': 0.5297907832462997, 'srl_resid_sigma_mult': 2.2578632655736914, 'topo_energy_sigma_mult': 3.749848456978249, 'max_depth': 4, 'learning_rate': 0.006667066665765487, 'subsample': 0.9575024604178737, 'colsample_bytree': 0.8277441163292609}. Best is trial 21 with value: 0.6101452643370191.",
+    "timestamp": "2026-02-19T03:21:10.700975588Z"
+  },
+  {
+    "insertId": "mal4feym45e",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:21:12.796643816Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "[I 2026-02-19 03:21:11,224] Trial 42 finished with value: 0.5741478374479494 and parameters: {'peace_threshold': 0.5484562355388279, 'srl_resid_sigma_mult': 1.0011062245596642, 'topo_energy_sigma_mult': 4.978963162770565, 'max_depth': 4, 'learning_rate': 0.006429016972164092, 'subsample': 0.978086424983855, 'colsample_bytree': 0.8625698008902666}. Best is trial 21 with value: 0.6101452643370191.",
+    "timestamp": "2026-02-19T03:21:11.284520903Z"
+  },
+  {
+    "insertId": "mal4feym45f",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:21:12.796643816Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "[I 2026-02-19 03:21:11,314] Trial 43 pruned. Physics collapse too severe. Insufficient signals.",
+    "timestamp": "2026-02-19T03:21:11.484538507Z"
+  },
+  {
+    "insertId": "mal4feym45g",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:21:12.796643816Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "[I 2026-02-19 03:21:11,762] Trial 44 finished with value: 0.5622225485343807 and parameters: {'peace_threshold': 0.5051201150919743, 'srl_resid_sigma_mult': 2.018314856576082, 'topo_energy_sigma_mult': 2.761523185703272, 'max_depth': 3, 'learning_rate': 0.01873197584415883, 'subsample': 0.9532040456012921, 'colsample_bytree': 0.8506055239162873}. Best is trial 21 with value: 0.6101452643370191.",
+    "timestamp": "2026-02-19T03:21:11.883875181Z"
+  },
+  {
+    "insertId": "mal4feym45h",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:21:12.796643816Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "[I 2026-02-19 03:21:12,648] Trial 45 finished with value: 0.5505994734699632 and parameters: {'peace_threshold': 0.38155659379779916, 'srl_resid_sigma_mult': 2.3663016048203356, 'topo_energy_sigma_mult': 2.4726817290589764, 'max_depth': 4, 'learning_rate': 0.005311408937707575, 'subsample': 0.9417012731008391, 'colsample_bytree': 0.7973028917635265}. Best is trial 21 with value: 0.6101452643370191.",
+    "timestamp": "2026-02-19T03:21:12.684261562Z"
+  },
+  {
+    "insertId": "13zu8dxckvt",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:21:14.997833105Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "[I 2026-02-19 03:21:12,736] Trial 46 pruned. Physics collapse too severe. Insufficient signals.",
+    "timestamp": "2026-02-19T03:21:12.884432896Z"
+  },
+  {
+    "insertId": "13zu8dxckvu",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:21:14.997833105Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "[I 2026-02-19 03:21:13,373] Trial 47 finished with value: 0.5702104971323018 and parameters: {'peace_threshold': 0.6308228559785058, 'srl_resid_sigma_mult': 1.682397724002663, 'topo_energy_sigma_mult': 3.172799332399727, 'max_depth': 3, 'learning_rate': 0.012884724536193798, 'subsample': 0.6155615546802704, 'colsample_bytree': 0.9324348377467723}. Best is trial 21 with value: 0.6101452643370191.",
+    "timestamp": "2026-02-19T03:21:13.484881834Z"
+  },
+  {
+    "insertId": "13zu8dxckvv",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:21:14.997833105Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "[I 2026-02-19 03:21:13,463] Trial 48 pruned. Physics collapse too severe. Insufficient signals.",
+    "timestamp": "2026-02-19T03:21:13.484891479Z"
+  },
+  {
+    "insertId": "13zu8dxckvw",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:21:14.997833105Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "[I 2026-02-19 03:21:14,153] Trial 49 finished with value: 0.5912624420091713 and parameters: {'peace_threshold': 0.46882890101994307, 'srl_resid_sigma_mult': 2.595673761569892, 'topo_energy_sigma_mult': 4.139492462541955, 'max_depth': 4, 'learning_rate': 0.007113645181191646, 'subsample': 0.6624010881015239, 'colsample_bytree': 0.8953369811248002}. Best is trial 21 with value: 0.6101452643370191.",
+    "timestamp": "2026-02-19T03:21:14.283827539Z"
+  },
+  {
+    "insertId": "13zu8dxckvx",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:21:14.997833105Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "/opt/conda/lib/python3.10/site-packages/google/api_core/_python_version_support.py:275: FutureWarning: You are using a Python version (3.10.18) which Google will stop supporting in new releases of google.api_core once it reaches its end of life (2026-10-04). Please upgrade to the latest Python version, or at least Python 3.11, to continue receiving updates for google.api_core past that date.",
+    "timestamp": "2026-02-19T03:21:14.884388491Z"
+  },
+  {
+    "insertId": "13zu8dxckvy",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:21:14.997833105Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "warnings.warn(message, FutureWarning)",
+    "timestamp": "2026-02-19T03:21:14.884401677Z"
+  },
+  {
+    "insertId": "be5b1gf9kblnq",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:21:20.006244631Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "--- V60 SWARM RESULT JSON START ---",
+    "timestamp": "2026-02-19T03:21:15.683906675Z"
+  },
+  {
+    "insertId": "be5b1gf9kblnr",
+    "jsonPayload": {
+      "base_matrix": "gs://omega_v52_central/omega/staging/base_matrix/v60/resume_aa8abb7/base_matrix.parquet",
+      "best_params": {
+        "colsample_bytree": 0.7855991276821759,
+        "learning_rate": 0.006525909043483982,
+        "max_depth": 5,
+        "peace_threshold": 0.5253567667772991,
+        "srl_resid_sigma_mult": 1.9773888188507172,
+        "subsample": 0.9382970275902356,
+        "topo_energy_sigma_mult": 5.427559578121958
+      },
+      "best_value": 0.6101452643370191,
+      "feature_cols": [
+        "sigma_eff",
+        "net_ofi",
+        "depth_eff",
+        "epiplexity",
+        "srl_resid",
+        "topo_area",
+        "topo_energy",
+        "topo_micro",
+        "topo_classic",
+        "topo_trend",
+        "price_change",
+        "bar_duration_ms",
+        "adaptive_y",
+        "epi_x_srl_resid",
+        "epi_x_topo_area",
+        "epi_x_net_ofi"
+      ],
+      "job_id": "8392580415252070400",
+      "n_completed": 20,
+      "n_trials": 50,
+      "seconds": 28.56,
+      "status": "completed"
+    },
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:21:20.006244631Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "timestamp": "2026-02-19T03:21:15.683915203Z"
+  },
+  {
+    "insertId": "be5b1gf9kblns",
+    "labels": {
+      "compute.googleapis.com/resource_id": "8763204613860703776",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-1szsq3uu-25c7edb9-4rsx",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "8392580415252070400",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T03:21:20.006244631Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "--- V60 SWARM RESULT JSON END ---",
+    "timestamp": "2026-02-19T03:21:15.683917031Z"
+  },
+  {
+    "insertId": "1soq5ygd5hzm",
+    "labels": {
+      "ml.googleapis.com/endpoint": ""
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/ml.googleapis.com%2F8392580415252070400",
+    "receiveTimestamp": "2026-02-19T03:21:22.703595953Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "gen-lang-client-0250995579",
+        "task_name": "service"
+      },
+      "type": "ml_job"
+    },
+    "severity": "INFO",
+    "textPayload": "Tearing down training program.",
+    "timestamp": "2026-02-19T03:21:21.439171048Z"
+  },
+  {
+    "insertId": "1soq5ygd5i7b",
+    "labels": {
+      "ml.googleapis.com/endpoint": ""
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/ml.googleapis.com%2F8392580415252070400",
+    "receiveTimestamp": "2026-02-19T03:23:29.842174147Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "gen-lang-client-0250995579",
+        "task_name": "service"
+      },
+      "type": "ml_job"
+    },
+    "severity": "INFO",
+    "textPayload": "Finished tearing down training program.",
+    "timestamp": "2026-02-19T03:23:29.052783674Z"
+  },
+  {
+    "insertId": "1soq5ygd5i7d",
+    "labels": {
+      "ml.googleapis.com/endpoint": "",
+      "ml.googleapis.com/job_state": "SUCCEEDED"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/ml.googleapis.com%2F8392580415252070400",
+    "receiveTimestamp": "2026-02-19T03:23:30.848542518Z",
+    "resource": {
+      "labels": {
+        "job_id": "8392580415252070400",
+        "project_id": "gen-lang-client-0250995579",
+        "task_name": "service"
+      },
+      "type": "ml_job"
+    },
+    "severity": "INFO",
+    "textPayload": "Job completed successfully.",
+    "timestamp": "2026-02-19T03:23:29.524845791Z"
+  }
+]

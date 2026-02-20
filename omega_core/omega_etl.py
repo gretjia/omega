@@ -255,7 +255,7 @@ def _lob_flux_expr() -> pl.Expr:
 
 def build_l2_frames(path: str, cfg: L2PipelineConfig, target_frames: float | None = None) -> pl.DataFrame:
     lf = scan_l2_quotes(path, cfg)
-    lf = lf.sort("time")
+    lf = lf.sort(["date", "time"])
     lf = _apply_session_filter(lf, cfg)
     lf = _apply_quality_filter(lf, cfg)
 
@@ -267,6 +267,12 @@ def build_l2_frames(path: str, cfg: L2PipelineConfig, target_frames: float | Non
     lf = lf.with_columns(_ofi_expr(cfg))
     lf = lf.with_columns(_lob_flux_expr())
     lf = lf.with_columns(_time_of_day_ms_expr("time").alias("__time_ms"))
+
+    # Phase 1: 3-second snapshot aggregation handling (Anti-Aliasing Low-Pass Filter)
+    lf = lf.with_columns([
+        pl.col("v_ofi").rolling_mean(window_size=3, min_samples=1).alias("v_ofi"),
+        pl.col("depth").rolling_mean(window_size=3, min_samples=1).alias("depth")
+    ])
 
     vc = cfg.volume_clock
 
@@ -331,6 +337,7 @@ def build_l2_frames(path: str, cfg: L2PipelineConfig, target_frames: float | Non
             pl.col("__time_ms").first().alias("time_start"),
             pl.col("__time_ms").last().alias("time_end"),
             pl.col("date").first().alias("date"),
+            pl.col("symbol").first().alias("symbol"),
             pl.len().alias("n_ticks"),
             pl.col("vol_tick").sum().alias("trade_vol"),
             pl.col("lob_flux").sum().alias("cancel_vol"),

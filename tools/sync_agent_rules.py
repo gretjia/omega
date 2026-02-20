@@ -42,8 +42,6 @@ def _render_codex(src: Dict) -> str:
         AUTO_NOTE,
         f"# {c['title']}",
         "",
-        f"Source version: `{src['meta']['version']}`",
-        "",
     ]
     for i, rule in enumerate(c["rules"], start=1):
         lines.append(f"{i}. **Rule {i}**: {rule}")
@@ -55,7 +53,7 @@ def _render_codex(src: Dict) -> str:
             "",
             "Core Paths:",
             f"- Active: `{g['core_paths']['primary_math_core']}` / `{g['core_paths']['primary_kernel']}`",
-            f"- Legacy: `{g['core_paths']['legacy_math_core']}` / `{g['core_paths']['legacy_kernel']}`",
+            f"- Secondary: `{g['core_paths']['secondary_math_core']}` / `{g['core_paths']['secondary_kernel']}`",
             "",
         ]
     )
@@ -105,7 +103,7 @@ def _render_trae(src: Dict) -> str:
     )
     for fp in ctx["key_files"]:
         lines.append(f"  - `{fp}`")
-    lines.append(f"- **Legacy Note**: {ctx['legacy_note']}")
+    lines.append(f"- **Archive Note**: {ctx['archive_note']}")
     lines.append("")
     return "\n".join(lines).rstrip() + "\n"
 

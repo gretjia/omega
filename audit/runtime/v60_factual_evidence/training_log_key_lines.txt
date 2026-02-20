@@ -1,0 +1,12 @@
+--- train success 602229 ---
+270:    "textPayload": "+ python3 -u payload.py --base-matrix-uri=gs://omega_v52_central/omega/staging/base_matrix/v60/resume_aa8abb7/base_matrix.parquet --code-bundle-uri=gs://omega_v52_central/omega/staging/code/omega_core_20260219-125410_78e36d9.zip --output-uri=gs://omega_v52_central/omega/staging/models/v6/20260219-125410_78e36d9 --peace-threshold=0.5253567667772991 --srl-resid-sigma-mult=1.9773888188507172 --topo-energy-sigma-mult=5.427559578121958 --xgb-max-depth=5 --xgb-learning-rate=0.006525909043483982 --xgb-subsample=0.9382970275902356 --xgb-colsample-bytree=0.7855991276821759",
+468:    "textPayload": "[*] Downloading base matrix: gs://omega_v52_central/omega/staging/base_matrix/v60/resume_aa8abb7/base_matrix.parquet",
+688:    "textPayload": "[*] Sliced rows for training: 2067 / 5780139 (mask_rows=2188)",
+763:      "mask_rows": 2188,
+764:      "model_uri": "gs://omega_v52_central/omega/staging/models/v6/20260219-125410_78e36d9/omega_v6_xgb_final.pkl",
+777:      "status": "completed",
+778:      "total_training_rows": 2067
+854:    "textPayload": "Job completed successfully.",
+
+--- train cancelled 402690 ---
+1805:    "textPayload": "Job cancelled.",

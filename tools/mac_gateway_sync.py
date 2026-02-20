@@ -26,16 +26,18 @@ warnings.filterwarnings("ignore", ".*non-supported Python version.*")
 import argparse
 import time
 import subprocess
-import os
 import shutil
-import glob
 import sys
+import re
 from pathlib import Path
 
 # --- Configuration ---
 BUFFER_DIR = Path.home() / "Omega_uplink_buffer"
 BATCH_SIZE_GB = 15  # Keep buffer well below free space limit
 IDENTITY_FILE = Path.home() / ".ssh" / "id_ed25519"
+SCP_RETRIES = 3
+SCP_RETRY_SLEEP_SEC = 5
+GCS_CP_CHUNK = 64
 
 # Host Definitions
 # source_path: The directory containing the frames ON THE REMOTE MACHINE.
@@ -75,6 +77,9 @@ def check_dependencies():
     if not shutil.which("ssh"):
         print("[!] Error: 'ssh' not found.")
         sys.exit(1)
+    if not shutil.which("scp"):
+        print("[!] Error: 'scp' not found.")
+        sys.exit(1)
 
 def get_ssh_cmd(target, command):
     """Returns the SSH command list with specific options to bypass bad config."""
@@ -84,7 +89,81 @@ def get_ssh_cmd(target, command):
     return ["ssh", "-F", "/dev/null", "-o", "StrictHostKeyChecking=no", "-i", str(IDENTITY_FILE), target, command]
 
 def get_scp_download_cmd(target, remote_path, local_path):
-    return ["scp", "-F", "/dev/null", "-o", "StrictHostKeyChecking=no", "-i", str(IDENTITY_FILE), "-q", f"{target}:{remote_path}", str(local_path)]
+    return [
+        "scp",
+        "-F",
+        "/dev/null",
+        "-o",
+        "StrictHostKeyChecking=no",
+        "-o",
+        "ConnectTimeout=20",
+        "-o",
+        "ServerAliveInterval=15",
+        "-o",
+        "ServerAliveCountMax=3",
+        "-i",
+        str(IDENTITY_FILE),
+        "-q",
+        f"{target}:{remote_path}",
+        str(local_path),
+    ]
+
+
+def scp_download_with_retry(target: str, remote_path: str, local_dir: Path, label: str) -> bool:
+    """Download one file with retry; returns True on success."""
+    for attempt in range(1, SCP_RETRIES + 1):
+        res = subprocess.run(
+            get_scp_download_cmd(target, remote_path, local_dir),
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+        if res.returncode == 0:
+            return True
+
+        print(
+            f"    [!] Download failed ({attempt}/{SCP_RETRIES}): {label} "
+            f"(rc={res.returncode})"
+        )
+        err = (res.stderr or "").strip()
+        if err:
+            print(f"        {err.splitlines()[-1]}")
+        if attempt < SCP_RETRIES:
+            time.sleep(SCP_RETRY_SLEEP_SEC)
+    return False
+
+
+def upload_files_to_gcs(local_paths: list[Path], gcs_target: str) -> None:
+    """Upload local files to GCS in bounded chunks."""
+    if not local_paths:
+        return
+
+    for i in range(0, len(local_paths), GCS_CP_CHUNK):
+        chunk = local_paths[i : i + GCS_CP_CHUNK]
+        cmd = ["gcloud", "storage", "cp"] + [str(p) for p in chunk] + [gcs_target]
+        subprocess.run(cmd, check=True)
+
+
+def get_gcs_existing_parquet_names(gcs_bucket: str, dest_subpath: str, git_hash: str) -> set[str]:
+    """
+    Returns parquet filenames already present in GCS for this host/hash.
+    """
+    prefix = f"{gcs_bucket.rstrip('/')}/omega/v52/frames/{dest_subpath}"
+    pattern = f"{prefix}/*_{git_hash}.parquet"
+    cmd = ["gcloud", "storage", "ls", pattern]
+    res = subprocess.run(cmd, capture_output=True, text=True)
+    if res.returncode != 0:
+        return set()
+
+    out: set[str] = set()
+    for raw in res.stdout.splitlines():
+        line = raw.strip()
+        if not line:
+            continue
+        name = line.rsplit("/", 1)[-1]
+        if re.match(rf".*_{re.escape(git_hash)}\.parquet$", name):
+            out.add(name)
+    return out
 
 def get_remote_file_list(host_config, git_hash, year_filter=None):
     """
@@ -168,53 +247,80 @@ def sync_batch(host_key, files_to_sync, gcs_bucket):
     target = host_cfg["ssh_target"]
     remote_dir = host_cfg["source_path"]
     local_batch_dir = BUFFER_DIR / host_cfg["dest_subpath"]
-    
+
+    if local_batch_dir.exists():
+        shutil.rmtree(local_batch_dir)
     local_batch_dir.mkdir(parents=True, exist_ok=True)
-    
+
     print(f"[*] Processing batch of {len(files_to_sync)} files from {host_key}...")
-    
-    for fname, _ in files_to_sync:
-        # Use forward slashes for SCP, even on Windows (OpenSSH handles it)
-        # Avoid double slashes
-        remote_path = f"{remote_dir}/{fname}".replace("//", "/")
-        
-        # Check if file already exists in GCS?
-        # Ideally we should, but for batch & burn we assume we want to sync.
-        # Adding a simple check using gsutil ls could be slow.
-        # We rely on the user to filter or overwrite.
-        
-        # Download Parquet
-        print(f"    < Downloading: {fname}")
-        subprocess.run(get_scp_download_cmd(target, remote_path, local_batch_dir), check=True)
-        
-        # Download Meta
-        meta_name = fname + ".meta.json"
-        meta_remote = f"{remote_dir}/{meta_name}".replace("//", "/")
-        subprocess.run(get_scp_download_cmd(target, meta_remote, local_batch_dir), check=False)
-
-    # 2. Upload Batch to GCS
-    print(f"[*] Uploading batch to {gcs_bucket}...")
+    downloaded: list[str] = []
     gcs_target = f"{gcs_bucket}/omega/v52/frames/{host_cfg['dest_subpath']}/"
-    
-    cmd = ["gcloud", "storage", "cp", "-r", str(local_batch_dir) + "/*", gcs_target]
-    subprocess.run(cmd, check=True)
-    
-    # 3. Handle .done files
-    print("[*] Verifying and finalizing (.done markers)...")
-    for fname, _ in files_to_sync:
-        done_name = fname + ".done"
-        # Always use forward slashes for SCP
-        remote_path_done = f"{remote_dir}/{done_name}".replace("//", "/")
-             
-        res = subprocess.run(get_scp_download_cmd(target, remote_path_done, local_batch_dir), check=False)
-        if res.returncode == 0:
-            subprocess.run(["gcloud", "storage", "cp", str(local_batch_dir / done_name), gcs_target], check=True)
 
-    # 4. Cleanup Buffer
-    print("[*] Cleaning up local buffer...")
-    shutil.rmtree(local_batch_dir)
-    local_batch_dir.mkdir(parents=True, exist_ok=True)
-    print("[+] Batch complete.\n")
+    try:
+        for fname, _ in files_to_sync:
+            # Use forward slashes for SCP, even on Windows (OpenSSH handles it)
+            remote_path = f"{remote_dir}/{fname}".replace("//", "/")
+            print(f"    < Downloading: {fname}")
+            ok = scp_download_with_retry(
+                target=target,
+                remote_path=remote_path,
+                local_dir=local_batch_dir,
+                label=fname,
+            )
+            if not ok:
+                print(f"    [!] Skipping after retries: {fname}")
+                continue
+
+            downloaded.append(fname)
+
+            # Download Meta (best effort)
+            meta_name = fname + ".meta.json"
+            meta_remote = f"{remote_dir}/{meta_name}".replace("//", "/")
+            scp_download_with_retry(
+                target=target,
+                remote_path=meta_remote,
+                local_dir=local_batch_dir,
+                label=meta_name,
+            )
+
+        if not downloaded:
+            print("[!] No parquet downloaded successfully in this batch; skipping upload.")
+            return
+
+        # 2. Upload batch payload (explicit files to avoid wildcard ambiguities)
+        print(f"[*] Uploading batch to {gcs_bucket}...")
+        upload_paths: list[Path] = []
+        for fname in downloaded:
+            pq = local_batch_dir / fname
+            if pq.exists():
+                upload_paths.append(pq)
+            meta = local_batch_dir / (fname + ".meta.json")
+            if meta.exists():
+                upload_paths.append(meta)
+        upload_files_to_gcs(upload_paths, gcs_target)
+
+        # 3. Handle .done files (best effort)
+        print("[*] Verifying and finalizing (.done markers)...")
+        done_paths: list[Path] = []
+        for fname in downloaded:
+            done_name = fname + ".done"
+            remote_path_done = f"{remote_dir}/{done_name}".replace("//", "/")
+            ok = scp_download_with_retry(
+                target=target,
+                remote_path=remote_path_done,
+                local_dir=local_batch_dir,
+                label=done_name,
+            )
+            if ok:
+                done_paths.append(local_batch_dir / done_name)
+        upload_files_to_gcs(done_paths, gcs_target)
+
+        print(f"[+] Batch complete. uploaded_parquet={len(downloaded)} uploaded_done={len(done_paths)}\n")
+    finally:
+        print("[*] Cleaning up local buffer...")
+        if local_batch_dir.exists():
+            shutil.rmtree(local_batch_dir)
+        local_batch_dir.mkdir(parents=True, exist_ok=True)
 
 def run_sync(bucket_name, git_hash, target_host=None, year_filter=None):
     check_dependencies()
@@ -228,7 +334,18 @@ def run_sync(bucket_name, git_hash, target_host=None, year_filter=None):
             
         print(f"=== Starting Sync for {host_key} ===")
         files = get_remote_file_list(HOSTS[host_key], git_hash=git_hash, year_filter=year_filter)
-        
+        existing = get_gcs_existing_parquet_names(
+            gcs_bucket=bucket_name,
+            dest_subpath=HOSTS[host_key]["dest_subpath"],
+            git_hash=git_hash,
+        )
+        if existing:
+            before = len(files)
+            files = [item for item in files if item[0] not in existing]
+            print(f"    Skipping {before - len(files)} already in GCS.")
+        else:
+            print("    GCS has no existing parquet for this hash/host.")
+
         current_batch = []
         current_batch_size = 0
         

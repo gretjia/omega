@@ -17,6 +17,7 @@ import glob
 import hashlib
 import json
 import multiprocessing as mp
+import re
 import shutil
 import subprocess
 import sys
@@ -45,6 +46,26 @@ from config_v6 import FEATURE_COLS
 from omega_core.trainer import OmegaTrainerV3
 
 
+def _mem_available_gb() -> float | None:
+    """
+    Linux-only soft signal used to avoid spawning an unsafe number of workers.
+    Falls back to None when not available.
+    """
+    meminfo = Path("/proc/meminfo")
+    try:
+        raw = meminfo.read_text(encoding="utf-8", errors="replace")
+    except Exception:
+        return None
+    m = re.search(r"^MemAvailable:\s+(\d+)\s+kB$", raw, flags=re.MULTILINE)
+    if not m:
+        return None
+    try:
+        kb = float(m.group(1))
+    except Exception:
+        return None
+    return kb / (1024.0 * 1024.0)
+
+
 def _scan_parquet_safe(paths: list[str]) -> pl.LazyFrame:
     """
     Polars may panic on mixed parquet statistics metadata in multi-file scans.
@@ -68,6 +89,44 @@ def _scan_parquet_safe(paths: list[str]) -> pl.LazyFrame:
     # Cross-file schema drift (especially on Windows) can trigger parser panics.
     # Build a relaxed concat from single-file scans to keep schema unification safe.
     return pl.concat([_scan_one(p) for p in uniq], how="diagonal_relaxed")
+
+
+def _extract_symbols_one_file(path: str) -> set[str]:
+    """
+    Return unique symbols from one parquet file using row-group iteration when
+    pyarrow is available to keep peak memory lower than full-column reads.
+    """
+    out: set[str] = set()
+    if pq is not None:
+        pf = pq.ParquetFile(str(path))
+        for rg_idx in range(int(pf.metadata.num_row_groups)):
+            table = pf.read_row_group(rg_idx, columns=["symbol"])
+            if "symbol" not in table.column_names:
+                continue
+            symbol_col = table.column("symbol")
+            if pc is not None and pa is not None:
+                try:
+                    symbol_col = pc.cast(symbol_col, pa.string(), safe=False)
+                except Exception:
+                    pass
+                try:
+                    values = pc.unique(symbol_col).to_pylist()
+                except Exception:
+                    values = symbol_col.to_pylist()
+            else:
+                values = symbol_col.to_pylist()
+            for sym in values:
+                if sym is not None:
+                    out.add(str(sym))
+        return out
+
+    sym_df = pl.scan_parquet(str(path)).select("symbol").collect()
+    if "symbol" not in sym_df.columns:
+        return out
+    for sym in sym_df.get_column("symbol").to_list():
+        if sym is not None:
+            out.add(str(sym))
+    return out
 
 
 def _read_lines(path: Path) -> list[str]:
@@ -318,7 +377,7 @@ def _process_symbol_batch(task: dict) -> dict:
             skipped_inputs += 1
             continue
 
-    if skipped_inputs > 0:
+    if skipped_inputs > 0 and not tables:
         tables.clear()
         gc.collect()
         return {
@@ -328,7 +387,7 @@ def _process_symbol_batch(task: dict) -> dict:
             "base_rows": 0,
             "output_path": "",
             "skipped_inputs": int(skipped_inputs),
-            "error": "input_read_failed",
+            "error": "all_input_read_failed",
         }
 
     if tables:
@@ -537,27 +596,7 @@ class LocalManifoldForger:
         skipped_inputs = 0
         for one in self.input_files:
             try:
-                if pq is not None:
-                    table = pq.read_table(str(one), columns=["symbol"])
-                    if "symbol" not in table.column_names:
-                        continue
-                    symbol_col = table.column("symbol")
-                    if pc is not None and pa is not None:
-                        try:
-                            symbol_col = pc.cast(symbol_col, pa.string(), safe=False)
-                        except Exception:
-                            pass
-                        try:
-                            symbols = pc.unique(symbol_col).to_pylist()
-                        except Exception:
-                            symbols = symbol_col.to_pylist()
-                    else:
-                        symbols = symbol_col.to_pylist()
-                else:
-                    sym_df = pl.scan_parquet(str(one)).select("symbol").collect()
-                    if "symbol" not in sym_df.columns:
-                        continue
-                    symbols = sym_df.get_column("symbol").to_list()
+                symbols = _extract_symbols_one_file(str(one))
             except Exception:
                 skipped_inputs += 1
                 continue
@@ -586,6 +625,9 @@ class LocalManifoldForger:
         *,
         symbols_per_batch: int = 50,
         max_workers: int = 12,
+        reserve_mem_gb: float = 40.0,
+        worker_mem_gb: float = 10.0,
+        dynamic_worker_cap: bool = True,
         sample_symbols: int = 0,
         seed: int = 42,
         resume: bool = True,
@@ -618,10 +660,12 @@ class LocalManifoldForger:
                     meta_symbols = int(meta.get("symbols", -1))
                     meta_ok = (meta_skipped == 0) and (meta_symbols == len(batch_symbols))
 
-                if (not meta_ok) or (not _is_compatible_reused_shard(shard_path)):
-                    reused_rows = 0
-                else:
+                shard_compatible = _is_compatible_reused_shard(shard_path)
+                # Backward compatible resume: older shard dirs may lack per-batch meta.
+                if shard_compatible and (meta_ok or meta is None):
                     reused_rows = _count_parquet_rows(shard_path)
+                else:
+                    reused_rows = 0
                 if reused_rows > 0:
                     reused_results.append(
                         {
@@ -651,16 +695,71 @@ class LocalManifoldForger:
 
         t0 = time.time()
         worker_count = 0
+        requested_worker_count = 0
+        worker_budget = 0
+        parallel_fallback_used = False
+        pool_error = ""
+        mem_available_gb = _mem_available_gb() if bool(dynamic_worker_cap) else None
+        print(
+            "[INFO] forge scheduling: "
+            f"total_batches={len(batches)}, "
+            f"pre_resumed={len(reused_results)}, "
+            f"pending={len(tasks)}, "
+            f"max_workers={int(max_workers)}",
+            flush=True,
+        )
         if not tasks:
             results: list[dict] = []
         else:
-            worker_count = max(1, min(int(max_workers), len(tasks)))
+            requested_worker_count = max(1, min(int(max_workers), len(tasks)))
+            worker_count = requested_worker_count
+            if bool(dynamic_worker_cap) and float(worker_mem_gb) > 0:
+                if mem_available_gb is not None:
+                    budget = int((float(mem_available_gb) - float(reserve_mem_gb)) // float(worker_mem_gb))
+                    worker_budget = max(1, budget)
+                    worker_count = max(1, min(worker_count, worker_budget))
+                    if worker_count < requested_worker_count:
+                        print(
+                            "[WARN] dynamic worker cap applied: "
+                            f"requested={requested_worker_count}, "
+                            f"effective={worker_count}, "
+                            f"mem_available_gb={mem_available_gb:.2f}, "
+                            f"reserve_mem_gb={float(reserve_mem_gb):.2f}, "
+                            f"worker_mem_gb={float(worker_mem_gb):.2f}",
+                            flush=True,
+                        )
+            print(
+                "[INFO] worker plan: "
+                f"requested={requested_worker_count}, "
+                f"effective={worker_count}, "
+                f"worker_budget={worker_budget}, "
+                f"mem_available_gb={mem_available_gb}",
+                flush=True,
+            )
             if worker_count == 1:
                 results = [_process_symbol_batch(t) for t in tasks]
             else:
                 ctx = mp.get_context("spawn")
-                with ctx.Pool(processes=worker_count) as pool:
-                    results = list(pool.imap_unordered(_process_symbol_batch, tasks))
+                results = []
+                try:
+                    with ctx.Pool(processes=worker_count) as pool:
+                        for item in pool.imap_unordered(_process_symbol_batch, tasks):
+                            results.append(item)
+                except Exception as exc:
+                    parallel_fallback_used = True
+                    pool_error = f"{type(exc).__name__}: {exc}"
+                    print(
+                        "[WARN] multiprocessing pool failed; "
+                        f"falling back to serial for remaining tasks ({pool_error})",
+                        flush=True,
+                    )
+                    finished = {int(x.get("batch_id", -1)) for x in results}
+                    for t in tasks:
+                        bid = int(t.get("batch_id", -1))
+                        if bid in finished:
+                            continue
+                        results.append(_process_symbol_batch(t))
+                    worker_count = 1
 
         ordered = sorted(reused_results + results, key=lambda x: int(x.get("batch_id", -1)))
         elapsed = round(time.time() - t0, 2)
@@ -668,6 +767,11 @@ class LocalManifoldForger:
             "symbols": symbols,
             "batches": ordered,
             "worker_count": worker_count,
+            "requested_worker_count": int(requested_worker_count),
+            "worker_budget": int(worker_budget),
+            "mem_available_gb": None if mem_available_gb is None else round(float(mem_available_gb), 2),
+            "parallel_fallback_used": bool(parallel_fallback_used),
+            "pool_error": str(pool_error),
             "resumed_batches": int(len(reused_results)),
             "processed_batches": int(len(results)),
             "total_batches": int(len(batches)),
@@ -686,6 +790,9 @@ def main() -> int:
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--symbols-per-batch", type=int, default=50)
     ap.add_argument("--max-workers", type=int, default=12)
+    ap.add_argument("--reserve-mem-gb", type=float, default=40.0)
+    ap.add_argument("--worker-mem-gb", type=float, default=10.0)
+    ap.add_argument("--no-dynamic-worker-cap", action="store_true")
     ap.add_argument("--max-rows-per-file", type=int, default=0)
     ap.add_argument("--peace-threshold", type=float, default=0.10)
     ap.add_argument("--peace-threshold-baseline", type=float, default=0.10)
@@ -696,6 +803,8 @@ def main() -> int:
     ap.add_argument("--output-uri", default="")
     ap.add_argument("--output-meta-uri", default="")
     ap.add_argument("--shard-dir", default="")
+    ap.add_argument("--merge-existing-shards-only", action="store_true")
+    ap.add_argument("--expected-shard-count", type=int, default=0)
     ap.add_argument("--no-resume", action="store_true")
     # Backward-compatibility flags kept only to block forbidden paths explicitly.
     ap.add_argument("--chunk-days", type=int, default=0)
@@ -708,6 +817,70 @@ def main() -> int:
         raise SystemExit("Forbidden by v60 objection: --float32-output is removed. Float64 is mandatory.")
     if int(args.max_rows_per_file) > 0:
         raise SystemExit("Ticker-sharding mode does not support --max-rows-per-file. Use --sample-symbols/--max-files.")
+
+    out_parquet = Path(args.output_parquet).resolve()
+    out_parquet.parent.mkdir(parents=True, exist_ok=True)
+    resume_enabled = not bool(args.no_resume)
+
+    shard_dir = (
+        Path(args.shard_dir).resolve()
+        if str(args.shard_dir).strip()
+        else (out_parquet.parent / f"{out_parquet.stem}_shards")
+    )
+    if shard_dir.exists() and not resume_enabled:
+        shutil.rmtree(shard_dir)
+    shard_dir.mkdir(parents=True, exist_ok=True)
+
+    if bool(args.merge_existing_shards_only):
+        shard_files = sorted(shard_dir.glob("base_matrix_batch_*.parquet"))
+        if not shard_files:
+            raise SystemExit("No shard parquet files found for --merge-existing-shards-only.")
+        if int(args.expected_shard_count) > 0 and len(shard_files) != int(args.expected_shard_count):
+            raise SystemExit(
+                f"Expected {int(args.expected_shard_count)} shard files, got {len(shard_files)}."
+            )
+        bad = [x for x in shard_files if not _is_compatible_reused_shard(x)]
+        if bad:
+            raise SystemExit(
+                f"Incompatible shard files detected (sample: {bad[0].name}). Refuse merge-only mode."
+            )
+        if out_parquet.exists():
+            out_parquet.unlink()
+        merged_rows, merged_files = _merge_batch_parquets(shard_files, out_parquet)
+        if merged_rows <= 0:
+            raise SystemExit("Merged output is empty in --merge-existing-shards-only mode.")
+
+        out_meta = Path(args.output_meta).resolve() if args.output_meta else out_parquet.with_suffix(
+            out_parquet.suffix + ".meta.json"
+        )
+        meta = {
+            "mode": "merge_existing_shards_only",
+            "output_parquet": str(out_parquet),
+            "output_meta": str(out_meta),
+            "shard_dir": str(shard_dir),
+            "merged_rows": int(merged_rows),
+            "merged_files": int(merged_files),
+            "hash": str(args.hash),
+        }
+        out_meta.write_text(json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8")
+        if args.output_uri:
+            _upload_file(out_parquet, args.output_uri)
+        if args.output_meta_uri:
+            _upload_file(out_meta, args.output_meta_uri)
+        print(
+            json.dumps(
+                {
+                    "status": "ok",
+                    "mode": "merge_existing_shards_only",
+                    "output_parquet": str(out_parquet),
+                    "output_meta": str(out_meta),
+                    "merged_rows": int(merged_rows),
+                    "merged_files": int(merged_files),
+                },
+                ensure_ascii=False,
+            )
+        )
+        return 0
 
     years = [x.strip() for x in str(args.years).split(",") if x.strip()]
     if args.input_file_list:
@@ -724,19 +897,6 @@ def main() -> int:
         files = files[: int(args.max_files)]
     if not files:
         raise SystemExit("No input frame files matched.")
-
-    out_parquet = Path(args.output_parquet).resolve()
-    out_parquet.parent.mkdir(parents=True, exist_ok=True)
-    resume_enabled = not bool(args.no_resume)
-
-    shard_dir = (
-        Path(args.shard_dir).resolve()
-        if str(args.shard_dir).strip()
-        else (out_parquet.parent / f"{out_parquet.stem}_shards")
-    )
-    if shard_dir.exists() and not resume_enabled:
-        shutil.rmtree(shard_dir)
-    shard_dir.mkdir(parents=True, exist_ok=True)
 
     keep_cols = list(
         dict.fromkeys(
@@ -807,21 +967,26 @@ def main() -> int:
     forge_result = forger.run_multicore_forge(
         symbols_per_batch=int(args.symbols_per_batch),
         max_workers=int(args.max_workers),
+        reserve_mem_gb=float(args.reserve_mem_gb),
+        worker_mem_gb=float(args.worker_mem_gb),
+        dynamic_worker_cap=not bool(args.no_dynamic_worker_cap),
         sample_symbols=int(args.sample_symbols),
         seed=int(args.seed),
         resume=resume_enabled,
     )
     batch_results = forge_result["batches"]
-    failed_batches = [
-        x
-        for x in batch_results
-        if int(x.get("skipped_inputs", 0)) > 0 or str(x.get("error", "")).strip()
-    ]
+    failed_batches = [x for x in batch_results if str(x.get("error", "")).strip()]
     if failed_batches:
         bad_ids = ",".join(str(int(x.get("batch_id", -1))) for x in failed_batches[:20])
         raise SystemExit(
             f"One or more batches had unreadable inputs (ids={bad_ids}). "
             "Refusing to merge partial shards."
+        )
+    skipped_inputs_total = int(sum(int(x.get("skipped_inputs", 0)) for x in batch_results))
+    if skipped_inputs_total > 0:
+        print(
+            f"[WARN] skipped unreadable inputs during forge: {skipped_inputs_total}",
+            flush=True,
         )
     shard_files = [Path(x["output_path"]) for x in batch_results if str(x.get("output_path", ""))]
     if not shard_files:
@@ -846,12 +1011,21 @@ def main() -> int:
         "base_rows": total_base_rows,
         "merged_rows": int(merged_rows),
         "merged_files": int(merged_files),
+        "skipped_inputs_total": int(skipped_inputs_total),
         "output_parquet": str(out_parquet),
         "shard_dir": str(shard_dir),
         "symbols_total": len(forge_result["symbols"]),
         "symbols_per_batch": int(args.symbols_per_batch),
         "batch_count": len(batch_results),
         "worker_count": int(forge_result["worker_count"]),
+        "requested_worker_count": int(forge_result.get("requested_worker_count", forge_result["worker_count"])),
+        "worker_budget": int(forge_result.get("worker_budget", 0)),
+        "mem_available_gb": forge_result.get("mem_available_gb"),
+        "reserve_mem_gb": float(args.reserve_mem_gb),
+        "worker_mem_gb": float(args.worker_mem_gb),
+        "dynamic_worker_cap": bool(not args.no_dynamic_worker_cap),
+        "parallel_fallback_used": bool(forge_result.get("parallel_fallback_used", False)),
+        "pool_error": str(forge_result.get("pool_error", "")),
         "resume_enabled": bool(resume_enabled),
         "resumed_batches": int(forge_result.get("resumed_batches", 0)),
         "processed_batches": int(forge_result.get("processed_batches", 0)),

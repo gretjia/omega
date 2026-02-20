@@ -1,0 +1,7 @@
+{
+    "project_id": "gen-lang-client-0250995579",
+    "region": "us-west1",
+    "bucket_name": "omega_v52",
+    "gcs_frame_path": "gs://omega_v52/omega/v52/frames",
+    "gcs_staging_path": "gs://omega_v52/staging"
+}

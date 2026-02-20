@@ -61,20 +61,61 @@ def _apply_recursive_physics(
     # v5.2 Fix: O(1) Memory Array Projection (Avoids to_dicts MemoryError)
     # =========================================================================
     n_rows = frames.height
-    
-    open_px = frames.get_column("open").fill_null(0.0).to_numpy()
-    close_px = frames.get_column("close").fill_null(0.0).to_numpy()
+
+    def _to_f64(v: object, default: float = 0.0) -> float:
+        if v is None:
+            return float(default)
+        if isinstance(v, (int, float, np.integer, np.floating)):
+            out = float(v)
+            return out if np.isfinite(out) else float(default)
+        s = str(v).strip().replace(",", "")
+        if not s:
+            return float(default)
+        if s.lower() in {"nan", "none", "null", "na", "nat", "inf", "+inf", "-inf"}:
+            return float(default)
+        try:
+            out = float(s)
+            return out if np.isfinite(out) else float(default)
+        except Exception:
+            return float(default)
+
+    def _safe_f64_col(col_name: str, default: float = 0.0) -> np.ndarray:
+        if col_name not in frames.columns:
+            return np.full(n_rows, float(default), dtype=np.float64)
+        col = frames.get_column(col_name)
+        vals = col.to_list()
+        return np.asarray([_to_f64(v, default=default) for v in vals], dtype=np.float64)
+
+    def _to_bool(v: object) -> bool:
+        if isinstance(v, bool):
+            return v
+        if v is None:
+            return False
+        if isinstance(v, (int, np.integer)):
+            return int(v) != 0
+        s = str(v).strip().lower()
+        return s in {"1", "true", "t", "yes", "y"}
+
+    def _safe_bool_col(col_name: str) -> np.ndarray:
+        if col_name not in frames.columns:
+            return np.zeros(n_rows, dtype=bool)
+        col = frames.get_column(col_name)
+        vals = col.to_list()
+        return np.asarray([_to_bool(v) for v in vals], dtype=bool)
+
+    open_px = _safe_f64_col("open", default=0.0)
+    close_px = _safe_f64_col("close", default=0.0)
     price_change = close_px - open_px
 
-    sigma_raw = frames.get_column("sigma").fill_nan(0.0).fill_null(0.0).to_numpy()
+    sigma_raw = _safe_f64_col("sigma", default=0.0)
     sigma_eff = np.maximum(sigma_raw, float(srl.sigma_floor))
-    
-    depth_raw = frames.get_column("depth").fill_nan(0.0).fill_null(0.0).to_numpy()
+
+    depth_raw = _safe_f64_col("depth", default=0.0)
     depth_eff = np.maximum(depth_raw, float(srl.depth_floor))
-    
-    net_ofi = frames.get_column("net_ofi").fill_null(0.0).to_numpy()
-    trade_vol = frames.get_column("trade_vol").fill_null(0.0).to_numpy()
-    cancel_vol = frames.get_column("cancel_vol").fill_null(0.0).to_numpy()
+
+    net_ofi = _safe_f64_col("net_ofi", default=0.0)
+    trade_vol = _safe_f64_col("trade_vol", default=0.0)
+    cancel_vol = _safe_f64_col("cancel_vol", default=0.0)
 
     def _safe_list_col(col_name: str) -> list:
         if col_name in frames.columns:
@@ -93,7 +134,7 @@ def _apply_recursive_physics(
     
     # v6.0: A-Share Singularity Mask
     if "has_singularity" in frames.columns:
-        has_singularity = frames.get_column("has_singularity").fill_null(False).to_numpy()
+        has_singularity = _safe_bool_col("has_singularity")
         # Disable physics active state during singularity
         out_is_active = out_is_active & (~has_singularity)
     else:
@@ -231,7 +272,7 @@ def _apply_recursive_physics(
             & (pl.col("topo_energy") > pl.col("sigma_eff") * topo_energy_sigma_mult)
             & (pl.col("spoof_ratio") < spoofing_ratio_max)
         ).alias("is_signal"),
-        (-pl.col("srl_resid").sign()).alias("direction"),
+        (pl.col("srl_resid").sign()).alias("direction"),
     ])
     return res_df
 

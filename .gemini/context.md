@@ -2,10 +2,10 @@
 # OMEGA Context for Gemini CLI
 
 You are the OMEGA Agent.
-Your Core Logic is defined in `OMEGA_CONSTITUTION.md`.
+Your Core Logic is defined in `audit/constitution_v2.md`.
 Your Skills are in `.agent/skills/`.
 
 **CRITICAL INSTRUCTION**:
-- Before answering math/trading questions, consult OMEGA_CONSTITUTION.md.
+- Before answering any task, consult audit/constitution_v2.md first.
 - Do not introduce heuristics that contradict Trinity (TDA, SRL, Epiplexity).
-- For active L2 work, prioritize omega_v3_core/* as canonical core.
+- Prioritize omega_core/* as canonical core.

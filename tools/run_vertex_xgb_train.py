@@ -1,18 +1,19 @@
 #!/usr/bin/env python3
 """
-OMEGA v6 Vertex payload: train XGBoost on framed signal parquet from GCS.
+OMEGA v6 Vertex payload: global in-memory XGBoost training on base_matrix.
 """
 
 from __future__ import annotations
 
 import argparse
+import gc
 import json
 import os
+import pickle
 import shutil
 import subprocess
 import sys
 import time
-from dataclasses import replace
 from pathlib import Path
 
 
@@ -23,37 +24,39 @@ def _install_dependencies() -> None:
             "-m",
             "pip",
             "install",
+            "--quiet",
             "polars",
             "gcsfs",
             "fsspec",
             "numpy",
-            "pandas",
             "xgboost",
-            "scikit-learn",
             "google-cloud-storage",
-            "psutil",
+            "scikit-learn",
         ]
     )
-
-
-def _bootstrap_codebase(code_bundle_uri: str) -> None:
-    try:
-        subprocess.check_call(["gsutil", "cp", code_bundle_uri, "omega_core.zip"])
-    except Exception:
-        from google.cloud import storage
-
-        uri = code_bundle_uri.replace("gs://", "", 1)
-        bucket_name, blob_name = uri.split("/", 1)
-        storage.Client().bucket(bucket_name).blob(blob_name).download_to_filename("omega_core.zip")
-
-    shutil.unpack_archive("omega_core.zip", extract_dir=".")
-    sys.path.append(os.getcwd())
 
 
 def _parse_gcs_uri(uri: str) -> tuple[str, str]:
     clean = uri.replace("gs://", "", 1)
     bucket, blob = clean.split("/", 1)
     return bucket, blob
+
+
+def _download_file(gcs_uri: str, local_path: Path) -> None:
+    local_path.parent.mkdir(parents=True, exist_ok=True)
+    if not gcs_uri.startswith("gs://"):
+        if Path(gcs_uri).resolve() != local_path.resolve():
+            shutil.copyfile(gcs_uri, local_path)
+        return
+    try:
+        subprocess.check_call(["gsutil", "cp", gcs_uri, str(local_path)])
+        return
+    except Exception:
+        pass
+    from google.cloud import storage
+
+    bucket_name, blob_name = _parse_gcs_uri(gcs_uri)
+    storage.Client().bucket(bucket_name).blob(blob_name).download_to_filename(str(local_path))
 
 
 def _upload_file(local_path: Path, gcs_uri: str) -> None:
@@ -63,97 +66,186 @@ def _upload_file(local_path: Path, gcs_uri: str) -> None:
     storage.Client().bucket(bucket_name).blob(blob_name).upload_from_filename(str(local_path))
 
 
-def _iter_selected_files(fs, data_pattern: str, years: list[str]) -> list[str]:
-    files = fs.glob(data_pattern)
-    if not years:
-        return ["gs://" + p for p in files]
-    return ["gs://" + p for p in files if any(y in p for y in years)]
+def _bootstrap_codebase(code_bundle_uri: str) -> None:
+    if not code_bundle_uri:
+        return
+    _download_file(code_bundle_uri, Path("omega_core.zip"))
+    shutil.unpack_archive("omega_core.zip", extract_dir=".")
+    if os.getcwd() not in sys.path:
+        sys.path.append(os.getcwd())
 
 
-def run_training(args: argparse.Namespace) -> None:
-    import gcsfs
+def run_global_training(args: argparse.Namespace) -> None:
+    import numpy as np
     import polars as pl
     import xgboost as xgb
+    from config_v6 import FEATURE_COLS
 
-    from config import L2PipelineConfig
-    from omega_core.trainer import OmegaTrainerV3
+    base_uri = str(args.base_matrix_uri).strip()
+    if not base_uri:
+        raise RuntimeError("--base-matrix-uri is required and must not be empty.")
+    local_matrix = Path("base_matrix_train.parquet")
+    print(f"[*] Downloading base matrix: {base_uri}", flush=True)
+    _download_file(base_uri, local_matrix)
 
-    cfg = L2PipelineConfig()
-    cfg = replace(cfg, model=replace(cfg.model, model_type="xgboost"))
+    print("[*] Loading global manifold into RAM...", flush=True)
+    started = time.time()
+    df = pl.read_parquet(local_matrix)
 
-    trainer = OmegaTrainerV3(cfg)
-    xgb_params = {
-        "objective": str(cfg.model.xgb_objective),
-        "eval_metric": str(cfg.model.xgb_eval_metric),
-        "max_depth": int(cfg.model.xgb_max_depth),
-        "eta": float(cfg.model.xgb_eta),
-        "subsample": float(cfg.model.xgb_subsample),
-        "colsample_bytree": float(cfg.model.xgb_colsample_bytree),
-        "verbosity": 1,
+    required_cols = {
+        "epiplexity",
+        "srl_resid_050",
+        "sigma_eff",
+        "topo_area",
+        "topo_energy",
+        "t1_fwd_return",
+        "date",
+        *list(FEATURE_COLS),
     }
-    rounds = int(max(1, cfg.model.xgb_num_boost_round))
+    missing = sorted([c for c in required_cols if c not in df.columns])
+    if missing:
+        raise RuntimeError(f"base_matrix missing columns: {missing}")
 
-    fs = gcsfs.GCSFileSystem()
-    train_files = _iter_selected_files(fs, args.data_pattern, args.train_years)
-    if not train_files:
-        raise RuntimeError("No training files matched data pattern/year filters.")
+    # v6.1: Calculate Excess Return Target (Alpha)
+    print("[*] Orthogonalizing target (Excess Return)...", flush=True)
+    df = df.with_columns([
+        (pl.col("t1_fwd_return") - pl.col("t1_fwd_return").mean().over("date")).alias("t1_excess_return")
+    ])
 
-    total_rows = 0
-    files_used = 0
-    start = time.time()
-    for uri in train_files:
-        try:
-            df_raw = pl.scan_parquet(uri).collect()
-            if df_raw.height == 0:
-                continue
-            df_proc = trainer._prepare_frames(df_raw, cfg)
-            if df_proc.height == 0:
-                continue
-            dtrain = trainer.build_epistemic_dmatrix(df_proc)
-            if dtrain is None:
-                continue
-            trainer.model = xgb.train(xgb_params, dtrain, num_boost_round=rounds, xgb_model=trainer.model)
-            total_rows += int(dtrain.num_row())
-            files_used += 1
-        except Exception as exc:
-            print(f"[Warn] Skip {uri}: {exc}", flush=True)
+    epi = df.get_column("epiplexity").to_numpy()
+    srl = df.get_column("srl_resid_050").to_numpy()
+    sigma = df.get_column("sigma_eff").to_numpy()
+    topo_area = df.get_column("topo_area").to_numpy()
+    topo_energy = df.get_column("topo_energy").to_numpy()
+    X_all = df.select(list(FEATURE_COLS)).to_numpy()
+    
+    # Use Excess Return for label
+    y_all = (df.get_column("t1_excess_return").to_numpy() > 0).astype(int)
 
-    if trainer.model is None or total_rows == 0:
-        raise RuntimeError("Training produced no valid rows/model.")
+    print(
+        "[*] Applying physics gates "
+        f"(peace={args.peace_threshold}, srl_mult={args.srl_resid_sigma_mult}, topo_mult={args.topo_energy_sigma_mult})...",
+        flush=True,
+    )
+    physics_mask = (
+        (epi > float(args.peace_threshold))
+        & (np.abs(srl) > float(args.srl_resid_sigma_mult) * sigma)
+        & (topo_energy > float(args.topo_energy_sigma_mult) * sigma)
+    )
 
-    out_dir = Path(".")
+    mask_rows = int(np.sum(physics_mask))
+    X_clean = X_all[physics_mask]
+    y_clean = y_all[physics_mask]
+    weights_clean = (epi * np.log1p(np.abs(topo_area)))[physics_mask]
+
+    finite = np.isfinite(weights_clean) & (weights_clean > 1e-8)
+    X_clean = X_clean[finite]
+    y_clean = y_clean[finite]
+    weights_clean = weights_clean[finite]
+
+    base_rows = int(df.height)
+    train_rows = int(len(y_clean))
+    print(f"[*] Sliced rows for training: {train_rows} / {base_rows} (mask_rows={mask_rows})", flush=True)
+    if train_rows <= 0:
+        raise RuntimeError("Physics gates removed all rows; cannot train.")
+
+    del df, epi, srl, sigma, topo_area, topo_energy, X_all, y_all, physics_mask, finite
+    gc.collect()
+
+    dtrain = xgb.DMatrix(
+        X_clean,
+        label=y_clean,
+        weight=weights_clean,
+        feature_names=list(FEATURE_COLS),
+    )
+
+    params = {
+        "objective": "binary:logistic",
+        "eval_metric": "auc",
+        "max_depth": int(args.xgb_max_depth),
+        "eta": float(args.xgb_learning_rate),
+        "subsample": float(args.xgb_subsample),
+        "colsample_bytree": float(args.xgb_colsample_bytree),
+        "tree_method": "hist",
+        "n_jobs": int(args.n_jobs),
+        "seed": int(args.seed),
+    }
+    rounds = int(max(1, args.num_boost_round))
+    print("[*] Running one-shot global xgb.train()...", flush=True)
+    model = xgb.train(params=params, dtrain=dtrain, num_boost_round=rounds)
+
+    payload = {
+        "model": model,
+        "scaler": None,
+        "feature_cols": list(FEATURE_COLS),
+    }
     model_name = "omega_v6_xgb_final.pkl"
-    trainer.save(out_dir=str(out_dir), name=model_name, extra_state={"total_rows": total_rows, "files_used": files_used})
+    with open(model_name, "wb") as f:
+        pickle.dump(payload, f)
 
-    output_prefix = args.output_uri.rstrip("/")
+    seconds = round(time.time() - started, 2)
+    output_prefix = str(args.output_uri).rstrip("/")
     model_uri = f"{output_prefix}/{model_name}"
-    metrics_uri = f"{output_prefix}/train_metrics.json"
+    _upload_file(Path(model_name), model_uri)
 
-    _upload_file(out_dir / model_name, model_uri)
     metrics = {
-        "total_rows": total_rows,
-        "files_used": files_used,
-        "seconds": round(time.time() - start, 2),
+        "status": "completed",
+        "base_matrix_uri": base_uri,
+        "base_rows": base_rows,
+        "mask_rows": mask_rows,
+        "total_training_rows": train_rows,
+        "seconds": seconds,
         "job_id": os.environ.get("CLOUD_ML_JOB_ID", "unknown"),
+        "model_uri": model_uri,
+        "overrides": {
+            "peace_threshold": float(args.peace_threshold),
+            "srl_resid_sigma_mult": float(args.srl_resid_sigma_mult),
+            "topo_energy_sigma_mult": float(args.topo_energy_sigma_mult),
+            "xgb_max_depth": int(args.xgb_max_depth),
+            "xgb_learning_rate": float(args.xgb_learning_rate),
+            "xgb_subsample": float(args.xgb_subsample),
+            "xgb_colsample_bytree": float(args.xgb_colsample_bytree),
+            "num_boost_round": rounds,
+            "seed": int(args.seed),
+        },
     }
-    metrics_path = out_dir / "train_metrics.json"
+    metrics_path = Path("train_metrics.json")
     metrics_path.write_text(json.dumps(metrics, ensure_ascii=False, indent=2), encoding="utf-8")
-    _upload_file(metrics_path, metrics_uri)
-    print(json.dumps({"model_uri": model_uri, "metrics_uri": metrics_uri, **metrics}, ensure_ascii=False))
+    _upload_file(metrics_path, f"{output_prefix}/train_metrics.json")
+    print(json.dumps(metrics, ensure_ascii=False), flush=True)
 
 
 def main() -> None:
-    ap = argparse.ArgumentParser(description="OMEGA v6 XGBoost Trainer Payload")
-    ap.add_argument("--code-bundle-uri", default="gs://omega_v52/staging/code/omega_core.zip")
-    ap.add_argument("--data-pattern", default="gs://omega_v52/omega/v52/frames/host=*/*.parquet")
-    ap.add_argument("--train-years", default="2023,2024")
-    ap.add_argument("--output-uri", required=True, help="GCS prefix, e.g. gs://bucket/staging/models/v6")
-    args = ap.parse_args()
-    args.train_years = [x.strip() for x in str(args.train_years).split(",") if x.strip()]
+    ap = argparse.ArgumentParser(description="OMEGA v6 global XGBoost trainer payload")
+    ap.add_argument("--base-matrix-uri", required=True, help="GCS URI for base_matrix.parquet")
+    ap.add_argument("--output-uri", required=True, help="GCS prefix for model output")
 
+    ap.add_argument("--peace-threshold", type=float, default=0.10)
+    ap.add_argument("--srl-resid-sigma-mult", type=float, default=0.5)
+    ap.add_argument("--topo-energy-sigma-mult", type=float, default=2.0)
+    ap.add_argument("--xgb-max-depth", type=int, default=5)
+    ap.add_argument("--xgb-learning-rate", type=float, default=0.03)
+    ap.add_argument("--xgb-subsample", type=float, default=0.9)
+    ap.add_argument("--xgb-colsample-bytree", type=float, default=0.8)
+    ap.add_argument("--num-boost-round", type=int, default=150)
+    ap.add_argument("--seed", type=int, default=42)
+    ap.add_argument("--n-jobs", type=int, default=-1)
+
+    # Legacy args kept for compatibility with old submitters.
+    ap.add_argument("--code-bundle-uri", required=True, help="Run-pinned code bundle URI.")
+    ap.add_argument("--data-pattern", default="")
+    ap.add_argument("--train-years", default="")
+    ap.add_argument("--max-files", type=int, default=0)
+    ap.add_argument("--max-rows-per-file", type=int, default=0)
+
+    args, _ = ap.parse_known_args()
+    if str(args.data_pattern).strip():
+        raise RuntimeError("`--data-pattern` is forbidden for this training payload. Use `--base-matrix-uri` only.")
+    if str(args.train_years).strip():
+        raise RuntimeError("`--train-years` is forbidden for this training payload. Use prebuilt base_matrix scope.")
     _install_dependencies()
     _bootstrap_codebase(args.code_bundle_uri)
-    run_training(args)
+    run_global_training(args)
 
 
 if __name__ == "__main__":

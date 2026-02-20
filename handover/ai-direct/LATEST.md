@@ -1,23 +1,20 @@
-# Latest Handover Status
-**Last Update:** 2026-02-17 00:05 UTC
-**Current Branch:** `v60`
+# Latest Status
 
-## Active Mission: OMEGA v6.0 (A-Share Hunting)
+Current Phase: Vertex Train Running (Evidence Package Ready, Backtest Takeover Armed)
+Last Update: 2026-02-19 19:50:18 +0800
+Active Train Job: projects/269018079180/locations/us-central1/customJobs/4026903526469795840
+Backtest Watcher: running (/tmp/backtest_takeover_aa8abb7.sh)
 
-### 1. System State
-- **Codebase:** v6.0 (XGBoost + A-Share Physics) deployed to all nodes.
-- **Master:** Synced with v5.2 "God View" stable release.
-- **Infrastructure:**
-  - **Oracle:** Validated (BigQuery).
-  - **Swarm:** Validated (Vertex AI).
-  - **Linux1:** **OFFLINE (Storage Unmounted).** Missing 50% of 2025 data.
+## Recent Handover Entries
+- [20260219_195018_v60_training_audit_package.md](entries/20260219_195018_v60_training_audit_package.md) - Submit-ready v60 training evidence package with raw sources/logs.
+- [20260219_155539_flexible_load_audited_design.md](entries/20260219_155539_flexible_load_audited_design.md) - Audited flexible-load contract and rollout status.
+- [20260218_084500_migration_to_central1.md](entries/20260218_084500_migration_to_central1.md) - Migration and quota fixes.
 
-### 2. Key Artifacts
-- **Philosophy:** `handover/ai-direct/entries/20260216_philosophy_vibe_coding.md` (Based on `audit/v6.md`).
-- **Debugging:** `handover/ai-direct/entries/20260216_vertex_god_view_lessons.md` (Cloud Deployment Guide).
-- **v6.0 Plan:** `handover/ai-direct/entries/20260216_v60_upgrade_summary.md`.
+## Approved Flexible-Load Contract
+- Worker policy: workers=0, workers_min=2, workers_cpu_frac=0.75, cpu low/high=55/88, mem headroom=24GB, est mem=3GB.
+- Backtest machine ladder: n2-standard-80 -> n2-standard-64 -> n2-standard-48 -> n2-standard-32.
+- Governance: dual recursive audit required before promoting new defaults.
 
-### 3. Immediate Tasks for Next Agent
-1.  **Verify Linux1:** Check if `/omega_pool` is back online.
-2.  **Re-Frame:** Execute `pipeline_runner.py --stage frame` on Windows/Linux to regenerate data with v6.0 logic (Singularity Mask + Lunch Break).
-3.  **Train:** Run `trainer.py` (XGBoost mode) on Vertex AI.
+## Immediate Action Required
+- Continue watcher until train succeeds and takeover submits backtest.
+- After train/backtest completion, append evidence delta into a new handover entry for auditor handoff.

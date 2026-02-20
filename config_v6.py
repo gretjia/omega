@@ -8,6 +8,7 @@ provide a conversion bridge to the runtime `config.L2PipelineConfig`.
 from __future__ import annotations
 
 from dataclasses import dataclass, field, replace
+from typing import Sequence
 
 from config import (
     AShareMicrostructureConfig as RuntimeAShareMicrostructureConfig,
@@ -55,3 +56,33 @@ class L2PipelineConfigV6:
             t_plus_1_horizon_days=self.micro.t_plus_1_horizon_days,
         )
         return replace(self.base, ashare_session=runtime_session, micro=runtime_micro)
+
+
+def v6_feature_cols(cfg: L2PipelineConfig | None = None) -> list[str]:
+    """
+    Canonical v6 feature list for tree models and swarm optimizers.
+    Keep this centralized so scripts do not hard-code column names.
+    """
+    runtime_cfg = cfg or L2PipelineConfig()
+    topo_race_cols: Sequence[str] = tuple(getattr(runtime_cfg.train, "topology_race_features", ()))
+    cols = [
+        "sigma_eff",
+        "net_ofi",
+        "depth_eff",
+        "epiplexity",
+        "srl_resid",
+        "topo_area",
+        "topo_energy",
+        *topo_race_cols,
+        "price_change",
+        "bar_duration_ms",
+        "adaptive_y",
+        "epi_x_srl_resid",
+        "epi_x_topo_area",
+        "epi_x_net_ofi",
+    ]
+    return list(dict.fromkeys(cols))
+
+
+# Architectural anchor used by v60 swarm scripts.
+FEATURE_COLS = tuple(v6_feature_cols())

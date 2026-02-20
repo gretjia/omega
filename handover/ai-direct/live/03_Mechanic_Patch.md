@@ -1,32 +1,47 @@
-# 03 Mechanic Patch
+task_id: TASK-20260219-v60-train-backtest-rewrite
+git_hash: 78e36d9
+timestamp_utc: 2026-02-19T12:24:27Z
 
-- task_id: TASK-20260218-V60-BASE-MATRIX-MEM-OPT
-- git_hash: 5ca36a3
-- timestamp_utc: 2026-02-18T21:11:18Z
+# Mechanic Patch
 
-## Scope
-- `/Users/zephryj/work/Omega_vNext/tools/v60_forge_base_matrix_local.py`
-- `/Users/zephryj/work/Omega_vNext/tools/v60_build_base_matrix.py`
-- `/Users/zephryj/work/Omega_vNext/audit/runtime/v60/v60_base_matrix_memory_basis_20260218.md`
+## 1) `tools/run_vertex_xgb_train.py`
+- Rewritten to base-matrix-first training flow.
+- `--base-matrix-uri` is mandatory (fail-closed).
+- `--code-bundle-uri` is mandatory (run-pinned reproducibility).
+- Legacy `--data-pattern` / `--train-years` now hard-fail if provided.
+- Loads base matrix once, applies physics masks in RAM, computes epistemic weights.
+- Builds one global `xgb.DMatrix` and runs one-shot `xgb.train()`.
+- Outputs model + metrics to GCS (`omega_v6_xgb_final.pkl`, `train_metrics.json`).
 
-## Key Changes
-1. Removed `to_pydict` full Python materialization in batch read path.
-2. Added Arrow projection + predicate path:
-   - `read_table(..., columns=select_cols, filters=[('symbol','in', ...)])`
-3. Added Arrow -> Polars path + vectorized type casts:
-   - `pl.from_arrow(..., rechunk=False)`
-   - numeric/bool `cast(..., strict=False)`
-4. Added memory cleanup points (`gc.collect`) for worker stability.
-5. Added global post-concat sort on (`symbol`, `date`, `time_end`, `bucket_id`) before recursive prepare.
-6. Preserved invariants:
-   - no `chunk-days`
-   - no float downcast workaround
-   - strict Float64 checks retained
-   - physics gates retained
+## 2) `tools/run_cloud_backtest.py`
+- Rewritten with strict day-key split filtering (`YYYYMMDD_` prefix).
+- Enforces year/month prefix filtering (`--test-years`, `--test-ym`).
+- `--test-years` is explicit-required fail-closed (`default=""` + empty hard-fail).
+- `--test-ym` default is empty (explicit-only month slicing).
+- `--code-bundle-uri` is mandatory (run-pinned reproducibility).
+- Default caps remain full coverage (`--max-files=0`, `--max-rows-per-file=0`).
+- Preserves threaded execution and adaptive worker controls with telemetry logs.
+- Emits full `per_file` audit data (plus `per_file_count`), no silent truncation.
+- Emits `split_guard` evidence in output JSON.
 
-## Smoke Evidence
-- command: `python3 tools/v60_build_base_matrix.py --input-pattern='artifacts/runtime/v52/frames/host=windows1/*_aa8abb7.parquet' --years=2023 --hash=aa8abb7 --max-files=3 --sample-symbols=20 --symbols-per-batch=10 --max-workers=2 --output-parquet='artifacts/runtime/v60/smoke_memory_opt/base_matrix.parquet' --output-meta='artifacts/runtime/v60/smoke_memory_opt/base_matrix.parquet.meta.json' --no-resume`
-- result: `status=ok`, `base_rows=1071`, `input_file_count=3`, `batch skipped_inputs=[0,0]`, no non-Float64 float columns.
+## 3) `tools/v60_autopilot.py`
+- Recursive-audit anchor switched to `audit/v60_training_final.md`.
+- Train stage now requires/resolves `optimization.base_matrix_uri`.
+- Train submit command now passes `--base-matrix-uri=...`.
+- Removed train-stage `--data-pattern` / `--train-years` injection.
+- Backtest month filter is explicit-only now: `--test-year-months` default empty.
+- Enforces fail-closed split inputs: empty `--train-years` / `--test-years` hard-fail.
+- Recursive audit now fails when train/test year sets are empty.
+- Status JSON always records split evidence (`backtest.split_guard`) and effective month-prefix list.
+- Introduced run-pinned code bundle URI: `.../omega_core_<run_id>_<git_hash>.zip`.
+- Passes run-pinned bundle URI to submitter and payload args for swarm/train/backtest.
 
-## Remaining Risk
-- Full-run memory depends on dispatch-time tuning of `symbols_per_batch` and `max_workers`.
+## 4) `tools/submit_vertex_sweep.py`
+- `--code-bundle-uri` changed to mandatory (no mutable default).
+- `submit_job()` now fail-closes when `code_bundle_uri` is empty.
+- Bundle upload and fallback execution both use the same explicit code bundle URI.
+
+## Validation
+Executed:
+`python3 -m py_compile tools/run_vertex_xgb_train.py tools/run_cloud_backtest.py tools/v60_autopilot.py tools/submit_vertex_sweep.py`
+Result: success (no syntax errors).

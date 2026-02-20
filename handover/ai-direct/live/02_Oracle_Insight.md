@@ -1,20 +1,18 @@
-# 02 Oracle Insight
+task_id: TASK-20260219-v60-train-backtest-rewrite
+git_hash: 78e36d9
+timestamp_utc: 2026-02-19T12:24:27Z
 
-- task_id: TASK-20260218-V60-BASE-MATRIX-MEM-OPT
-- git_hash: 5ca36a3
-- timestamp_utc: 2026-02-18T21:11:18Z
+# Oracle Insight
 
-## Strategy
-1. Keep the architect's execution semantics intact; optimize only memory-heavy data-materialization path.
-2. Replace Python object explosion path (`to_pydict` full expansion) with Arrow/Polars projection/filter/vectorized cast.
-3. Preserve strict Float64 + physics-gate invariants and local ticker-sharding topology.
+Primary failure mode in prior training path is architectural:
+- reverted to raw-frame scanning and incremental `xgb.train(xgb_model=...)` loops,
+- causing I/O stall + tree explosion risk.
 
-## Decision
-1. Delta scope is memory-path optimization only, not physics formula redesign.
-2. Add global post-concat sort for consistent causal ordering before recursive preparation.
-3. Keep final state as `NO EXECUTE` after smoke + audit.
+Required corrected topology:
+- base matrix built on edge,
+- cloud train consumes one base matrix snapshot,
+- one-shot global train,
+- backtest keeps explicit temporal split and auditable telemetry.
 
-## Acceptance Bar
-1. `smoke` output non-empty, `skipped_inputs=0`, no forbidden float dtype.
-2. v6/v60 objection constraints remain intact.
-3. Dual-audit artifacts record `VERDICT: PASS` in current task scope.
+Merge gate before deploy:
+- independent read-only audit verdict must be PASS.

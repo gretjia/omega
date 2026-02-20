@@ -1,11 +1,19 @@
-# OMEGA v5.2: The Epistemic Release (Distributed Controller-Worker)
+# OMEGA: The Epistemic Release (Distributed Controller-Worker)
 
 > **"Physics is invariant. Structure is emergent. The observer is bounded."**
 
-OMEGA v5.2 represents the convergence of **Universal Market Physics** (Sato 2025) and **Computational Information Theory** (Finzi 2026), plus a hard engineering pivot:
+OMEGA represents the convergence of **Universal Market Physics** (Sato 2025) and **Computational Information Theory** (Finzi 2026), plus a hard engineering pivot:
 - **DoD 指标换轨**：`Vector Alignment (Physics)` -> `Model_Alignment (Epistemic)`，并保留 `Phys_Alignment` 作为基线对照。
 - **内存/吞吐换轨**：禁用 `to_dicts()` 行级展开；核心算子张量化/向量化；仅保留严格因果的轻量 IIR 递推。
 - **分布式执行换轨**：Mac 作为 **Controller（代码与配置权威）**；Windows1 + Linux 作为 **Workers（只拉代码、跑 framing）**；原始 `.7z` 数据不进 Git。
+
+---
+
+## 宪法优先（2026-02-18）
+
+- 最高宪法文件：`audit/constitution_v2.md`
+- 所有 agent 在任何任务（规划/实现/审计）前，必须先阅读一次该文件。
+- 该文件在常规任务流中视为不可更改（immutable）；仅允许人工显式宪法修订流程变更。
 
 ---
 
@@ -16,9 +24,9 @@ OMEGA v5.2 represents the convergence of **Universal Market Physics** (Sato 2025
 - **Windows1 + Linux**：各自外挂 `USB4 8T NVMe SSD`，两块盘内原始 `.7z` 数据完全一致；因此 **不需要内网搬运 raw 数据**，只需要同步代码与分片清单。
 
 对应的落地文件/入口：
-- 分布式总纲：`audit/v52_3_machies_sync.md`
-- v52 后续实施总计划：`audit/v52_final_implementation_plan.md`
-- 运行元信息模板：`audit/runtime/v52/run_meta.template.json`
+- 分布式治理入口：`audit/multi_agents.md`
+- 运行治理入口：`audit/runtime/multi_agent/README.md`
+- 运行元信息模板：`audit/runtime/current/run_meta.template.json`
 
 ### 强制纪律（否则会踩坑）
 
@@ -28,9 +36,57 @@ OMEGA v5.2 represents the convergence of **Universal Market Physics** (Sato 2025
 3. **任何 framing/training/run 必须 pin 到明确的 Git commit 或 tag**，并写入 `run_meta.json`（由 `run_meta.template.json` 复制）。
 4. `.gitignore` 负责隔离：`.7z` / `.parquet` / artifacts / logs 一律不进 Git。
 
+## Handover 记忆体系使用教程（2026-02-18）
+
+本项目的 handover 记忆体系由 `deploy_and_check.py` 统一驱动。
+
+主命令：
+```bash
+python3 .codex/skills/multi-agent-ops/scripts/deploy_and_check.py
+```
+
+### 快速使用（每个任务都按这个节奏）
+
+1. 任务开始前运行一次主命令。
+2. 查看 `handover/ai-direct/live/00_Lesson_Recall.md` 的 Top-K 历史经验，避免重复踩坑。
+3. 执行任务；若出现重大故障或修复，更新 `handover/ai-direct/live/01..05_*.md` 后再运行一次主命令刷新记忆。
+4. 任务结束前写入交接事实：
+   - `handover/ai-direct/entries/*.md`
+   - `handover/DEBUG_LESSONS.md`
+5. 结束前再次运行主命令，确保索引、召回和治理校验全部通过。
+
+### 命令选项
+
+1. 初始化/修复缺失文件：
+```bash
+python3 .codex/skills/multi-agent-ops/scripts/deploy_and_check.py --repair
+```
+2. 增加召回条目数：
+```bash
+python3 .codex/skills/multi-agent-ops/scripts/deploy_and_check.py --memory-top-k 8
+```
+3. 临时关闭索引与召回：
+```bash
+python3 .codex/skills/multi-agent-ops/scripts/deploy_and_check.py --no-memory-recall
+```
+4. 输出 JSON 便于自动化/CI：
+```bash
+python3 .codex/skills/multi-agent-ops/scripts/deploy_and_check.py --json
+```
+
+### 数据流（重要）
+
+1. 真相源（可写）：
+   - `handover/ai-direct/entries/*.md`
+   - `handover/DEBUG_LESSONS.md`
+2. 派生层（只读，不手改）：
+   - `handover/index/memory_index.jsonl`
+   - `handover/index/memory_index.sqlite3`
+   - `handover/ai-direct/live/00_Lesson_Recall.md`
+
 ---
 
-## v5.2 分布式同步与运行（推荐路径）
+## 分布式同步与运行（推荐路径）
 
 ### 1) Mac Controller：本地 clone + 本地 bare origin
 
@@ -70,13 +126,13 @@ git ls-remote git://<mac_ip>/Omega_vNext.git
 > 因为 Windows1 与 Linux 的 raw 盘内容完全一致，所以分片清单在哪台生成都一样。
 
 ```bash
-python tools/build_7z_shards.py --root <RAW_ROOT> --out-dir audit/runtime/v52 --rule date_mod2
+python tools/build_7z_shards.py --root <RAW_ROOT> --out-dir audit/runtime/current --rule date_mod2
 ```
 
 输出：
-- `audit/runtime/v52/archive_manifest_7z.txt`
-- `audit/runtime/v52/shard_windows1.txt`
-- `audit/runtime/v52/shard_linux.txt`
+- `audit/runtime/current/archive_manifest_7z.txt`
+- `audit/runtime/current/shard_windows1.txt`
+- `audit/runtime/current/shard_linux.txt`
 
 将这 3 个小文件同步回 Mac Controller 的 repo 后，由 Mac 提交并 push（Workers 只 pull）。
 
@@ -84,12 +140,12 @@ python tools/build_7z_shards.py --root <RAW_ROOT> --out-dir audit/runtime/v52 --
 
 Windows1：
 ```bash
-python pipeline_runner.py --stage frame --config configs/hardware/windows1.yaml --archive-list audit/runtime/v52/shard_windows1.txt
+python pipeline_runner.py --stage frame --config configs/hardware/windows1.yaml --archive-list audit/runtime/current/shard_windows1.txt
 ```
 
 Linux：
 ```bash
-python pipeline_runner.py --stage frame --config configs/hardware/linux.yaml --archive-list audit/runtime/v52/shard_linux.txt
+python pipeline_runner.py --stage frame --config configs/hardware/linux.yaml --archive-list audit/runtime/current/shard_linux.txt
 ```
 
 `--archive-list` 支持：
@@ -148,14 +204,14 @@ python tools/compare_raw_manifests.py \
     *   **Metaphor:** A damper that stiffens when it hits a solid object (Structure) but remains loose in air (Noise).
 
 4.  **Causal Volume Projection (Paradox 3 Fix)**
-    *   **Fix:** Volume buckets are now sized by linearly extrapolating current cumulative volume based on elapsed time. This eliminates look-ahead bias found in v40.
+    *   **Fix:** Volume buckets are now sized by linearly extrapolating current cumulative volume based on elapsed time. This eliminates look-ahead bias found in earlier implementations.
     *   **Implementation:** `omega_etl.py` now strictly enforces time-sorting of slices to ensure `cum_vol` is monotonic and causal.
 
 ---
 
-## 系统架构 (v5.0 Architecture)
+## 系统架构 (Modular Architecture)
 
-OMEGA v5.0 adopts a **Modular Pipeline Architecture**, separating Configuration, Logic, and Execution.
+OMEGA adopts a **Modular Pipeline Architecture**, separating Configuration, Logic, and Execution.
 
 ```mermaid
 graph TD
@@ -182,7 +238,7 @@ graph TD
     *   `interfaces/`: Abstract Base Classes (IMathCore) for future-proofing.
     *   `adapters/`: Glue code that binds `omega_core` to the pipeline.
     *   `engine/`: The logic for Framing, Training, and Backtesting.
-*   **`omega_core/`**: **The Math Core (v5.0).**
+*   **`omega_core/`**: **The Math Core.**
     *   `omega_math_core.py`: Pure physics formulas (SRL 0.5, Compression Gain).
     *   `kernel.py`: The Holographic Damper logic.
     *   `trainer.py`: SGD Online Learning implementation (Multi-Symbol Aware).
@@ -190,18 +246,18 @@ graph TD
     *   `hardware/`: Hardware profiles (e.g., `active_profile.yaml`).
 *   **`parallel_trainer/`**: **High-Performance Driver.**
     *   Legacy-compatible multiprocessing drivers for Training/Backtesting.
-*   **`archive/`**: Legacy v1/v3/v40 code that is no longer active.
+*   **`archive/`**: Historical code that is no longer active.
 
 ---
 
 ## 快速开始 (Quick Start)
 
-v5.2 多机（Mac Controller + Windows1/Linux Workers）优先按本 README 上方 “分布式同步与运行 / 并行 framing” 执行。
+多机（Mac Controller + Windows1/Linux Workers）优先按本 README 上方 “分布式同步与运行 / 并行 framing” 执行。
 
-下方历史章节（Windows Hub / 计划任务 / v5 runtime）仅保留为参考，不再作为 v5.2 推荐路径。
+下方历史章节（Windows Hub / 计划任务 / runtime 历史脚本）仅保留为参考，不再作为推荐路径。
 
 ### 1. 配置硬件
-OMEGA v5.0 自动检测硬件配置。首次运行会自动生成默认配置：
+OMEGA 自动检测硬件配置。首次运行会自动生成默认配置：
 ```bash
 python pipeline_runner.py
 ```
@@ -221,24 +277,23 @@ python pipeline_runner.py --stage frame
 
 ### 4. 训练 (Phase 2)
 ```bash
-python parallel_trainer/run_parallel_v31.py --stage-dir D:/Omega_train_stage
+python parallel_trainer/run_parallel.py --stage-dir D:/Omega_train_stage
 ```
 *Note: Ensure `D:/Omega_train_stage` exists for high-speed IO.*
 
 ### 5. 回测 (Phase 3)
 ```bash
-python parallel_trainer/run_parallel_backtest_v31.py
+python parallel_trainer/run_parallel_backtest.py
 ```
 
 ### 5.1 命名治理与归档入口（2026-02-13）
 - 命名治理方案：`audit/filesystem_naming_archive_plan_2026-02-13.md`
-- v5 运行期未使用文件归档索引：`audit/v5_runtime/windows/ARCHIVE_INDEX.md`
-- 归档根路径：`archive/legacy/2026-02-13/v5_runtime_unused/`
+- 归档根路径：`archive/` 下按日期/主题划分的历史目录
 
 说明：
-- 未来活跃文件命名不再包含版本号（如 `v31` / `v5`）。
-- 版本信息改放在元数据、审计文档与 `archive/legacy/...` 路径层级。
-- 当前 `run_parallel_v31.py` / `run_parallel_backtest_v31.py` 仍保留为兼容入口，后续按治理方案迁移为无版本入口。
+- 未来活跃文件命名不再包含版本号（例如历史脚本名中的编号）。
+- 版本信息改放在元数据、审计文档与 `archive/...` 路径层级。
+- `parallel_trainer/run_parallel.py` 与 `parallel_trainer/run_parallel_backtest.py` 为稳定入口。
 
 ### 6. Mac 主控 SSH（Windows_1）
 已验证可从 Mac 无交互连接 Windows_1（仅连通 smoke，不触发 framing/train/backtest）。
@@ -267,45 +322,6 @@ ssh windows1-w1 "hostname && whoami"
 ```
 
 说明：当前 Mac 存在双网卡同网段场景，需绑定源地址（`BindAddress 192.168.3.49`）以避免偶发 `No route to host`。
-
-### 7. Windows_1 后台全链路（训练+回测）执行与监控（v5）
-当前 detached 主入口：`audit/v5_runtime/windows/run_full_noresume_detached.ps1`。
-
-1) 在 Mac 侧同步脚本到 Windows_1：
-```bash
-scp audit/v5_runtime/windows/run_full_noresume_detached.ps1 windows1-w1:/C:/Omega_vNext/audit/v5_runtime/windows/run_full_noresume_detached.ps1
-```
-
-2) 首次创建计划任务（只需一次）：
-```bash
-ssh windows1-w1 "cmd /c schtasks /Create /TN OmegaFullNoResumeDetached /SC ONCE /ST 00:00 /TR \"powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\\Omega_vNext\\audit\\v5_runtime\\windows\\run_full_noresume_detached.ps1\" /RL HIGHEST /F"
-```
-
-3) 每次启动全链路（脱离 SSH 会话）：
-```bash
-ssh windows1-w1 "cmd /c schtasks /Run /TN OmegaFullNoResumeDetached"
-```
-
-4) 监控训练/回测进度（Mac 侧随时执行）：
-```bash
-ssh windows1-w1 "powershell -NoProfile -Command \"Get-Content 'C:\\Omega_vNext\\audit\\v5_runtime\\windows\\train\\train_status.json'\""
-ssh windows1-w1 "powershell -NoProfile -Command \"Get-Content 'C:\\Omega_vNext\\audit\\v5_runtime\\windows\\backtest\\backtest_status.json'\""
-ssh windows1-w1 "powershell -NoProfile -Command \"Get-Content 'C:\\Omega_vNext\\audit\\v5_runtime\\windows\\pipeline\\full_noresume.log' -Tail 60\""
-```
-
-5) 快速判定是否异常退出：
-```bash
-ssh windows1-w1 "powershell -NoProfile -Command \"if (Test-Path 'C:\\Omega_vNext\\audit\\v5_runtime\\windows\\pipeline\\full_noresume_exit_code.txt') { Get-Content 'C:\\Omega_vNext\\audit\\v5_runtime\\windows\\pipeline\\full_noresume_exit_code.txt' } else { 'RUNNING' }\""
-```
-
-6) 已验证的稳定参数（CPU 训练）：
-- `workers=8`
-- `batch_rows=750000`
-- `checkpoint_rows=1500000`
-- `stage_dir=D:/Omega_train_stage`
-- `stage_chunk_files=16`
-- `stage_copy_workers=4`
-- 断点续跑开启（不使用 `--no-resume`）
 
 ### 8. 审计门控说明（回测阶段）
 - 默认 `fail_on_audit_failed=true`。
@@ -364,9 +380,9 @@ Host windows2-w2
 ./tools/git_sync/mac_publish_and_rollout.sh --remote hub --branch main
 ```
 
-带版本标签发布：
+带发布标签发布：
 ```bash
-./tools/git_sync/mac_publish_and_rollout.sh --remote hub --branch main --tag v2026.02.12-r2
+./tools/git_sync/mac_publish_and_rollout.sh --remote hub --branch main --tag release-2026-02-12-r2
 ```
 
 指定目标主机列表：
@@ -393,12 +409,17 @@ powershell -ExecutionPolicy Bypass -File tools\git_sync\windows_update_from_hub.
 
 ## 关键文档 (Documentation)
 
-*   **[audit/v5_explain.md](audit/v5_explain.md)**: v5.0 的详细解释文档（理论背景与代码实现）。
+*   **[AGENTS.md](AGENTS.md)**: 跨 CLI 统一规则入口（稳定路径优先，版本兼容别名策略）。
+*   **[audit/multi_agents.md](audit/multi_agents.md)**: 版本无关的多 Agent 架构规范（主入口）。
+*   **[audit/runtime/multi_agent/README.md](audit/runtime/multi_agent/README.md)**: 多 Agent 运行配置说明（主路径与兼容策略）。
+*   **[audit/runtime/multi_agent/agent_profiles.yaml](audit/runtime/multi_agent/agent_profiles.yaml)**: 模型档位与角色路由配置（热切换入口）。
+*   **[audit/runtime/multi_agent/recursive_audit_prompts.md](audit/runtime/multi_agent/recursive_audit_prompts.md)**: 双审递归审计提示词模板。
+*   **[handover/DEBUG_LESSONS.md](handover/DEBUG_LESSONS.md)**: Debug 经验沉淀总账（由 `deploy_and_check.py` 自动维护，供各 agent 复用与防回归）。
 *   **[audit/filesystem_naming_archive_plan_2026-02-13.md](audit/filesystem_naming_archive_plan_2026-02-13.md)**: 文件命名去版本号与归档迁移方案（分阶段执行）。
-*   **[audit/v5_runtime/windows/ARCHIVE_INDEX.md](audit/v5_runtime/windows/ARCHIVE_INDEX.md)**: 本次 v5 未使用文件归档映射（原路径 -> archive 路径）。
 *   **[audit/OMEGA_NextGen_Architecture_Plan.md](audit/OMEGA_NextGen_Architecture_Plan.md)**: 未来架构演进路线图。
-*   **[audit/v40_storage_estimation_2020_2026.md](audit/v40_storage_estimation_2020_2026.md)**: 存储规划指南。
 *   **[docs/git_multi_machine_hub.md](docs/git_multi_machine_hub.md)**: Mac + Windows1 + Windows2 代码同步/发布规范（避免手工复制粘贴）。
+*   **[handover/README.md](handover/README.md)**: AI 会话交接目录规范。
+*   **[handover/ai-direct/README.md](handover/ai-direct/README.md)**: 快速恢复与 `01..05` 交接总线规则。
 *   **[omega_core/README.md](omega_core/README.md)**: Core 数学内核说明。
 *   **[parallel_trainer/README.md](parallel_trainer/README.md)**: 并行训练/回测执行说明。
 *   **[rq/README.md](rq/README.md)**: RQ 相关模块说明。
@@ -426,8 +447,12 @@ powershell -ExecutionPolicy Bypass -File tools\git_sync\windows_update_from_hub.
 *   [.agent/skills/pipeline_performance/SKILL.md](.agent/skills/pipeline_performance/SKILL.md)
 *   [.agent/skills/qmtsdk/SKILL.md](.agent/skills/qmtsdk/SKILL.md)
 *   [.agent/skills/rqsdk/SKILL.md](.agent/skills/rqsdk/SKILL.md)
-*   [.agent/skills/v3_mainline_guard/SKILL.md](.agent/skills/v3_mainline_guard/SKILL.md)
+
+## Codex Executable Skills
+
+*   [.codex/skills/multi-agent-ops/SKILL.md](.codex/skills/multi-agent-ops/SKILL.md) (stable)
+*   [.codex/skills/omega-run-ops/SKILL.md](.codex/skills/omega-run-ops/SKILL.md)
 
 ---
 
-> **Note:** v40 Frames are **NOT COMPATIBLE** with v5.0 due to the Paradox 3 fix. Please re-run framing.
+> **Note:** Historical frame artifacts from older pipelines are not guaranteed to be compatible with the current framing logic. Please re-run framing.
