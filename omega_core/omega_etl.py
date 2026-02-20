@@ -251,8 +251,12 @@ def _ofi_expr(cfg: L2PipelineConfig) -> pl.Expr:
     raise ValueError(f"Unknown ofi_mode: {ofi_cfg.ofi_mode}")
 
 
-def _lob_flux_expr() -> pl.Expr:
-    return (pl.col("bid_v1").diff().abs() + pl.col("ask_v1").diff().abs()).alias("lob_flux")
+def _lob_flux_expr(group_col: str | None = None) -> pl.Expr:
+    """LOB flux = |Δbid_v1| + |Δask_v1|. Must isolate by symbol to prevent
+    cross-symbol diff bleeding (stock B open - stock A close = phantom flux)."""
+    b_diff = pl.col("bid_v1").diff().over(group_col) if group_col else pl.col("bid_v1").diff()
+    a_diff = pl.col("ask_v1").diff().over(group_col) if group_col else pl.col("ask_v1").diff()
+    return (b_diff.abs() + a_diff.abs()).alias("lob_flux")
 
 
 def build_l2_frames(path: str, cfg: L2PipelineConfig, target_frames: float | None = None) -> pl.DataFrame:
@@ -277,7 +281,7 @@ def build_l2_frames(path: str, cfg: L2PipelineConfig, target_frames: float | Non
     if cfg.quality.drop_nonpositive_frame_price:
         lf = lf.filter(pl.col("microprice") > float(cfg.quality.min_frame_price))
     lf = lf.with_columns(_ofi_expr(cfg))
-    lf = lf.with_columns(_lob_flux_expr())
+    lf = lf.with_columns(_lob_flux_expr(group_col))
     lf = lf.with_columns(_time_of_day_ms_expr("time").alias("__time_ms"))
 
     # Phase 1: 3-second snapshot aggregation handling (Anti-Aliasing Low-Pass Filter)

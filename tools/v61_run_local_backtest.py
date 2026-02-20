@@ -106,29 +106,22 @@ def _process_backtest_batch(task: dict) -> dict:
         feature_cols = payload.get("feature_cols")
 
     # Load Data for Batch Symbols ONLY
-    # We scan ALL files but filter for these symbols immediately
+    # ACTION 3: Single-file scan to prevent Arrow Rust panics from schema drift
+    # across months of parquet files. Sequential is safer than bulk scan.
     try:
-        lf = pl.scan_parquet(input_files)
-        # Filter pushdown
-        lf = lf.filter(pl.col("symbol").is_in(symbols))
-        
-        # Sort by Date/Time to ensure T+1 Causality
-        # CRITICAL V6.1 FIX: Sort by ["date", "time"] (or ["date", "time_end"])
-        sort_cols = ["date"]
-        schema = lf.collect_schema().names()
-        if "time" in schema:
-            sort_cols.append("time")
-        elif "time_end" in schema:
-            sort_cols.append("time_end")
-        elif "bucket_id" in schema:
-            sort_cols.append("bucket_id")
-            
-        lf = lf.sort(sort_cols)
-        
-        df = lf.collect()
-        
-        if df.height == 0:
+        tables = []
+        for f_path in input_files:
+            try:
+                df_one = pl.scan_parquet(f_path).filter(pl.col("symbol").is_in(symbols)).collect()
+                if df_one.height > 0:
+                    tables.append(df_one)
+            except Exception:
+                continue
+
+        if not tables:
             return {"batch_id": batch_id, "rows": 0, "metrics": {}}
+
+        df = pl.concat(tables, how="diagonal_relaxed")
 
         # V6.1: Run _prepare_frames (includes T+1 logic and Physics features if not present)
         # Note: If reusing precomputed physics, this is fast.

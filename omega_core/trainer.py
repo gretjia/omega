@@ -446,15 +446,29 @@ def _vector_alignment(
         (_over_symbol(pl.col("close").shift(-int(horizon))) - pl.col("close")).alias("fwd_return")
     )
 
-    dir_sign = np.sign(np.asarray(merged["direction"].to_numpy(), dtype=float))
-    fwd_sign = np.sign(np.asarray(merged["fwd_return"].to_numpy(), dtype=float))
+    dir_sign = np.sign(np.asarray(merged.get_column("direction").to_numpy(), dtype=float))
+    # ACTION 1: Safe single-column extraction (never cast full DataFrame to numpy)
+    fwd_sign = np.sign(np.asarray(merged.get_column("fwd_return").to_numpy(), dtype=float))
     
-    epi = np.asarray(merged["epiplexity"].to_numpy(), dtype=float)
+    epi = np.asarray(merged.get_column("epiplexity").to_numpy(), dtype=float)
     if epi.size == 0 or not np.any(np.isfinite(epi)):
         return float("nan"), float("nan")
         
     epi_q = float(np.nanquantile(epi, 0.8))
-    mask = np.isfinite(dir_sign) & np.isfinite(fwd_sign) & (dir_sign != 0.0) & (fwd_sign != 0.0) & (epi >= epi_q)
+
+    # ACTION 4: Seal singularity leakage — exclude limit-up/down rows where
+    # depth=0 causes physics explosion. Training filters these; eval must too.
+    if "is_physics_valid" in merged.columns:
+        is_valid_arr = np.asarray(merged.get_column("is_physics_valid").to_numpy(), dtype=bool)
+    else:
+        is_valid_arr = np.ones_like(epi, dtype=bool)
+
+    mask = (
+        np.isfinite(dir_sign) & np.isfinite(fwd_sign)
+        & (dir_sign != 0.0) & (fwd_sign != 0.0)
+        & (epi >= epi_q)
+        & is_valid_arr  # Physics Singularity Immunity
+    )
     
     phys_align = float("nan")
     if int(np.sum(mask)) >= int(min_samples):
