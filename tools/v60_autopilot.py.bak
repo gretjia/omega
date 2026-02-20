@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-v61 full-stack autopilot (Boomerang Topology):
-frame monitor -> upload -> v60 optimization (in-memory swarm) -> train -> BOOMERANG -> local backtest.
+v60 full-stack autopilot:
+frame monitor -> upload -> v60 optimization (in-memory swarm) -> train -> backtest.
 """
 
 from __future__ import annotations
@@ -89,6 +89,7 @@ def detect_git_hash() -> str:
     except Exception:
         return ""
 
+
 def count_unique_output_dates(path: Path) -> int:
     if not path.exists():
         return 0
@@ -104,13 +105,16 @@ def count_unique_output_dates(path: Path) -> int:
                 keys.add(key)
     return len(keys)
 
+
 def parse_prefixed_int(text: str, key: str) -> int:
     m = re.search(rf"{re.escape(key)}=(\d+)", text)
     return int(m.group(1)) if m else -1
 
+
 def parse_prefixed_str(text: str, key: str) -> str:
     m = re.search(rf"{re.escape(key)}=([^\r\n]+)", text)
     return m.group(1).strip() if m else ""
+
 
 def linux_done_count(git_hash: str) -> int:
     if not SSH_IDENTITY_FILE.exists():
@@ -138,6 +142,7 @@ def linux_done_count(git_hash: str) -> int:
     except Exception:
         return -1
 
+
 def windows_done_and_state(git_hash: str, task_name: str) -> tuple[int, str]:
     ps = (
         "$ProgressPreference='SilentlyContinue'; "
@@ -150,6 +155,7 @@ def windows_done_and_state(git_hash: str, task_name: str) -> tuple[int, str]:
     res = run([sys.executable, str(SSH_PS), WINDOWS_SSH_TARGET, "--command", ps], check=False)
     text = (res.stdout or "") + "\n" + (res.stderr or "")
     return parse_prefixed_int(text, "done_windows"), parse_prefixed_str(text, "task_state")
+
 
 def collect_diag(task_name: str) -> dict:
     if SSH_IDENTITY_FILE.exists():
@@ -179,6 +185,7 @@ def collect_diag(task_name: str) -> dict:
     win_out = run([sys.executable, str(SSH_PS), WINDOWS_SSH_TARGET, "--command", win_ps], check=False).stdout
     return {"linux_tail": linux_log.strip(), "windows_tail": (win_out or "").strip()}
 
+
 def gcs_count(bucket: str, host: str, git_hash: str) -> int:
     pattern = f"{bucket}/omega/v52/frames/host={host}/*_{git_hash}.parquet"
     res = run(["bash", "-lc", f"gcloud storage ls '{pattern}' 2>/dev/null | wc -l"], check=False)
@@ -187,14 +194,17 @@ def gcs_count(bucket: str, host: str, git_hash: str) -> int:
     except Exception:
         return -1
 
+
 def gcs_read_json(uri: str) -> dict:
     res = run(["bash", "-lc", f"gcloud storage cat '{uri}'"], check=False)
     if res.returncode != 0:
         raise RuntimeError(f"gcloud storage cat failed for {uri}: {res.stderr}")
     return json.loads(res.stdout)
 
+
 def add_script_arg(cmd: list[str], item: str) -> None:
     cmd.append(f"--script-arg={item}")
+
 
 def parse_float(d: dict, key: str) -> float | None:
     if key not in d:
@@ -204,6 +214,7 @@ def parse_float(d: dict, key: str) -> float | None:
     except Exception:
         return None
 
+
 def parse_int(d: dict, key: str) -> int | None:
     if key not in d:
         return None
@@ -211,6 +222,7 @@ def parse_int(d: dict, key: str) -> int | None:
         return int(d[key])
     except Exception:
         return None
+
 
 def recursive_audit_checkpoint(
     node: str,
@@ -232,6 +244,7 @@ def recursive_audit_checkpoint(
             if snippet not in text:
                 issues.append(f"audit anchor missing: {snippet}")
 
+    # Strict guard for v60 base-matrix relaxed gate constants from architect override.
     if abs(float(args.base_peace_threshold) - 0.10) > 1e-12:
         issues.append(f"base peace_threshold drifted: {args.base_peace_threshold}")
     if abs(float(args.base_matrix_peace_threshold_baseline) - 0.10) > 1e-12:
@@ -239,6 +252,7 @@ def recursive_audit_checkpoint(
     if abs(float(args.base_srl_resid_sigma_mult) - 0.5) > 1e-12:
         issues.append(f"base srl_resid_sigma_mult drifted: {args.base_srl_resid_sigma_mult}")
 
+    # This run is explicitly the optimization-enabled v60 chain.
     if node in {"pre_base_matrix", "post_base_matrix", "post_optimize", "pre_train", "pre_backtest", "completed"}:
         if not bool(args.enable_optimization):
             issues.append("optimization disabled but v60 override requires optimization-first chain")
@@ -332,7 +346,7 @@ def recursive_audit_checkpoint(
 
 
 def main() -> int:
-    ap = argparse.ArgumentParser(description="OMEGA v61 full-stack autopilot (Boomerang)")
+    ap = argparse.ArgumentParser(description="OMEGA v60 full-stack autopilot")
     ap.add_argument("--hash", default="", help="Frame git short hash (default: local HEAD)")
     ap.add_argument("--bucket", default="gs://omega_v52")
     ap.add_argument("--windows-expected", type=int, default=0)
@@ -342,7 +356,11 @@ def main() -> int:
     ap.add_argument("--windows-task-name", default="Omega_v52_frame03")
     ap.add_argument("--train-years", default="2023,2024")
     ap.add_argument("--test-years", default="2025,2026")
-    ap.add_argument("--test-year-months", default="", help="Optional comma-separated date prefixes for backtest.")
+    ap.add_argument(
+        "--test-year-months",
+        default="",
+        help="Optional comma-separated date prefixes for backtest (YYYY or YYYYMM).",
+    )
     ap.add_argument("--train-machine-type", default="n2-standard-16")
     ap.add_argument("--backtest-machine-type", default="n2-standard-8")
     ap.add_argument("--train-max-files", type=int, default=0)
@@ -354,7 +372,11 @@ def main() -> int:
     ap.add_argument("--optimization-min-samples", type=int, default=2000)
     ap.add_argument("--optimization-seed", type=int, default=42)
     ap.add_argument("--base-matrix-max-files", type=int, default=0)
-    ap.add_argument("--base-matrix-local-input-pattern", default="", help="Local glob for base_matrix ETL inputs.")
+    ap.add_argument(
+        "--base-matrix-local-input-pattern",
+        default="",
+        help="Local glob for base_matrix ETL inputs (gs:// is forbidden).",
+    )
     ap.add_argument("--base-matrix-sample-symbols", type=int, default=0)
     ap.add_argument("--base-matrix-max-rows-per-file", type=int, default=0)
     ap.add_argument("--base-matrix-symbols-per-batch", type=int, default=50)
@@ -404,13 +426,16 @@ def main() -> int:
         raise SystemExit("--test-years cannot be empty.")
 
     if str(args.base_matrix_exec_mode).strip().lower() != "local":
-        raise SystemExit("Forbidden: base_matrix ETL must run locally.")
+        raise SystemExit(
+            "Forbidden by v60 objection: base_matrix ETL must run locally. "
+            "Set --base-matrix-exec-mode=local."
+        )
     if int(args.base_matrix_chunk_days) > 0:
-        raise SystemExit("Forbidden: --base-matrix-chunk-days is removed.")
+        raise SystemExit("Forbidden by v60 objection: --base-matrix-chunk-days is removed.")
     if bool(args.base_matrix_float32_output):
-        raise SystemExit("Forbidden: --base-matrix-float32-output is removed.")
+        raise SystemExit("Forbidden by v60 objection: --base-matrix-float32-output is removed.")
     if bool(args.base_matrix_spot):
-        raise SystemExit("Forbidden: base_matrix stage cannot run on Vertex spot instances.")
+        raise SystemExit("Forbidden by v60 objection: base_matrix stage cannot run on Vertex spot instances.")
     if int(args.base_matrix_max_rows_per_file) > 0:
         raise SystemExit("Ticker-sharding base_matrix mode does not support --base-matrix-max-rows-per-file.")
     base_matrix_input_pattern = str(args.base_matrix_local_input_pattern).strip()
@@ -419,12 +444,12 @@ def main() -> int:
             REPO_ROOT / "artifacts" / "runtime" / "v52" / "frames" / "host=*" / f"*_{git_hash}.parquet"
         )
     if base_matrix_input_pattern.startswith("gs://"):
-        raise SystemExit("Forbidden: --base-matrix-local-input-pattern must point to local files.")
+        raise SystemExit(
+            "Forbidden by v60 objection: --base-matrix-local-input-pattern must point to local files, not gs:// URIs."
+        )
     local_base_inputs = sorted(glob.glob(base_matrix_input_pattern))
     if not local_base_inputs:
-        # Warning only - frames might be generating remotely
-        print(f"[WARN] No local base_matrix input files matched: {base_matrix_input_pattern}")
-        # raise SystemExit(f"No local base_matrix input files matched: {base_matrix_input_pattern}")
+        raise SystemExit(f"No local base_matrix input files matched: {base_matrix_input_pattern}")
 
     win_expected = int(args.windows_expected) or count_unique_output_dates(
         REPO_ROOT / "audit/runtime/v52/shard_windows1.txt"
@@ -474,6 +499,29 @@ def main() -> int:
         f"Autopilot started hash={git_hash} expected windows={win_expected} linux={lin_expected} "
         f"poll={args.poll_sec}s stall={args.stall_sec}s optimization={bool(args.enable_optimization)}"
     )
+    log(
+        "Machine plan "
+        f"base=local_ticker_sharding opt={args.optimization_machine_type} "
+        f"train={args.train_machine_type} backtest={args.backtest_machine_type}"
+    )
+    log(
+        "Spot plan "
+        f"base=False opt={bool(args.optimization_spot)} "
+        f"train={bool(args.train_spot)} backtest={bool(args.backtest_spot)}"
+    )
+    log(
+        "Data caps "
+        "base("
+        f"symbols_per_batch={int(args.base_matrix_symbols_per_batch)}, "
+        f"max_workers={int(args.base_matrix_max_workers)}, "
+        f"sample_symbols={int(args.base_matrix_sample_symbols)}"
+        ") "
+        f"train(max_files={int(args.train_max_files)}, max_rows_per_file={int(args.train_max_rows_per_file)}) "
+        f"backtest(max_files={int(args.backtest_max_files)}, max_rows_per_file={int(args.backtest_max_rows_per_file)})"
+    )
+    log(f"Base-matrix local input pattern={base_matrix_input_pattern} files={len(local_base_inputs)}")
+    if test_year_months:
+        log(f"Backtest month guard enabled: {','.join(test_year_months)}")
     recursive_audit_checkpoint(
         "bootstrap",
         git_hash=git_hash,
@@ -546,13 +594,63 @@ def main() -> int:
         extra={"linux_done": state.get("frame", {}).get("linux_done"), "windows_done": state.get("frame", {}).get("windows_done")},
     )
 
-    # Stage 2: upload - SKIPPED FOR V61 (Data Gravity)
-    log("Skipping Frame Upload (Data Gravity Enforced). Base Matrix will be uploaded in Stage 3.")
-    state["stage"] = "sync_gcs_skipped"
-    flush_state()
+    # Stage 2: upload
+    if args.upload_mode == "sync_once":
+        state["stage"] = "sync_gcs"
+        flush_state()
+        for host in ("linux1", "windows1"):
+            log(f"Sync start host={host}")
+            run_stream(
+                [
+                    sys.executable,
+                    "tools/mac_gateway_sync.py",
+                    "--bucket",
+                    args.bucket,
+                    "--host",
+                    host,
+                    "--hash",
+                    git_hash,
+                ],
+                log,
+            )
+            state["upload"][host] = {"synced_at": now_ts()}
+            flush_state()
+    else:
+        state["stage"] = "wait_gcs_upload"
+        flush_state()
+        last_upload_total = -1
+        last_upload_progress_ts = time.time()
+        while True:
+            lin_gcs = gcs_count(args.bucket, "linux1", git_hash)
+            win_gcs = gcs_count(args.bucket, "windows1", git_hash)
+            total_upload = max(0, lin_gcs) + max(0, win_gcs)
 
-    lin_gcs = 0 # Dummy
-    win_gcs = 0 # Dummy
+            state["upload"]["gcs_counts"] = {
+                "linux1": lin_gcs,
+                "windows1": win_gcs,
+                "checked_at": now_ts(),
+            }
+            flush_state()
+            log(f"GCS progress linux1={lin_gcs}/{lin_expected} windows1={win_gcs}/{win_expected}")
+
+            if lin_gcs >= lin_expected and win_gcs >= win_expected:
+                log("Upload stage complete.")
+                break
+
+            if total_upload > last_upload_total:
+                last_upload_total = total_upload
+                last_upload_progress_ts = time.time()
+            elif time.time() - last_upload_progress_ts >= float(args.stall_sec):
+                log("Upload progress appears stalled.")
+                last_upload_progress_ts = time.time()
+
+            time.sleep(max(10, int(args.poll_sec)))
+
+    lin_gcs = gcs_count(args.bucket, "linux1", git_hash)
+    win_gcs = gcs_count(args.bucket, "windows1", git_hash)
+    state["upload"]["gcs_counts"] = {"linux1": lin_gcs, "windows1": win_gcs, "checked_at": now_ts()}
+    flush_state()
+    log(f"GCS counts linux1={lin_gcs} windows1={win_gcs}")
 
     run_id = datetime.utcnow().strftime("%Y%m%d-%H%M%S")
     data_pattern = f"{args.bucket}/omega/v52/frames/host=*/*_{git_hash}.parquet"
@@ -783,74 +881,77 @@ def main() -> int:
     state["train"]["model_uri"] = f"{train_output_uri}/omega_v6_xgb_final.pkl"
     flush_state()
 
-    # Stage 6: BOOMERANG -> Local Edge Backtest (Replacing Cloud Backtest)
-    state["stage"] = "local_backtest"
-    # Download model first
-    model_uri = state["train"]["model_uri"]
-    local_model_path = REPO_ROOT / f"artifacts/runtime/v60/models/{run_id}/omega_v6_xgb_final.pkl"
-    local_model_path.parent.mkdir(parents=True, exist_ok=True)
-    
-    log(f"Downloading Boomerang Model from {model_uri}...")
-    run(["gcloud", "storage", "cp", model_uri, str(local_model_path)], check=True)
-    
-    backtest_output_local = REPO_ROOT / f"artifacts/runtime/v60/backtest/{run_id}/backtest_metrics.json"
-    backtest_output_local.parent.mkdir(parents=True, exist_ok=True)
-    
-    state["backtest"]["output_path"] = str(backtest_output_local)
+    # Stage 6: Vertex backtest (same physics gate overrides)
+    state["stage"] = "vertex_backtest"
+    backtest_output_uri = f"{args.bucket}/staging/backtest/v6/{run_id}_{git_hash}/backtest_metrics.json"
+    state["backtest"]["output_uri"] = backtest_output_uri
+    state["backtest"]["overrides"] = {
+        "peace_threshold": train_overrides["peace_threshold"],
+        "srl_resid_sigma_mult": train_overrides["srl_resid_sigma_mult"],
+        "topo_energy_sigma_mult": train_overrides["topo_energy_sigma_mult"],
+    }
     flush_state()
-    
-    log("Starting Local Edge Backtest (Ticker Sharding)...")
-    # Note: We use the LOCAL base_matrix input pattern to find frames.
-    # In V61 guide, we are supposed to execute this on the EDGE node (Linux/Windows).
-    # Since autopilot runs on Mac (Orchestrator), we need to dispatch this to the Edge Node?
-    # Or assume Autopilot IS the Edge Node?
-    # Context: User said "download results to local linux single machine backtest".
-    # And "Autopilot monitors".
-    # If Autopilot runs on Mac, it cannot run the backtest on Linux unless it SSH's.
-    # But v61_run_local_backtest.py is designed for local execution.
-    
-    # We will dispatch via SSH to Linux (Zepher) for the backtest.
-    # We need to transfer the model to Linux first.
-    
-    linux_model_path = f"/tmp/omega_v61_backtest/{run_id}/omega_v6_xgb_final.pkl"
-    linux_output_path = f"/tmp/omega_v61_backtest/{run_id}/backtest_metrics.json"
-    
-    log(f"Dispatching Backtest to Linux Node ({LINUX_SSH_TARGET})...")
-    
-    # 1. Create dir on Linux
-    run(["ssh", "-F", "/dev/null", *SSH_CONNECT_OPTS, "-o", "StrictHostKeyChecking=no", "-i", str(SSH_IDENTITY_FILE), LINUX_SSH_TARGET, f"mkdir -p {Path(linux_model_path).parent}"], check=True)
-    
-    # 2. SCP Model
-    run(["scp", "-F", "/dev/null", *SSH_CONNECT_OPTS, "-o", "StrictHostKeyChecking=no", "-i", str(SSH_IDENTITY_FILE), str(local_model_path), f"{LINUX_SSH_TARGET}:{linux_model_path}"], check=True)
-    
-    # 3. Run Backtest Script (SSH)
-    # Assumes code is synced.
+    log("Submitting Vertex backtest job (sync mode)...")
+    recursive_audit_checkpoint(
+        "pre_backtest",
+        git_hash=git_hash,
+        args=args,
+        state=state,
+        audit_log_path=audit_log_path,
+        log_fn=log,
+        extra={"backtest_overrides": state["backtest"]["overrides"]},
+    )
+
     backtest_cmd = [
-        "ssh", "-F", "/dev/null", *SSH_CONNECT_OPTS, "-o", "StrictHostKeyChecking=no", "-i", str(SSH_IDENTITY_FILE), LINUX_SSH_TARGET,
-        f"python3 /home/zepher/work/Omega_vNext/tools/v61_run_local_backtest.py --model-path {linux_model_path} --frames-dir /omega_pool/parquet_data/v52/frames/host=linux1 --output {linux_output_path} --workers 16 --symbols-per-batch 50"
+        sys.executable,
+        "tools/submit_vertex_sweep.py",
+        "--script",
+        "tools/run_cloud_backtest.py",
+        "--machine-type",
+        args.backtest_machine_type,
+        "--code-bundle-uri",
+        code_bundle_uri,
+        "--sync",
+        f"--sync-timeout-sec={int(args.backtest_sync_timeout_sec)}",
     ]
-    
-    log(f"Running remote backtest: {' '.join(backtest_cmd)}")
-    # We stream this? Or wait? Stream is better.
-    # But run_stream assumes local Popen.
-    # We can use subprocess.run and capture output.
-    
-    res = subprocess.run(backtest_cmd, capture_output=True, text=True)
-    if res.returncode != 0:
-        log(f"Remote backtest failed: {res.stderr}")
-        raise RuntimeError("Remote backtest failed")
-    
-    log("Remote backtest completed.")
-    log(res.stdout)
-    
-    # 4. Retrieve Results
-    run(["scp", "-F", "/dev/null", *SSH_CONNECT_OPTS, "-o", "StrictHostKeyChecking=no", "-i", str(SSH_IDENTITY_FILE), f"{LINUX_SSH_TARGET}:{linux_output_path}", str(backtest_output_local)], check=True)
-    
+    if args.vertex_force_gcloud_fallback:
+        backtest_cmd.append("--force-gcloud-fallback")
+    if args.backtest_spot:
+        backtest_cmd.append("--spot")
+    add_script_arg(backtest_cmd, f"--code-bundle-uri={code_bundle_uri}")
+    add_script_arg(backtest_cmd, f"--data-pattern={data_pattern}")
+    add_script_arg(backtest_cmd, f"--test-years={args.test_years}")
+    add_script_arg(backtest_cmd, f"--max-files={int(args.backtest_max_files)}")
+    add_script_arg(backtest_cmd, f"--max-rows-per-file={int(args.backtest_max_rows_per_file)}")
+    if test_year_months:
+        add_script_arg(backtest_cmd, f"--test-ym={','.join(test_year_months)}")
+    add_script_arg(backtest_cmd, f"--model-uri={state['train']['model_uri']}")
+    add_script_arg(backtest_cmd, f"--output-uri={backtest_output_uri}")
+
+    if train_overrides["peace_threshold"] is not None:
+        add_script_arg(backtest_cmd, f"--peace-threshold={train_overrides['peace_threshold']}")
+    if train_overrides["srl_resid_sigma_mult"] is not None:
+        add_script_arg(backtest_cmd, f"--srl-resid-sigma-mult={train_overrides['srl_resid_sigma_mult']}")
+    if train_overrides["topo_energy_sigma_mult"] is not None:
+        add_script_arg(backtest_cmd, f"--topo-energy-sigma-mult={train_overrides['topo_energy_sigma_mult']}")
+
+    if args.backtest_spot:
+        try:
+            run_stream(backtest_cmd, log)
+        except Exception as spot_exc:
+            state["backtest"]["spot_failed_at"] = now_ts()
+            state["backtest"]["spot_error"] = str(spot_exc)
+            flush_state()
+            log(f"Spot backtest job failed; retrying once on on-demand. error={spot_exc}")
+            ondemand_cmd = [x for x in backtest_cmd if x != "--spot"]
+            run_stream(ondemand_cmd, log)
+    else:
+        run_stream(backtest_cmd, log)
     state["backtest"]["completed_at"] = now_ts()
+
     state["stage"] = "completed"
     state["completed_at"] = now_ts()
     flush_state()
-    
     recursive_audit_checkpoint(
         "completed",
         git_hash=git_hash,
