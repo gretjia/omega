@@ -1,8 +1,14 @@
 #!/usr/bin/env python3
 """
-v61 Windows Framing Agent (SHARDED).
+v61 Windows Framing Agent (SHARDED, Anti-Fragile Edition).
 Processes raw 7z archives -> Parquet Frames.
-Supports 2023-2026 data.
+
+Anti-Fragile Fixes (2026-02-21):
+  1. POLARS_MAX_THREADS=8 to prevent thread explosion
+  2. Global config load (was: per-file YAML parse)
+  3. Git hash computed once in main() (was: subprocess per file)
+  4. Workers default=2 (was: 4, caused swap thrash)
+  5. shutil.rmtree for reliable cleanup
 """
 
 import os
@@ -10,8 +16,13 @@ import sys
 import hashlib
 import subprocess
 import argparse
+import shutil
+import uuid
 from pathlib import Path
 from multiprocessing import Pool
+
+# 【CRITICAL DEFENSE】Cap Polars internal Rayon threads per worker.
+os.environ["POLARS_MAX_THREADS"] = "8"
 
 # Add project root to sys.path
 sys.path.append(r"C:\Omega_vNext")
@@ -23,100 +34,107 @@ RAW_ROOT = Path(r"E:\data\level2")
 OUTPUT_ROOT = Path(r"D:\Omega_frames\v61\host=windows1")
 SEVEN_ZIP = r"C:\Program Files\7-Zip\7z.exe"
 
+# 【FIX 2】Global config — load once, not per-file
+GLOBAL_CFG = load_l2_pipeline_config()
+
 def get_shard(filename, total_shards):
     h = hashlib.md5(filename.encode()).hexdigest()
     return int(h, 16) % total_shards
 
 def process_day(args):
-    year, month, day_path, shard_info = args
-    shard_index, total_shards = shard_info
-    
-    filename = day_path.name
-    if get_shard(filename, total_shards) != shard_index:
-        return None
-        
-    os.chdir(r"C:\Omega_vNext")
-    cfg = load_l2_pipeline_config()
-    date_str = day_path.stem
-    try:
-        hash_str = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"], cwd=r"C:\Omega_vNext").decode().strip()
-    except:
-        hash_str = "unknown"
+    """Process a single trading day: 7z extract -> CSV scan -> Polars ETL -> Parquet."""
+    day_path, hash_str, shard_index, total_shards = args
 
+    os.chdir(r"C:\Omega_vNext")
+    date_str = day_path.stem
     out_path = OUTPUT_ROOT / f"{date_str}_{hash_str}.parquet"
     done_path = OUTPUT_ROOT / f"{date_str}_{hash_str}.parquet.done"
-    
+
     if done_path.exists():
-        return f"Skipped {date_str} (Done)"
-        
+        return f"[{date_str}] Skipped (Done)"
+
     print(f"[{date_str}] Starting processing (Shard {shard_index}/{total_shards})...", flush=True)
-    
-    import uuid
+
     unique_id = uuid.uuid4().hex
     tmp_dir = Path(f"D:/tmp/framing/{date_str}_{unique_id}")
-    
+
+    # Ensure clean start
+    if tmp_dir.exists():
+        shutil.rmtree(tmp_dir, ignore_errors=True)
+    tmp_dir.mkdir(parents=True, exist_ok=True)
+
     try:
-        if tmp_dir.exists():
-            subprocess.run(["rmdir", "/s", "/q", str(tmp_dir)], shell=True, check=False)
-        tmp_dir.mkdir(parents=True, exist_ok=True)
-    except Exception as e:
-        return f"Setup Error {date_str}: {e}"
-    
-    try:
+        # 7z extraction
         cmd = [SEVEN_ZIP, "x", str(day_path), f"-o{tmp_dir}", "-y"]
-        subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
-        
+        subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
         csvs = list(tmp_dir.glob("**/*.csv"))
         if not csvs:
-            return f"Error {date_str}: No CSVs found"
-            
-        frames = build_l2_frames([str(p) for p in csvs], cfg)
-        
+            return f"[{date_str}] Error: No CSVs found"
+
+        # ETL with global config (no re-parse)
+        frames = build_l2_frames([str(p) for p in csvs], GLOBAL_CFG)
+
         if frames.height > 0:
-            frames.write_parquet(out_path, compression="snappy")
+            # Atomic write: write to .tmp then rename
+            tmp_parquet = out_path.with_suffix(".parquet.tmp")
+            frames.write_parquet(tmp_parquet, compression="snappy")
+            tmp_parquet.rename(out_path)
             done_path.touch()
-            return f"Completed {date_str}: {frames.height} rows"
+            return f"[{date_str}] Completed: {frames.height} rows"
         else:
-            return f"Error {date_str}: Empty frames"
-            
+            return f"[{date_str}] Error: Empty frames"
+
     except Exception as e:
-        return f"CRITICAL Error {date_str}: {e}"
+        return f"[{date_str}] CRITICAL Error: {e}"
     finally:
-        try:
-            if tmp_dir.exists():
-                subprocess.run(["rmdir", "/s", "/q", str(tmp_dir)], shell=True, check=False)
-        except:
-            pass
+        # ALWAYS clean up extracted CSVs, even on error
+        shutil.rmtree(tmp_dir, ignore_errors=True)
 
 def main():
-    ap = argparse.ArgumentParser()
+    ap = argparse.ArgumentParser(description="v61 Windows Framing Agent (Anti-Fragile)")
     ap.add_argument("--years", default="2023,2024,2025,2026")
-    ap.add_argument("--workers", type=int, default=4)
+    ap.add_argument("--workers", type=int, default=2,
+                    help="Number of parallel workers. Default=2 to prevent swap thrash.")
     ap.add_argument("--shard", type=int, default=1, help="Shard index (0 to N-1)")
     ap.add_argument("--total-shards", type=int, default=2, help="Total number of shards")
     args = ap.parse_args()
-    
+
     years = args.years.split(",")
     all_files = []
-    
+
     OUTPUT_ROOT.mkdir(parents=True, exist_ok=True)
-    
+
+    # 【FIX 1】Compute git hash ONCE in main, pass to workers
+    try:
+        hash_str = subprocess.check_output(
+            ["git", "rev-parse", "--short", "HEAD"],
+            cwd=r"C:\Omega_vNext"
+        ).decode().strip()
+    except Exception:
+        hash_str = "unknown"
+
+    print(f"Git hash: {hash_str}")
+    print(f"Shard: {args.shard}/{args.total_shards}, Workers: {args.workers}")
+    print(f"POLARS_MAX_THREADS: {os.environ.get('POLARS_MAX_THREADS', 'unset')}")
+
     for year in years:
         year_path = RAW_ROOT / year
         if year_path.exists():
-             for p in year_path.rglob("*.7z"):
-                 all_files.append(p)
-        
+            for p in year_path.rglob("*.7z"):
+                all_files.append(p)
+
         for sub in RAW_ROOT.glob(f"{year}*"):
             if sub.is_dir() and sub.name != year:
-                 for p in sub.rglob("*.7z"):
-                     all_files.append(p)
+                for p in sub.rglob("*.7z"):
+                    all_files.append(p)
 
+    # Filter by shard BEFORE spawning Pool
     tasks = []
     skipped_by_shard = 0
     for f in all_files:
         if get_shard(f.name, args.total_shards) == args.shard:
-            tasks.append(("unknown", "unknown", f, (args.shard, args.total_shards)))
+            tasks.append((f, hash_str, args.shard, args.total_shards))
         else:
             skipped_by_shard += 1
 
@@ -131,7 +149,9 @@ def main():
     with Pool(args.workers) as p:
         for res in p.imap_unordered(process_day, tasks):
             if res:
-                print(res)
+                print(res, flush=True)
+
+    print("=== FRAMING COMPLETE ===")
 
 if __name__ == "__main__":
     main()
