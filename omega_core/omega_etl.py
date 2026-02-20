@@ -49,7 +49,9 @@ def _numeric_cols(cfg: L2PipelineConfig) -> List[str]:
 def scan_l2_quotes(path: str | List[str], cfg: L2PipelineConfig) -> pl.LazyFrame:
     if isinstance(path, list):
         lfs = [scan_l2_quotes(p, cfg) for p in path]
-        return pl.concat(lfs)
+        # diagonal_relaxed: allow CSVs with different column sets (e.g. early 2023
+        # archives missing L2 depth columns). Missing cols filled with null.
+        return pl.concat(lfs, how="diagonal_relaxed")
 
     is_parquet = path.lower().endswith(".parquet")
     

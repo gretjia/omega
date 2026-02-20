@@ -146,7 +146,9 @@ def main():
         print("Nothing to do for this shard. Exiting.")
         return
 
-    with Pool(args.workers) as p:
+    # maxtasksperchild=1: Force worker death after each 7z+ETL cycle.
+    # Polars/Rust jemalloc hoards memory and won't release to OS.
+    with Pool(args.workers, maxtasksperchild=1) as p:
         for res in p.imap_unordered(process_day, tasks):
             if res:
                 print(res, flush=True)
