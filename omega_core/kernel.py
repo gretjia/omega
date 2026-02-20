@@ -82,9 +82,9 @@ def _apply_recursive_physics(
     def _safe_f64_col(col_name: str, default: float = 0.0) -> np.ndarray:
         if col_name not in frames.columns:
             return np.full(n_rows, float(default), dtype=np.float64)
-        col = frames.get_column(col_name)
-        vals = col.to_list()
-        return np.asarray([_to_f64(v, default=default) for v in vals], dtype=np.float64)
+        arr = frames.get_column(col_name).cast(pl.Float64, strict=False).fill_null(default).fill_nan(default).to_numpy()
+        # Ring-0 Physics Shield: Cleanse all infinities that Polars ignores
+        return np.nan_to_num(arr, nan=default, posinf=default, neginf=default)
 
     def _to_bool(v: object) -> bool:
         if isinstance(v, bool):
@@ -184,9 +184,15 @@ def _apply_recursive_physics(
     # --- Sequential Recursion (Scalar Loop - Fast) ---
     # Extract symbols for boundary detection
     if "symbol" in frames.columns:
-        syms = frames.get_column("symbol").cast(pl.String).fill_null("").to_numpy()
+        syms = frames.get_column("symbol").cast(pl.String, strict=False).fill_null("").to_numpy()
     else:
         syms = np.full(n_rows, "", dtype=object)
+
+    # ACTION 2: Extract dates for overnight phase transition detection
+    if "date" in frames.columns:
+        dates = frames.get_column("date").cast(pl.String, strict=False).fill_null("").to_numpy()
+    else:
+        dates = np.full(n_rows, "", dtype=object)
 
     out_srl_resid = np.zeros(n_rows, dtype=np.float64)
     out_y = np.zeros(n_rows, dtype=np.float64)
@@ -199,8 +205,10 @@ def _apply_recursive_physics(
         print(f"    Running Recursive Physics on {n_rows} rows...", flush=True)
     
     for i in range(n_rows):
-        # FAST BOUNDARY DETECT: Reset physics state if we cross into a new symbol's manifold
-        if i > 0 and syms[i] != syms[i-1]:
+        # FAST BOUNDARY DETECT: Reset physics on new symbol OR new trading day
+        # ACTION 2: Overnight Phase Transition — yesterday's resistance state
+        # must NOT contaminate today's opening auction (耗散结构 phase boundary)
+        if i > 0 and (syms[i] != syms[i-1] or dates[i] != dates[i-1]):
             current_y = base_y
 
         # Universal SRL (Delta=0.5)

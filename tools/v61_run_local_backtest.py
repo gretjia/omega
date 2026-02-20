@@ -239,7 +239,10 @@ def main() -> int:
     
     processed_batches = 0
     
-    with mp.Pool(args.workers) as pool:
+    # ACTION 4: Anti-Fragile Memory Release — force worker death after each batch
+    # Rust/C++ jemalloc inside Polars does NOT reliably return freed pages to OS.
+    # maxtasksperchild=1 forces process restart → OS Ring-0 reclaims all memory.
+    with mp.Pool(args.workers, maxtasksperchild=1) as pool:
         for res in pool.imap_unordered(_process_backtest_batch, tasks):
             if "error" in res:
                 print(f"    [!] Batch {res['batch_id']} error: {res['error']}")
