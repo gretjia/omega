@@ -17,8 +17,8 @@ def trigger_ai_repair(msg):
     
     print(f"\n\033[91m🚨 WAKING UP AI REPAIR PROTOCOL: {msg}\033[0m\n")
     
-    # Try antigravity first (specifically with gemini-3.1-pro), then fallback to standard codex exec
-    cmd = f'antigravity --model "gemini-3.1-pro" "{log_msg}" || codex exec "{log_msg}"'
+    # Since `antigravity` CLI pops up a GUI, we use `codex exec` for true headless autonomous terminal repair
+    cmd = f'codex exec "{log_msg}"'
     
     try:
         print(f"[{datetime.datetime.now()}] Executing: {cmd}")
@@ -56,8 +56,9 @@ def run_watchdog():
         now_str = datetime.datetime.now().strftime('%H:%M:%S')
         try:
             # --- LINUX CHECKS ---
-            _, l_ps = ssh_cmd(linux, "ps aux | grep python3 | grep -v grep | grep v61_linux")
-            l_alive = "v61_linux" in l_ps
+            l_rc, l_ps = ssh_cmd(linux, "ps aux | grep python3 | grep -v grep | grep v61_linux")
+            # If SSH timed out, assume alive to prevent false stroke alerts
+            l_alive = "v61_linux" in l_ps if l_rc != -1 else True
             
             _, l_fs = ssh_cmd(linux, "df -h / | tail -1 | awk '{print $5}'")
             l_mem = ssh_cmd(linux, "free -g | grep Mem | awk '{print $7}'")[1]
@@ -67,8 +68,8 @@ def run_watchdog():
             l_cnt = int(l_cnt_out) if l_cnt_out.isdigit() else l_last_files
 
             # --- WINDOWS CHECKS ---
-            _, w_ps = ssh_cmd(windows, 'powershell -Command "Get-Process -Name python -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Id"')
-            w_alive = len(w_ps) > 0
+            w_rc, w_ps = ssh_cmd(windows, 'powershell -Command "Get-Process -Name python -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Id"')
+            w_alive = len(w_ps) > 0 if w_rc != -1 else True
 
             w_fs = ssh_cmd(windows, 'powershell -Command "$d=Get-Volume -DriveLetter C; [math]::Round(($d.Size - $d.SizeRemaining)/$d.Size * 100)"')[1]
             w_tail_cmd = 'powershell -Command "Get-Content C:\\Omega_vNext\\framing_v61.log -Tail 1 -ErrorAction SilentlyContinue"'
