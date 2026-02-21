@@ -32,6 +32,8 @@ def _install_dependencies() -> None:
             "xgboost",
             "google-cloud-storage",
             "scikit-learn",
+            "python-json-logger",
+            "psutil",
         ]
     )
 
@@ -106,10 +108,10 @@ def run_global_training(args: argparse.Namespace) -> None:
     if missing:
         raise RuntimeError(f"base_matrix missing columns: {missing}")
 
-    # v6.1: Calculate Excess Return Target (Alpha)
+    # v61 Fix: Calculate Excess Return Target (Alpha) without Look-Ahead Bias
     print("[*] Orthogonalizing target (Excess Return)...", flush=True)
     df = df.with_columns([
-        (pl.col("t1_fwd_return") - pl.col("t1_fwd_return").mean().over("date")).alias("t1_excess_return")
+        (pl.col("t1_fwd_return") - pl.col("t1_fwd_return").mean().over(["date", "time"])).alias("t1_excess_return")
     ])
 
     epi = df.get_column("epiplexity").to_numpy()

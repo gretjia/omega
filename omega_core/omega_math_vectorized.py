@@ -104,13 +104,21 @@ def calc_epiplexity_vectorized(traces: List[Sequence[float]], min_len: int = 10,
     
     # Valid where length ok AND denominator > eps
     is_computable = valid_mask & (denom > 1e-12)
-    
     out[is_computable] = r2[is_computable]
     
-    # Clip [0, 1] (R^2 definition)
-    out = np.clip(out, 0.0, 1.0)
+    # V62 Upgrade: Time-Bounded Minimum Description Length (MDL) Gain
+    R_squared = np.clip(out, 0.0, 0.9999)
+    delta_k = 2.0
     
-    return out
+    with np.errstate(divide='ignore', invalid='ignore'):
+        mdl_gain = -(safe_cnt / 2.0) * np.log(1.0 - R_squared) - (delta_k / 2.0) * np.log(safe_cnt)
+        
+    out_mdl = np.full(n, fallback, dtype=np.float64)
+    is_mdl_valid = valid_mask & (safe_cnt >= 3)
+    out_mdl[is_mdl_valid] = mdl_gain[is_mdl_valid]
+    
+    out_mdl[out_mdl <= 0.0] = 0.0
+    return out_mdl
 
 def calc_topology_area_vectorized(
     x_traces: List[Sequence[float]], 

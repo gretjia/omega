@@ -122,6 +122,13 @@ def _process_backtest_batch(task: dict) -> dict:
             return {"batch_id": batch_id, "rows": 0, "metrics": {}}
 
         df = pl.concat(tables, how="diagonal_relaxed")
+        
+        # V62 Defensive Engineering: Drop heavy trace lists before sorting/preparing
+        # to prevent OOM spikes as warned in handover/DEBUG_LESSONS.md
+        heavy_cols = ["ofi_list", "ofi_trace", "vol_list", "vol_trace", "time_trace", "trace"]
+        drop_cols = [c for c in heavy_cols if c in df.columns]
+        if drop_cols:
+            df = df.drop(drop_cols)
 
         # V6.1: Run _prepare_frames (includes T+1 logic and Physics features if not present)
         # Note: If reusing precomputed physics, this is fast.

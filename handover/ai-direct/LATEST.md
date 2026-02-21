@@ -1,20 +1,21 @@
 # Latest Status
 
-Current Phase: Vertex Train Running (Evidence Package Ready, Backtest Takeover Armed)
-Last Update: 2026-02-19 19:50:18 +0800
-Active Train Job: projects/269018079180/locations/us-central1/customJobs/4026903526469795840
-Backtest Watcher: running (/tmp/backtest_takeover_aa8abb7.sh)
+Current Phase: v61 Sharded Framing (Linux Shard 0 Running, Windows Shard 1 Pending Alignment)
+Last Update: 2026-02-21 02:08:00 +0800
+Active Agent: Antigravity (Cursor, took over from Gemini 3 Flash in tmux:0)
+Branch: v60-consolidated @ 6244bab
 
 ## Recent Handover Entries
+
+- [20260221_020800_v61_sharding_takeover.md](entries/20260221_020800_v61_sharding_takeover.md) - v61 sharded framing takeover: context, node status, action plan.
 - [20260219_195018_v60_training_audit_package.md](entries/20260219_195018_v60_training_audit_package.md) - Submit-ready v60 training evidence package with raw sources/logs.
 - [20260219_155539_flexible_load_audited_design.md](entries/20260219_155539_flexible_load_audited_design.md) - Audited flexible-load contract and rollout status.
 - [20260218_084500_migration_to_central1.md](entries/20260218_084500_migration_to_central1.md) - Migration and quota fixes.
 
-## Approved Flexible-Load Contract
-- Worker policy: workers=0, workers_min=2, workers_cpu_frac=0.75, cpu low/high=55/88, mem headroom=24GB, est mem=3GB.
-- Backtest machine ladder: n2-standard-80 -> n2-standard-64 -> n2-standard-48 -> n2-standard-32.
-- Governance: dual recursive audit required before promoting new defaults.
+- [20260221_220009_v61_operations_suspension.md](entries/20260221_220009_v61_operations_suspension.md) - Cluster Suspension due to Linux ZFS deadlock and V61 GitOps realignment.
 
 ## Immediate Action Required
-- Continue watcher until train succeeds and takeover submits backtest.
-- After train/backtest completion, append evidence delta into a new handover entry for auditor handoff.
+
+- **USER**: Physically hard-reboot the Linux server (192.168.3.113) to clear the ZFS lock.
+- **AI**: Upon restart, execute strict `gemini.md` Protocol (Step 2 "One-Pulse" sync) to pull the true V60-consolidated codebase down to Linux and Windows.
+- **AI**: Resume `v61_linux_framing.py` and `v61_windows_framing.py`, ensuring a 2-minute `tail -f` monitor.

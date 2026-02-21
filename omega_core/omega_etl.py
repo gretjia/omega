@@ -434,13 +434,15 @@ def build_l2_frames(path: str | List[str], cfg: L2PipelineConfig, target_frames:
     lf = lf.with_columns(_time_of_day_ms_expr("time").alias("__time_ms"))
 
     # Phase 1: 3-second snapshot aggregation handling (Anti-Aliasing Low-Pass Filter)
-    # Must group by symbol if present to avoid cross-contamination
+    # MUST enforce deterministic temporal sorting for the Turing tape
     if group_col:
+        lf = lf.sort([group_col, "__time_ms"])
         lf = lf.with_columns([
             pl.col("v_ofi").rolling_mean(window_size=3, min_periods=1).over(group_col).alias("v_ofi"),
             pl.col("depth").rolling_mean(window_size=3, min_periods=1).over(group_col).alias("depth")
         ])
     else:
+        lf = lf.sort(["__time_ms"])
         lf = lf.with_columns([
             pl.col("v_ofi").rolling_mean(window_size=3, min_periods=1).alias("v_ofi"),
             pl.col("depth").rolling_mean(window_size=3, min_periods=1).alias("depth")

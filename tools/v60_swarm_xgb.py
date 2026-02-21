@@ -70,6 +70,7 @@ def _install_dependencies() -> None:
             "gcsfs",
             "fsspec",
             "psutil",
+            "python-json-logger",
         ]
     )
 
@@ -112,9 +113,9 @@ class EpistemicSwarmV6:
             # Let's try to load it if it was excluded, but we loaded everything with read_parquet
             raise ValueError("Base matrix must contain 'date' column for Excess Return calculation.")
 
-        print("Calculating Excess Return (Alpha) target...", flush=True)
+        print("Calculating Excess Return (Alpha) target without Look-Ahead Bias...", flush=True)
         self.df = self.df.with_columns([
-            (pl.col("t1_fwd_return") - pl.col("t1_fwd_return").mean().over("date")).alias("t1_excess_return")
+            (pl.col("t1_fwd_return") - pl.col("t1_fwd_return").mean().over(["date", "time"])).alias("t1_excess_return")
         ])
         
         self.feature_cols = list(feature_cols)
@@ -143,8 +144,8 @@ class EpistemicSwarmV6:
         import xgboost as xgb
         import polars as pl
 
-        # v6.1: Tighter ranges to prevent dataset collapse
-        peace_threshold = trial.suggest_float("peace_threshold", 0.15, 0.40)
+        # V62 Fix: Strict hard-caps on ranges to strictly prevent dataset collapse
+        peace_threshold = trial.suggest_float("peace_threshold", 0.05, 0.20)
         srl_mult = trial.suggest_float("srl_resid_sigma_mult", 0.5, 2.0)
         topo_energy_mult = trial.suggest_float("topo_energy_sigma_mult", 1.0, 3.0)
 
@@ -225,8 +226,8 @@ def main() -> int:
     ap.add_argument("--base-matrix", default="")
     ap.add_argument("--base-matrix-uri", default="")
     ap.add_argument("--n-trials", type=int, default=50)
-    # v6.1: Increased default min-samples to prevent dataset collapse
-    ap.add_argument("--min-samples", type=int, default=150000)
+    # V62 Fix: Strict min-samples penalty threshold
+    ap.add_argument("--min-samples", type=int, default=50000)
     ap.add_argument("--nfold", type=int, default=5)
     ap.add_argument("--early-stopping-rounds", type=int, default=15)
     ap.add_argument("--num-boost-round", type=int, default=150)

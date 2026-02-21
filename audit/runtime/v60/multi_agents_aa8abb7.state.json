@@ -1,9 +1,9 @@
 {
   "hash": "aa8abb7",
-  "updated_at_utc": "2026-02-20T16:20:02Z",
+  "updated_at_utc": "2026-02-21T17:38:02Z",
   "agents": {
     "windows-monitor": {
-      "last_tick_utc": "2026-02-20T16:20:02Z",
+      "last_tick_utc": "2026-02-21T17:38:02Z",
       "status": "ok",
       "task_state": "Ready",
       "guard_state": "Running",
@@ -11,10 +11,10 @@
       "shard_parquet": 303,
       "shard_meta": 303,
       "py_count": 0,
-      "mem_free_gb": 87.84,
+      "mem_free_gb": 87.54,
       "mem_total_gb": 95.78,
       "last_progress_epoch": 1771533002.686053,
-      "stall_age_sec": 71400,
+      "stall_age_sec": 162480,
       "last_action": "none"
     },
     "linux-bootstrap": {
@@ -45,7 +45,7 @@
       "log_tail": ""
     },
     "autopilot-gate": {
-      "last_tick_utc": "2026-02-20T16:20:02Z",
+      "last_tick_utc": "2026-02-21T17:35:00Z",
       "status": "ok",
       "windows_done": true,
       "linux_done": false,
