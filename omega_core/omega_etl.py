@@ -46,9 +46,15 @@ def _numeric_cols(cfg: L2PipelineConfig) -> List[str]:
     return cols
 
 
-def scan_l2_quotes(path: str | List[str], cfg: L2PipelineConfig) -> pl.LazyFrame:
+def scan_l2_quotes(path: str | List[str], cfg: L2PipelineConfig) -> pl.LazyFrame | None:
     if isinstance(path, list):
-        lfs = [scan_l2_quotes(p, cfg) for p in path]
+        lfs = []
+        for p in path:
+            lf = scan_l2_quotes(p, cfg)
+            if lf is not None:
+                lfs.append(lf)
+        if not lfs:
+            return None
         # diagonal_relaxed: allow CSVs with different column sets (e.g. early 2023
         # archives missing L2 depth columns). Missing cols filled with null.
         return pl.concat(lfs, how="diagonal_relaxed")
@@ -78,9 +84,18 @@ def scan_l2_quotes(path: str | List[str], cfg: L2PipelineConfig) -> pl.LazyFrame
     schema = lf.collect_schema()
     valid_rename = {k: v for k, v in rename.items() if k in schema.names()}
     
-    if not valid_rename:
+    valid_mapped_cols = set(valid_rename.values())
+    if not valid_mapped_cols:
         if "microprice" in schema.names():
             return lf
+        return None
+
+    # CRITICAL: L2 pipeline requires BOTH depth and trade columns.
+    # Early 2023 archives feature split data (行情.csv, 逐笔成交.csv). We skip these 
+    # unifiedly instead of creating diagonal garbage frames.
+    required = {"bid_p1", "ask_p1", "price", "vol"}
+    if not required.issubset(valid_mapped_cols) and "microprice" not in valid_mapped_cols:
+        return None
             
     lf = lf.select([pl.col(c) for c in valid_rename.keys()]).rename(valid_rename)
 
@@ -259,8 +274,30 @@ def _lob_flux_expr(group_col: str | None = None) -> pl.Expr:
     return (b_diff.abs() + a_diff.abs()).alias("lob_flux")
 
 
-def build_l2_frames(path: str, cfg: L2PipelineConfig, target_frames: float | None = None) -> pl.DataFrame:
+def build_l2_frames(path: str | List[str], cfg: L2PipelineConfig, target_frames: float | None = None) -> pl.DataFrame:
+    # --- ANTI-FRAGILE MEMORY & ISOLATION FIX ---
+    # Process files individually to cap Polars memory at ~100MB per dataset,
+    # rather than bursting to 50GB+ when resolving a 5000-stock LazyFrame DAG.
+    # This also guarantees cross-symbol isolation for chronological shift() ops.
+    if isinstance(path, list):
+        if not path:
+            return pl.DataFrame()
+        collected = []
+        for p in path:
+            try:
+                df = build_l2_frames(p, cfg, target_frames)
+                if df.height > 0:
+                    collected.append(df)
+            except Exception:
+                continue
+        if not collected:
+            return pl.DataFrame()
+        return pl.concat(collected, how="vertical_relaxed")
+
+    # Standard single-file processing
     lf = scan_l2_quotes(path, cfg)
+    if lf is None:
+        return pl.DataFrame()
     
     # Check for symbol column to enable multi-symbol isolation
     schema_names = lf.collect_schema().names()
