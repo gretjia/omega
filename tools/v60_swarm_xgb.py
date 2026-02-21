@@ -236,7 +236,7 @@ def main() -> int:
     ap.add_argument("--output-uri", default="")
     ap.add_argument("--install-deps", action="store_true")
     ap.add_argument("--bootstrap-code", action="store_true")
-    ap.add_argument("--code-bundle-uri", default="gs://omega_v52/staging/code/omega_core.zip")
+    ap.add_argument("--code-bundle-uri", default="gs://omega_v52_central/staging/code/omega_core.zip")
     args = ap.parse_args()
 
     if args.install_deps:

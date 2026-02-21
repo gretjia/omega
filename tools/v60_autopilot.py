@@ -372,7 +372,7 @@ def recursive_audit_checkpoint(
 def main() -> int:
     ap = argparse.ArgumentParser(description="OMEGA v61 full-stack autopilot (Boomerang)")
     ap.add_argument("--hash", default="", help="Frame git short hash (default: local HEAD)")
-    ap.add_argument("--bucket", default="gs://omega_v52")
+    ap.add_argument("--bucket", default="gs://omega_v52_central")
     ap.add_argument("--windows-expected", type=int, default=0)
     ap.add_argument("--linux-expected", type=int, default=0)
     ap.add_argument("--poll-sec", type=int, default=180)

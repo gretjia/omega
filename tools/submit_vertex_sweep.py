@@ -35,8 +35,8 @@ from google.api_core import exceptions as gax_exceptions
 PROJECT_ID = "gen-lang-client-0250995579"
 REGION = "us-central1"
 STAGING_BUCKET = "gs://omega_v52_central/staging"
-CODE_BUCKET_PATH = "gs://omega_v52/staging/code/omega_core.zip"
-PAYLOAD_BUCKET_PREFIX = "gs://omega_v52/staging/code/payloads"
+CODE_BUCKET_PATH = "gs://omega_v52_central/staging/code/omega_core.zip"
+PAYLOAD_BUCKET_PREFIX = "gs://omega_v52_central/staging/code/payloads"
 
 def zip_and_upload_code(repo_root, gcs_uri):
     """

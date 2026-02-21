@@ -7,8 +7,8 @@ from google.cloud import aiplatform
 # --- Configuration ---
 # Uses the project/bucket you provided
 PROJECT_ID = "gen-lang-client-0250995579"
-LOCATION = "us-west1"
-STAGING_BUCKET = "gs://omega_v52/staging"
+LOCATION = "us-central1"
+STAGING_BUCKET = "gs://omega_v52_central/staging"
 TIMESTAMP = "20260216_smoke"
 
 # --- The Actual Training Code to Run on Vertex ---
@@ -39,7 +39,7 @@ def run_smoke_test():
     
     # 1. Define GCS Pattern (Looking for ANY uploaded frame)
     # We use a wildcard to find at least one file.
-    gcs_pattern = "gs://omega_v52/omega/v52/frames/host=*/*_4f9c786.parquet"
+    gcs_pattern = "gs://omega_v52_central/omega/v52/frames/host=*/*_4f9c786.parquet"
     
     logging.info(f"Scanning for files matching: {gcs_pattern}")
     

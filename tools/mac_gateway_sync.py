@@ -363,7 +363,7 @@ def run_sync(bucket_name, git_hash, target_host=None, year_filter=None):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="OMEGA v5.2 Mac Gateway Sync")
-    parser.add_argument("--bucket", default="gs://omega_v52", help="GCS Bucket Name (default: gs://omega_v52)")
+    parser.add_argument("--bucket", default="gs://omega_v52_central", help="GCS Bucket Name (default: gs://omega_v52)")
     parser.add_argument("--host", help="Specific host to sync (linux1 or windows1)")
     parser.add_argument("--year", help="Filter by year (e.g., 2025)")
     parser.add_argument("--hash", default="", help="Frame git short hash suffix (default: local HEAD short hash)")

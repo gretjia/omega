@@ -14,7 +14,7 @@ import re
 import sys
 from collections import defaultdict
 
-BUCKET = "gs://omega_v52/omega/v52/frames"
+BUCKET = "gs://omega_v52_central/omega/v52/frames"
 
 def get_file_list():
     print(f"[*] Scanning {BUCKET} recursively...")

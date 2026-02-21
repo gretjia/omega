@@ -309,7 +309,7 @@ def launch_ai_debug(
 def main() -> int:
     ap = argparse.ArgumentParser(description="AI incident watchdog for Omega long runs")
     ap.add_argument("--hash", required=True, help="run git short hash")
-    ap.add_argument("--bucket", default="gs://omega_v52")
+    ap.add_argument("--bucket", default="gs://omega_v52_central")
     ap.add_argument("--repo-root", default=".")
     ap.add_argument("--poll-sec", type=int, default=120)
     ap.add_argument("--status-stale-sec", type=int, default=900)

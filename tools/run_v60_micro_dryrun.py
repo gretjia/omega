@@ -58,7 +58,7 @@ def add_script_arg(cmd: list[str], item: str) -> None:
 def main() -> int:
     ap = argparse.ArgumentParser(description="v60 micro dry-run: base_matrix + 3-trial swarm")
     ap.add_argument("--hash", required=True)
-    ap.add_argument("--bucket", default="gs://omega_v52")
+    ap.add_argument("--bucket", default="gs://omega_v52_central")
     ap.add_argument("--local-input-pattern", required=True)
     ap.add_argument("--years", default="")
     ap.add_argument("--sample-symbols", type=int, default=10)

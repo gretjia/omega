@@ -153,7 +153,7 @@ def cmd_trigger_vertex(args: argparse.Namespace) -> None:
     script_args = list(args.script_arg)
     if not script_args and Path(args.script).name == "run_vertex_xgb_train.py":
         run_id = datetime.utcnow().strftime("%Y%m%d-%H%M%S")
-        script_args = ["--output-uri", f"gs://omega_v52/staging/models/v6/{run_id}"]
+        script_args = ["--output-uri", f"gs://omega_v52_central/staging/models/v6/{run_id}"]
 
     cmd = [
         sys.executable,
@@ -178,7 +178,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_dispatch.set_defaults(func=cmd_dispatch_frame)
 
     p_sync = sub.add_parser("sync-gcs", help="Sync framed parquet from workers to GCS")
-    p_sync.add_argument("--bucket", default="gs://omega_v52")
+    p_sync.add_argument("--bucket", default="gs://omega_v52_central")
     p_sync.add_argument("--host", default=None, help="Optional: linux1 or windows1")
     p_sync.add_argument("--year", default=None, help="Optional: year filter (e.g. 2025)")
     p_sync.add_argument("--hash", default="", help="Frame git short hash (optional)")

@@ -796,7 +796,7 @@ def main() -> int:
         "--linux-frame-dir",
         default="/omega_pool/parquet_data/v52/frames/host=linux1",
     )
-    ap.add_argument("--gcs-linux-prefix", default="gs://omega_v52/omega/v52/frames/host=linux1")
+    ap.add_argument("--gcs-linux-prefix", default="gs://omega_v52_central/omega/v52/frames/host=linux1")
     ap.add_argument("--linux-git-sync", choices=["none", "pull", "pin"], default="none")
     ap.add_argument("--linux-git-ref", default="")
     ap.add_argument("--sync-per-tick", type=int, default=1)
