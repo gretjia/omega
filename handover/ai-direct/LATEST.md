@@ -7,6 +7,7 @@ Branch: v60-consolidated @ 6244bab
 
 ## Recent Handover Entries
 
+- [20260222_020800_v62_night_watchdog.md](entries/20260222_020800_v62_night_watchdog.md) - Autonomous Night Watchdog Script Deployment.
 - [20260222_014300_v62_smoke_test_initiation.md](entries/20260222_014300_v62_smoke_test_initiation.md) - V62 Smoke Test Config and Execution tracking.
 - [20260221_020800_v61_sharding_takeover.md](entries/20260221_020800_v61_sharding_takeover.md) - v61 sharded framing takeover: context, node status, action plan.
 - [20260219_195018_v60_training_audit_package.md](entries/20260219_195018_v60_training_audit_package.md) - Submit-ready v60 training evidence package with raw sources/logs.
