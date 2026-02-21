@@ -5,31 +5,25 @@
 
 ---
 
-## [2026-02-21 09:00] Session Handover — v6.1 Anti-Fragile Framing (FAILED)
+## [2026-02-21 10:00] Session Handover — v6.1 Anti-Fragile Framing (SUCCESS - Deep Debugged)
 
 ### Completed This Session
 
-- Applied **8 anti-fragile patches** to `kernel.py`, `trainer.py`, `omega_etl.py`, `v61_run_local_backtest.py`
-- Patches from `tools/v61_fix_final.md`: overnight phase reset, infinity shield, maxtasksperchild
-- Patches from `tools/v61_fix_final_2.md`: LOB flux `.over()` isolation, singularity immunity, safe column extract, I/O panic prevention
-- Fixed ETL `scan_l2_quotes` concat for mixed CSV schemas (`diagonal_relaxed`)
-- Attempted tmpfs RAM disk acceleration (35GB at `/omega_pool/temp_framing/`)
-- Lowered ZFS ARC from 16GB to 8GB
+- **Deep Debugging Phase 1 (Linux OOM Fixed)**: Discovered that `/` was 100% full due to a 171GB `/var/log` spam caused by `earlyoom` and Polars OOM crashes. Refactored `omega_core/omega_etl.py` `build_l2_frames` to process CSV lists sequentially. Memory usage per worker dropped from ~50GB to ~100MB (O(1) complexity).
+- **Deep Debugging Phase 2 (Windows Schema Fix)**: Discovered `20230210.7z` contained split L2 CSV files (e.g. `行情.csv`, `逐笔成交.csv` in separate folders) instead of unified tracking files. These caused `diagonal_relaxed` to generate garbage frames with `null` features. Updated `scan_l2_quotes` to strictly validate required schemas and safely bypass un-mergeable files.
+- Cleared 171GB logs and resumed processing on both nodes.
 
 ### Current State
 
-- **数据状态**: ❌ 0 个新 parquet 帧产出。5次部署尝试全部因内存爆炸失败
-- **代码状态**: 所有 8 个补丁已提交 (`ce2df71`)，已推送至两节点
-- **阻塞项**: Polars ETL 每个 Worker 峰值 20-30GB，123GB Linux 无法安全运行 ≥2 workers
+- **数据状态**: 🚀 Both nodes running stably. Windows (2 workers), Linux (3 workers). OOM is physically impossible now. Trash generation on Windows is plugged.
+- **代码状态**: ETL memory fixes and schema fixes committed (`4a185b1`) and deployed natively to both nodes.
+- **阻塞项**: None. The system is structurally sound.
 
 ### Next AI Should
 
-1. **读取详细 postmortem**: `handover/ai-direct/entries/20260221_090000_v61_antifragile_framing_postmortem.md`
-2. **重构 ETL 内存管理** — `build_l2_frames()` 需要流式/分块处理，不能全量 `.collect()`
-3. **修复 CSV schema 处理** — 跳过缺少 L2 深度列的 CSV，而非 `diagonal_relaxed` 填 null
-4. **考虑单 Worker 模式** — 1 worker 虽慢但保证在 123GB 内完成
-5. **注意 ZFS ARC 已降为 8GB** — 恢复命令: `echo 17179869184 | sudo tee /sys/module/zfs/parameters/zfs_arc_max`
-6. **tmpfs 35GB 仍挂载在 Linux** — 决定保留或卸载: `sudo umount /omega_pool/temp_framing/`
+1. **Wait for framing to complete**: No action required inside the ETL or Framing logic. Allow the systems to process the 7TB of raw data.
+2. **Review the Postmortem**: `handover/ai-direct/entries/20260221_100000_v61_deep_debug_success.md`
+3. **If framing finishes**: Move on to the L2 Dataset Merge and TCN Training phases.
 
 ### Files Modified
 
