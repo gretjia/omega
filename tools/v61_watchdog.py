@@ -11,13 +11,22 @@ import subprocess
 import datetime
 import sys
 
-# Mac Text-to-Speech alert
-def say_alert(msg):
-    print(f"\n\033[91m🚨 WATCHDOG ALERT: {msg}\033[0m\n")
-    # MacOS notification
-    os.system(f"""osascript -e 'display notification "{msg}" with title "OMEGA WATCHDOG"'""")
-    # MacOS Chinese voice
-    os.system(f"say -v Ting-Ting '{msg}'")
+# Mac Text-to-Speech alert replaced with AI Repair Protocol
+def trigger_ai_repair(msg):
+    log_msg = f"System Watchdog detected a critical anomaly during v61 framing: {msg}. Please investigate the system state (Disk, RAM, SSH to zepher/jiazi depending on the error), fix the root cause, and resume the framing process."
+    
+    print(f"\n\033[91m🚨 WAKING UP AI REPAIR PROTOCOL: {msg}\033[0m\n")
+    
+    # Try antigravity first (specifically with gemini-3.1-pro), then fallback to standard codex exec
+    cmd = f'antigravity --model "gemini-3.1-pro" "{log_msg}" || codex exec "{log_msg}"'
+    
+    try:
+        print(f"[{datetime.datetime.now()}] Executing: {cmd}")
+        # Run AI synchronously so the watchdog pauses and waits for the fix to complete
+        subprocess.run(cmd, shell=True)
+        print(f"[{datetime.datetime.now()}] AI Repair session ended. Resuming watchdog...")
+    except Exception as e:
+        print(f"Failed to start AI: {e}")
 
 def ssh_cmd(host, cmd, timeout=10):
     try:
@@ -31,7 +40,8 @@ def ssh_cmd(host, cmd, timeout=10):
 
 def run_watchdog():
     print(f"[{datetime.datetime.now()}] Gearing up OMEGA Watchdog (v61)...")
-    print("Monitoring nodes: Linux(192.168.3.113), Windows(192.168.3.112)\n")
+    print("Monitoring nodes: Linux(192.168.3.113), Windows(192.168.3.112)")
+    print("AI Auto-Repair Strategy: Antigravity/Codex (Gemini 3.1 Pro)\n")
     
     linux = "zepher@192.168.3.113"
     windows = "jiazi@192.168.3.112"
@@ -39,6 +49,8 @@ def run_watchdog():
     l_last_files = 0
     w_last_files = 0
     stalled_minutes = 0
+    
+    last_repair_time = 0
 
     while True:
         now_str = datetime.datetime.now().strftime('%H:%M:%S')
@@ -73,28 +85,37 @@ def run_watchdog():
             sys.stdout.flush()
 
             # --- ALARM LOGIC ---
-            if not l_alive: say_alert("Linux framing 进程已掉线！")
-            if not w_alive: say_alert("Windows framing 进程已掉线！")
+            alerts = []
+            if not l_alive: alerts.append("Linux framing 进程已掉线！")
+            if not w_alive: alerts.append("Windows framing 进程已掉线！")
             
-            if l_fs == "100%" or l_fs == "99%": say_alert("Linux Root 根节点磁盘爆满！")
-            if l_mem.isdigit() and int(l_mem) < 2: say_alert("Linux 可用内存不足低于2G！")
+            if l_fs == "100%" or l_fs == "99%": alerts.append("Linux Root 根节点磁盘爆满！")
+            if l_mem.isdigit() and int(l_mem) < 2: alerts.append("Linux 可用内存不足低于2G！")
             
             error_keywords = ["CRITICAL", "Error", "killed", "OOM"]
             if any(k in l_tail for k in error_keywords) and "Empty frames" not in l_tail:
-                say_alert(f"Linux 日志出现错误词: {l_tail}")
+                alerts.append(f"Linux 日志出现错误词: {l_tail}")
             if any(k in w_tail for k in error_keywords) and "Empty frames" not in w_tail:
-                say_alert(f"Windows 日志出现错误词: {w_tail}")
+                alerts.append(f"Windows 日志出现错误词: {w_tail}")
 
             # Check Stall
             if l_cnt == l_last_files and w_cnt == w_last_files:
                 stalled_minutes += 1
                 if stalled_minutes >= 30:
-                    say_alert("进度已停滞长达 30 分钟没有新产出！")
+                    alerts.append("进度已停滞长达 30 分钟没有新产出！")
             else:
                 stalled_minutes = 0
 
             l_last_files = l_cnt
             w_last_files = w_cnt
+
+            if alerts:
+                # 30 minute cooldown for AI repair to prevent swarm logic loop
+                if time.time() - last_repair_time > 1800:
+                    trigger_ai_repair(" | ".join(alerts))
+                    last_repair_time = time.time()
+                else:
+                    print("\n[Cooldown] Anomaly persists, but waiting for AI repair cooldown...")
 
             time.sleep(60)
 
