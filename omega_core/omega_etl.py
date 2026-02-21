@@ -48,16 +48,28 @@ def _numeric_cols(cfg: L2PipelineConfig) -> List[str]:
 
 def scan_l2_quotes(path: str | List[str], cfg: L2PipelineConfig) -> pl.LazyFrame | None:
     if isinstance(path, list):
-        lfs = []
-        for p in path:
-            lf = scan_l2_quotes(p, cfg)
-            if lf is not None:
-                lfs.append(lf)
-        if not lfs:
+        if not path:
             return None
-        # diagonal_relaxed: allow CSVs with different column sets (e.g. early 2023
-        # archives missing L2 depth columns). Missing cols filled with null.
-        return pl.concat(lfs, how="diagonal_relaxed")
+        # Check if it's the split CSVs format (has 行情.csv and 逐笔成交.csv)
+        path_strs = [str(p) for p in path]
+        quote_file = next((p for p in path_strs if "行情.csv" in p), None)
+        trade_file = next((p for p in path_strs if "逐笔成交.csv" in p), None)
+        
+        if quote_file and trade_file:
+            print(f"[DEBUG] Processing split files: {quote_file} & {trade_file}")
+            return _scan_split_l2_quotes(quote_file, trade_file, cfg)
+        else:
+            # Fallback for other list formats (e.g. chunked CSVs)
+            lfs = []
+            for p in path:
+                lf = scan_l2_quotes(p, cfg)
+                if lf is not None:
+                    lfs.append(lf)
+            if not lfs:
+                return None
+            # diagonal_relaxed: allow CSVs with different column sets (e.g. early 2023
+            # archives missing L2 depth columns). Missing cols filled with null.
+            return pl.concat(lfs, how="diagonal_relaxed")
 
     is_parquet = path.lower().endswith(".parquet")
     
@@ -106,6 +118,85 @@ def scan_l2_quotes(path: str | List[str], cfg: L2PipelineConfig) -> pl.LazyFrame
     lf = lf.with_columns(
         [pl.col("time").cast(pl.Int64, strict=False)]
         + [pl.col(c).cast(pl.Float64, strict=False) for c in cols_to_cast]
+    )
+    return lf
+
+
+def _scan_split_l2_quotes(quote_file: str, trade_file: str, cfg: L2PipelineConfig) -> pl.LazyFrame | None:
+    """
+    Dedicated parser for early 2023 split format (行情.csv + 逐笔成交.csv).
+    Fuses microsecond trades backward onto 3-second L2 snapshot quotes.
+    """
+    enc = cfg.io.csv_encoding.lower() if cfg.io.csv_encoding else "utf8"
+    
+    # 1. Load Quotes (行情.csv)
+    if enc not in ["utf8", "utf-8"]:
+        q_lf = pl.read_csv(quote_file, encoding=cfg.io.csv_encoding, infer_schema_length=0).lazy()
+    else:
+        q_lf = pl.scan_csv(quote_file, encoding=enc, infer_schema_length=0)
+    q_rename = _rename_map(cfg)
+    q_schema = q_lf.collect_schema().names()
+    q_valid_rename = {k: v for k, v in q_rename.items() if k in q_schema}
+    
+    q_lf = q_lf.select([pl.col(c) for c in q_valid_rename.keys()]).rename(q_valid_rename)
+    
+    if "time" not in q_lf.collect_schema().names():
+        print(f"[DEBUG] Quitting: no time col in quote. Columns: {q_lf.collect_schema().names()}")
+        return None
+        
+    q_lf = q_lf.with_columns(pl.col("time").cast(pl.Int64, strict=False))
+    q_lf = q_lf.sort("time")
+
+    # Drop intersecting columns from quotes explicitly via select to avoid Polars optimizer join bugs
+    intersecting = {"price", "vol", "turnover", "bs_flag", "symbol", "exchange", "date"}
+    q_keep_cols = [c for c in q_lf.collect_schema().names() if c not in intersecting]
+    if "time" not in q_keep_cols:
+        q_keep_cols.append("time")
+    q_lf = q_lf.select(q_keep_cols)
+
+    # 2. Load Trades (逐笔成交.csv)
+    if enc not in ["utf8", "utf-8"]:
+        t_lf = pl.read_csv(trade_file, encoding=cfg.io.csv_encoding, infer_schema_length=0).lazy()
+    else:
+        t_lf = pl.scan_csv(trade_file, encoding=enc, infer_schema_length=0)
+    t_rename = _rename_map(cfg)
+    # Add alias mappings for split trades format
+    t_rename["成交价格"] = "price"
+    t_rename["成交数量"] = "vol"
+    t_rename["成交金额"] = "turnover"  # Sometimes named 成交金额 instead of 成交额
+    t_rename["成交额"] = "turnover"
+    
+    t_schema = t_lf.collect_schema().names()
+    t_valid_rename = {k: v for k, v in t_rename.items() if k in t_schema}
+    
+    t_lf = t_lf.select([pl.col(c) for c in t_valid_rename.keys()]).rename(t_valid_rename)
+    
+    if "time" not in t_lf.collect_schema().names():
+        print(f"[DEBUG] Quitting: no time col in trade. Columns: {t_lf.collect_schema().names()}")
+        return None
+        
+    t_lf = t_lf.with_columns(pl.col("time").cast(pl.Int64, strict=False))
+    t_lf = t_lf.sort("time")
+
+    # 3. Asof Join Trades into Quotes (Trades -> Quotes)
+    lf = t_lf.join_asof(q_lf, on="time", strategy="backward")
+
+    # 4. Standard validation
+    valid_mapped_cols = set(lf.collect_schema().names())
+    required = {"bid_p1", "ask_p1", "price", "vol"}
+    if not required.issubset(valid_mapped_cols) and "microprice" not in valid_mapped_cols:
+        print(f"[DEBUG] Quitting: missing required col. Required: {required}, found: {valid_mapped_cols}")
+        return None
+
+    print(f"[DEBUG] _scan_split_l2_quotes SUCCESS for {quote_file}")
+
+    # 5. Type Casting
+    num_cols = _numeric_cols(cfg)
+    existing_cols = lf.collect_schema().names()
+    cols_to_cast = [c for c in num_cols if c in existing_cols]
+    
+    lf = lf.with_columns(
+        [pl.col(c).cast(pl.Float64, strict=False) for c in cols_to_cast]
     )
     return lf
 
@@ -282,19 +373,40 @@ def build_l2_frames(path: str | List[str], cfg: L2PipelineConfig, target_frames:
     if isinstance(path, list):
         if not path:
             return pl.DataFrame()
-        collected = []
-        for p in path:
-            try:
-                df = build_l2_frames(p, cfg, target_frames)
-                if df.height > 0:
-                    collected.append(df)
-            except Exception:
-                continue
-        if not collected:
-            return pl.DataFrame()
-        return pl.concat(collected, how="vertical_relaxed")
+            
+        # If this list is ALREADY a targeted split-CSV group for a single symbol,
+        # we bypass the chunking loop and fall through to the ETL engine below.
+        is_split_group = len(path) <= 4 and any("行情.csv" in str(p) for p in path) and any("逐笔成交.csv" in str(p) for p in path)
+        if not is_split_group:
+            from collections import defaultdict
+            from pathlib import Path
+            
+            # Group flat list of thousands of CSVs into per-symbol lists
+            grouped = defaultdict(list)
+            for p in path:
+                grouped[str(Path(p).parent)].append(str(p))
+                
+            collected = []
+            for symbol_dir, group_files in grouped.items():
+                try:
+                    # Depending on whether it's 2024 unified CSVs (len=1) or 2023 split (len>1),
+                    # recursively call build_l2_frames. The targeted group will either bypass 
+                    # the list-check entirely or hit the is_split_group=True check.
+                    if len(group_files) == 1:
+                        df = build_l2_frames(group_files[0], cfg, target_frames)
+                    else:
+                        df = build_l2_frames(group_files, cfg, target_frames)
+                        
+                    if df.height > 0:
+                        collected.append(df)
+                except Exception as e:
+                    print(f"Error processing {symbol_dir}: {e}")
+                    continue
+            if not collected:
+                return pl.DataFrame()
+            return pl.concat(collected, how="vertical_relaxed")
 
-    # Standard single-file processing
+    # Standard single-file (or single split-group) processing
     lf = scan_l2_quotes(path, cfg)
     if lf is None:
         return pl.DataFrame()
@@ -420,8 +532,8 @@ def build_l2_frames(path: str | List[str], cfg: L2PipelineConfig, target_frames:
             (pl.col("__time_ms") - pl.col("__time_ms").first()).alias("time_trace"),
             pl.col("__time_ms").first().alias("time_start"),
             pl.col("__time_ms").last().alias("time_end"),
-            pl.col("date").first().alias("date"),
-            pl.col("symbol").first().alias("symbol"),
+            pl.col("date").first().alias("_date_temp"),
+            pl.col("symbol").first().alias("_symbol_temp"),
             pl.len().alias("n_ticks"),
             pl.col("vol_tick").sum().alias("trade_vol"),
             pl.col("lob_flux").sum().alias("cancel_vol"),
@@ -429,6 +541,16 @@ def build_l2_frames(path: str | List[str], cfg: L2PipelineConfig, target_frames:
         ],
         maintain_order=True,
     )
+    
+    # Rename temp columns to standard names if they were not group keys
+    rename_rules = {}
+    if "date" not in frames.collect_schema().names():
+        rename_rules["_date_temp"] = "date"
+    if "symbol" not in frames.collect_schema().names():
+        rename_rules["_symbol_temp"] = "symbol"
+        
+    frames = frames.rename(rename_rules)
+    frames = frames.drop(["_date_temp", "_symbol_temp"], strict=False)
 
     frames = frames.filter(pl.col("n_ticks") >= int(vc.min_ticks_per_bucket))
     if cfg.quality.drop_nonpositive_frame_price:

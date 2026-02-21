@@ -99,9 +99,7 @@ def _apply_recursive_physics(
     def _safe_bool_col(col_name: str) -> np.ndarray:
         if col_name not in frames.columns:
             return np.zeros(n_rows, dtype=bool)
-        col = frames.get_column(col_name)
-        vals = col.to_list()
-        return np.asarray([_to_bool(v) for v in vals], dtype=bool)
+        return frames.get_column(col_name).cast(pl.Boolean, strict=False).fill_null(False).to_numpy()
 
     open_px = _safe_f64_col("open", default=0.0)
     close_px = _safe_f64_col("close", default=0.0)
@@ -119,8 +117,8 @@ def _apply_recursive_physics(
 
     def _safe_list_col(col_name: str) -> list:
         if col_name in frames.columns:
-            return frames.get_column(col_name).to_list()
-        return [None] * n_rows
+            return [x if x is not None else [] for x in frames.get_column(col_name).to_list()]
+        return [[] for _ in range(n_rows)]
 
     trace_col = _safe_list_col("trace")
     ofi_list_col = _safe_list_col("ofi_list")

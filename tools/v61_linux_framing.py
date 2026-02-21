@@ -19,7 +19,7 @@ import argparse
 import shutil
 import uuid
 from pathlib import Path
-from multiprocessing import Pool
+from multiprocessing import get_context
 
 # 【CRITICAL DEFENSE】Cap Polars internal Rayon threads per worker.
 # Without this: 4 workers × 32 CPU cores = 128 threads fighting for RAM.
@@ -147,9 +147,10 @@ def main():
         print("Nothing to do for this shard. Exiting.")
         return
 
-    # maxtasksperchild=5: Balance between jemalloc memory release and cold-start cost.
-    # Worker restarts every 5 files to return hoarded pages to OS Ring-0.
-    with Pool(args.workers, maxtasksperchild=5) as p:
+    # Linux + Polars can deadlock under fork; force spawn context for worker safety.
+    # maxtasksperchild=5 balances memory release and process cold-start overhead.
+    ctx = get_context("spawn")
+    with ctx.Pool(args.workers, maxtasksperchild=5) as p:
         for res in p.imap_unordered(process_day, tasks):
             if res:
                 print(res, flush=True)
