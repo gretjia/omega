@@ -24,6 +24,10 @@
 1. **Wait for framing to complete**: No action required inside the ETL or Framing logic. Allow the systems to process the 7TB of raw data.
 2. **Review the Postmortem**: `handover/ai-direct/entries/20260221_100000_v61_deep_debug_success.md`
 3. **If framing finishes**: Move on to the L2 Dataset Merge and TCN Training phases.
+4. **[FUTURE UPGRADE] Rescue Early 2023 Split CSVs**:
+   - Windows is currently skipping early 2023 data because the archives contain fragmented files (`行情.csv`, `逐笔成交.csv`, `逐笔委托.csv` in `000001.SZ/` directories) rather than unified wide tables.
+   - **DO NOT `concat(how=\"diagonal_relaxed\")`**, as this ruins the V61 Holographic Topology formulas with `null` features.
+   - **Plan**: Write a dedicated `scan_split_l2_quotes()` function using Asof Join or strict timestamp alignment (`merge`) to fuse these 3 tables per symbol per day. This will rescue 1-2TB of highly valuable early-2023 training data.
 
 ### Files Modified
 
