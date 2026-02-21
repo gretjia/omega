@@ -28,9 +28,9 @@ def trigger_ai_repair(msg):
     except Exception as e:
         print(f"Failed to start AI: {e}")
 
-def ssh_cmd(host, cmd, timeout=10):
+def ssh_cmd(host, cmd, timeout=20):
     try:
-        r = subprocess.run(["ssh", "-o", "ConnectTimeout=5", host, cmd], 
+        r = subprocess.run(["ssh", "-o", "ConnectTimeout=10", host, cmd], 
                            capture_output=True, text=True, timeout=timeout)
         return r.returncode, r.stdout.strip()
     except subprocess.TimeoutExpired:
@@ -49,6 +49,8 @@ def run_watchdog():
     l_last_files = 0
     w_last_files = 0
     stalled_minutes = 0
+    l_timeout_strikes = 0
+    w_timeout_strikes = 0
     
     last_repair_time = 0
 
@@ -57,8 +59,13 @@ def run_watchdog():
         try:
             # --- LINUX CHECKS ---
             l_rc, l_ps = ssh_cmd(linux, "ps aux | grep python3 | grep -v grep | grep v61_linux")
-            # If SSH timed out, assume alive to prevent false stroke alerts
-            l_alive = "v61_linux" in l_ps if l_rc != -1 else True
+            
+            if l_rc not in (0, 1):
+                l_timeout_strikes += 1
+                l_alive = True  # Assume alive during temporary SSH drop
+            else:
+                l_timeout_strikes = 0
+                l_alive = "v61_linux" in l_ps
             
             _, l_fs = ssh_cmd(linux, "df -h / | tail -1 | awk '{print $5}'")
             l_mem = ssh_cmd(linux, "free -g | grep Mem | awk '{print $7}'")[1]
@@ -69,7 +76,12 @@ def run_watchdog():
 
             # --- WINDOWS CHECKS ---
             w_rc, w_ps = ssh_cmd(windows, 'powershell -Command "Get-Process -Name python -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Id"')
-            w_alive = len(w_ps) > 0 if w_rc != -1 else True
+            if w_rc not in (0, 1):
+                w_timeout_strikes += 1
+                w_alive = True
+            else:
+                w_timeout_strikes = 0
+                w_alive = len(w_ps) > 0
 
             w_fs = ssh_cmd(windows, 'powershell -Command "$d=Get-Volume -DriveLetter C; [math]::Round(($d.Size - $d.SizeRemaining)/$d.Size * 100)"')[1]
             w_tail_cmd = 'powershell -Command "Get-Content C:\\Omega_vNext\\framing_v61.log -Tail 1 -ErrorAction SilentlyContinue"'
@@ -89,6 +101,9 @@ def run_watchdog():
             alerts = []
             if not l_alive: alerts.append("Linux framing 进程已掉线！")
             if not w_alive: alerts.append("Windows framing 进程已掉线！")
+            
+            if l_timeout_strikes >= 5: alerts.append("Linux 节点长达5分钟彻底断联 (SSH死锁)！")
+            if w_timeout_strikes >= 5: alerts.append("Windows 节点长达5分钟彻底断联 (SSH死锁)！")
             
             if l_fs == "100%" or l_fs == "99%": alerts.append("Linux Root 根节点磁盘爆满！")
             if l_mem.isdigit() and int(l_mem) < 2: alerts.append("Linux 可用内存不足低于2G！")
