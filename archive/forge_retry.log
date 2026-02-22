@@ -1,0 +1,2 @@
+[INFO] forge scheduling: total_batches=151, pre_resumed=0, pending=151, max_workers=6
+[INFO] worker plan: requested=6, effective=6, worker_budget=0, mem_available_gb=None

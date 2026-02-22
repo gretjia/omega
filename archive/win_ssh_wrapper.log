@@ -1,0 +1,4 @@
+
+jiazi@DESKTOP-41JIDL2 C:\Users\jiazi>cd /d D:\work\Omega_vNext   
+
+jiazi@DESKTOP-41JIDL2 D:\work\Omega_vNext>C:\Python314\python.exe pipeline_runner.py --stage frame --config configs\hardware\windows1.yaml --archive-list audit\runtime\v52\shard_windows1.txt   1>win_frame_bat.log 2>&1 

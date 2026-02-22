@@ -27,17 +27,17 @@ This is the canonical handover folder for AI session continuation.
 1. On takeover (new AI or context loss), read `ai-direct/LATEST.md` first.
 2. Then read the newest file in `ai-direct/entries/`.
 3. **CRITICAL:** Read `COSTLY_LESSONS.md` to avoid financial waste.
-4. Run `V60_PRE_SUBMIT_CHECKLIST.md` before any costly v60 cloud launch.
-5. Run `python3 .codex/skills/multi-agent-ops/scripts/deploy_and_check.py` to sync index + generate recall.
-6. Read `ai-direct/live/00_Lesson_Recall.md` before implementation/debug to avoid repeated failures.
-7. If task uses multi-agent flow, read `ai-direct/live/01..05_*.md` in order.
-8. Read `DEBUG_LESSONS.md` when deeper historical detail is needed.
-9. Before ending a work session, create a new entry from template.
-10. Update `ai-direct/LATEST.md` to reflect the newest truth.
+4. Run `python3 .codex/skills/multi-agent-ops/scripts/deploy_and_check.py` to sync index + generate recall.
+5. Read `ai-direct/live/00_Lesson_Recall.md` before implementation/debug to avoid repeated failures.
+6. If task uses multi-agent flow, read `ai-direct/live/01..05_*.md` in order.
+7. Read `DEBUG_LESSONS.md` when deeper historical detail is needed.
+8. Before ending a work session, create a new entry from template.
+9. Update `ai-direct/LATEST.md` to reflect the newest truth.
 
 ## AI Debug Agent Configuration
 
 **IMPORTANT:** For automated debugging (watchdogs, CI bots), always use `gemini -y`.
+
 - **Reason:** `gemini -y` provides full shell and network access (e.g., `gcloud logging`, internet access), which is required for diagnosing cloud-native failures (OOM, Quota, API errors) that are not visible in local logs.
 - **Legacy:** Do NOT use `codex exec` for cloud infrastructure debugging as it may be sandboxed/restricted.
 
