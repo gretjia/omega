@@ -4,6 +4,7 @@
 #
 # Anti-Fragile Fixes:
 #   1. POLARS_MAX_THREADS=8 to prevent thread explosion
+import os
 import sys
 import hashlib
 import subprocess
