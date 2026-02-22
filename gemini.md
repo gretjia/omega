@@ -8,6 +8,7 @@
 1. **Semantic Desyncs (Fake Starts):** Running an execution script (e.g., `v61_framing.py`) *before* the actual mathematical code (`kernel.py` / `omega_etl.py`) is fully upgraded to match the `vXX.md` constraints.
 2. **SCP Hot-Patching (Git Bypass):** Sneaking code onto remote nodes using `scp`. This destroys version control (`git hash` mismatch) and creates "ghost states". **SCP is strictly banned for code updates.**
 3. **Silent Island Network Ignorance:** Blindly sending `git pull` or outbound Github requests to Windows/Linux worker nodes without realizing they sit on isolated LANs and lack direct SSH/GitHub access, causing permanent terminal timeouts.
+4. **Hallucinated Audits (Fake Execution):** Faking or simulating the output of a multi-agent audit (e.g., claiming to have run `codex exec` or queried a secondary LLM without actually spawning the physical subprocess). **This is a severe breach of trust. All delegated agent audits MUST be physically executed via actual shell commands (e.g., `trigger_codex_audit.sh`) and the authentic `stdout`/`.log` files must be read and aggregated.**
 
 ---
 

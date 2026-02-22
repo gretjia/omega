@@ -413,14 +413,12 @@ def build_l1_base_ticks(path: str | List[str], cfg: L2PipelineConfig) -> pl.Data
     lf = _apply_session_filter(lf, cfg)
     lf = _apply_quality_filter(lf, cfg)
 
+    # Codex Correction: Stage 1 should ONLY extract Base Lake Parquets. 
+    # NO mathematical aggregation (microprice, ofi, depth) should happen here. 
+    # It takes 72 hours otherwise. We just output the valid sorted ticks.
     lf = lf.with_columns(
-        [_volume_tick_expr(cfg), _microprice_expr(cfg), _depth_expr(cfg)]
+        [_volume_tick_expr(cfg), _time_of_day_ms_expr("time").alias("__time_ms")]
     )
-    if cfg.quality.drop_nonpositive_frame_price:
-        lf = lf.filter(pl.col("microprice") > float(cfg.quality.min_frame_price))
-    lf = lf.with_columns(_ofi_expr(cfg))
-    lf = lf.with_columns(_lob_flux_expr(group_col))
-    lf = lf.with_columns(_time_of_day_ms_expr("time").alias("__time_ms"))
 
     return lf.collect()
 
@@ -429,6 +427,15 @@ def build_l2_features_from_l1(lf: pl.LazyFrame, cfg: L2PipelineConfig, target_fr
     """Stage 2: Physics Engine. Reads Base L1 -> Applies advanced math aggregations -> L2 Parquet."""
     schema_names = lf.collect_schema().names()
     group_col = "symbol" if "symbol" in schema_names else None
+
+    # Codex Correction: Apply Physics (microprice, depth, OFI, flux) ONLY IN STAGE 2
+    lf = lf.with_columns(
+        [_microprice_expr(cfg), _depth_expr(cfg)]
+    )
+    if cfg.quality.drop_nonpositive_frame_price:
+        lf = lf.filter(pl.col("microprice") > float(cfg.quality.min_frame_price))
+    lf = lf.with_columns(_ofi_expr(cfg))
+    lf = lf.with_columns(_lob_flux_expr(group_col))
 
     # Temporal Rolling fix: V62 demands absolute time `3s` rolling instead of row-based `window_size=3`.
     # First, convert ms epoch to a Datetime object to satisfy Polars period rolling.

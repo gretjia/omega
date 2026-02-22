@@ -55,9 +55,17 @@ def process_chunk(kwargs):
             frames_df.write_parquet(tmp_parquet, compression="snappy")
             tmp_parquet.rename(out_path)
             done_path.touch()
-            return f"[{file_path.name}] Completed: {frames_df.height} rows"
+            return_msg = f"[{file_path.name}] Completed: {frames_df.height} rows"
         else:
-            return f"[{file_path.name}] Error: Empty physics frames generated"
+            return_msg = f"[{file_path.name}] Error: Empty physics frames generated"
+            
+        # OOM Guard: Force garbage collection to prevent leak-like memory creep in long-lived workers
+        del frames_df
+        del lf
+        import gc
+        gc.collect()
+        
+        return return_msg
             
     except Exception as e:
         return f"[{file_path.name}] CRITICAL Error: {e}"

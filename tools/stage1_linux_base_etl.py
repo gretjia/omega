@@ -4,6 +4,7 @@
 #
 # Anti-Fragile Fixes (Codex Validated):
 #   1. Robust NVMe Fallback: Writes temp cache to /home/zepher/framing_cache (4TB NVMe) instead of finite /dev/shm.
+import os
 import sys
 import hashlib
 import subprocess
