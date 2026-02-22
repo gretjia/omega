@@ -16,6 +16,8 @@ import atexit
 from pathlib import Path
 from multiprocessing import get_context
 
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+
 # 【ZFS BYPASS & CPU OPTIMIZATION】
 # Extracting to the massive 4TB NVMe (/home) bypasses ZFS write amplification and RAM limits.
 os.environ["POLARS_TEMP_DIR"] = "/home/zepher/framing_cache"
@@ -23,7 +25,8 @@ os.environ["TMPDIR"] = "/home/zepher/framing_cache"
 os.environ["POLARS_MAX_THREADS"] = "4"
 
 # Add project root to sys.path
-sys.path.append("/home/zepher/work/Omega_vNext")
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
 from config import load_l2_pipeline_config
 from omega_core.omega_etl import build_l1_base_ticks
@@ -108,7 +111,7 @@ def main():
     try:
         hash_str = subprocess.check_output(
             ["git", "rev-parse", "--short", "HEAD"],
-            cwd="/home/zepher/work/Omega_vNext"
+            cwd=str(PROJECT_ROOT),
         ).decode().strip()
     except Exception:
         hash_str = "unknown"

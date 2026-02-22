@@ -302,7 +302,10 @@ python tools\stage1_windows_base_etl.py --years 2023,2024,2025,2026 --total-shar
 这部分代码在每一次修改 `omega_core/` 的数学逻辑后都需要重新运行。它直接从高速内存中读取 `Base_L1.parquet`，然后将其灌入 `@numba.njit` 加速的内核中生成高维特征矩阵。
 
 ```bash
-python tools/stage2_physics_compute.py --years 2023,2024,2025,2026
+python tools/stage2_physics_compute.py \
+  --input-dir /omega_pool/parquet_data/v62_base_l1 \
+  --output-dir /omega_pool/parquet_data/v62_feature_l2 \
+  --workers 4
 ```
 
 ### Stage 3: Vertex AI XGBoost Training & Backtest

@@ -17,7 +17,7 @@ import numpy as np
 import polars as pl
 
 from config import L2PipelineConfig, load_l2_pipeline_config
-from omega_core.omega_etl import build_l2_frames
+from omega_core.omega_etl import build_l2_features_from_l1, scan_l2_quotes
 from omega_core.omega_math_core import (
     calc_srl_state,
 )
@@ -319,7 +319,11 @@ def run_l2_kernel(
     initial_y: float | None = None,
     target_frames: float | None = None,
 ) -> tuple[pl.DataFrame, pl.DataFrame]:
-    frames = build_l2_frames(path, cfg, target_frames=target_frames)
+    lf = scan_l2_quotes(path, cfg)
+    if lf is None:
+        frames = pl.DataFrame()
+    else:
+        frames = build_l2_features_from_l1(lf, cfg, target_frames=target_frames)
     frames = _apply_recursive_physics(frames, cfg, initial_y=initial_y)
     signals = frames.filter(pl.col("is_signal") == True)
     return frames, signals

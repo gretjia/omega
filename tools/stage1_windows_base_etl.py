@@ -14,11 +14,14 @@ import uuid
 from pathlib import Path
 from multiprocessing import Pool
 
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+
 # 【CRITICAL DEFENSE】Cap Polars internal Rayon threads per worker.
 os.environ["POLARS_MAX_THREADS"] = "8"
 
 # Add project root to sys.path
-sys.path.append(r"C:\Omega_vNext")
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
 from config import load_l2_pipeline_config
 from omega_core.omega_etl import build_l1_base_ticks
@@ -38,7 +41,7 @@ def process_day(args):
     """Process a single trading day: 7z extract -> CSV scan -> Polars ETL -> Parquet."""
     day_path, hash_str, shard_index, total_shards = args
 
-    os.chdir(r"C:\Omega_vNext")
+    os.chdir(str(PROJECT_ROOT))
     date_str = day_path.stem
     out_path = OUTPUT_ROOT / f"{date_str}_{hash_str}.parquet"
     done_path = OUTPUT_ROOT / f"{date_str}_{hash_str}.parquet.done"
@@ -103,7 +106,7 @@ def main():
     try:
         hash_str = subprocess.check_output(
             ["git", "rev-parse", "--short", "HEAD"],
-            cwd=r"C:\Omega_vNext"
+            cwd=str(PROJECT_ROOT),
         ).decode().strip()
     except Exception:
         hash_str = "unknown"

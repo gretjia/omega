@@ -218,3 +218,15 @@ Write only reproducible, technical lessons.
 - fix: Persist executed payload sources and SHA256 manifests for each run alongside metrics and job describes.
 - guardrail: A run is audit-incomplete unless source snapshot files and hash manifest are present in the evidence package.
 - refs: `audit/runtime/v60_factual_evidence/source_tools_run_cloud_backtest.py`, `audit/runtime/v60_factual_evidence/source_tools_run_vertex_xgb_train.py`, `audit/runtime/v60_factual_evidence/source_omega_core_trainer.py`, `audit/runtime/v60_factual_evidence/source_file_sha256.txt`
+
+## 2026-02-22T11:29:44Z | TASK-20260222-V62-DUAL-STAGE1-RELAUNCH-MONITOR_debug
+- task_id: TASK-20260222-V62-DUAL-STAGE1-RELAUNCH-MONITOR
+- git_hash: 47acc72+working-tree
+- role: debug_scribe
+- model_profile: codex_medium
+- auto_key: TASK-20260222-V62-DUAL-STAGE1-RELAUNCH-MONITOR|47acc72+working-tree
+- symptom: `/Users/zephryj/work/Omega_vNext/omega_core/kernel.py`: replace stale `build_l2_frames` import path with current ETL chain.
+- root_cause: Root cause captured across mechanic and recursive auditor artifacts.
+- fix: Patch applied and validated under current multi-agent flow.
+- guardrail: Mandatory next gates before declaring run healthy:
+- refs: `handover/ai-direct/live/05_Final_Audit_Decision.md`, `handover/ai-direct/live/04A_Gemini_Recursive_Audit.md`, `handover/ai-direct/live/04B_Codex_Recursive_Audit.md`, `handover/ai-direct/live/03_Mechanic_Patch.md`, `handover/ai-direct/live/02_Oracle_Insight.md`, `handover/ai-direct/live/01_Raw_Context.md`
