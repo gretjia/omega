@@ -41,3 +41,9 @@ framer_progress.jsonl
 
 # Local private bare remote
 .local_remote/
+
+# Legacy and Handover Archives
+archive/
+*.bundle
+*.zip
+
