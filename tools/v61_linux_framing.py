@@ -18,13 +18,16 @@ import subprocess
 import argparse
 import shutil
 import uuid
+import signal
+import atexit
 from pathlib import Path
 from multiprocessing import get_context
 
-# 【CRITICAL DEFENSE】Cap Polars internal Rayon threads per worker.
-# Without this: 4 workers × 32 CPU cores = 128 threads fighting for RAM.
-# With this:    2 workers × 8 threads  = 16 threads = optimal for 32-core Ryzen.
-os.environ["POLARS_MAX_THREADS"] = "8"
+# 【ZFS BYPASS & CPU OPTIMIZATION】
+# Extracting to the massive 4TB NVMe (/home) bypasses ZFS write amplification and RAM limits.
+os.environ["POLARS_TEMP_DIR"] = "/home/zepher/framing_cache"
+os.environ["TMPDIR"] = "/home/zepher/framing_cache"
+os.environ["POLARS_MAX_THREADS"] = "4"
 
 # Add project root to sys.path
 sys.path.append("/home/zepher/work/Omega_vNext")
@@ -57,7 +60,8 @@ def process_day(args):
     print(f"[{date_str}] Starting processing (Shard {shard_index}/{total_shards})...", flush=True)
 
     unique_id = uuid.uuid4().hex
-    tmp_dir = Path(f"/omega_pool/temp_framing/{date_str}_{unique_id}")
+    # Extract directly to the 4TB NVMe disk mounted at /home to bypass ZFS IO deadlocks
+    tmp_dir = Path(f"/home/zepher/framing_cache/omega_framing_{date_str}_{unique_id}")
 
     # Ensure clean start — kill any orphaned debris
     if tmp_dir.exists():
@@ -95,8 +99,8 @@ def process_day(args):
 def main():
     ap = argparse.ArgumentParser(description="v61 Linux Framing Agent (Anti-Fragile)")
     ap.add_argument("--years", default="2023,2024,2025,2026")
-    ap.add_argument("--workers", type=int, default=2,
-                    help="Number of parallel workers. Default=2 to prevent swap thrash.")
+    ap.add_argument("--workers", type=int, default=6,
+                    help="Number of parallel workers. Default=6 for 32-core RAM disk extraction.")
     ap.add_argument("--shard", type=int, default=0, help="Shard index (0 to N-1)")
     ap.add_argument("--total-shards", type=int, default=2, help="Total number of shards")
     args = ap.parse_args()
@@ -118,6 +122,16 @@ def main():
     print(f"Git hash: {hash_str}")
     print(f"Shard: {args.shard}/{args.total_shards}, Workers: {args.workers}")
     print(f"POLARS_MAX_THREADS: {os.environ.get('POLARS_MAX_THREADS', 'unset')}")
+
+    # 【FIX 5】Bulletproof cleanup: Ensure the global framing cache on the 4TB drive is swept if the main process dies
+    CACHE_DIR = "/home/zepher/framing_cache"
+    def nuke_cache(*args_sig):
+        print("\n[WATCHDOG] Sweeping framing_cache to prevent 4TB disk explosion...", flush=True)
+        shutil.rmtree(CACHE_DIR, ignore_errors=True)
+    
+    atexit.register(nuke_cache)
+    signal.signal(signal.SIGINT, nuke_cache)
+    signal.signal(signal.SIGTERM, nuke_cache)
 
     for year in years:
         year_path = RAW_ROOT / year

@@ -50,7 +50,7 @@ HOSTS = {
     },
     "windows1": {
         "ssh_target": "jiazi@192.168.3.112",
-        "source_path": "D:/Omega_frames/v52/frames/host=windows1/",
+        "source_path": "D:/Omega_frames/v61/host=windows1/",
         "dest_subpath": "host=windows1"
     }
 }
