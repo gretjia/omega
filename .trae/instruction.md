@@ -4,7 +4,7 @@
 > **ATTENTION AGENT**: You are operating within the OMEGA Antigravity Environment.
 
 ## Prime Directives
-1. **Directive 1**: Read the Constitution first in each session.
+1. **Directive 1**: Read audit/constitution_v2.md first in each session.
 2. **Directive 2**: Use modular skills under .agent/skills/ instead of generic assumptions.
 3. **Directive 3**: When implementing: Plan -> Verify -> Execute -> Audit.
 
@@ -12,6 +12,6 @@
 - **Root**: `.`
 - **Environment**: `Conda OMEGA`
 - **Key Files**:
-  - `omega_v3_core/kernel.py`
-  - `omega_v3_core/omega_math_core.py`
-- **Legacy Note**: Root kernel.py and omega_math_core.py are compatibility shims; legacy/L1 source lives in legacy_model/v1/.
+  - `omega_core/kernel.py`
+  - `omega_core/omega_math_core.py`
+- **Archive Note**: Archived paths are intentionally marked N/A in current repository baseline.

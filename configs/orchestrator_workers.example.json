@@ -1,0 +1,21 @@
+[
+  {
+    "name": "linux1",
+    "host": "linux1-lx",
+    "platform": "linux",
+    "repo_root": "/home/zepher/work/Omega_vNext",
+    "python_exec": "python3",
+    "config_path": "configs/hardware/linux.yaml",
+    "archive_list": "audit/runtime/v52/shard_linux.txt"
+  },
+  {
+    "name": "windows1",
+    "host": "windows1-w1",
+    "platform": "windows",
+    "repo_root": "D:\\work\\Omega_vNext",
+    "python_exec": "C:\\Python314\\python.exe",
+    "config_path": "configs\\hardware\\windows1.yaml",
+    "archive_list": "audit\\runtime\\v52\\shard_windows1.txt",
+    "task_name": "Omega_v6_frame_windows1"
+  }
+]

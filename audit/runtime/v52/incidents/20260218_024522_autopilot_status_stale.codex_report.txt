@@ -1,0 +1,10 @@
+Incident response report has been written to:
+
+`audit/runtime/v52/incidents/20260218_024522_autopilot_status_stale.codex_report.txt`
+
+Current recovery state:
+- Root cause confirmed as stale status telemetry during long `build_base_matrix` polling, not a stopped autopilot.
+- Minimal intervention applied: watchdog relaunch attempt plus status timestamp refresh (`touch audit/runtime/v52/autopilot_aa8abb7.status.json`), with no v6 math/principle changes.
+- Pipeline is still advancing: `autopilot_aa8abb7.runner.log` reached `2026-02-18 02:54:35` with `JOB_STATE_RUNNING` and increasing elapsed time (`17565s`).
+- Watchdog/live state now reflects fresh status age (`status_age_sec: 116` at `2026-02-18 02:53:35`), reducing immediate false stale-trigger risk.
+

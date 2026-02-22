@@ -1,0 +1,4 @@
+version: 1
+display_name: v60 Multi-Agent Ops (Alias)
+short_description: Compatibility alias to stable multi-agent-ops skill
+default_prompt: Use the stable multi-agent-ops skill path; this alias is for backward compatibility only.

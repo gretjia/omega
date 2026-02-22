@@ -10,6 +10,7 @@ Implements:
 from __future__ import annotations
 
 import math
+import os
 import pickle
 import time
 from pathlib import Path
@@ -20,6 +21,10 @@ import polars as pl
 import psutil
 from sklearn.linear_model import SGDClassifier
 from sklearn.preprocessing import StandardScaler
+try:
+    import xgboost as xgb
+except ImportError:
+    xgb = None
 
 from config import L2PipelineConfig
 from omega_core.kernel import apply_recursive_physics, run_l2_kernel
@@ -34,8 +39,28 @@ def check_memory_safe(threshold: float = 85.0, sleep_sec: float = 10.0) -> None:
 class OmegaTrainerV3:
     def __init__(self, cfg: L2PipelineConfig):
         self.cfg = cfg
-        self.model = SGDClassifier(loss="log_loss", penalty="l2", alpha=1e-4, average=True)
         self.scaler = StandardScaler()
+
+        self.model_type = str(getattr(cfg.model, "model_type", "xgboost")).lower()
+        if self.model_type == "xgboost":
+            if xgb is None:
+                raise ImportError("XGBoost required for model_type='xgboost'")
+            self.model = None
+        elif self.model_type == "lightgbm":
+            raise NotImplementedError("model_type='lightgbm' is declared but not implemented in this runtime.")
+        else:
+            self.model = SGDClassifier(
+                loss=str(getattr(cfg.model, "loss", "log_loss")),
+                penalty=str(getattr(cfg.model, "penalty", "l2")),
+                alpha=float(getattr(cfg.model, "alpha", 1e-4)),
+                l1_ratio=float(getattr(cfg.model, "l1_ratio", 0.15)),
+                learning_rate=str(getattr(cfg.model, "learning_rate", "optimal")),
+                eta0=float(getattr(cfg.model, "eta0", 0.01)),
+                power_t=float(getattr(cfg.model, "power_t", 0.5)),
+                average=bool(getattr(cfg.model, "average", True)),
+                max_iter=int(getattr(cfg.model, "max_iter", 1)),
+                tol=getattr(cfg.model, "tol", None),
+            )
 
         topo_race_cols = list(getattr(self.cfg.train, "topology_race_features", ()))
         raw_feature_cols = [
@@ -48,6 +73,7 @@ class OmegaTrainerV3:
         self.label_col = "direction_label"
         self.is_fitted = False
         self._warned_missing_cols = False
+        self._warned_reuse_precomputed = False
 
     @staticmethod
     def _signed_log1p(expr: pl.Expr) -> pl.Expr:
@@ -63,6 +89,38 @@ class OmegaTrainerV3:
             return df
         return df.with_columns(pl.col(col).clip(lower_bound=float(lo), upper_bound=float(hi)))
 
+    def _build_t_plus_one_targets(self, df: pl.DataFrame, cfg: L2PipelineConfig) -> tuple[pl.DataFrame, bool]:
+        t1_days = int(max(0, getattr(cfg.micro, "t_plus_1_horizon_days", 0)))
+        if t1_days <= 0 or "date" not in df.columns or "close" not in df.columns:
+            return df, False
+
+        key_cols = ["date"]
+        over_cols: List[str] = []
+        if "symbol" in df.columns:
+            key_cols = ["symbol", "date"]
+            over_cols = ["symbol"]
+
+        sort_cols = list(key_cols)
+        if "time_end" in df.columns:
+            sort_cols.append("time_end")
+        elif "bucket_id" in df.columns:
+            sort_cols.append("bucket_id")
+
+        daily = (
+            df.sort(sort_cols)
+            .group_by(key_cols, maintain_order=True)
+            .agg(pl.col("close").last().alias("_day_close"))
+            .sort(key_cols)
+        )
+        if over_cols:
+            daily = daily.with_columns(pl.col("_day_close").shift(-t1_days).over(over_cols).alias("t1_close"))
+        else:
+            daily = daily.with_columns(pl.col("_day_close").shift(-t1_days).alias("t1_close"))
+
+        daily = daily.select(key_cols + ["t1_close"])
+        df = df.join(daily, on=key_cols, how="left")
+        return df, True
+
     def _prepare_frames(self, df: pl.DataFrame, cfg: L2PipelineConfig) -> pl.DataFrame:
         tcfg = cfg.train
 
@@ -71,7 +129,31 @@ class OmegaTrainerV3:
                 print("[Warning] trade_vol/cancel_vol missing. Spoofing filter may degrade.")
                 self._warned_missing_cols = True
 
-        df = apply_recursive_physics(df, cfg)
+        reuse_precomputed = os.environ.get("OMEGA_REUSE_PRECOMPUTED_PHYSICS", "0").strip().lower() in {
+            "1",
+            "true",
+            "yes",
+            "y",
+        }
+        precomputed_cols = (
+            "sigma_eff",
+            "depth_eff",
+            "epiplexity",
+            "topo_area",
+            "topo_energy",
+            "srl_resid",
+            "adaptive_y",
+            "is_signal",
+            "direction",
+            "price_change",
+        )
+        can_reuse_precomputed = reuse_precomputed and all(c in df.columns for c in precomputed_cols)
+        if can_reuse_precomputed:
+            if not self._warned_reuse_precomputed:
+                print("[Info] Reusing precomputed physics columns; skipping recursive kernel recompute.")
+                self._warned_reuse_precomputed = True
+        else:
+            df = apply_recursive_physics(df, cfg)
 
         df = df.with_columns(
             [
@@ -85,22 +167,36 @@ class OmegaTrainerV3:
         label_sigma_mult = float(tcfg.label_sigma_mult)
         min_valid_close = float(getattr(tcfg, "min_valid_close", 0.0))
 
+        df, use_t1 = self._build_t_plus_one_targets(df, cfg)
+
         def _over_symbol(expr: pl.Expr) -> pl.Expr:
             if "symbol" in df.columns:
                 return expr.over("symbol")
             return expr
 
+        if use_t1:
+            df = df.with_columns(
+                [
+                    pl.col("t1_close").alias("close_fwd"),
+                    (pl.col("t1_close") - pl.col("close")).alias("fwd_change"),
+                ]
+            )
+        else:
+            df = (
+                df.with_columns(
+                    [
+                        _over_symbol(pl.col("close").shift(-horizon)).alias("close_fwd"),
+                    ]
+                )
+                .with_columns(
+                    [
+                        (pl.col("close_fwd") - pl.col("close")).alias("fwd_change"),
+                    ]
+                )
+            )
+
         df = (
-            df.with_columns(
-                [
-                    _over_symbol(pl.col("close").shift(-horizon)).alias("close_fwd"),
-                ]
-            )
-            .with_columns(
-                [
-                    (pl.col("close_fwd") - pl.col("close")).alias("fwd_change"),
-                ]
-            )
+            df
             .with_columns(
                 pl.when((pl.col("close") > min_valid_close) & (pl.col("close_fwd") > min_valid_close))
                 .then(pl.col("close"))
@@ -114,12 +210,15 @@ class OmegaTrainerV3:
                 ]
             )
             .with_columns(
-                pl.when(pl.col("ret_k").abs() > label_sigma_mult * pl.col("sigma_ret"))
-                .then(pl.col("ret_k").sign())
-                .otherwise(0.0)
-                .alias(self.label_col)
+                [
+                    pl.when(pl.col("ret_k").abs() > label_sigma_mult * pl.col("sigma_ret"))
+                    .then(pl.col("ret_k").sign())
+                    .otherwise(0.0)
+                    .alias(self.label_col),
+                    pl.col("ret_k").alias("t1_fwd_return"),
+                ]
             )
-            .drop_nulls()
+            .drop_nulls(subset=["close_valid", "ret_k", "sigma_ret", self.label_col, "t1_fwd_return"])
         )
 
         if bool(getattr(tcfg, "use_structural_filter", False)) and df.height > 0:
@@ -143,10 +242,97 @@ class OmegaTrainerV3:
 
         return df
 
+    def build_epistemic_dmatrix(self, df: pl.DataFrame) -> xgb.DMatrix | None:
+        """
+        v6.0: Epistemic Sample Weighting for XGBoost.
+        Weight = Epiplexity * log1p(Topo_Area)
+        """
+        missing = [c for c in self.feature_cols if c not in df.columns]
+        if missing:
+            return None
+
+        X = df.select(self.feature_cols).to_numpy()
+        if "t1_fwd_return" in df.columns:
+            y = (df.get_column("t1_fwd_return").to_numpy() > 0).astype(int)
+        else:
+            y = np.where(df.select(self.label_col).to_numpy().ravel() > 0, 1, 0)
+        
+        epi = np.clip(df.get_column("epiplexity").to_numpy(), 0.0, 1.0)
+        topo = np.log1p(np.abs(df.get_column("topo_area").to_numpy()))
+        
+        if "is_signal" in df.columns:
+            is_valid = df.get_column("is_signal").to_numpy().astype(float)
+        else:
+            is_valid = np.ones_like(epi)
+            
+        if "is_physics_valid" in df.columns:
+            is_phys = df.get_column("is_physics_valid").to_numpy().astype(float)
+            is_valid = is_valid * is_phys
+            
+        weights = epi * topo * is_valid
+        valid_mask = np.isfinite(weights) & (weights > 1e-4)
+        if not np.any(valid_mask):
+            return None
+
+        return xgb.DMatrix(
+            data=X[valid_mask],
+            label=y[valid_mask],
+            weight=weights[valid_mask],
+            feature_names=self.feature_cols,
+        )
+
+    def train_xgboost(self, dirs: List[Path], checkpoint_interval: int):
+        print("Starting XGBoost training (Incremental)...")
+        mcfg = self.cfg.model
+        xgb_params = {
+            "objective": str(getattr(mcfg, "xgb_objective", "binary:logistic")),
+            "eval_metric": str(getattr(mcfg, "xgb_eval_metric", "logloss")),
+            "max_depth": int(getattr(mcfg, "xgb_max_depth", 6)),
+            "eta": float(getattr(mcfg, "xgb_eta", 0.1)),
+            "subsample": float(getattr(mcfg, "xgb_subsample", 0.9)),
+            "colsample_bytree": float(getattr(mcfg, "xgb_colsample_bytree", 0.9)),
+            "verbosity": 1,
+        }
+        rounds = int(max(1, getattr(mcfg, "xgb_num_boost_round", 10)))
+        total_rows = 0
+        
+        for d in dirs:
+            files = sorted(list(d.glob("*.parquet")))
+            for f in files:
+                try:
+                    lf = pl.scan_parquet(str(f))
+                    df_batch = lf.collect()
+                    if df_batch.height == 0: continue
+                    
+                    df_batch = self._prepare_frames(df_batch, self.cfg)
+                    if df_batch.height == 0: continue
+
+                    dtrain = self.build_epistemic_dmatrix(df_batch)
+                    if dtrain is None:
+                        continue
+                    
+                    # Incremental Train: Update existing booster
+                    self.model = xgb.train(xgb_params, dtrain, num_boost_round=rounds, xgb_model=self.model)
+                    
+                    total_rows += int(dtrain.num_row())
+                    if total_rows % 200000 == 0:
+                        print(f"Rows: {total_rows}")
+                        
+                except Exception as exc:
+                    print(f"Error {f.name}: {exc}")
+                    
+        self.save(name="omega_v6_xgb_final.pkl", extra_state={"total_rows": int(total_rows)})
+        self.is_fitted = True
+        print(f"XGBoost Training complete. Total rows: {total_rows:,}")
+
     def train(self, sample_frac: float = 1.0, checkpoint_interval: int = 500000) -> None:
-        print("Starting training OMEGA v5.2...")
+        print(f"Starting training OMEGA v5.2/v6.0 ({self.model_type})...")
         dirs = discover_l2_dirs()
         if not dirs:
+            return
+            
+        if self.model_type == "xgboost":
+            self.train_xgboost(dirs, checkpoint_interval)
             return
 
         classes = np.array([-1, 1]) if self.cfg.train.drop_neutral_labels else np.array([-1, 0, 1])
@@ -250,26 +436,46 @@ def _vector_alignment(
             return expr.over("symbol")
         return expr
 
-    merged = frames.with_columns(
+    # Explicitly sort by causal time order before applying shift
+    # to avoid data bleeding between concatenated files/symbols.
+    sort_cols = ["time_end"]
+    if "symbol" in frames.columns:
+        sort_cols = ["symbol", "time_end"]
+    
+    merged = frames.sort(sort_cols).with_columns(
         (_over_symbol(pl.col("close").shift(-int(horizon))) - pl.col("close")).alias("fwd_return")
     )
 
-    dir_sign = np.sign(np.asarray(merged["direction"].to_numpy(), dtype=float))
-    fwd_sign = np.sign(np.asarray(merged["fwd_return"].to_numpy(), dtype=float))
+    dir_sign = np.sign(np.asarray(merged.get_column("direction").to_numpy(), dtype=float))
+    # ACTION 1: Safe single-column extraction (never cast full DataFrame to numpy)
+    fwd_sign = np.sign(np.asarray(merged.get_column("fwd_return").to_numpy(), dtype=float))
     
-    epi = np.asarray(merged["epiplexity"].to_numpy(), dtype=float)
+    epi = np.asarray(merged.get_column("epiplexity").to_numpy(), dtype=float)
     if epi.size == 0 or not np.any(np.isfinite(epi)):
         return float("nan"), float("nan")
         
     epi_q = float(np.nanquantile(epi, 0.8))
-    mask = np.isfinite(dir_sign) & np.isfinite(fwd_sign) & (dir_sign != 0.0) & (fwd_sign != 0.0) & (epi >= epi_q)
+
+    # ACTION 4: Seal singularity leakage — exclude limit-up/down rows where
+    # depth=0 causes physics explosion. Training filters these; eval must too.
+    if "is_physics_valid" in merged.columns:
+        is_valid_arr = np.asarray(merged.get_column("is_physics_valid").to_numpy(), dtype=bool)
+    else:
+        is_valid_arr = np.ones_like(epi, dtype=bool)
+
+    mask = (
+        np.isfinite(dir_sign) & np.isfinite(fwd_sign)
+        & (dir_sign != 0.0) & (fwd_sign != 0.0)
+        & (epi >= epi_q)
+        & is_valid_arr  # Physics Singularity Immunity
+    )
     
     phys_align = float("nan")
     if int(np.sum(mask)) >= int(min_samples):
         phys_align = float(np.mean(dir_sign[mask] == fwd_sign[mask]))
 
     model_align = float("nan")
-    if model is not None and scaler is not None and feature_cols is not None:
+    if model is not None and feature_cols is not None:
         if "epi_x_srl_resid" not in merged.columns:
             merged = merged.with_columns([
                 (pl.col("epiplexity") * pl.col("srl_resid")).alias("epi_x_srl_resid"),
@@ -282,16 +488,22 @@ def _vector_alignment(
             X_all = merged.select(feature_cols).to_numpy()
             X_valid = X_all[mask]
             if X_valid.shape[0] >= min_samples:
-                X_scaled = scaler.transform(X_valid)
-                if hasattr(model, "predict_proba"):
-                    probas = model.predict_proba(X_scaled)
-                    c_idx = np.where(model.classes_ == 1)[0]
+                X_eval = X_valid
+                if scaler is not None and (xgb is None or not isinstance(model, xgb.Booster)):
+                    X_eval = scaler.transform(X_eval)
+
+                if xgb is not None and isinstance(model, xgb.Booster):
+                    dtest = xgb.DMatrix(X_eval, feature_names=feature_cols)
+                    preds = np.sign(model.predict(dtest) - 0.5)
+                elif hasattr(model, "predict_proba"):
+                    probas = model.predict_proba(X_eval)
+                    c_idx = np.where(model.classes_ == 1)[0] if hasattr(model, "classes_") else []
                     if len(c_idx) > 0:
                         preds = np.sign(probas[:, c_idx[0]] - 0.5)
                     else:
-                        preds = np.sign(model.predict(X_scaled))
+                        preds = np.sign(model.predict(X_eval))
                 else:
-                    preds = np.sign(model.predict(X_scaled))
+                    preds = np.sign(model.predict(X_eval))
                     
                 fwd_valid = fwd_sign[mask]
                 valid_m = (preds != 0) & (fwd_valid != 0)
@@ -302,10 +514,15 @@ def _vector_alignment(
 
 
 def _collect_traces(frames: pl.DataFrame, max_traces: int | None) -> List[Sequence[float]]:
-    if "trace" not in frames.columns: return []
-    traces = frames["trace"].to_list()
-    if max_traces is None: return traces
-    return traces[: int(max_traces)]
+    if "trace" not in frames.columns:
+        return []
+    trace_col = frames["trace"]
+    if max_traces is None:
+        return trace_col.to_list()
+    take_n = max(0, int(max_traces))
+    if take_n == 0:
+        return []
+    return trace_col.head(take_n).to_list()
 
 
 def evaluate_frames(
@@ -368,9 +585,11 @@ def evaluate_dod(metrics: Dict[str, float], cfg: L2PipelineConfig) -> bool:
 def get_latest_model(out_dir: str = "./artifacts") -> dict | None:
     paths = list(Path(out_dir).glob("checkpoint_rows_*.pkl"))
     if not paths:
-        final_p = Path(out_dir) / "omega_v5_model_final.pkl"
-        if final_p.exists():
-            with open(final_p, "rb") as f: return pickle.load(f)
+        for final_name in ("omega_v6_xgb_final.pkl", "omega_v5_model_final.pkl"):
+            final_p = Path(out_dir) / final_name
+            if final_p.exists():
+                with open(final_p, "rb") as f:
+                    return pickle.load(f)
         return None
     paths.sort(key=lambda p: int(p.stem.split('_')[-1]))
     try:

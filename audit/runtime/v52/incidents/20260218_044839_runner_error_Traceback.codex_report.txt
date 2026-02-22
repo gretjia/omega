@@ -1,0 +1,20 @@
+Report written to `audit/runtime/v52/incidents/20260218_044839_runner_error_Traceback.codex_report.txt`.
+
+What I changed:
+- Hardened fallback polling in `tools/submit_vertex_sweep.py:211` to avoid crashing on a single `gcloud ai custom-jobs describe` failure.
+- Added bounded retry behavior (`max_describe_fail_streak=10`) and preserved timeout/cancel handling with tracked `last_state` in `tools/submit_vertex_sweep.py:212`.
+- Verified syntax with in-memory compile.
+
+Runtime recovery attempt:
+- Relaunched autopilot once with `--base-matrix-sync-timeout-sec=43200`.
+- In this sandbox, the background process was reaped, so I could not keep runtime continuation alive here.
+- Restored `audit/runtime/v52/autopilot_aa8abb7.status.json` to the pre-attempt `build_base_matrix` snapshot to avoid leaving a misleading intermediate state.
+
+Current status:
+- Root cause confirmed with concrete traceback evidence from `audit/runtime/v52/incidents/20260218_044839_runner_error_Traceback.md:172`.
+- Patch is in place.
+- Pipeline resumed in this sandbox: no (environment/runtime limitation), documented in the report.
+
+Next step to actually resume:
+1. Relaunch `tools/v60_autopilot.py` from the real host runtime/session (outside this sandbox) so it uses the patched submitter.
+2. Update watchdog launch to use `--base-matrix-sync-timeout-sec=43200` to prevent repeat 6h timeout cancellations.

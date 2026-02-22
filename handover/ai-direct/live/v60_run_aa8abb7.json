@@ -1,0 +1,68 @@
+{
+  "updated_at": "2026-02-18 14:23:08",
+  "hash": "aa8abb7",
+  "stage": "build_base_matrix",
+  "completed": false,
+  "autopilot_running": true,
+  "uplink_running": true,
+  "gcs": {
+    "linux1_parquet": 484,
+    "windows1_parquet": 263,
+    "total_parquet": 747,
+    "stall_age_sec": 81527
+  },
+  "status_age_sec": 7970,
+  "restarts": {
+    "autopilot": 14,
+    "uplink": 0
+  },
+  "triggers": {
+    "count": 19,
+    "last_trigger_ts": 1771381288.6176572,
+    "active_codex_pid": 0
+  },
+  "paths": {
+    "state_json": "/Users/zephryj/work/Omega_vNext/audit/runtime/v52/ai_watchdog_aa8abb7.state.json",
+    "autopilot_status_json": "/Users/zephryj/work/Omega_vNext/audit/runtime/v52/autopilot_aa8abb7.status.json",
+    "autopilot_runner_log": "/Users/zephryj/work/Omega_vNext/audit/runtime/v52/autopilot_aa8abb7.runner.log",
+    "autopilot_log": "/Users/zephryj/work/Omega_vNext/audit/runtime/v52/autopilot_aa8abb7.log",
+    "uplink_log": "/Users/zephryj/work/Omega_vNext/audit/runtime/v52/uplink_aa8abb7.log",
+    "incidents_dir": "/Users/zephryj/work/Omega_vNext/audit/runtime/v52/incidents",
+    "handover_events_md": "/Users/zephryj/work/Omega_vNext/handover/ai-direct/live/v60_events_aa8abb7.md"
+  },
+  "status_snapshot": {
+    "started_at": "2026-02-18 12:10:07",
+    "git_hash": "aa8abb7",
+    "bucket": "gs://omega_v52_central/omega",
+    "windows_expected": 263,
+    "linux_expected": 484,
+    "stage": "build_base_matrix",
+    "frame": {
+      "linux_done": 484,
+      "windows_done": 263,
+      "windows_task_state": "Ready",
+      "probe_linux": 484,
+      "probe_windows": 263,
+      "probe_ok": true,
+      "updated_at": "2026-02-18 12:10:08"
+    },
+    "upload": {
+      "gcs_counts": {
+        "linux1": 484,
+        "windows1": 263,
+        "checked_at": "2026-02-18 12:10:15"
+      }
+    },
+    "optimization": {
+      "base_matrix_uri": "gs://omega_v52_central/omega/staging/base_matrix/v60/20260218-041015_aa8abb7/base_matrix.parquet",
+      "base_matrix_meta_uri": "gs://omega_v52_central/omega/staging/base_matrix/v60/20260218-041015_aa8abb7/base_matrix.meta.json",
+      "base_matrix_exec_mode": "vertex",
+      "base_matrix_machine_type": "e2-highmem-16",
+      "base_matrix_spot": false
+    },
+    "train": {},
+    "backtest": {},
+    "run_id": "20260218-041015",
+    "data_pattern": "gs://omega_v52_central/omega/omega/v52/frames/host=*/*_aa8abb7.parquet"
+  }
+}

@@ -1,0 +1,11 @@
+Wrote the incident report to:
+
+`audit/runtime/v52/incidents/20260218_102128_runner_error_Traceback.codex_report.txt`
+
+Key outcome now:
+- Root cause confirmed at runtime level: base-matrix Vertex fallback jobs repeatedly reached `JOB_STATE_FAILED`, causing `v60_autopilot.py` to exit.
+- Concrete upstream evidence also captured: one submit attempt failed with `RESOURCE_EXHAUSTED` (`custom_model_training_n2_cpus`) at `2026-02-18 09:22:37`.
+- Latest retry (`customJobs/2052312584379432960`) ran and failed again at `2026-02-18 10:25:22`.
+- Current state at `2026-02-18 10:31 CST`: `stage=build_base_matrix`, `autopilot_running=false`, `uplink_running=true` (pipeline not resumed at report time).
+
+I also documented all commands/actions attempted (including direct job-diagnosis attempts blocked by sandbox proxy/network restrictions) and the next checks/risks in the report.

@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "hash": "",
+  "years": [
+    "2023",
+    "2024"
+  ],
+  "input_files": [
+    "/Users/zephryj/work/Omega_vNext/artifacts/runtime/v52/frames/host=windows1/20230104_aa8abb7.parquet",
+    "/Users/zephryj/work/Omega_vNext/artifacts/runtime/v52/frames/host=windows1/20230110_aa8abb7.parquet",
+    "/Users/zephryj/work/Omega_vNext/artifacts/runtime/v52/frames/host=windows1/20230113_aa8abb7.parquet",
+    "/Users/zephryj/work/Omega_vNext/artifacts/runtime/v52/frames/host=windows1/20230116_aa8abb7.parquet",
+    "/Users/zephryj/work/Omega_vNext/artifacts/runtime/v52/frames/host=windows1/20230119_aa8abb7.parquet"
+  ],
+  "input_files_fingerprint": "c90d7cd3098fc051b1eb52b079b4a13769c3acc18b2561332cd35fa743c9520f",
+  "symbols_per_batch": 50,
+  "sample_symbols": 0,
+  "seed": 42,
+  "peace_threshold": 0.1,
+  "peace_threshold_baseline": 0.1,
+  "srl_resid_sigma_mult": 0.5,
+  "topo_energy_sigma_mult": null,
+  "keep_cols": [
+    "sigma_eff",
+    "net_ofi",
+    "depth_eff",
+    "epiplexity",
+    "srl_resid",
+    "topo_area",
+    "topo_energy",
+    "topo_micro",
+    "topo_classic",
+    "topo_trend",
+    "price_change",
+    "bar_duration_ms",
+    "adaptive_y",
+    "epi_x_srl_resid",
+    "epi_x_topo_area",
+    "epi_x_net_ofi",
+    "symbol",
+    "date",
+    "bucket_id",
+    "time_end",
+    "srl_resid_050",
+    "is_signal",
+    "is_physics_valid",
+    "t1_fwd_return",
+    "direction_label"
+  ]
+}

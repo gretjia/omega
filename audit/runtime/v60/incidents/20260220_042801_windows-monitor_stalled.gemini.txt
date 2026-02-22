@@ -1,0 +1,17 @@
+YOLO mode is enabled. All tool calls will be automatically approved.
+Error authenticating: FatalAuthenticationError: Interactive consent could not be obtained.
+Please run Gemini CLI in an interactive terminal to authenticate, or use NO_BROWSER=true for manual authentication.
+    at getConsentForOauth (file:///opt/homebrew/Cellar/gemini-cli/0.29.2/libexec/lib/node_modules/@google/gemini-cli/node_modules/@google/gemini-cli-core/dist/src/utils/authConsent.js:19:19)
+    at initOauthClient (file:///opt/homebrew/Cellar/gemini-cli/0.29.2/libexec/lib/node_modules/@google/gemini-cli/node_modules/@google/gemini-cli-core/dist/src/code_assist/oauth2.js:193:35)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async createCodeAssistContentGenerator (file:///opt/homebrew/Cellar/gemini-cli/0.29.2/libexec/lib/node_modules/@google/gemini-cli/node_modules/@google/gemini-cli-core/dist/src/code_assist/codeAssist.js:14:28)
+    at async file:///opt/homebrew/Cellar/gemini-cli/0.29.2/libexec/lib/node_modules/@google/gemini-cli/node_modules/@google/gemini-cli-core/dist/src/core/contentGenerator.js:78:48
+    at async createContentGenerator (file:///opt/homebrew/Cellar/gemini-cli/0.29.2/libexec/lib/node_modules/@google/gemini-cli/node_modules/@google/gemini-cli-core/dist/src/core/contentGenerator.js:53:23)
+    at async Config.refreshAuth (file:///opt/homebrew/Cellar/gemini-cli/0.29.2/libexec/lib/node_modules/@google/gemini-cli/node_modules/@google/gemini-cli-core/dist/src/config/config.js:594:33)
+    at async main (file:///opt/homebrew/Cellar/gemini-cli/0.29.2/libexec/lib/node_modules/@google/gemini-cli/dist/src/gemini.js:245:17) {
+  exitCode: 41
+}
+YOLO mode is enabled. All tool calls will be automatically approved.
+Session cleanup disabled: Either maxAge or maxCount must be specified
+[31mInteractive consent could not be obtained.
+Please run Gemini CLI in an interactive terminal to authenticate, or use NO_BROWSER=true for manual authentication.[0m

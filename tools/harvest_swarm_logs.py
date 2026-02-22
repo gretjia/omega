@@ -98,7 +98,7 @@ def main():
             print(f"[+] Saved {fname} (Score: {data['value']:.4f})")
             
             # Upload to GCS for aggregator
-            gcs_path = f"gs://omega_v52/staging/results/best_params_{jid}.json"
+            gcs_path = f"gs://omega_v52_central/staging/results/best_params_{jid}.json"
             subprocess.run(["gsutil", "cp", fname, gcs_path], check=True)
             found_count += 1
         else:

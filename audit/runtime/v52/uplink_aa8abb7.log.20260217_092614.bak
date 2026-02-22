@@ -1,0 +1,1359 @@
+[2026-02-17 09:08:53] uplink cycle begin
+[2026-02-17 09:10:39] uplink cycle begin
+[2026-02-17 09:11:04] uplink cycle begin
+[*] Using frame hash filter: aa8abb7
+=== Starting Sync for linux1 ===
+[*] Scanning zepher@192.168.3.113:/omega_pool/parquet_data/v52/frames/host=linux1/ for completed frames (hash: aa8abb7)...
+    Found 298 candidate frames.
+    GCS has no existing parquet for this hash/host.
+[*] Processing batch of 104 files from linux1...
+    < Downloading: 20230103_aa8abb7.parquet
+    < Downloading: 20230105_aa8abb7.parquet
+    < Downloading: 20230106_aa8abb7.parquet
+    < Downloading: 20230109_aa8abb7.parquet
+    < Downloading: 20230111_aa8abb7.parquet
+    < Downloading: 20230112_aa8abb7.parquet
+    < Downloading: 20230117_aa8abb7.parquet
+    < Downloading: 20230118_aa8abb7.parquet
+    < Downloading: 20230120_aa8abb7.parquet
+    < Downloading: 20230130_aa8abb7.parquet
+    < Downloading: 20230201_aa8abb7.parquet
+    < Downloading: 20230202_aa8abb7.parquet
+    < Downloading: 20230207_aa8abb7.parquet
+    < Downloading: 20230208_aa8abb7.parquet
+    < Downloading: 20230210_aa8abb7.parquet
+    < Downloading: 20230213_aa8abb7.parquet
+    < Downloading: 20230214_aa8abb7.parquet
+    < Downloading: 20230216_aa8abb7.parquet
+    < Downloading: 20230217_aa8abb7.parquet
+    < Downloading: 20230220_aa8abb7.parquet
+    < Downloading: 20230222_aa8abb7.parquet
+    < Downloading: 20230223_aa8abb7.parquet
+    < Downloading: 20230228_aa8abb7.parquet
+    < Downloading: 20230301_aa8abb7.parquet
+    < Downloading: 20230303_aa8abb7.parquet
+    < Downloading: 20230306_aa8abb7.parquet
+    < Downloading: 20230307_aa8abb7.parquet
+    < Downloading: 20230309_aa8abb7.parquet
+    < Downloading: 20230310_aa8abb7.parquet
+    < Downloading: 20230313_aa8abb7.parquet
+    < Downloading: 20230315_aa8abb7.parquet
+    < Downloading: 20230316_aa8abb7.parquet
+    < Downloading: 20230321_aa8abb7.parquet
+    < Downloading: 20230322_aa8abb7.parquet
+    < Downloading: 20230324_aa8abb7.parquet
+    < Downloading: 20230327_aa8abb7.parquet
+    < Downloading: 20230328_aa8abb7.parquet
+    < Downloading: 20230330_aa8abb7.parquet
+    < Downloading: 20230331_aa8abb7.parquet
+    < Downloading: 20230403_aa8abb7.parquet
+    < Downloading: 20230406_aa8abb7.parquet
+    < Downloading: 20230411_aa8abb7.parquet
+    < Downloading: 20230412_aa8abb7.parquet
+    < Downloading: 20230414_aa8abb7.parquet
+    < Downloading: 20230417_aa8abb7.parquet
+    < Downloading: 20230418_aa8abb7.parquet
+    < Downloading: 20230420_aa8abb7.parquet
+    < Downloading: 20230421_aa8abb7.parquet
+    < Downloading: 20230424_aa8abb7.parquet
+    < Downloading: 20230426_aa8abb7.parquet
+    < Downloading: 20230427_aa8abb7.parquet
+    < Downloading: 20230504_aa8abb7.parquet
+    < Downloading: 20230505_aa8abb7.parquet
+    < Downloading: 20230508_aa8abb7.parquet
+    < Downloading: 20230510_aa8abb7.parquet
+    < Downloading: 20230511_aa8abb7.parquet
+    < Downloading: 20230516_aa8abb7.parquet
+    < Downloading: 20230517_aa8abb7.parquet
+    < Downloading: 20230519_aa8abb7.parquet
+    < Downloading: 20230522_aa8abb7.parquet
+    < Downloading: 20230523_aa8abb7.parquet
+    < Downloading: 20230525_aa8abb7.parquet
+    < Downloading: 20230526_aa8abb7.parquet
+    < Downloading: 20230529_aa8abb7.parquet
+    < Downloading: 20230531_aa8abb7.parquet
+    < Downloading: 20230601_aa8abb7.parquet
+    < Downloading: 20230606_aa8abb7.parquet
+    < Downloading: 20230607_aa8abb7.parquet
+    < Downloading: 20230609_aa8abb7.parquet
+    < Downloading: 20230612_aa8abb7.parquet
+    < Downloading: 20230613_aa8abb7.parquet
+    < Downloading: 20230615_aa8abb7.parquet
+    < Downloading: 20230616_aa8abb7.parquet
+    < Downloading: 20230619_aa8abb7.parquet
+    < Downloading: 20230621_aa8abb7.parquet
+    < Downloading: 20230627_aa8abb7.parquet
+    < Downloading: 20230628_aa8abb7.parquet
+WARNING:  Python 3.9 will be deprecated on January 27th, 2026. Please use Python version 3.10 and up.
+To reinstall gcloud, run:
+    $ gcloud components reinstall
+
+This will also prompt to install a compatible version of Python.
+
+If you have a compatible Python interpreter installed, you can use it by setting
+the CLOUDSDK_PYTHON environment variable to point to it.
+
+    < Downloading: 20230630_aa8abb7.parquet
+    < Downloading: 20230703_aa8abb7.parquet
+    < Downloading: 20230705_aa8abb7.parquet
+WARNING: Parallel composite upload was turned ON to get the best performance on
+uploading large objects. If you would like to opt-out and instead
+perform a normal upload, run:
+`gcloud config set storage/parallel_composite_upload_enabled False`
+If you would like to disable this warning, run:
+`gcloud config set storage/parallel_composite_upload_enabled True`
+Note that with parallel composite uploads, your object might be
+uploaded as a composite object
+(https://cloud.google.com/storage/docs/composite-objects), which means
+that any user who downloads your object will need to use crc32c
+checksums to verify data integrity. gcloud storage is capable of
+computing crc32c checksums, but this might pose a problem for other
+clients.
+
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230606_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230606_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230328_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230328_aa8abb7.parquet.meta.json
+  
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230306_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230306_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230310_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230310_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230613_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230613_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230825_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230825_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230309_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230309_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230523_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230523_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230717_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230717_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230118_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230118_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230201_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230201_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230511_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230511_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230606_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230606_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230718_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230718_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230306_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230306_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230628_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230628_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230424_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230424_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230217_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230217_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230222_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230222_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230609_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230609_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230711_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230711_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230418_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230418_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230322_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230322_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230105_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230105_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230313_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230313_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230816_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230816_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230508_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230508_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230529_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230529_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230811_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230811_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230706_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230706_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230627_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230627_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230814_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230814_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230111_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230111_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230609_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230609_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230210_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230210_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230526_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230526_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230301_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230301_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230508_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230508_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230417_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230417_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230601_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230601_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230516_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230516_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230411_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230411_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230216_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230216_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230309_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230309_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230802_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230802_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230519_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230519_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230822_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230822_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230327_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230327_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230804_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230804_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230301_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230301_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230117_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230117_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230424_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230424_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230222_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230222_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230703_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230703_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230601_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230601_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230510_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230510_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230406_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230406_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230619_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230619_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230706_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230706_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230801_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230801_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230112_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230112_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230421_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230421_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230324_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230324_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230109_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230109_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230517_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230517_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230322_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230322_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230208_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230208_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230720_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230720_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230616_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230616_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230213_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230213_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230525_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230525_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230711_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230711_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230412_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230412_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230106_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230106_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230228_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230228_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230619_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230619_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230207_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230207_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230523_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230523_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230220_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230220_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230505_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230505_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230223_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230223_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230316_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230316_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230814_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230814_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230118_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230118_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230316_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230316_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230607_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230607_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230714_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230714_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230201_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230201_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230417_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230417_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230330_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230330_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230522_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230522_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230804_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230804_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230531_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230531_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230727_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230727_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230418_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230418_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230214_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230214_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230616_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230616_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230724_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230724_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230510_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230510_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230307_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230307_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230117_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230117_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230303_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230303_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230426_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230426_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230630_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230630_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230216_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230216_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230517_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230517_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230721_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230721_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230427_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230427_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230807_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230807_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230516_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230516_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230420_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230420_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230630_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230630_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230726_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230726_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230213_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230213_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230817_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230817_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230324_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230324_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230705_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230705_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230531_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230531_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230112_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230112_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230109_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230109_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230525_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230525_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230331_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230331_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230414_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230414_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230120_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230120_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230825_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230825_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230801_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230801_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230330_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230330_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230208_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230208_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230412_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230412_aa8abb7.parquet
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/auth/__init__.py:54: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/oauth2/__init__.py:40: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/auth/__init__.py:54: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/auth/__init__.py:54: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/auth/__init__.py:54: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/auth/__init__.py:54: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/auth/__init__.py:54: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/auth/__init__.py:54: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/auth/__init__.py:54: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/auth/__init__.py:54: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/auth/__init__.py:54: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/auth/__init__.py:54: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/auth/__init__.py:54: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/auth/__init__.py:54: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/auth/__init__.py:54: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/auth/__init__.py:54: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/auth/__init__.py:54: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/auth/__init__.py:54: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/oauth2/__init__.py:40: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/oauth2/__init__.py:40: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/oauth2/__init__.py:40: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/oauth2/__init__.py:40: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/oauth2/__init__.py:40: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/oauth2/__init__.py:40: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/oauth2/__init__.py:40: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/oauth2/__init__.py:40: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/oauth2/__init__.py:40: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/oauth2/__init__.py:40: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/oauth2/__init__.py:40: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/oauth2/__init__.py:40: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/oauth2/__init__.py:40: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/oauth2/__init__.py:40: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/oauth2/__init__.py:40: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/oauth2/__init__.py:40: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+    < Downloading: 20230706_aa8abb7.parquet
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/api_core/_python_version_support.py:246: FutureWarning: You are using a non-supported Python version (3.9.6). Google will not post any further updates to google.api_core supporting this Python version. Please upgrade to the latest Python version, or at least Python 3.10, and then update google.api_core.
+  warnings.warn(message, FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/api_core/_python_version_support.py:246: FutureWarning: You are using a non-supported Python version (3.9.6). Google will not post any further updates to google.api_core supporting this Python version. Please upgrade to the latest Python version, or at least Python 3.10, and then update google.api_core.
+  warnings.warn(message, FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/api_core/_python_version_support.py:246: FutureWarning: You are using a non-supported Python version (3.9.6). Google will not post any further updates to google.api_core supporting this Python version. Please upgrade to the latest Python version, or at least Python 3.10, and then update google.api_core.
+  warnings.warn(message, FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/api_core/_python_version_support.py:246: FutureWarning: You are using a non-supported Python version (3.9.6). Google will not post any further updates to google.api_core supporting this Python version. Please upgrade to the latest Python version, or at least Python 3.10, and then update google.api_core.
+  warnings.warn(message, FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/api_core/_python_version_support.py:246: FutureWarning: You are using a non-supported Python version (3.9.6). Google will not post any further updates to google.api_core supporting this Python version. Please upgrade to the latest Python version, or at least Python 3.10, and then update google.api_core.
+  warnings.warn(message, FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/api_core/_python_version_support.py:246: FutureWarning: You are using a non-supported Python version (3.9.6). Google will not post any further updates to google.api_core supporting this Python version. Please upgrade to the latest Python version, or at least Python 3.10, and then update google.api_core.
+  warnings.warn(message, FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/api_core/_python_version_support.py:246: FutureWarning: You are using a non-supported Python version (3.9.6). Google will not post any further updates to google.api_core supporting this Python version. Please upgrade to the latest Python version, or at least Python 3.10, and then update google.api_core.
+  warnings.warn(message, FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/api_core/_python_version_support.py:246: FutureWarning: You are using a non-supported Python version (3.9.6). Google will not post any further updates to google.api_core supporting this Python version. Please upgrade to the latest Python version, or at least Python 3.10, and then update google.api_core.
+  warnings.warn(message, FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/api_core/_python_version_support.py:246: FutureWarning: You are using a non-supported Python version (3.9.6). Google will not post any further updates to google.api_core supporting this Python version. Please upgrade to the latest Python version, or at least Python 3.10, and then update google.api_core.
+  warnings.warn(message, FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/api_core/_python_version_support.py:246: FutureWarning: You are using a non-supported Python version (3.9.6). Google will not post any further updates to google.api_core supporting this Python version. Please upgrade to the latest Python version, or at least Python 3.10, and then update google.api_core.
+  warnings.warn(message, FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/api_core/_python_version_support.py:246: FutureWarning: You are using a non-supported Python version (3.9.6). Google will not post any further updates to google.api_core supporting this Python version. Please upgrade to the latest Python version, or at least Python 3.10, and then update google.api_core.
+  warnings.warn(message, FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/api_core/_python_version_support.py:246: FutureWarning: You are using a non-supported Python version (3.9.6). Google will not post any further updates to google.api_core supporting this Python version. Please upgrade to the latest Python version, or at least Python 3.10, and then update google.api_core.
+  warnings.warn(message, FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/api_core/_python_version_support.py:246: FutureWarning: You are using a non-supported Python version (3.9.6). Google will not post any further updates to google.api_core supporting this Python version. Please upgrade to the latest Python version, or at least Python 3.10, and then update google.api_core.
+  warnings.warn(message, FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/api_core/_python_version_support.py:246: FutureWarning: You are using a non-supported Python version (3.9.6). Google will not post any further updates to google.api_core supporting this Python version. Please upgrade to the latest Python version, or at least Python 3.10, and then update google.api_core.
+  warnings.warn(message, FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/api_core/_python_version_support.py:246: FutureWarning: You are using a non-supported Python version (3.9.6). Google will not post any further updates to google.api_core supporting this Python version. Please upgrade to the latest Python version, or at least Python 3.10, and then update google.api_core.
+  warnings.warn(message, FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/api_core/_python_version_support.py:246: FutureWarning: You are using a non-supported Python version (3.9.6). Google will not post any further updates to google.api_core supporting this Python version. Please upgrade to the latest Python version, or at least Python 3.10, and then update google.api_core.
+  warnings.warn(message, FutureWarning)
+    < Downloading: 20230711_aa8abb7.parquet
+.........Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230712_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230712_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230202_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230202_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230504_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230504_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230621_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230621_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230106_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230106_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230103_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230103_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230310_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230310_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230714_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230714_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230504_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230504_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230822_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230822_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230120_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230120_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230313_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230313_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230207_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230207_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230522_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230522_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230321_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230321_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230406_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230406_aa8abb7.parquet.meta.json
+.Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230519_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230519_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230810_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230810_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230214_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230214_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230808_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230808_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230403_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230403_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230721_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230721_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230613_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230613_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230427_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230427_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230511_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230511_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230420_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230420_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230726_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230726_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230807_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230807_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230414_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230414_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230217_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230217_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230724_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230724_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230505_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230505_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230823_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230823_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230823_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230823_aa8abb7.parquet.meta.json
+.Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230130_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230130_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230615_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230615_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230403_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230403_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230228_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230228_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230202_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230202_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230703_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230703_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230811_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230811_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230103_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230103_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230808_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230808_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230810_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230810_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230727_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230727_aa8abb7.parquet
+.Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230315_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230315_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230130_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230130_aa8abb7.parquet
+    < Downloading: 20230712_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230717_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230717_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230426_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230426_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230612_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230612_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230628_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230628_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230615_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230615_aa8abb7.parquet
+.Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230421_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230421_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230223_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230223_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230303_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230303_aa8abb7.parquet
+    < Downloading: 20230714_aa8abb7.parquet
+....Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230621_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230621_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230720_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230720_aa8abb7.parquet
+    < Downloading: 20230717_aa8abb7.parquet
+......Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230817_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230817_aa8abb7.parquet.meta.json
+    < Downloading: 20230718_aa8abb7.parquet
+    < Downloading: 20230720_aa8abb7.parquet
+    < Downloading: 20230721_aa8abb7.parquet
+    < Downloading: 20230724_aa8abb7.parquet
+    < Downloading: 20230726_aa8abb7.parquet
+    < Downloading: 20230727_aa8abb7.parquet
+    < Downloading: 20230801_aa8abb7.parquet
+    < Downloading: 20230802_aa8abb7.parquet
+    < Downloading: 20230804_aa8abb7.parquet
+    < Downloading: 20230807_aa8abb7.parquet
+Read from remote host 192.168.3.113: Operation timed out
+scp: Connection closed
+Traceback (most recent call last):
+  File "/Users/zephryj/work/Omega_vNext/tools/mac_gateway_sync.py", line 300, in <module>
+    run_sync(args.bucket, git_hash=git_hash, target_host=args.host, year_filter=args.year)
+  File "/Users/zephryj/work/Omega_vNext/tools/mac_gateway_sync.py", line 274, in run_sync
+    sync_batch(host_key, current_batch, bucket_name)
+  File "/Users/zephryj/work/Omega_vNext/tools/mac_gateway_sync.py", line 211, in sync_batch
+    subprocess.run(get_scp_download_cmd(target, remote_path, local_batch_dir), check=True)
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/subprocess.py", line 528, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['scp', '-F', '/dev/null', '-o', 'StrictHostKeyChecking=no', '-i', '/Users/zephryj/.ssh/id_ed25519', '-q', 'zepher@192.168.3.113:/omega_pool/parquet_data/v52/frames/host=linux1/20230807_aa8abb7.parquet', '/Users/zephryj/Omega_uplink_buffer/host=linux1']' returned non-zero exit status 255.
+[2026-02-17 09:13:03] linux1 sync rc=1
+[*] Using frame hash filter: aa8abb7
+=== Starting Sync for windows1 ===
+[*] Scanning jiazi@192.168.3.112:D:/Omega_frames/v52/frames/host=windows1/ for completed frames (hash: aa8abb7)...
+    Found 184 candidate frames.
+    GCS has no existing parquet for this hash/host.
+[*] Processing batch of 101 files from windows1...
+    < Downloading: 20230104_aa8abb7.parquet
+    < Downloading: 20230110_aa8abb7.parquet
+    < Downloading: 20230113_aa8abb7.parquet
+    < Downloading: 20230116_aa8abb7.parquet
+    < Downloading: 20230119_aa8abb7.parquet
+    < Downloading: 20230131_aa8abb7.parquet
+    < Downloading: 20230203_aa8abb7.parquet
+    < Downloading: 20230206_aa8abb7.parquet
+    < Downloading: 20230209_aa8abb7.parquet
+    < Downloading: 20230215_aa8abb7.parquet
+    < Downloading: 20230221_aa8abb7.parquet
+    < Downloading: 20230224_aa8abb7.parquet
+    < Downloading: 20230227_aa8abb7.parquet
+    < Downloading: 20230302_aa8abb7.parquet
+    < Downloading: 20230308_aa8abb7.parquet
+    < Downloading: 20230314_aa8abb7.parquet
+    < Downloading: 20230317_aa8abb7.parquet
+    < Downloading: 20230320_aa8abb7.parquet
+    < Downloading: 20230323_aa8abb7.parquet
+    < Downloading: 20230329_aa8abb7.parquet
+    < Downloading: 20230404_aa8abb7.parquet
+    < Downloading: 20230407_aa8abb7.parquet
+    < Downloading: 20230410_aa8abb7.parquet
+    < Downloading: 20230413_aa8abb7.parquet
+    < Downloading: 20230419_aa8abb7.parquet
+    < Downloading: 20230425_aa8abb7.parquet
+    < Downloading: 20230428_aa8abb7.parquet
+    < Downloading: 20230509_aa8abb7.parquet
+    < Downloading: 20230512_aa8abb7.parquet
+    < Downloading: 20230515_aa8abb7.parquet
+    < Downloading: 20230518_aa8abb7.parquet
+    < Downloading: 20230524_aa8abb7.parquet
+    < Downloading: 20230530_aa8abb7.parquet
+    < Downloading: 20230602_aa8abb7.parquet
+    < Downloading: 20230605_aa8abb7.parquet
+    < Downloading: 20230608_aa8abb7.parquet
+    < Downloading: 20230614_aa8abb7.parquet
+    < Downloading: 20230620_aa8abb7.parquet
+    < Downloading: 20230626_aa8abb7.parquet
+    < Downloading: 20230629_aa8abb7.parquet
+    < Downloading: 20230704_aa8abb7.parquet
+    < Downloading: 20230707_aa8abb7.parquet
+    < Downloading: 20230710_aa8abb7.parquet
+    < Downloading: 20230713_aa8abb7.parquet
+    < Downloading: 20230719_aa8abb7.parquet
+    < Downloading: 20230725_aa8abb7.parquet
+    < Downloading: 20230728_aa8abb7.parquet
+    < Downloading: 20230731_aa8abb7.parquet
+    < Downloading: 20230803_aa8abb7.parquet
+    < Downloading: 20230809_aa8abb7.parquet
+    < Downloading: 20230815_aa8abb7.parquet
+    < Downloading: 20230818_aa8abb7.parquet
+    < Downloading: 20230821_aa8abb7.parquet
+    < Downloading: 20230824_aa8abb7.parquet
+    < Downloading: 20230830_aa8abb7.parquet
+    < Downloading: 20230905_aa8abb7.parquet
+    < Downloading: 20230908_aa8abb7.parquet
+    < Downloading: 20230911_aa8abb7.parquet
+    < Downloading: 20230914_aa8abb7.parquet
+    < Downloading: 20230920_aa8abb7.parquet
+    < Downloading: 20230926_aa8abb7.parquet
+    < Downloading: 20231010_aa8abb7.parquet
+    < Downloading: 20231013_aa8abb7.parquet
+    < Downloading: 20231016_aa8abb7.parquet
+    < Downloading: 20231019_aa8abb7.parquet
+    < Downloading: 20231025_aa8abb7.parquet
+    < Downloading: 20231031_aa8abb7.parquet
+    < Downloading: 20231103_aa8abb7.parquet
+    < Downloading: 20231106_aa8abb7.parquet
+    < Downloading: 20231109_aa8abb7.parquet
+    < Downloading: 20231115_aa8abb7.parquet
+    < Downloading: 20231121_aa8abb7.parquet
+    < Downloading: 20231124_aa8abb7.parquet
+    < Downloading: 20231127_aa8abb7.parquet
+    < Downloading: 20231130_aa8abb7.parquet
+    < Downloading: 20231205_aa8abb7.parquet
+    < Downloading: 20231208_aa8abb7.parquet
+    < Downloading: 20231211_aa8abb7.parquet
+    < Downloading: 20231214_aa8abb7.parquet
+    < Downloading: 20231220_aa8abb7.parquet
+    < Downloading: 20231226_aa8abb7.parquet
+    < Downloading: 20231229_aa8abb7.parquet
+    < Downloading: 20240103_aa8abb7.parquet
+    < Downloading: 20240109_aa8abb7.parquet
+    < Downloading: 20240112_aa8abb7.parquet
+    < Downloading: 20240115_aa8abb7.parquet
+    < Downloading: 20240118_aa8abb7.parquet
+    < Downloading: 20240124_aa8abb7.parquet
+    < Downloading: 20240130_aa8abb7.parquet
+    < Downloading: 20240202_aa8abb7.parquet
+    < Downloading: 20240205_aa8abb7.parquet
+    < Downloading: 20240208_aa8abb7.parquet
+    < Downloading: 20240220_aa8abb7.parquet
+    < Downloading: 20240223_aa8abb7.parquet
+    < Downloading: 20240226_aa8abb7.parquet
+    < Downloading: 20240229_aa8abb7.parquet
+    < Downloading: 20240301_aa8abb7.parquet
+    < Downloading: 20240304_aa8abb7.parquet
+    < Downloading: 20240307_aa8abb7.parquet
+    < Downloading: 20240313_aa8abb7.parquet
+    < Downloading: 20240319_aa8abb7.parquet
+[*] Uploading batch to gs://omega_v52...
+WARNING:  Python 3.9 will be deprecated on January 27th, 2026. Please use Python version 3.10 and up.
+To reinstall gcloud, run:
+    $ gcloud components reinstall
+
+This will also prompt to install a compatible version of Python.
+
+If you have a compatible Python interpreter installed, you can use it by setting
+the CLOUDSDK_PYTHON environment variable to point to it.
+
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20231013_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20231013_aa8abb7.parquet.meta.json
+WARNING: Parallel composite upload was turned ON to get the best performance on
+uploading large objects. If you would like to opt-out and instead
+perform a normal upload, run:
+`gcloud config set storage/parallel_composite_upload_enabled False`
+If you would like to disable this warning, run:
+`gcloud config set storage/parallel_composite_upload_enabled True`
+Note that with parallel composite uploads, your object might be
+uploaded as a composite object
+(https://cloud.google.com/storage/docs/composite-objects), which means
+that any user who downloads your object will need to use crc32c
+checksums to verify data integrity. gcloud storage is capable of
+computing crc32c checksums, but this might pose a problem for other
+clients.
+
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230914_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20230914_aa8abb7.parquet
+  
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20231205_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20231205_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230704_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20230704_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230512_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20230512_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230821_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20230821_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230110_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20230110_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230119_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20230119_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230803_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20230803_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230320_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20230320_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20240124_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20240124_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230914_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20230914_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230719_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20230719_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230410_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20230410_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230725_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20230725_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230830_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20230830_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230419_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20230419_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20231121_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20231121_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230926_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20230926_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20240301_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20240301_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20240301_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20240301_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20231220_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20231220_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230116_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20230116_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230620_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20230620_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230314_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20230314_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20231013_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20231013_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20231130_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20231130_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230920_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20230920_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230407_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20230407_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20240118_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20240118_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230209_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20230209_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230905_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20230905_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230203_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20230203_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230830_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20230830_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230206_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20230206_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230725_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20230725_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20231130_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20231130_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20231103_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20231103_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230710_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20230710_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230524_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20230524_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230614_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20230614_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230131_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20230131_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20240124_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20240124_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230317_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20230317_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20240313_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20240313_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230515_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20230515_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230920_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20230920_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20231127_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20231127_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230707_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20230707_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230728_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20230728_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230815_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20230815_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20231226_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20231226_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20240307_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20240307_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230110_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20230110_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20231229_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20231229_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20231106_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20231106_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20231019_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20231019_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230407_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20230407_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230518_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20230518_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20231103_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20231103_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230809_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20230809_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230518_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20230518_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230803_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20230803_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20240118_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20240118_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230410_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20230410_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230206_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20230206_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230713_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20230713_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20231115_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20231115_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20231214_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20231214_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20231229_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20231229_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20240115_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20240115_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20240304_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20240304_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20240112_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20240112_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230209_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20230209_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230227_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20230227_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230224_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20230224_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230524_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20230524_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20240223_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20240223_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20231025_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20231025_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230308_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20230308_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230911_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20230911_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230425_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20230425_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20231226_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20231226_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20240319_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20240319_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230719_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20230719_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20231205_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20231205_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20231208_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20231208_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20231031_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20231031_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20240319_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20240319_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20240109_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20240109_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20231127_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20231127_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230323_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20230323_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230509_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20230509_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20240220_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20240220_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20231109_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20231109_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20231016_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20231016_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20240208_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20240208_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230608_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20230608_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20240115_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20240115_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230302_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20230302_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230515_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20230515_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230302_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20230302_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20240229_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20240229_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230629_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20230629_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230614_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20230614_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230215_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20230215_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230404_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20230404_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230530_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20230530_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20231031_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20231031_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230821_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20230821_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20240229_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20240229_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20231010_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20231010_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230905_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20230905_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20240202_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20240202_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230221_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20230221_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230602_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20230602_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230329_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20230329_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230314_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20230314_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230602_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20230602_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20240103_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20240103_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230818_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20230818_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20231115_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20231115_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230713_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20230713_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230104_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20230104_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20240313_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20240313_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230317_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20230317_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20231214_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20231214_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230626_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20230626_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20240226_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20240226_aa8abb7.parquet
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/auth/__init__.py:54: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/oauth2/__init__.py:40: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+../Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/auth/__init__.py:54: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/auth/__init__.py:54: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/auth/__init__.py:54: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/auth/__init__.py:54: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/auth/__init__.py:54: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/auth/__init__.py:54: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/auth/__init__.py:54: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/auth/__init__.py:54: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/auth/__init__.py:54: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/auth/__init__.py:54: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/auth/__init__.py:54: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/auth/__init__.py:54: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/auth/__init__.py:54: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/auth/__init__.py:54: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/auth/__init__.py:54: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/auth/__init__.py:54: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+./Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/oauth2/__init__.py:40: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/oauth2/__init__.py:40: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/oauth2/__init__.py:40: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/oauth2/__init__.py:40: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/oauth2/__init__.py:40: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/oauth2/__init__.py:40: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/oauth2/__init__.py:40: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/oauth2/__init__.py:40: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/oauth2/__init__.py:40: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/oauth2/__init__.py:40: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/oauth2/__init__.py:40: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/oauth2/__init__.py:40: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/oauth2/__init__.py:40: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/oauth2/__init__.py:40: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/oauth2/__init__.py:40: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/oauth2/__init__.py:40: FutureWarning: You are using a Python version 3.9 past its end of life. Google will update google-auth with critical bug fixes on a best-effort basis, but not with any other fixes or features. Please upgrade your Python version, and then update google-auth.
+  warnings.warn(eol_message.format("3.9"), FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/api_core/_python_version_support.py:246: FutureWarning: You are using a non-supported Python version (3.9.6). Google will not post any further updates to google.api_core supporting this Python version. Please upgrade to the latest Python version, or at least Python 3.10, and then update google.api_core.
+  warnings.warn(message, FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/api_core/_python_version_support.py:246: FutureWarning: You are using a non-supported Python version (3.9.6). Google will not post any further updates to google.api_core supporting this Python version. Please upgrade to the latest Python version, or at least Python 3.10, and then update google.api_core.
+  warnings.warn(message, FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/api_core/_python_version_support.py:246: FutureWarning: You are using a non-supported Python version (3.9.6). Google will not post any further updates to google.api_core supporting this Python version. Please upgrade to the latest Python version, or at least Python 3.10, and then update google.api_core.
+  warnings.warn(message, FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/api_core/_python_version_support.py:246: FutureWarning: You are using a non-supported Python version (3.9.6). Google will not post any further updates to google.api_core supporting this Python version. Please upgrade to the latest Python version, or at least Python 3.10, and then update google.api_core.
+  warnings.warn(message, FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/api_core/_python_version_support.py:246: FutureWarning: You are using a non-supported Python version (3.9.6). Google will not post any further updates to google.api_core supporting this Python version. Please upgrade to the latest Python version, or at least Python 3.10, and then update google.api_core.
+  warnings.warn(message, FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/api_core/_python_version_support.py:246: FutureWarning: You are using a non-supported Python version (3.9.6). Google will not post any further updates to google.api_core supporting this Python version. Please upgrade to the latest Python version, or at least Python 3.10, and then update google.api_core.
+  warnings.warn(message, FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/api_core/_python_version_support.py:246: FutureWarning: You are using a non-supported Python version (3.9.6). Google will not post any further updates to google.api_core supporting this Python version. Please upgrade to the latest Python version, or at least Python 3.10, and then update google.api_core.
+  warnings.warn(message, FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/api_core/_python_version_support.py:246: FutureWarning: You are using a non-supported Python version (3.9.6). Google will not post any further updates to google.api_core supporting this Python version. Please upgrade to the latest Python version, or at least Python 3.10, and then update google.api_core.
+  warnings.warn(message, FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/api_core/_python_version_support.py:246: FutureWarning: You are using a non-supported Python version (3.9.6). Google will not post any further updates to google.api_core supporting this Python version. Please upgrade to the latest Python version, or at least Python 3.10, and then update google.api_core.
+  warnings.warn(message, FutureWarning)
+./Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/api_core/_python_version_support.py:246: FutureWarning: You are using a non-supported Python version (3.9.6). Google will not post any further updates to google.api_core supporting this Python version. Please upgrade to the latest Python version, or at least Python 3.10, and then update google.api_core.
+  warnings.warn(message, FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/api_core/_python_version_support.py:246: FutureWarning: You are using a non-supported Python version (3.9.6). Google will not post any further updates to google.api_core supporting this Python version. Please upgrade to the latest Python version, or at least Python 3.10, and then update google.api_core.
+  warnings.warn(message, FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/api_core/_python_version_support.py:246: FutureWarning: You are using a non-supported Python version (3.9.6). Google will not post any further updates to google.api_core supporting this Python version. Please upgrade to the latest Python version, or at least Python 3.10, and then update google.api_core.
+  warnings.warn(message, FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/api_core/_python_version_support.py:246: FutureWarning: You are using a non-supported Python version (3.9.6). Google will not post any further updates to google.api_core supporting this Python version. Please upgrade to the latest Python version, or at least Python 3.10, and then update google.api_core.
+  warnings.warn(message, FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/api_core/_python_version_support.py:246: FutureWarning: You are using a non-supported Python version (3.9.6). Google will not post any further updates to google.api_core supporting this Python version. Please upgrade to the latest Python version, or at least Python 3.10, and then update google.api_core.
+  warnings.warn(message, FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/api_core/_python_version_support.py:246: FutureWarning: You are using a non-supported Python version (3.9.6). Google will not post any further updates to google.api_core supporting this Python version. Please upgrade to the latest Python version, or at least Python 3.10, and then update google.api_core.
+  warnings.warn(message, FutureWarning)
+/Users/zephryj/Library/Python/3.9/lib/python/site-packages/google/api_core/_python_version_support.py:246: FutureWarning: You are using a non-supported Python version (3.9.6). Google will not post any further updates to google.api_core supporting this Python version. Please upgrade to the latest Python version, or at least Python 3.10, and then update google.api_core.
+  warnings.warn(message, FutureWarning)
+........Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230221_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20230221_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20231109_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20231109_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230428_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20230428_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20231208_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20231208_aa8abb7.parquet
+.Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230815_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20230815_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20231025_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20231025_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20231211_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20231211_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230605_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20230605_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230413_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20230413_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230605_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20230605_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20240205_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20240205_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230323_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20230323_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20240109_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20240109_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20231220_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20231220_aa8abb7.parquet.meta.json
+.Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230428_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20230428_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230707_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20230707_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20231010_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20231010_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20231106_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20231106_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20240226_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20240226_aa8abb7.parquet.meta.json
+.Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230113_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20230113_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230809_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20230809_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230512_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20230512_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20231121_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20231121_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20240208_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20240208_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20240112_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20240112_aa8abb7.parquet
+.Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230131_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20230131_aa8abb7.parquet
+.Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230425_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20230425_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230116_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20230116_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230728_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20230728_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20231124_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20231124_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230203_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20230203_aa8abb7.parquet
+.Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20240220_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20240220_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230620_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20230620_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20240223_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20240223_aa8abb7.parquet.meta.json
+.Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20240205_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20240205_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230308_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20230308_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230227_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20230227_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230731_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20230731_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20231019_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20231019_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230215_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20230215_aa8abb7.parquet
+.Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230818_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20230818_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230731_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20230731_aa8abb7.parquet.meta.json
+.Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230320_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20230320_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20231016_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20231016_aa8abb7.parquet
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230509_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20230509_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230626_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20230626_aa8abb7.parquet.meta.json
+..Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20240307_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20240307_aa8abb7.parquet.meta.json
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230608_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20230608_aa8abb7.parquet.meta.json
+.....Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230224_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20230224_aa8abb7.parquet.meta.json
+...Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20231211_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20231211_aa8abb7.parquet.meta.json
+.......................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230529_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230529_aa8abb7.parquet
+................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230816_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230816_aa8abb7.parquet
+...................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230411_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230411_aa8abb7.parquet.meta.json
+............................................................................................................................................................................................................................................................................................................................................................................................................................................Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230419_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20230419_aa8abb7.parquet.meta.json
+.......Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230710_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20230710_aa8abb7.parquet.meta.json
+.Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230926_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20230926_aa8abb7.parquet.meta.json
+......................................................................................................[2026-02-17 09:22:58] uplink cycle begin
+[*] Using frame hash filter: aa8abb7
+=== Starting Sync for linux1 ===
+[*] Scanning zepher@192.168.3.113:/omega_pool/parquet_data/v52/frames/host=linux1/ for completed frames (hash: aa8abb7)...
+.    Found 306 candidate frames.
+.......    GCS has no existing parquet for this hash/host.
+[*] Processing batch of 104 files from linux1...
+    < Downloading: 20230103_aa8abb7.parquet
+.....    < Downloading: 20230105_aa8abb7.parquet
+....    < Downloading: 20230106_aa8abb7.parquet
+.ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=linux1/20230421_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230421_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=linux1/20230421_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230421_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=linux1/20230615_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230615_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=linux1/20230615_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230615_aa8abb7.parquet'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230816_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=linux1/20230615_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230615_aa8abb7.parquet'
+............................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................ERROR: Could not get size of resource file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230718_aa8abb7.parquet.meta.json.
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=linux1/20230628_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230628_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=linux1/20230529_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230529_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=linux1/20230529_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230529_aa8abb7.parquet'
+WARNING: Size cannot be determined for resource: file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230718_aa8abb7.parquet.meta.json. Error: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230718_aa8abb7.parquet.meta.json'
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230718_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230718_aa8abb7.parquet.meta.json
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=linux1/20230529_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230529_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=linux1/20230529_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230529_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=linux1/20230628_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230628_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=linux1/20230628_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230628_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=linux1/20230612_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230612_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=linux1/20230612_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230612_aa8abb7.parquet'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230411_aa8abb7.parquet.meta.json'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=linux1/20230612_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230612_aa8abb7.parquet'
+WARNING: Size cannot be determined for resource: file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230607_aa8abb7.parquet.meta.json. Error: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230607_aa8abb7.parquet.meta.json'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=linux1/20230426_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230426_aa8abb7.parquet'
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230607_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230607_aa8abb7.parquet.meta.json
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=linux1/20230426_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230426_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=linux1/20230130_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230130_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=linux1/20230130_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230130_aa8abb7.parquet'
+ERROR: Temporary components were not uploaded correctly. Please retry this upload.
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=linux1/20230130_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230130_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=linux1/20230703_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230703_aa8abb7.parquet'
+WARNING: Size cannot be determined for resource: file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230327_aa8abb7.parquet. Error: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230327_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=linux1/20230703_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230703_aa8abb7.parquet'
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230327_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230327_aa8abb7.parquet
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=linux1/20230703_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230703_aa8abb7.parquet'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230718_aa8abb7.parquet.meta.json'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=linux1/20230228_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230228_aa8abb7.parquet'
+WARNING: Size cannot be determined for resource: file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230328_aa8abb7.parquet. Error: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230328_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=linux1/20230228_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230228_aa8abb7.parquet'
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230328_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230328_aa8abb7.parquet
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=linux1/20230228_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230228_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=linux1/20230505_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230505_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=linux1/20230505_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230505_aa8abb7.parquet'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230607_aa8abb7.parquet.meta.json'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=linux1/20230505_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230505_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=linux1/20230414_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230414_aa8abb7.parquet'
+WARNING: Size cannot be determined for resource: file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230321_aa8abb7.parquet.meta.json. Error: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230321_aa8abb7.parquet.meta.json'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=linux1/20230414_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230414_aa8abb7.parquet'
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230321_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230321_aa8abb7.parquet.meta.json
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=linux1/20230414_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230414_aa8abb7.parquet'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230327_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=linux1/20230427_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230427_aa8abb7.parquet'
+WARNING: Size cannot be determined for resource: file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230315_aa8abb7.parquet. Error: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230315_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=linux1/20230427_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230427_aa8abb7.parquet'
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230315_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230315_aa8abb7.parquet
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=linux1/20230427_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230427_aa8abb7.parquet'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230613_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=linux1/20230321_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230321_aa8abb7.parquet'
+ERROR: Temporary components were not uploaded correctly. Please retry this upload.
+WARNING: Size cannot be determined for resource: file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230612_aa8abb7.parquet.meta.json. Error: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230612_aa8abb7.parquet.meta.json'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230328_aa8abb7.parquet'
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230612_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230612_aa8abb7.parquet.meta.json
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=linux1/20230321_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230321_aa8abb7.parquet'
+WARNING: Size cannot be determined for resource: file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230210_aa8abb7.parquet.meta.json. Error: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230210_aa8abb7.parquet.meta.json'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230403_aa8abb7.parquet'
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230210_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230210_aa8abb7.parquet.meta.json
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230214_aa8abb7.parquet'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230321_aa8abb7.parquet.meta.json'
+WARNING: Size cannot be determined for resource: file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230220_aa8abb7.parquet. Error: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230220_aa8abb7.parquet'
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230220_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230220_aa8abb7.parquet
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=linux1/20230313_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230313_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=linux1/20230822_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230822_aa8abb7.parquet'
+WARNING: Size cannot be determined for resource: file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230627_aa8abb7.parquet. Error: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230627_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=linux1/20230822_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230822_aa8abb7.parquet'
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230627_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230627_aa8abb7.parquet
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230315_aa8abb7.parquet'
+WARNING: Size cannot be determined for resource: file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230705_aa8abb7.parquet.meta.json. Error: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230705_aa8abb7.parquet.meta.json'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=linux1/20230822_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230822_aa8abb7.parquet'
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230705_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230705_aa8abb7.parquet.meta.json
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230612_aa8abb7.parquet.meta.json'
+WARNING: Size cannot be determined for resource: file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230712_aa8abb7.parquet. Error: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230712_aa8abb7.parquet'
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230712_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230712_aa8abb7.parquet
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=linux1/20230504_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230504_aa8abb7.parquet'
+WARNING: Size cannot be determined for resource: file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230526_aa8abb7.parquet. Error: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230526_aa8abb7.parquet'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230210_aa8abb7.parquet.meta.json'
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230526_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230526_aa8abb7.parquet
+WARNING: Size cannot be determined for resource: file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230331_aa8abb7.parquet. Error: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230331_aa8abb7.parquet'
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230331_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230331_aa8abb7.parquet
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=linux1/20230504_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230504_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=linux1/20230504_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230504_aa8abb7.parquet'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230220_aa8abb7.parquet'
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230105_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=linux1/20230105_aa8abb7.parquet
+WARNING: Size cannot be determined for resource: file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230307_aa8abb7.parquet.meta.json. Error: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230307_aa8abb7.parquet.meta.json'
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230307_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230307_aa8abb7.parquet.meta.json
+...    < Downloading: 20230109_aa8abb7.parquet
+.....    < Downloading: 20230111_aa8abb7.parquet
+....    < Downloading: 20230112_aa8abb7.parquet
+....    < Downloading: 20230117_aa8abb7.parquet
+....    < Downloading: 20230118_aa8abb7.parquet
+.....    < Downloading: 20230120_aa8abb7.parquet
+....    < Downloading: 20230130_aa8abb7.parquet
+....    < Downloading: 20230201_aa8abb7.parquet
+.....    < Downloading: 20230202_aa8abb7.parquet
+.....    < Downloading: 20230207_aa8abb7.parquet
+.....    < Downloading: 20230208_aa8abb7.parquet
+...ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230608_aa8abb7.parquet.meta.json'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230224_aa8abb7.parquet.meta.json'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230320_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230320_aa8abb7.parquet'
+ERROR: Could not get size of resource file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230908_aa8abb7.parquet.meta.json.
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230320_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230320_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20231016_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20231016_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20231016_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20231016_aa8abb7.parquet'
+WARNING: Size cannot be determined for resource: file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230908_aa8abb7.parquet.meta.json. Error: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230908_aa8abb7.parquet.meta.json'
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230908_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20230908_aa8abb7.parquet.meta.json
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20231211_aa8abb7.parquet.meta.json'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230419_aa8abb7.parquet.meta.json'
+WARNING: Size cannot be determined for resource: file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230104_aa8abb7.parquet.meta.json. Error: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230104_aa8abb7.parquet.meta.json'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230710_aa8abb7.parquet.meta.json'
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230104_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20230104_aa8abb7.parquet.meta.json
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20231016_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20231016_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20231016_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20231016_aa8abb7.parquet'
+WARNING: Size cannot be determined for resource: file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230530_aa8abb7.parquet. Error: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230530_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230320_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230320_aa8abb7.parquet'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230926_aa8abb7.parquet.meta.json'
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230530_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20230530_aa8abb7.parquet
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230320_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230320_aa8abb7.parquet'
+WARNING: Size cannot be determined for resource: file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230704_aa8abb7.parquet. Error: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230704_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20231019_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20231019_aa8abb7.parquet'
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230704_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20230704_aa8abb7.parquet
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20231019_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20231019_aa8abb7.parquet'
+WARNING: Size cannot be determined for resource: file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20240130_aa8abb7.parquet.meta.json. Error: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20240130_aa8abb7.parquet.meta.json'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230908_aa8abb7.parquet.meta.json'
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20240130_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20240130_aa8abb7.parquet.meta.json
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20231019_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20231019_aa8abb7.parquet'
+WARNING: Size cannot be determined for resource: file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230113_aa8abb7.parquet. Error: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230113_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230215_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230215_aa8abb7.parquet'
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230113_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20230113_aa8abb7.parquet
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230104_aa8abb7.parquet.meta.json'
+ERROR: Temporary components were not uploaded correctly. Please retry this upload.
+WARNING: Size cannot be determined for resource: file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20240130_aa8abb7.parquet. Error: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20240130_aa8abb7.parquet'
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20240130_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20240130_aa8abb7.parquet
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230215_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230215_aa8abb7.parquet'
+WARNING: Size cannot be determined for resource: file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20240304_aa8abb7.parquet. Error: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20240304_aa8abb7.parquet'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230530_aa8abb7.parquet'
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20240304_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20240304_aa8abb7.parquet
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230215_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230215_aa8abb7.parquet'
+WARNING: Size cannot be determined for resource: file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230629_aa8abb7.parquet.meta.json. Error: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230629_aa8abb7.parquet.meta.json'
+ERROR: Temporary components were not uploaded correctly. Please retry this upload.
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230704_aa8abb7.parquet'
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230629_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20230629_aa8abb7.parquet.meta.json
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230731_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230731_aa8abb7.parquet'
+WARNING: Size cannot be determined for resource: file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20231124_aa8abb7.parquet. Error: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20231124_aa8abb7.parquet'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20240130_aa8abb7.parquet.meta.json'
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20231124_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20231124_aa8abb7.parquet
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230731_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230731_aa8abb7.parquet'
+WARNING: Size cannot be determined for resource: file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230824_aa8abb7.parquet.meta.json. Error: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230824_aa8abb7.parquet.meta.json'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230113_aa8abb7.parquet'
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230824_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20230824_aa8abb7.parquet.meta.json
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230731_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230731_aa8abb7.parquet'
+WARNING: Size cannot be determined for resource: file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230404_aa8abb7.parquet.meta.json. Error: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230404_aa8abb7.parquet.meta.json'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20240130_aa8abb7.parquet'
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230404_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20230404_aa8abb7.parquet.meta.json
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230227_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230227_aa8abb7.parquet'
+WARNING: Size cannot be determined for resource: file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230824_aa8abb7.parquet. Error: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230824_aa8abb7.parquet'
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230824_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20230824_aa8abb7.parquet
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20240304_aa8abb7.parquet'
+WARNING: Size cannot be determined for resource: file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230119_aa8abb7.parquet.meta.json. Error: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230119_aa8abb7.parquet.meta.json'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230227_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230227_aa8abb7.parquet'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230629_aa8abb7.parquet.meta.json'
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230119_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20230119_aa8abb7.parquet.meta.json
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230227_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230227_aa8abb7.parquet'
+WARNING: Size cannot be determined for resource: file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20240202_aa8abb7.parquet.meta.json. Error: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20240202_aa8abb7.parquet.meta.json'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20231124_aa8abb7.parquet'
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20240202_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20240202_aa8abb7.parquet.meta.json
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230620_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230620_aa8abb7.parquet'
+WARNING: Size cannot be determined for resource: file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230911_aa8abb7.parquet. Error: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230911_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230620_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230620_aa8abb7.parquet'
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230911_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20230911_aa8abb7.parquet
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230824_aa8abb7.parquet.meta.json'
+WARNING: Size cannot be determined for resource: file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230908_aa8abb7.parquet. Error: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230908_aa8abb7.parquet'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230404_aa8abb7.parquet.meta.json'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230824_aa8abb7.parquet'
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230908_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20230908_aa8abb7.parquet
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230620_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230620_aa8abb7.parquet'
+WARNING: Size cannot be determined for resource: file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230413_aa8abb7.parquet. Error: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230413_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20240220_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20240220_aa8abb7.parquet'
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230413_aa8abb7.parquet to gs://omega_v52/omega/v52/frames/host=windows1/20230413_aa8abb7.parquet
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230119_aa8abb7.parquet.meta.json'
+WARNING: Size cannot be determined for resource: file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230329_aa8abb7.parquet.meta.json. Error: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230329_aa8abb7.parquet.meta.json'
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20230329_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20230329_aa8abb7.parquet.meta.json
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20240220_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20240220_aa8abb7.parquet'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20240202_aa8abb7.parquet.meta.json'
+WARNING: Size cannot be determined for resource: file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20240103_aa8abb7.parquet.meta.json. Error: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20240103_aa8abb7.parquet.meta.json'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20240220_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20240220_aa8abb7.parquet'
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=windows1/20240103_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=windows1/20240103_aa8abb7.parquet.meta.json
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230203_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230203_aa8abb7.parquet'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230911_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230203_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230203_aa8abb7.parquet'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230908_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230203_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230203_aa8abb7.parquet'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230413_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230728_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230728_aa8abb7.parquet'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230329_aa8abb7.parquet.meta.json'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230728_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230728_aa8abb7.parquet'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20240103_aa8abb7.parquet.meta.json'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230728_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230728_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230131_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230131_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230131_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230131_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230131_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230131_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20240112_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20240112_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20240112_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20240112_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20240112_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20240112_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20231106_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20231106_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20231106_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20231106_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20231106_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20231106_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20240205_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20240205_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20240205_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20240205_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20240205_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20240205_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20231025_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20231025_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20231025_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20231025_aa8abb7.parquet'
+ERROR: Temporary components were not uploaded correctly. Please retry this upload.
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20231025_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20231025_aa8abb7.parquet'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230428_aa8abb7.parquet.meta.json'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20231208_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20231208_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20231208_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20231208_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230428_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230428_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230428_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230428_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230428_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230428_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20231109_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20231109_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20231109_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20231109_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20231109_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20231109_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20240226_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20240226_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20240226_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20240226_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20240226_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20240226_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20240226_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20240226_aa8abb7.parquet'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230605_aa8abb7.parquet'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230413_aa8abb7.parquet.meta.json'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230605_aa8abb7.parquet.meta.json'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20231211_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230425_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230425_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230425_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230425_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230323_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230323_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230323_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230323_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230323_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230323_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20231205_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20231205_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20231205_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20231205_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20231205_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20231205_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230302_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230302_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230302_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230302_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230302_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230302_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230629_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230629_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230608_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230608_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230515_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230515_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230608_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230608_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230608_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230608_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230614_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230614_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20240229_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20240229_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20240229_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20240229_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20240229_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20240229_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20240229_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20240229_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20240229_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20240229_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230404_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230404_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230404_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230404_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230404_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230404_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230404_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230404_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230221_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230221_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20240202_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20240202_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20240202_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20240202_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20240202_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20240202_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20240202_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20240202_aa8abb7.parquet'
+ERROR: Temporary components were not uploaded correctly. Please retry this upload.
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20240202_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20240202_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20240109_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20240109_aa8abb7.parquet'
+ERROR: Temporary components were not uploaded correctly. Please retry this upload.
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20240109_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20240109_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20240109_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20240109_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20240319_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20240319_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20240319_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20240319_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20240319_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20240319_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20240319_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20240319_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20231010_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20231010_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20231010_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20231010_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20231010_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20231010_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20240313_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20240313_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20240313_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20240313_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20240313_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20240313_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230410_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230410_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230410_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230410_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230410_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230410_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230410_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230410_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230419_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230419_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230419_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230419_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230419_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230419_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230419_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230419_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230104_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230104_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230104_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230104_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230104_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230104_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230314_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230314_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230314_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230314_aa8abb7.parquet'
+ERROR: Temporary components were not uploaded correctly. Please retry this upload.
+ERROR: Temporary components were not uploaded correctly. Please retry this upload.
+ERROR: Temporary components were not uploaded correctly. Please retry this upload.
+ERROR: Temporary components were not uploaded correctly. Please retry this upload.
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230314_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230314_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230314_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230314_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230914_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230914_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230914_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230914_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230914_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230914_aa8abb7.parquet'
+ERROR: Temporary components were not uploaded correctly. Please retry this upload.
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230329_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230329_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230329_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230329_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230329_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230329_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230329_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230329_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230626_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230626_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230626_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230626_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230626_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230626_aa8abb7.parquet'
+ERROR: Unable to read file [/Users/zephryj/Omega_uplink_buffer/host=windows1/20230626_aa8abb7.parquet]: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230626_aa8abb7.parquet'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20231229_aa8abb7.parquet'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20231214_aa8abb7.parquet'
+ERROR: Temporary components were not uploaded correctly. Please retry this upload.
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20231115_aa8abb7.parquet'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230713_aa8abb7.parquet.meta.json'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20240118_aa8abb7.parquet'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230206_aa8abb7.parquet.meta.json'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230803_aa8abb7.parquet'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230518_aa8abb7.parquet'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230809_aa8abb7.parquet.meta.json'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20231103_aa8abb7.parquet'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230518_aa8abb7.parquet.meta.json'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230407_aa8abb7.parquet.meta.json'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20231019_aa8abb7.parquet.meta.json'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20231106_aa8abb7.parquet.meta.json'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20231229_aa8abb7.parquet.meta.json'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230110_aa8abb7.parquet'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20240307_aa8abb7.parquet'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20231226_aa8abb7.parquet'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230815_aa8abb7.parquet'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230728_aa8abb7.parquet.meta.json'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230707_aa8abb7.parquet'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20231127_aa8abb7.parquet'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230920_aa8abb7.parquet'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230515_aa8abb7.parquet.meta.json'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20240313_aa8abb7.parquet.meta.json'
+ERROR: Temporary components were not uploaded correctly. Please retry this upload.
+ERROR: Temporary components were not uploaded correctly. Please retry this upload.
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230317_aa8abb7.parquet'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20240124_aa8abb7.parquet'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230131_aa8abb7.parquet.meta.json'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230614_aa8abb7.parquet.meta.json'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230524_aa8abb7.parquet'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230710_aa8abb7.parquet'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20231103_aa8abb7.parquet.meta.json'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20231130_aa8abb7.parquet'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230725_aa8abb7.parquet.meta.json'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230206_aa8abb7.parquet'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230905_aa8abb7.parquet'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230830_aa8abb7.parquet'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230209_aa8abb7.parquet'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20240118_aa8abb7.parquet.meta.json'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230407_aa8abb7.parquet'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230920_aa8abb7.parquet.meta.json'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20231130_aa8abb7.parquet.meta.json'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20231013_aa8abb7.parquet'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230314_aa8abb7.parquet.meta.json'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230620_aa8abb7.parquet.meta.json'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230116_aa8abb7.parquet'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20231220_aa8abb7.parquet'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20240301_aa8abb7.parquet'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20240301_aa8abb7.parquet.meta.json'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230926_aa8abb7.parquet'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230830_aa8abb7.parquet.meta.json'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20231121_aa8abb7.parquet'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230725_aa8abb7.parquet'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230410_aa8abb7.parquet.meta.json'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230719_aa8abb7.parquet.meta.json'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230914_aa8abb7.parquet.meta.json'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20240124_aa8abb7.parquet.meta.json'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230119_aa8abb7.parquet'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230320_aa8abb7.parquet.meta.json'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230110_aa8abb7.parquet.meta.json'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230704_aa8abb7.parquet.meta.json'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=windows1/20230821_aa8abb7.parquet'
+.    < Downloading: 20230210_aa8abb7.parquet
+.....    < Downloading: 20230213_aa8abb7.parquet
+.....    < Downloading: 20230214_aa8abb7.parquet
+....    < Downloading: 20230216_aa8abb7.parquet
+.....    < Downloading: 20230217_aa8abb7.parquet
+.....    < Downloading: 20230220_aa8abb7.parquet
+.....    < Downloading: 20230222_aa8abb7.parquet
+....    < Downloading: 20230223_aa8abb7.parquet
+....    < Downloading: 20230228_aa8abb7.parquet
+.....    < Downloading: 20230301_aa8abb7.parquet
+.ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230627_aa8abb7.parquet'
+...............................................................................................WARNING: Size cannot be determined for resource: file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230802_aa8abb7.parquet.meta.json. Error: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230802_aa8abb7.parquet.meta.json'
+Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230802_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230802_aa8abb7.parquet.meta.json
+...    < Downloading: 20230303_aa8abb7.parquet
+.....    < Downloading: 20230306_aa8abb7.parquet
+....    < Downloading: 20230307_aa8abb7.parquet
+.....    < Downloading: 20230309_aa8abb7.parquet
+....    < Downloading: 20230310_aa8abb7.parquet
+.ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230705_aa8abb7.parquet.meta.json'
+ERROR: [Errno 2] No such file or directory: '/Users/zephryj/Omega_uplink_buffer/host=linux1/20230712_aa8abb7.parquet'
+......................Copying file:///Users/zephryj/Omega_uplink_buffer/host=linux1/20230111_aa8abb7.parquet.meta.json to gs://omega_v52/omega/v52/frames/host=linux1/20230111_aa8abb7.parquet.meta.json
+....    < Downloading: 20230313_aa8abb7.parquet
+.[2026-02-17 09:23:28] uplink cycle begin
+[*] Using frame hash filter: aa8abb7
+=== Starting Sync for linux1 ===
+[*] Scanning zepher@192.168.3.113:/omega_pool/parquet_data/v52/frames/host=linux1/ for completed frames (hash: aa8abb7)...
+    Found 306 candidate frames.
+    GCS has no existing parquet for this hash/host.
+[*] Processing batch of 104 files from linux1...
+    < Downloading: 20230103_aa8abb7.parquet
+    < Downloading: 20230105_aa8abb7.parquet
+    < Downloading: 20230106_aa8abb7.parquet
+    < Downloading: 20230109_aa8abb7.parquet
+    < Downloading: 20230111_aa8abb7.parquet
+    < Downloading: 20230112_aa8abb7.parquet
+    < Downloading: 20230117_aa8abb7.parquet
+    < Downloading: 20230118_aa8abb7.parquet
+    < Downloading: 20230120_aa8abb7.parquet
+    < Downloading: 20230130_aa8abb7.parquet
+    < Downloading: 20230201_aa8abb7.parquet
+    < Downloading: 20230202_aa8abb7.parquet
+    < Downloading: 20230207_aa8abb7.parquet
+    < Downloading: 20230208_aa8abb7.parquet
+    < Downloading: 20230210_aa8abb7.parquet
+    < Downloading: 20230213_aa8abb7.parquet
+    < Downloading: 20230214_aa8abb7.parquet
+    < Downloading: 20230216_aa8abb7.parquet
+    < Downloading: 20230217_aa8abb7.parquet
+    < Downloading: 20230220_aa8abb7.parquet
+    < Downloading: 20230222_aa8abb7.parquet
+    [!] Download failed (1/3): 20230222_aa8abb7.parquet (rc=255)
+        scp: Connection closed
+    < Downloading: 20230223_aa8abb7.parquet
+    < Downloading: 20230228_aa8abb7.parquet
+    < Downloading: 20230301_aa8abb7.parquet
+    < Downloading: 20230303_aa8abb7.parquet
+    < Downloading: 20230306_aa8abb7.parquet
+    < Downloading: 20230307_aa8abb7.parquet
+    < Downloading: 20230309_aa8abb7.parquet
+    < Downloading: 20230310_aa8abb7.parquet
+    < Downloading: 20230313_aa8abb7.parquet
+    < Downloading: 20230315_aa8abb7.parquet
+    < Downloading: 20230316_aa8abb7.parquet
+    < Downloading: 20230321_aa8abb7.parquet
+    < Downloading: 20230322_aa8abb7.parquet
+    < Downloading: 20230324_aa8abb7.parquet
+    < Downloading: 20230327_aa8abb7.parquet
+    < Downloading: 20230328_aa8abb7.parquet
+    < Downloading: 20230330_aa8abb7.parquet
+    < Downloading: 20230331_aa8abb7.parquet
+    < Downloading: 20230403_aa8abb7.parquet
+    < Downloading: 20230406_aa8abb7.parquet
+    < Downloading: 20230411_aa8abb7.parquet
+    < Downloading: 20230412_aa8abb7.parquet
+    < Downloading: 20230414_aa8abb7.parquet
+    < Downloading: 20230417_aa8abb7.parquet
+    < Downloading: 20230418_aa8abb7.parquet
+    < Downloading: 20230420_aa8abb7.parquet
+    < Downloading: 20230421_aa8abb7.parquet
+    < Downloading: 20230424_aa8abb7.parquet
+    < Downloading: 20230426_aa8abb7.parquet
+    < Downloading: 20230427_aa8abb7.parquet
+    < Downloading: 20230504_aa8abb7.parquet
+    < Downloading: 20230505_aa8abb7.parquet
+    < Downloading: 20230508_aa8abb7.parquet
+    < Downloading: 20230510_aa8abb7.parquet
+    < Downloading: 20230511_aa8abb7.parquet
+    < Downloading: 20230516_aa8abb7.parquet
+    < Downloading: 20230517_aa8abb7.parquet
+    < Downloading: 20230519_aa8abb7.parquet
+    < Downloading: 20230522_aa8abb7.parquet
+    < Downloading: 20230523_aa8abb7.parquet
+    < Downloading: 20230525_aa8abb7.parquet
+    < Downloading: 20230526_aa8abb7.parquet
+    < Downloading: 20230529_aa8abb7.parquet
+    < Downloading: 20230531_aa8abb7.parquet
+    < Downloading: 20230601_aa8abb7.parquet
+    < Downloading: 20230606_aa8abb7.parquet
+    < Downloading: 20230607_aa8abb7.parquet
+    < Downloading: 20230609_aa8abb7.parquet
+    < Downloading: 20230612_aa8abb7.parquet
+    < Downloading: 20230613_aa8abb7.parquet
+    < Downloading: 20230615_aa8abb7.parquet
+    < Downloading: 20230616_aa8abb7.parquet
+    < Downloading: 20230619_aa8abb7.parquet
+    < Downloading: 20230621_aa8abb7.parquet
+    < Downloading: 20230627_aa8abb7.parquet
+    < Downloading: 20230628_aa8abb7.parquet
+    < Downloading: 20230630_aa8abb7.parquet
+    < Downloading: 20230703_aa8abb7.parquet
+    < Downloading: 20230705_aa8abb7.parquet
+    < Downloading: 20230706_aa8abb7.parquet
+    < Downloading: 20230711_aa8abb7.parquet
+    < Downloading: 20230712_aa8abb7.parquet
+    < Downloading: 20230714_aa8abb7.parquet
+    < Downloading: 20230717_aa8abb7.parquet
+    < Downloading: 20230718_aa8abb7.parquet
+    < Downloading: 20230720_aa8abb7.parquet
+    < Downloading: 20230721_aa8abb7.parquet
+    < Downloading: 20230724_aa8abb7.parquet
+    < Downloading: 20230726_aa8abb7.parquet
+    < Downloading: 20230727_aa8abb7.parquet
+    < Downloading: 20230801_aa8abb7.parquet
+    < Downloading: 20230802_aa8abb7.parquet

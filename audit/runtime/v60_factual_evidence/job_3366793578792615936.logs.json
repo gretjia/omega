@@ -1,0 +1,2069 @@
+[
+  {
+    "insertId": "k07cfbd936v",
+    "labels": {
+      "ml.googleapis.com/endpoint": "",
+      "ml.googleapis.com/job_state": "QUEUED"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/ml.googleapis.com%2F3366793578792615936",
+    "receiveTimestamp": "2026-02-19T17:40:17.028464070Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "gen-lang-client-0250995579",
+        "task_name": "service"
+      },
+      "type": "ml_job"
+    },
+    "severity": "INFO",
+    "textPayload": "Waiting for job to be provisioned.",
+    "timestamp": "2026-02-19T17:40:16.049540421Z"
+  },
+  {
+    "insertId": "k07cfbd936w",
+    "labels": {
+      "ml.googleapis.com/endpoint": ""
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/ml.googleapis.com%2F3366793578792615936",
+    "receiveTimestamp": "2026-02-19T17:40:17.028464070Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "gen-lang-client-0250995579",
+        "task_name": "service"
+      },
+      "type": "ml_job"
+    },
+    "severity": "INFO",
+    "textPayload": "Vertex AI is provisioning job running framework. First time usage might take couple of minutes, and subsequent runs can be much faster.",
+    "timestamp": "2026-02-19T17:40:16.058847571Z"
+  },
+  {
+    "insertId": "k07cfbd936x",
+    "labels": {
+      "ml.googleapis.com/endpoint": ""
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/ml.googleapis.com%2F3366793578792615936",
+    "receiveTimestamp": "2026-02-19T17:40:17.028464070Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "gen-lang-client-0250995579",
+        "task_name": "service"
+      },
+      "type": "ml_job"
+    },
+    "severity": "INFO",
+    "textPayload": "Vertex AI is setting up this job.",
+    "timestamp": "2026-02-19T17:40:16.072683427Z"
+  },
+  {
+    "insertId": "k07cfbd936y",
+    "labels": {
+      "ml.googleapis.com/endpoint": ""
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/ml.googleapis.com%2F3366793578792615936",
+    "receiveTimestamp": "2026-02-19T17:40:17.028464070Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "gen-lang-client-0250995579",
+        "task_name": "service"
+      },
+      "type": "ml_job"
+    },
+    "severity": "INFO",
+    "textPayload": "Waiting for training program to start.",
+    "timestamp": "2026-02-19T17:40:16.072750083Z"
+  },
+  {
+    "insertId": "k07cfbd9371",
+    "labels": {
+      "ml.googleapis.com/endpoint": "",
+      "ml.googleapis.com/job_state": "PREPARING"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/ml.googleapis.com%2F3366793578792615936",
+    "receiveTimestamp": "2026-02-19T17:40:18.025526001Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "gen-lang-client-0250995579",
+        "task_name": "service"
+      },
+      "type": "ml_job"
+    },
+    "severity": "INFO",
+    "textPayload": "Job is preparing.",
+    "timestamp": "2026-02-19T17:40:16.655289623Z"
+  },
+  {
+    "insertId": "1ne14lpfa307kf",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:42:33.248257074Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.",
+    "timestamp": "2026-02-19T17:42:31.931852708Z"
+  },
+  {
+    "insertId": "1ne14lpfa307kg",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:42:33.248257074Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "google-cloud-datastore 1.15.5 requires protobuf<4.0.0dev, but you have protobuf 4.25.8 which is incompatible.",
+    "timestamp": "2026-02-19T17:42:31.931862219Z"
+  },
+  {
+    "insertId": "1ne14lpfa307kh",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:42:33.248257074Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.",
+    "timestamp": "2026-02-19T17:42:31.931863707Z"
+  },
+  {
+    "insertId": "1ne14lpfa307ki",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:42:33.248257074Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "+ python3 -",
+    "timestamp": "2026-02-19T17:42:32.132416049Z"
+  },
+  {
+    "insertId": "1ne14lpfa307kj",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:42:33.248257074Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "/opt/conda/lib/python3.10/site-packages/google/api_core/_python_version_support.py:275: FutureWarning: You are using a Python version (3.10.18) which Google will stop supporting in new releases of google.api_core once it reaches its end of life (2026-10-04). Please upgrade to the latest Python version, or at least Python 3.11, to continue receiving updates for google.api_core past that date.",
+    "timestamp": "2026-02-19T17:42:33.132498311Z"
+  },
+  {
+    "insertId": "1ne14lpfa307kk",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:42:33.248257074Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "warnings.warn(message, FutureWarning)",
+    "timestamp": "2026-02-19T17:42:33.132506392Z"
+  },
+  {
+    "insertId": "1qr7ficfaqull0",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:42:38.253345034Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "+ python3 -u payload.py --code-bundle-uri=gs://omega_v52_central/omega/staging/code/omega_core_20260219-174002_n2highmem80.zip '--data-pattern=gs://omega_v52_central/omega/omega/v52/frames/host=*/*_aa8abb7.parquet' --test-years=2025,2026 --test-ym=2025,202601 --max-files=0 --max-rows-per-file=0 --model-uri=gs://omega_v52_central/omega/staging/models/v6/20260219-125410_78e36d9/omega_v6_xgb_final.pkl --output-uri=gs://omega_v52_central/omega/staging/backtest/v6/20260219-125410_78e36d9/backtest_metrics_global_causal_rewrite_n2highmem80_schemafix_full_20260219-174002.json --peace-threshold=0.5253567667772991 --srl-resid-sigma-mult=1.9773888188507172 --topo-energy-sigma-mult=5.427559578121958",
+    "timestamp": "2026-02-19T17:42:33.732423179Z"
+  },
+  {
+    "insertId": "k07cfbd93g0",
+    "labels": {
+      "ml.googleapis.com/endpoint": "",
+      "ml.googleapis.com/job_state": "RUNNING"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/ml.googleapis.com%2F3366793578792615936",
+    "receiveTimestamp": "2026-02-19T17:42:35.179533520Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "gen-lang-client-0250995579",
+        "task_name": "service"
+      },
+      "type": "ml_job"
+    },
+    "severity": "INFO",
+    "textPayload": "Job is running.",
+    "timestamp": "2026-02-19T17:42:34.176304146Z"
+  },
+  {
+    "insertId": "1qr7ficfaqull1",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:42:38.253345034Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.",
+    "timestamp": "2026-02-19T17:42:37.732047385Z"
+  },
+  {
+    "insertId": "1qr7ficfaqull2",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:42:38.253345034Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Error in sitecustomize; set PYTHONVERBOSE for traceback:",
+    "timestamp": "2026-02-19T17:42:37.931713458Z"
+  },
+  {
+    "insertId": "1qr7ficfaqull3",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:42:38.253345034Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "ModuleNotFoundError: No module named 'pythonjsonlogger'",
+    "timestamp": "2026-02-19T17:42:37.931720679Z"
+  },
+  {
+    "insertId": "3c8eebf8ae7yv",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:42:42.647818887Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Error in sitecustomize; set PYTHONVERBOSE for traceback:",
+    "timestamp": "2026-02-19T17:42:38.531736973Z"
+  },
+  {
+    "insertId": "3c8eebf8ae7yw",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:42:42.647818887Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "ModuleNotFoundError: No module named 'pythonjsonlogger'",
+    "timestamp": "2026-02-19T17:42:38.531743389Z"
+  },
+  {
+    "insertId": "3c8eebf8ae7yx",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:42:42.647818887Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 17:42:42,469 [INFO] Target locked: 263 frames of data.",
+    "timestamp": "2026-02-19T17:42:42.531893092Z"
+  },
+  {
+    "insertId": "3c8eebf8ae7yy",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:42:42.647818887Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Error in sitecustomize; set PYTHONVERBOSE for traceback:",
+    "timestamp": "2026-02-19T17:42:42.531899256Z"
+  },
+  {
+    "insertId": "3c8eebf8ae7yz",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:42:42.647818887Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "ModuleNotFoundError: No module named 'pythonjsonlogger'",
+    "timestamp": "2026-02-19T17:42:42.531901446Z"
+  },
+  {
+    "insertId": "1x4rcj2fb6ynrg",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:42:44.847999573Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Error in sitecustomize; set PYTHONVERBOSE for traceback:",
+    "timestamp": "2026-02-19T17:42:43.132063854Z"
+  },
+  {
+    "insertId": "1x4rcj2fb6ynrh",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:42:44.847999573Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "ModuleNotFoundError: No module named 'pythonjsonlogger'",
+    "timestamp": "2026-02-19T17:42:43.132069716Z"
+  },
+  {
+    "insertId": "1x4rcj2fb6ynri",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:42:44.847999573Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 17:42:44,075 [INFO] Running schema preflight on: gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250103_aa8abb7.parquet",
+    "timestamp": "2026-02-19T17:42:44.131802582Z"
+  },
+  {
+    "insertId": "1x4rcj2fb6ynrj",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:42:44.847999573Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 17:42:44,591 [INFO] Schema preflight passed: time_key=time_end dedup_keys=['symbol', 'time_end'] sort_keys=['symbol', 'date', 'time_end']",
+    "timestamp": "2026-02-19T17:42:44.732561527Z"
+  },
+  {
+    "insertId": "1x4rcj2fb6ynrk",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:42:44.847999573Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "/opt/conda/lib/python3.10/site-packages/google/api_core/_python_version_support.py:275: FutureWarning: You are using a Python version (3.10.18) which Google will stop supporting in new releases of google.api_core once it reaches its end of life (2026-10-04). Please upgrade to the latest Python version, or at least Python 3.11, to continue receiving updates for google.api_core past that date.",
+    "timestamp": "2026-02-19T17:42:44.732568176Z"
+  },
+  {
+    "insertId": "1x4rcj2fb6ynrl",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:42:44.847999573Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "warnings.warn(message, FutureWarning)",
+    "timestamp": "2026-02-19T17:42:44.732570462Z"
+  },
+  {
+    "insertId": "fl85iaf107xdu",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:42:49.848060831Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 17:42:44,848 [INFO] Rapid downloading 263 files to local NVMe...",
+    "timestamp": "2026-02-19T17:42:44.932168628Z"
+  },
+  {
+    "insertId": "whs3fzfb2kr2o",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:53:44.961107547Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 17:53:44,232 [WARNING] Connection pool is full, discarding connection: storage.googleapis.com. Connection pool size: 10",
+    "timestamp": "2026-02-19T17:53:44.332110477Z"
+  },
+  {
+    "insertId": "qxgpeyfazez54",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:53:49.924176116Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 17:53:46,837 [WARNING] Connection pool is full, discarding connection: storage.googleapis.com. Connection pool size: 10",
+    "timestamp": "2026-02-19T17:53:46.931705338Z"
+  },
+  {
+    "insertId": "qxgpeyfazez55",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:53:49.924176116Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 17:53:48,513 [WARNING] Connection pool is full, discarding connection: storage.googleapis.com. Connection pool size: 10",
+    "timestamp": "2026-02-19T17:53:48.532337396Z"
+  },
+  {
+    "insertId": "qxgpeyfazez56",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:53:49.924176116Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 17:53:48,713 [WARNING] Connection pool is full, discarding connection: storage.googleapis.com. Connection pool size: 10",
+    "timestamp": "2026-02-19T17:53:48.731878506Z"
+  },
+  {
+    "insertId": "bp7wkjfaspbee",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:53:54.932146592Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 17:53:51,747 [WARNING] Connection pool is full, discarding connection: storage.googleapis.com. Connection pool size: 10",
+    "timestamp": "2026-02-19T17:53:51.931703325Z"
+  },
+  {
+    "insertId": "bp7wkjfaspbef",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:53:54.932146592Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 17:53:53,410 [WARNING] Connection pool is full, discarding connection: storage.googleapis.com. Connection pool size: 10",
+    "timestamp": "2026-02-19T17:53:53.532555126Z"
+  },
+  {
+    "insertId": "d3lnudf5qin6l",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:53:59.925795018Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 17:53:55,641 [WARNING] Connection pool is full, discarding connection: storage.googleapis.com. Connection pool size: 10",
+    "timestamp": "2026-02-19T17:53:55.731863390Z"
+  },
+  {
+    "insertId": "ptawzef21igem",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:54:04.051786107Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 17:54:01,481 [WARNING] Connection pool is full, discarding connection: storage.googleapis.com. Connection pool size: 10",
+    "timestamp": "2026-02-19T17:54:01.531953045Z"
+  },
+  {
+    "insertId": "ptawzef21igen",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:54:04.051786107Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 17:54:02,009 [WARNING] Connection pool is full, discarding connection: storage.googleapis.com. Connection pool size: 10",
+    "timestamp": "2026-02-19T17:54:02.132547122Z"
+  },
+  {
+    "insertId": "ptawzef21igeo",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:54:04.051786107Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 17:54:02,333 [WARNING] Connection pool is full, discarding connection: storage.googleapis.com. Connection pool size: 10",
+    "timestamp": "2026-02-19T17:54:02.531826246Z"
+  },
+  {
+    "insertId": "ptawzef21igep",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:54:04.051786107Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 17:54:03,791 [WARNING] Connection pool is full, discarding connection: storage.googleapis.com. Connection pool size: 10",
+    "timestamp": "2026-02-19T17:54:03.932166107Z"
+  },
+  {
+    "insertId": "ptawzef21igeq",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:54:04.051786107Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 17:54:03,903 [WARNING] Connection pool is full, discarding connection: storage.googleapis.com. Connection pool size: 10",
+    "timestamp": "2026-02-19T17:54:03.932175139Z"
+  },
+  {
+    "insertId": "ptawzef21iger",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:54:04.051786107Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 17:54:03,908 [WARNING] Connection pool is full, discarding connection: storage.googleapis.com. Connection pool size: 10",
+    "timestamp": "2026-02-19T17:54:03.932176822Z"
+  },
+  {
+    "insertId": "8cv9nvfaxz8dr",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:54:09.048172107Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 17:54:06,613 [WARNING] Connection pool is full, discarding connection: storage.googleapis.com. Connection pool size: 10",
+    "timestamp": "2026-02-19T17:54:06.732111354Z"
+  },
+  {
+    "insertId": "8cv9nvfaxz8ds",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:54:09.048172107Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 17:54:06,961 [WARNING] Connection pool is full, discarding connection: storage.googleapis.com. Connection pool size: 10",
+    "timestamp": "2026-02-19T17:54:07.132276685Z"
+  },
+  {
+    "insertId": "1fnmnahfbp3sgu",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:54:14.049020971Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 17:54:12,107 [WARNING] Connection pool is full, discarding connection: storage.googleapis.com. Connection pool size: 10",
+    "timestamp": "2026-02-19T17:54:12.131778087Z"
+  },
+  {
+    "insertId": "1fnmnahfbp3sgv",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:54:14.049020971Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 17:54:13,874 [WARNING] Connection pool is full, discarding connection: storage.googleapis.com. Connection pool size: 10",
+    "timestamp": "2026-02-19T17:54:13.931871140Z"
+  },
+  {
+    "insertId": "1h0vwx6fbq5vlr",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:54:19.049208847Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 17:54:16,435 [WARNING] Connection pool is full, discarding connection: storage.googleapis.com. Connection pool size: 10",
+    "timestamp": "2026-02-19T17:54:16.531741217Z"
+  },
+  {
+    "insertId": "345b1of9s179v",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:54:24.401801238Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 17:54:20,131 [WARNING] Connection pool is full, discarding connection: storage.googleapis.com. Connection pool size: 10",
+    "timestamp": "2026-02-19T17:54:20.132428950Z"
+  },
+  {
+    "insertId": "345b1of9s179w",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:54:24.401801238Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 17:54:20,445 [WARNING] Connection pool is full, discarding connection: storage.googleapis.com. Connection pool size: 10",
+    "timestamp": "2026-02-19T17:54:20.531829315Z"
+  },
+  {
+    "insertId": "345b1of9s179x",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:54:24.401801238Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 17:54:20,523 [WARNING] Connection pool is full, discarding connection: storage.googleapis.com. Connection pool size: 10",
+    "timestamp": "2026-02-19T17:54:20.531839008Z"
+  },
+  {
+    "insertId": "345b1of9s179y",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:54:24.401801238Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 17:54:21,988 [WARNING] Connection pool is full, discarding connection: storage.googleapis.com. Connection pool size: 10",
+    "timestamp": "2026-02-19T17:54:22.132224673Z"
+  },
+  {
+    "insertId": "136j5dofa91fye",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:54:28.052815767Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 17:54:26,277 [WARNING] Connection pool is full, discarding connection: storage.googleapis.com. Connection pool size: 10",
+    "timestamp": "2026-02-19T17:54:26.332142072Z"
+  },
+  {
+    "insertId": "136j5dofa91fyf",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:54:28.052815767Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 17:54:26,296 [WARNING] Connection pool is full, discarding connection: storage.googleapis.com. Connection pool size: 10",
+    "timestamp": "2026-02-19T17:54:26.332148265Z"
+  },
+  {
+    "insertId": "136j5dofa91fyg",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:54:28.052815767Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 17:54:26,445 [WARNING] Connection pool is full, discarding connection: storage.googleapis.com. Connection pool size: 10",
+    "timestamp": "2026-02-19T17:54:26.531853661Z"
+  },
+  {
+    "insertId": "136j5dofa91fyh",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:54:28.052815767Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 17:54:27,392 [WARNING] Connection pool is full, discarding connection: storage.googleapis.com. Connection pool size: 10",
+    "timestamp": "2026-02-19T17:54:27.531761973Z"
+  },
+  {
+    "insertId": "136j5dofa91fyi",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:54:28.052815767Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 17:54:27,909 [WARNING] Connection pool is full, discarding connection: storage.googleapis.com. Connection pool size: 10",
+    "timestamp": "2026-02-19T17:54:27.931761071Z"
+  },
+  {
+    "insertId": "fkx7dsfai8pd5",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:54:33.049230753Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 17:54:28,299 [WARNING] Connection pool is full, discarding connection: storage.googleapis.com. Connection pool size: 10",
+    "timestamp": "2026-02-19T17:54:28.332306725Z"
+  },
+  {
+    "insertId": "fkx7dsfai8pd6",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:54:33.049230753Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 17:54:28,960 [WARNING] Connection pool is full, discarding connection: storage.googleapis.com. Connection pool size: 10",
+    "timestamp": "2026-02-19T17:54:29.131882778Z"
+  },
+  {
+    "insertId": "fkx7dsfai8pd7",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:54:33.049230753Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 17:54:32,783 [WARNING] Connection pool is full, discarding connection: storage.googleapis.com. Connection pool size: 10",
+    "timestamp": "2026-02-19T17:54:32.932672659Z"
+  },
+  {
+    "insertId": "fkx7dsfai8pd8",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:54:33.049230753Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 17:54:32,914 [WARNING] Connection pool is full, discarding connection: storage.googleapis.com. Connection pool size: 10",
+    "timestamp": "2026-02-19T17:54:32.932678185Z"
+  },
+  {
+    "insertId": "5u3jgdfcf6mhj",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:54:36.847345692Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 17:54:34,830 [WARNING] Connection pool is full, discarding connection: storage.googleapis.com. Connection pool size: 10",
+    "timestamp": "2026-02-19T17:54:34.931918689Z"
+  },
+  {
+    "insertId": "5u3jgdfcf6mhk",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:54:36.847345692Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 17:54:35,157 [WARNING] Connection pool is full, discarding connection: storage.googleapis.com. Connection pool size: 10",
+    "timestamp": "2026-02-19T17:54:35.332082821Z"
+  },
+  {
+    "insertId": "5u3jgdfcf6mhl",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:54:36.847345692Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 17:54:35,195 [WARNING] Connection pool is full, discarding connection: storage.googleapis.com. Connection pool size: 10",
+    "timestamp": "2026-02-19T17:54:35.332095301Z"
+  },
+  {
+    "insertId": "5u3jgdfcf6mhm",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:54:36.847345692Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 17:54:35,344 [WARNING] Connection pool is full, discarding connection: storage.googleapis.com. Connection pool size: 10",
+    "timestamp": "2026-02-19T17:54:35.531823174Z"
+  },
+  {
+    "insertId": "5u3jgdfcf6mhn",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:54:36.847345692Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 17:54:36,668 [WARNING] Connection pool is full, discarding connection: storage.googleapis.com. Connection pool size: 10",
+    "timestamp": "2026-02-19T17:54:36.732333768Z"
+  },
+  {
+    "insertId": "gyacx6fb39v3a",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:54:39.139850290Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 17:54:37,385 [WARNING] Connection pool is full, discarding connection: storage.googleapis.com. Connection pool size: 10",
+    "timestamp": "2026-02-19T17:54:37.532691196Z"
+  },
+  {
+    "insertId": "gyacx6fb39v3b",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:54:39.139850290Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 17:54:37,581 [WARNING] Connection pool is full, discarding connection: storage.googleapis.com. Connection pool size: 10",
+    "timestamp": "2026-02-19T17:54:37.732110258Z"
+  },
+  {
+    "insertId": "gyacx6fb39v3c",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:54:39.139850290Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 17:54:37,617 [WARNING] Connection pool is full, discarding connection: storage.googleapis.com. Connection pool size: 10",
+    "timestamp": "2026-02-19T17:54:37.732113845Z"
+  },
+  {
+    "insertId": "gyacx6fb39v3d",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:54:39.139850290Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 17:54:38,293 [WARNING] Connection pool is full, discarding connection: storage.googleapis.com. Connection pool size: 10",
+    "timestamp": "2026-02-19T17:54:38.331714323Z"
+  },
+  {
+    "insertId": "gyacx6fb39v3e",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:54:39.139850290Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 17:54:38,753 [WARNING] Connection pool is full, discarding connection: storage.googleapis.com. Connection pool size: 10",
+    "timestamp": "2026-02-19T17:54:38.932558361Z"
+  },
+  {
+    "insertId": "gyacx6fb39v3f",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:54:39.139850290Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 17:54:38,926 [WARNING] Connection pool is full, discarding connection: storage.googleapis.com. Connection pool size: 10",
+    "timestamp": "2026-02-19T17:54:38.932564335Z"
+  },
+  {
+    "insertId": "e7n5vlfchr8jn",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:54:40.653467604Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 17:54:38,988 [WARNING] Connection pool is full, discarding connection: storage.googleapis.com. Connection pool size: 10",
+    "timestamp": "2026-02-19T17:54:39.132246590Z"
+  },
+  {
+    "insertId": "e7n5vlfchr8jo",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:54:40.653467604Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 17:54:39,128 [WARNING] Connection pool is full, discarding connection: storage.googleapis.com. Connection pool size: 10",
+    "timestamp": "2026-02-19T17:54:39.132255548Z"
+  },
+  {
+    "insertId": "e7n5vlfchr8jp",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:54:40.653467604Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 17:54:39,953 [WARNING] Connection pool is full, discarding connection: storage.googleapis.com. Connection pool size: 10",
+    "timestamp": "2026-02-19T17:54:40.131686447Z"
+  },
+  {
+    "insertId": "e7n5vlfchr8jq",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:54:40.653467604Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 17:54:40,251 [WARNING] Connection pool is full, discarding connection: storage.googleapis.com. Connection pool size: 10",
+    "timestamp": "2026-02-19T17:54:40.332034253Z"
+  },
+  {
+    "insertId": "e7n5vlfchr8jr",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:54:40.653467604Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 17:54:40,331 [WARNING] Connection pool is full, discarding connection: storage.googleapis.com. Connection pool size: 10",
+    "timestamp": "2026-02-19T17:54:40.531738083Z"
+  },
+  {
+    "insertId": "e7n5vlfchr8js",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:54:40.653467604Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 17:54:40,340 [WARNING] Connection pool is full, discarding connection: storage.googleapis.com. Connection pool size: 10",
+    "timestamp": "2026-02-19T17:54:40.531742263Z"
+  },
+  {
+    "insertId": "cix4fkfbm1lpx",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:54:41.649294798Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 17:54:40,871 [WARNING] Connection pool is full, discarding connection: storage.googleapis.com. Connection pool size: 10",
+    "timestamp": "2026-02-19T17:54:40.932034081Z"
+  },
+  {
+    "insertId": "cix4fkfbm1lpy",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:54:41.649294798Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 17:54:40,955 [WARNING] Connection pool is full, discarding connection: storage.googleapis.com. Connection pool size: 10",
+    "timestamp": "2026-02-19T17:54:41.132508814Z"
+  },
+  {
+    "insertId": "cix4fkfbm1lpz",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:54:41.649294798Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 17:54:41,230 [WARNING] Connection pool is full, discarding connection: storage.googleapis.com. Connection pool size: 10",
+    "timestamp": "2026-02-19T17:54:41.332121171Z"
+  },
+  {
+    "insertId": "cix4fkfbm1lq0",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:54:41.649294798Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 17:54:41,236 [WARNING] Connection pool is full, discarding connection: storage.googleapis.com. Connection pool size: 10",
+    "timestamp": "2026-02-19T17:54:41.332126615Z"
+  },
+  {
+    "insertId": "cix4fkfbm1lq1",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:54:41.649294798Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 17:54:41,350 [WARNING] Connection pool is full, discarding connection: storage.googleapis.com. Connection pool size: 10",
+    "timestamp": "2026-02-19T17:54:41.531834750Z"
+  },
+  {
+    "insertId": "wsu1djf9b5r69",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:54:42.250094688Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 17:54:41,556 [WARNING] Connection pool is full, discarding connection: storage.googleapis.com. Connection pool size: 10",
+    "timestamp": "2026-02-19T17:54:41.731806471Z"
+  },
+  {
+    "insertId": "wsu1djf9b5r6a",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:54:42.250094688Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 17:54:41,559 [INFO] Parallel download complete.",
+    "timestamp": "2026-02-19T17:54:41.731809837Z"
+  },
+  {
+    "insertId": "wsu1djf9b5r6b",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:54:42.250094688Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Error in sitecustomize; set PYTHONVERBOSE for traceback:",
+    "timestamp": "2026-02-19T17:54:41.731811379Z"
+  },
+  {
+    "insertId": "wsu1djf9b5r6c",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:54:42.250094688Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "ModuleNotFoundError: No module named 'pythonjsonlogger'",
+    "timestamp": "2026-02-19T17:54:41.731812596Z"
+  },
+  {
+    "insertId": "wsu1djf9b5r6d",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:54:42.250094688Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Error in sitecustomize; set PYTHONVERBOSE for traceback:",
+    "timestamp": "2026-02-19T17:54:42.131879912Z"
+  },
+  {
+    "insertId": "wsu1djf9b5r6e",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:54:42.250094688Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "ModuleNotFoundError: No module named 'pythonjsonlogger'",
+    "timestamp": "2026-02-19T17:54:42.131886229Z"
+  },
+  {
+    "insertId": "v4yirzfcp54y1",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:54:47.248074261Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 17:54:43,057 [INFO] Loading all raw data into a single massive RAM matrix...",
+    "timestamp": "2026-02-19T17:54:43.132673844Z"
+  },
+  {
+    "insertId": "zuoso8fbk75f9",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:55:02.249557Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 17:54:58,783 [INFO] Resolved causal keys: time_key=time_end dedup_keys=['symbol', 'time_end'] sort_keys=['symbol', 'date', 'time_end']",
+    "timestamp": "2026-02-19T17:54:58.932021914Z"
+  },
+  {
+    "insertId": "zuoso8fbk75fa",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:55:02.249557Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 17:54:58,783 [INFO] Deduplicating tick collisions across hosts (linux1 vs windows1)...",
+    "timestamp": "2026-02-19T17:54:58.932030527Z"
+  },
+  {
+    "insertId": "fkpycff8as2pd",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:56:02.268160420Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 17:55:58,333 [INFO] Sorting multidimensional spacetime (32368466 rows)...",
+    "timestamp": "2026-02-19T17:55:58.532918368Z"
+  },
+  {
+    "insertId": "gdisdhfaawfxa",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4199774404134761944",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-ls2ljsvb-e5635233-g9vg",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "3366793578792615936",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T17:56:12.260202415Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 17:56:11,718 [INFO] Applying physical engine. Polars Rust backend will saturate all CPU cores.",
+    "timestamp": "2026-02-19T17:56:11.731811172Z"
+  },
+  {
+    "insertId": "k07cfbd991q",
+    "labels": {
+      "ml.googleapis.com/endpoint": ""
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/ml.googleapis.com%2F3366793578792615936",
+    "receiveTimestamp": "2026-02-19T18:20:47.705754642Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "gen-lang-client-0250995579",
+        "task_name": "service"
+      },
+      "type": "ml_job"
+    },
+    "severity": "ERROR",
+    "textPayload": "Replicas low on memory: workerpool0. Specify a machine with larger memory and try again.",
+    "timestamp": "2026-02-19T18:20:46.253667053Z"
+  },
+  {
+    "insertId": "k07cfbd995a",
+    "labels": {
+      "ml.googleapis.com/endpoint": ""
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/ml.googleapis.com%2F3366793578792615936",
+    "receiveTimestamp": "2026-02-19T18:21:31.753927689Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "gen-lang-client-0250995579",
+        "task_name": "service"
+      },
+      "type": "ml_job"
+    },
+    "severity": "INFO",
+    "textPayload": "Finished tearing down training program.",
+    "timestamp": "2026-02-19T18:21:30.270091250Z"
+  },
+  {
+    "insertId": "k07cfbd995b",
+    "labels": {
+      "ml.googleapis.com/endpoint": "",
+      "ml.googleapis.com/job_state": "FAILED"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/ml.googleapis.com%2F3366793578792615936",
+    "receiveTimestamp": "2026-02-19T18:21:31.753927689Z",
+    "resource": {
+      "labels": {
+        "job_id": "3366793578792615936",
+        "project_id": "gen-lang-client-0250995579",
+        "task_name": "service"
+      },
+      "type": "ml_job"
+    },
+    "severity": "INFO",
+    "textPayload": "Job failed.",
+    "timestamp": "2026-02-19T18:21:30.562895346Z"
+  }
+]

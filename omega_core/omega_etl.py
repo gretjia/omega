@@ -46,10 +46,30 @@ def _numeric_cols(cfg: L2PipelineConfig) -> List[str]:
     return cols
 
 
-def scan_l2_quotes(path: str | List[str], cfg: L2PipelineConfig) -> pl.LazyFrame:
+def scan_l2_quotes(path: str | List[str], cfg: L2PipelineConfig) -> pl.LazyFrame | None:
     if isinstance(path, list):
-        lfs = [scan_l2_quotes(p, cfg) for p in path]
-        return pl.concat(lfs)
+        if not path:
+            return None
+        # Check if it's the split CSVs format (has 行情.csv and 逐笔成交.csv)
+        path_strs = [str(p) for p in path]
+        quote_file = next((p for p in path_strs if "行情.csv" in p), None)
+        trade_file = next((p for p in path_strs if "逐笔成交.csv" in p), None)
+        
+        if quote_file and trade_file:
+            print(f"[DEBUG] Processing split files: {quote_file} & {trade_file}")
+            return _scan_split_l2_quotes(quote_file, trade_file, cfg)
+        else:
+            # Fallback for other list formats (e.g. chunked CSVs)
+            lfs = []
+            for p in path:
+                lf = scan_l2_quotes(p, cfg)
+                if lf is not None:
+                    lfs.append(lf)
+            if not lfs:
+                return None
+            # diagonal_relaxed: allow CSVs with different column sets (e.g. early 2023
+            # archives missing L2 depth columns). Missing cols filled with null.
+            return pl.concat(lfs, how="diagonal_relaxed")
 
     is_parquet = path.lower().endswith(".parquet")
     
@@ -76,9 +96,18 @@ def scan_l2_quotes(path: str | List[str], cfg: L2PipelineConfig) -> pl.LazyFrame
     schema = lf.collect_schema()
     valid_rename = {k: v for k, v in rename.items() if k in schema.names()}
     
-    if not valid_rename:
+    valid_mapped_cols = set(valid_rename.values())
+    if not valid_mapped_cols:
         if "microprice" in schema.names():
             return lf
+        return None
+
+    # CRITICAL: L2 pipeline requires BOTH depth and trade columns.
+    # Early 2023 archives feature split data (行情.csv, 逐笔成交.csv). We skip these 
+    # unifiedly instead of creating diagonal garbage frames.
+    required = {"bid_p1", "ask_p1", "price", "vol"}
+    if not required.issubset(valid_mapped_cols) and "microprice" not in valid_mapped_cols:
+        return None
             
     lf = lf.select([pl.col(c) for c in valid_rename.keys()]).rename(valid_rename)
 
@@ -93,16 +122,147 @@ def scan_l2_quotes(path: str | List[str], cfg: L2PipelineConfig) -> pl.LazyFrame
     return lf
 
 
+def _scan_split_l2_quotes(quote_file: str, trade_file: str, cfg: L2PipelineConfig) -> pl.LazyFrame | None:
+    """
+    Dedicated parser for early 2023 split format (行情.csv + 逐笔成交.csv).
+    Fuses microsecond trades backward onto 3-second L2 snapshot quotes.
+    """
+    enc = cfg.io.csv_encoding.lower() if cfg.io.csv_encoding else "utf8"
+    
+    # 1. Load Quotes (行情.csv)
+    if enc not in ["utf8", "utf-8"]:
+        q_lf = pl.read_csv(quote_file, encoding=cfg.io.csv_encoding, infer_schema_length=0).lazy()
+    else:
+        q_lf = pl.scan_csv(quote_file, encoding=enc, infer_schema_length=0)
+    q_rename = _rename_map(cfg)
+    q_schema = q_lf.collect_schema().names()
+    q_valid_rename = {k: v for k, v in q_rename.items() if k in q_schema}
+    
+    q_lf = q_lf.select([pl.col(c) for c in q_valid_rename.keys()]).rename(q_valid_rename)
+    
+    if "time" not in q_lf.collect_schema().names():
+        print(f"[DEBUG] Quitting: no time col in quote. Columns: {q_lf.collect_schema().names()}")
+        return None
+        
+    q_lf = q_lf.with_columns(pl.col("time").cast(pl.Int64, strict=False))
+    q_lf = q_lf.sort("time")
+
+    # Drop intersecting columns from quotes explicitly via select to avoid Polars optimizer join bugs
+    intersecting = {"price", "vol", "turnover", "bs_flag", "symbol", "exchange", "date"}
+    q_keep_cols = [c for c in q_lf.collect_schema().names() if c not in intersecting]
+    if "time" not in q_keep_cols:
+        q_keep_cols.append("time")
+    q_lf = q_lf.select(q_keep_cols)
+
+    # 2. Load Trades (逐笔成交.csv)
+    if enc not in ["utf8", "utf-8"]:
+        t_lf = pl.read_csv(trade_file, encoding=cfg.io.csv_encoding, infer_schema_length=0).lazy()
+    else:
+        t_lf = pl.scan_csv(trade_file, encoding=enc, infer_schema_length=0)
+    t_rename = _rename_map(cfg)
+    # Add alias mappings for split trades format
+    t_rename["成交价格"] = "price"
+    t_rename["成交数量"] = "vol"
+    t_rename["成交金额"] = "turnover"  # Sometimes named 成交金额 instead of 成交额
+    t_rename["成交额"] = "turnover"
+    
+    t_schema = t_lf.collect_schema().names()
+    t_valid_rename = {k: v for k, v in t_rename.items() if k in t_schema}
+    
+    t_lf = t_lf.select([pl.col(c) for c in t_valid_rename.keys()]).rename(t_valid_rename)
+    
+    if "time" not in t_lf.collect_schema().names():
+        print(f"[DEBUG] Quitting: no time col in trade. Columns: {t_lf.collect_schema().names()}")
+        return None
+        
+    t_lf = t_lf.with_columns(pl.col("time").cast(pl.Int64, strict=False))
+    t_lf = t_lf.sort("time")
+
+    # 3. Asof Join Trades into Quotes (Trades -> Quotes)
+    lf = t_lf.join_asof(q_lf, on="time", strategy="backward")
+
+    # 4. Standard validation
+    valid_mapped_cols = set(lf.collect_schema().names())
+    required = {"bid_p1", "ask_p1", "price", "vol"}
+    if not required.issubset(valid_mapped_cols) and "microprice" not in valid_mapped_cols:
+        print(f"[DEBUG] Quitting: missing required col. Required: {required}, found: {valid_mapped_cols}")
+        return None
+
+    print(f"[DEBUG] _scan_split_l2_quotes SUCCESS for {quote_file}")
+
+    # 5. Type Casting
+    num_cols = _numeric_cols(cfg)
+    existing_cols = lf.collect_schema().names()
+    cols_to_cast = [c for c in num_cols if c in existing_cols]
+    
+    lf = lf.with_columns(
+        [pl.col(c).cast(pl.Float64, strict=False) for c in cols_to_cast]
+    )
+    return lf
+
+
 def _apply_session_filter(lf: pl.LazyFrame, cfg: L2PipelineConfig) -> pl.LazyFrame:
     s = cfg.session
     if not s.enable_session_filter or s.allow_auction:
         return lf
-    cond = (
+    cond_hhmmssmmm = (
         (pl.col("time") >= int(s.session_1_start)) & (pl.col("time") <= int(s.session_1_end))
     ) | (
         (pl.col("time") >= int(s.session_2_start)) & (pl.col("time") <= int(s.session_2_end))
     )
-    return lf.filter(cond)
+    ashare = cfg.ashare_session
+    t_ms = _time_of_day_ms_expr("time")
+    cond_ms = (
+        (t_ms >= int(ashare.morning_start_ms)) & (t_ms <= int(ashare.morning_end_ms))
+    ) | (
+        (t_ms >= int(ashare.afternoon_start_ms)) & (t_ms <= int(ashare.afternoon_end_ms))
+    )
+    return lf.filter(cond_hhmmssmmm | cond_ms)
+
+
+def _hhmmssmmm_to_ms_expr(time_expr: pl.Expr) -> pl.Expr:
+    t = time_expr.cast(pl.Int64, strict=False)
+    hh = t // 10_000_000
+    mm = (t // 100_000) % 100
+    ss = (t // 1_000) % 100
+    ms = t % 1_000
+    return ((((hh * 60) + mm) * 60 + ss) * 1_000 + ms).cast(pl.Int64, strict=False)
+
+
+def _time_of_day_ms_expr(time_col: str = "time") -> pl.Expr:
+    """
+    Normalize mixed time formats to milliseconds since midnight.
+    Supported inputs:
+    - HHMMSSmmm (e.g. 93000000)
+    - ms-of-day (0~86400000)
+    - epoch ms/us
+    """
+    t = pl.col(time_col).cast(pl.Int64, strict=False)
+    hhmmssmmm_ms = _hhmmssmmm_to_ms_expr(t)
+    return (
+        pl.when(t.is_null())
+        .then(None)
+        .when(t >= 1_000_000_000_000_000)
+        .then((t // 1_000) % 86_400_000)  # epoch microseconds
+        .when(t >= 100_000_000_000)
+        .then(t % 86_400_000)  # epoch milliseconds
+        .when((t >= 10_000_000) & (t <= 235_959_999))
+        .then(hhmmssmmm_ms)  # HHMMSSmmm
+        .otherwise(t)  # already ms-of-day
+        .cast(pl.Int64, strict=False)
+    )
+
+
+def _ashare_elapsed_expr(t_ms: pl.Expr, cfg: L2PipelineConfig) -> pl.Expr:
+    ashare = cfg.ashare_session
+    morning_len = int(ashare.morning_end_ms - ashare.morning_start_ms)
+    return (
+        pl.when(t_ms <= int(ashare.morning_end_ms))
+        .then(t_ms - int(ashare.morning_start_ms))
+        .when(t_ms >= int(ashare.afternoon_start_ms))
+        .then((t_ms - int(ashare.afternoon_start_ms)) + morning_len)
+        .otherwise(morning_len)
+    ).clip(lower_bound=0)
 
 
 def _apply_quality_filter(lf: pl.LazyFrame, cfg: L2PipelineConfig) -> pl.LazyFrame:
@@ -197,103 +357,214 @@ def _ofi_expr(cfg: L2PipelineConfig) -> pl.Expr:
     raise ValueError(f"Unknown ofi_mode: {ofi_cfg.ofi_mode}")
 
 
-def _lob_flux_expr() -> pl.Expr:
-    return (pl.col("bid_v1").diff().abs() + pl.col("ask_v1").diff().abs()).alias("lob_flux")
+def _lob_flux_expr(group_col: str | None = None) -> pl.Expr:
+    """LOB flux = |Δbid_v1| + |Δask_v1|. Must isolate by symbol to prevent
+    cross-symbol diff bleeding (stock B open - stock A close = phantom flux)."""
+    b_diff = pl.col("bid_v1").diff().over(group_col) if group_col else pl.col("bid_v1").diff()
+    a_diff = pl.col("ask_v1").diff().over(group_col) if group_col else pl.col("ask_v1").diff()
+    return (b_diff.abs() + a_diff.abs()).alias("lob_flux")
 
 
-def build_l2_frames(path: str, cfg: L2PipelineConfig, target_frames: float | None = None) -> pl.DataFrame:
+def build_l1_base_ticks(path: str | List[str], cfg: L2PipelineConfig) -> pl.DataFrame:
+    """Stage 1: Base Lake Extraction. Parses 7z/CSV -> Computes basic ticks (No Physics) -> L1 Parquet."""
+    if isinstance(path, list):
+        if not path:
+            return pl.DataFrame()
+            
+        is_split_group = len(path) <= 4 and any("行情.csv" in str(p) for p in path) and any("逐笔成交.csv" in str(p) for p in path)
+        if not is_split_group:
+            from collections import defaultdict
+            from pathlib import Path
+            
+            grouped = defaultdict(list)
+            for p in path:
+                grouped[str(Path(p).parent)].append(str(p))
+                
+            collected = []
+            for symbol_dir, group_files in grouped.items():
+                try:
+                    if len(group_files) == 1:
+                        df = build_l1_base_ticks(group_files[0], cfg)
+                    else:
+                        df = build_l1_base_ticks(group_files, cfg)
+                        
+                    if df.height > 0:
+                        collected.append(df)
+                except Exception as e:
+                    print(f"Error processing {symbol_dir}: {e}")
+                    continue
+            if not collected:
+                return pl.DataFrame()
+            return pl.concat(collected, how="vertical_relaxed")
+
     lf = scan_l2_quotes(path, cfg)
-    lf = lf.sort("time")
+    if lf is None:
+        return pl.DataFrame()
+    
+    schema_names = lf.collect_schema().names()
+    group_col = "symbol" if "symbol" in schema_names else None
+
+    # Sort strictly by symbol then time (Causal Ordering)
+    sort_cols = ["date", "time"]
+    if group_col:
+        sort_cols = [group_col, "date", "time"]
+    lf = lf.sort(sort_cols)
+    
     lf = _apply_session_filter(lf, cfg)
     lf = _apply_quality_filter(lf, cfg)
 
+    # Codex Correction: Stage 1 should ONLY extract Base Lake Parquets. 
+    # NO mathematical aggregation (microprice, ofi, depth) should happen here. 
+    # It takes 72 hours otherwise. We just output the valid sorted ticks.
     lf = lf.with_columns(
-        [_volume_tick_expr(cfg), _microprice_expr(cfg), _depth_expr(cfg)]
+        [_volume_tick_expr(cfg), _time_of_day_ms_expr("time").alias("__time_ms")]
+    )
+
+    return lf.collect()
+
+
+def build_l2_features_from_l1(lf: pl.LazyFrame, cfg: L2PipelineConfig, target_frames: float | None = None) -> pl.DataFrame:
+    """Stage 2: Physics Engine. Reads Base L1 -> Applies advanced math aggregations -> L2 Parquet."""
+    schema_names = lf.collect_schema().names()
+    group_col = "symbol" if "symbol" in schema_names else None
+
+    # Codex Correction: Apply Physics (microprice, depth, OFI, flux) ONLY IN STAGE 2
+    lf = lf.with_columns(
+        [_microprice_expr(cfg), _depth_expr(cfg)]
     )
     if cfg.quality.drop_nonpositive_frame_price:
         lf = lf.filter(pl.col("microprice") > float(cfg.quality.min_frame_price))
     lf = lf.with_columns(_ofi_expr(cfg))
-    lf = lf.with_columns(_lob_flux_expr())
+    lf = lf.with_columns(_lob_flux_expr(group_col))
+
+    # Temporal Rolling fix: V62 demands absolute time `3s` rolling instead of row-based `window_size=3`.
+    # First, convert ms epoch to a Datetime object to satisfy Polars period rolling.
+    lf = lf.with_columns(
+        pl.from_epoch(pl.col("__time_ms"), time_unit="ms").alias("__time_dt")
+    )
+
+    if group_col:
+        lf = lf.sort([group_col, "__time_dt"])
+        # Use grouped temporal rolling
+        rolled = lf.rolling(index_column="__time_dt", period="3s", closed="left", group_by=group_col).agg([
+            pl.col("v_ofi").mean().alias("v_ofi_mean"),
+            pl.col("depth").mean().alias("depth_mean")
+        ])
+        lf = lf.join(rolled, on=[group_col, "__time_dt"], how="left")
+    else:
+        lf = lf.sort(["__time_dt"])
+        rolled = lf.rolling(index_column="__time_dt", period="3s", closed="left").agg([
+            pl.col("v_ofi").mean().alias("v_ofi_mean"),
+            pl.col("depth").mean().alias("depth_mean")
+        ])
+        lf = lf.join(rolled, on="__time_dt", how="left")
+        
+    # Override original scalar values with the temporaly smoothed anti-aliased ones
+    lf = lf.with_columns([
+        pl.col("v_ofi_mean").alias("v_ofi"),
+        pl.col("depth_mean").alias("depth")
+    ]).drop(["v_ofi_mean", "depth_mean"])
+
 
     vc = cfg.volume_clock
 
-    # --- v5.0 Fix: Causal Volume Projection ---
-    # Replace global .sum().over(1) (Paradox 3) with Causal Extrapolation.
-    # Est_Daily_Vol = Current_Cum_Vol / Fraction_Of_Day_Passed
-    
     if getattr(vc, "dynamic_bucket_size", False) or target_frames is not None:
         frames_target = float(target_frames) if target_frames is not None else float(vc.daily_volume_proxy_div)
-        
-        # 1. Calculate Time Fraction
-        session_start = int(cfg.session.session_1_start)
-        session_end = int(cfg.session.session_2_end)
-        total_duration = max(1.0, float(session_end - session_start))
-        
-        # Avoid div/0 at opening: clamp elapsed time to min 1 min (60000 ms)
-        # Ensure elapsed is safe
-        elapsed = (pl.col("time") - session_start).clip(lower_bound=60000)
-        # v5.1 P4: morning spike extrapolation guard.
-        # Raise lower bound from 0.01 to 0.05 to avoid explosive early-session projection.
-        time_fraction = (elapsed / total_duration).clip(lower_bound=0.05, upper_bound=1.0)
-        
-        # 2. Causal Extrapolation
-        # If we are 10% into the day and have 1M vol, we project 10M total.
-        cum_vol_expr = pl.col("vol_tick").cum_sum()
+
+        elapsed = _ashare_elapsed_expr(pl.col("__time_ms"), cfg)
+        time_fraction = (elapsed / float(cfg.ashare_session.total_duration_ms)).clip(
+            lower_bound=0.05, upper_bound=1.0
+        )
+
+        if group_col:
+            cum_vol_expr = pl.col("vol_tick").cum_sum().over(group_col)
+        else:
+            cum_vol_expr = pl.col("vol_tick").cum_sum()
+            
         est_daily_vol = cum_vol_expr / time_fraction
-        
-        # 3. Dynamic Bucket Size
         target_bucket_size = est_daily_vol / frames_target
-        
         bucket_size_expr = (
             pl.when(target_bucket_size > float(vc.min_bucket_size))
             .then(target_bucket_size)
             .otherwise(float(vc.min_bucket_size))
         )
-        
+
         lf = lf.with_columns(
             [
                 cum_vol_expr.alias("cum_vol"),
-                bucket_size_expr.alias("dynamic_bucket_sz")
+                bucket_size_expr.alias("dynamic_bucket_sz"),
             ]
         )
         
-        # Integral Bucket Sizing
-        # We integrate 1/BucketSize to find BucketID. This naturally adapts to volatility.
-        lf = lf.with_columns(
-            (pl.col("vol_tick") / pl.col("dynamic_bucket_sz")).cum_sum().cast(pl.Int64).alias("bucket_id")
-        )
-        
+        if group_col:
+            lf = lf.with_columns(
+                (pl.col("vol_tick") / pl.col("dynamic_bucket_sz"))
+                .cum_sum().over(group_col)
+                .cast(pl.Int64)
+                .alias("bucket_id")
+            )
+        else:
+            lf = lf.with_columns(
+                (pl.col("vol_tick") / pl.col("dynamic_bucket_sz"))
+                .cum_sum()
+                .cast(pl.Int64)
+                .alias("bucket_id")
+            )
     else:
-        # Static bucket mode
+        if group_col:
+            lf = lf.with_columns(pl.col("vol_tick").cum_sum().over(group_col).alias("cum_vol"))
+        else:
+            lf = lf.with_columns(pl.col("vol_tick").cum_sum().alias("cum_vol"))
+            
         lf = lf.with_columns(
-            [pl.col("vol_tick").cum_sum().alias("cum_vol")]
-        )
-        lf = lf.with_columns(
-            [(pl.col("cum_vol") // float(vc.bucket_size)).cast(pl.Int64).alias("bucket_id")]
+            (pl.col("cum_vol") // float(vc.bucket_size)).cast(pl.Int64).alias("bucket_id")
         )
 
-    frames = lf.group_by("bucket_id").agg(
+    if {"bid_v1", "ask_v1"}.issubset(schema_names):
+        singularity_eps = float(cfg.micro.limit_singularity_eps)
+        singularity_expr = (
+            (pl.col("bid_v1") <= singularity_eps) | (pl.col("ask_v1") <= singularity_eps)
+        ).alias("is_singularity")
+    else:
+        singularity_expr = pl.lit(False).alias("is_singularity")
+    lf = lf.with_columns(singularity_expr)
+
+    group_keys = ["bucket_id"]
+    if group_col:
+        group_keys = [group_col, "bucket_id"]
+
+    # Notice: list columns ('ofi_list', 'vol_list', 'trace') are dropped per V62 Codex Audit memory protections.
+    # Numba @njit matrix compute will be fed directly from pure scalar columns.
+    frames = lf.group_by(group_keys).agg(
         [
             pl.col("microprice").first().alias("open"),
             pl.col("microprice").last().alias("close"),
             pl.col("microprice").std().alias("sigma"),
             pl.col("v_ofi").sum().alias("net_ofi"),
             pl.col("depth").mean().alias("depth"),
-            pl.col("microprice").alias("trace"),
-            pl.col("v_ofi").alias("ofi_list"),
-            pl.col("v_ofi").cum_sum().alias("ofi_trace"),
-            pl.col("vol_tick").alias("vol_list"),
-            pl.col("vol_tick").cum_sum().alias("vol_trace"),
-            (pl.col("time") - pl.col("time").first()).alias("time_trace"),
-            pl.col("time").first().alias("time_start"),
-            pl.col("time").last().alias("time_end"),
-            pl.col("date").first().alias("date"),
-            pl.count().alias("n_ticks"),
+            pl.col("v_ofi").cum_sum().last().alias("ofi_trace"),
+            pl.col("vol_tick").cum_sum().last().alias("vol_trace"),
+            (pl.col("__time_ms").last() - pl.col("__time_ms").first()).alias("time_trace_span"),
+            pl.col("__time_ms").first().alias("time_start"),
+            pl.col("__time_ms").last().alias("time_end"),
+            pl.col("date").first().alias("_date_temp"),
+            pl.col("symbol").first().alias("_symbol_temp"),
+            pl.len().alias("n_ticks"),
             pl.col("vol_tick").sum().alias("trade_vol"),
             pl.col("lob_flux").sum().alias("cancel_vol"),
+            pl.col("is_singularity").max().alias("has_singularity"),
         ],
         maintain_order=True,
     )
+    
+    rename_rules = {}
+    if "date" not in frames.collect_schema().names():
+        rename_rules["_date_temp"] = "date"
+    if "symbol" not in frames.collect_schema().names():
+        rename_rules["_symbol_temp"] = "symbol"
+        
+    frames = frames.rename(rename_rules)
+    frames = frames.drop(["_date_temp", "_symbol_temp"], strict=False)
 
     frames = frames.filter(pl.col("n_ticks") >= int(vc.min_ticks_per_bucket))
     if cfg.quality.drop_nonpositive_frame_price:
@@ -302,6 +573,9 @@ def build_l2_frames(path: str, cfg: L2PipelineConfig, target_frames: float | Non
             (pl.col("open") > min_frame_px) & (pl.col("close") > min_frame_px)
         )
     frames = frames.with_columns(
-        (pl.col("time_end") - pl.col("time_start")).alias("bar_duration_ms")
+        [
+            (pl.col("time_end") - pl.col("time_start")).alias("bar_duration_ms"),
+            (~pl.col("has_singularity")).alias("is_physics_valid"),
+        ]
     )
     return frames.collect()

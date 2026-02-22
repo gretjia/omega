@@ -8,6 +8,7 @@ hardware:
     stage_root: D:/Omega_frames/v52/stage_windows1
     # Parquet frames output (host-isolated to avoid collisions).
     output_root: D:/Omega_frames/v52/frames/host=windows1
+    seven_zip_exe: "C:\\Program Files\\7-Zip\\7z.exe"
     io_slots: 4
     disable_indexing: true
   compute:

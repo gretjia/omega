@@ -1,0 +1,23 @@
+Incident report is written to:
+
+`audit/runtime/v52/incidents/20260217_210747_runner_error_JOB_STATE_FAILED.codex_report.txt`
+
+I applied one minimal operational fix (no v6 math/principle changes):
+
+- Updated `tools/v60_autopilot.py:323` default `--base-matrix-max-rows-per-file` from `0` to `10000` to reduce base-matrix memory pressure on Vertex retries.
+- Verified syntax with:
+  - `PYTHONPYCACHEPREFIX=/tmp/pycache python3 -m py_compile tools/v60_autopilot.py`
+
+Root-cause evidence captured in the report:
+
+- Repeated base-matrix Vertex failures in `audit/runtime/v52/autopilot_aa8abb7.runner.log` at `:419`, `:478`, `:534`, `:615` (`JOB_STATE_FAILED` across multiple customJobs).
+- Memory-risk pattern in `tools/v60_build_base_matrix.py:100` (eager collect + full concat of all files).
+
+Current status at last check (`handover/ai-direct/live/v60_run_aa8abb7.json`):
+
+- `stage=build_base_matrix`
+- `autopilot_running=false`
+- `uplink_running=true`
+- Pipeline has not resumed yet during this session.
+
+I also documented that direct Vertex `gcloud ai custom-jobs describe` diagnostics were blocked from this sandbox (DNS/network restriction), so exact cloud-side error detail could not be fetched here.

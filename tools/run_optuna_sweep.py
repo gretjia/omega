@@ -125,7 +125,9 @@ def run_optimization(n_trials, output_uri):
         # Also maybe inject it into training config if needed?
         # For now, standard modification.
         
-        cfg = replace(base_cfg, signal=sig_cfg, srl=srl_cfg)
+        # Legacy sweep objective uses SGD partial_fit; force legacy model type here.
+        model_cfg = replace(base_cfg.model, model_type="sgd_logistic")
+        cfg = replace(base_cfg, signal=sig_cfg, srl=srl_cfg, model=model_cfg)
         
         # Initialize Trainer
         trainer = OmegaTrainerV3(cfg)

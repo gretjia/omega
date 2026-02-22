@@ -81,9 +81,23 @@ def calc_compression_gain(trace: Sequence[float], cfg: L2EpiplexityConfig) -> fl
     # Gain = 1 - (Unexplained_Entropy / Total_Entropy)
     # Equivalent to R-squared for the linear fit.
     ratio = var_resid / var_total
-    gain = 1.0 - ratio
+    R_squared = float(np.clip(1.0 - ratio, 0.0, 0.9999))
     
-    return float(np.clip(gain, 0.0, 1.0))
+    # V62 Upgrade: Time-Bounded Minimum Description Length (MDL) Gain
+    # delta_k = 2 for linear probe (slope, intercept)
+    delta_k = 2.0
+    
+    # Turing Discipline: Require enough degrees of freedom
+    if n < 3:
+        return 0.0
+        
+    mdl_gain_bits = -(n / 2.0) * np.log(1.0 - R_squared) - (delta_k / 2.0) * np.log(n)
+    
+    # Turing Discipline: If the model costs more bits to describe than the raw data itself, it is pure noise.
+    if mdl_gain_bits <= 0:
+        return 0.0
+        
+    return float(mdl_gain_bits)
 
 
 def calc_srl_state(

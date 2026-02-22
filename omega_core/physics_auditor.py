@@ -18,7 +18,7 @@ import polars as pl
 
 from config import L2PipelineConfig
 from omega_core.kernel import OmegaKernel, apply_recursive_physics
-from omega_core.trainer_v51 import get_latest_model, evaluate_frames
+from omega_core.trainer import get_latest_model, evaluate_frames
 
 
 class OmegaPhysicsAuditor:
@@ -65,6 +65,12 @@ class OmegaPhysicsAuditor:
             if end_y is not None and math.isfinite(end_y):
                 last_y_state = float(end_y)
 
+            # V61 Fix: Calculate future_ret BEFORE sampling to preserve causal time structure.
+            if "future_ret" not in daily_df.columns and "close" in daily_df.columns:
+                daily_df = daily_df.with_columns(
+                    (pl.col("close").shift(-1) - pl.col("close")).alias("future_ret")
+                ).drop_nulls()
+
             if sample_frac < 1.0:
                 daily_df = daily_df.sample(fraction=float(sample_frac), seed=42)
 
@@ -74,10 +80,6 @@ class OmegaPhysicsAuditor:
             return {"status": "no_data"}
 
         full_df = pl.concat(audit_frames, how="diagonal_relaxed")
-        
-        # Inject future_ret if missing
-        if "future_ret" not in full_df.columns and "close" in full_df.columns:
-            full_df = full_df.with_columns((pl.col("close").shift(-1) - pl.col("close")).alias("future_ret")).drop_nulls()
 
         metrics = self._generate_epistemic_report(full_df, final_y=last_y_state)
         metrics.update(

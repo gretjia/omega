@@ -22,7 +22,7 @@ from pathlib import Path
 from typing import Iterable, List, Tuple
 
 
-_DATE_RE = re.compile(r"^(\\d{8})")
+_DATE_RE = re.compile(r"^(\d{8})")
 
 
 def _iter_archives(root: Path, ext: str) -> Iterable[Path]:
@@ -37,32 +37,41 @@ def _rel_posix(p: Path, root: Path) -> str:
     return p.relative_to(root).as_posix()
 
 
-def _pick_shard(rel: str, rule: str) -> int:
+def _pick_shard(rel: str, rule: str, ratio: Tuple[int, int]) -> int:
     """
-    Returns shard id: 0 or 1.
+    Returns shard id: 0 (A) or 1 (B).
     """
+    wa, wb = ratio
+    total_w = wa + wb
+    
+    # Deterministic hash for weighted split
+    # MD5 is stable across platforms/python versions for this purpose
+    h = int(hashlib.md5(rel.encode("utf-8", errors="replace")).hexdigest(), 16)
+    
+    # If rule is date-based, we use date integer as the seed for stability per day
     base = Path(rel).name
-    if rule == "date_mod2":
-        m = _DATE_RE.match(base)
-        if m:
-            try:
-                return int(m.group(1)) % 2
-            except Exception:
-                pass
-        # fallback to hash if date not parseable
-        rule = "hash_mod2"
+    m = _DATE_RE.match(base)
+    if rule == "date_mod" and m:
+        seed = int(m.group(1))
+    else:
+        # Fallback to file hash or if rule is "hash"
+        seed = h
 
-    if rule == "hash_mod2":
-        h = hashlib.sha1(rel.encode("utf-8", errors="replace")).digest()
-        return int(h[0]) % 2
-
-    raise ValueError(f"Unknown rule: {rule}")
+    # Modulo arithmetic for weights
+    # 0 .. wa-1 -> Shard A
+    # wa .. total-1 -> Shard B
+    
+    if (seed % total_w) < wa:
+        return 0
+    else:
+        return 1
 
 
 def _atomic_write_text(path: Path, content: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_suffix(path.suffix + ".tmp")
-    tmp.write_text(content, encoding="utf-8", newline="\n")
+    with tmp.open("w", encoding="utf-8", newline="\n") as f:
+        f.write(content)
     os.replace(tmp, path)
 
 
@@ -71,10 +80,21 @@ def main() -> int:
     ap.add_argument("--root", required=True, help="Root directory containing raw .7z archives.")
     ap.add_argument("--ext", default=".7z", help="Archive extension filter (default .7z).")
     ap.add_argument("--out-dir", default="audit/runtime/v52", help="Output directory (default audit/runtime/v52).")
-    ap.add_argument("--rule", choices=["date_mod2", "hash_mod2"], default="date_mod2", help="Shard rule.")
-    ap.add_argument("--a-name", default="shard_windows1.txt", help="Shard A filename.")
-    ap.add_argument("--b-name", default="shard_linux.txt", help="Shard B filename.")
+    ap.add_argument("--rule", choices=["date_mod", "hash"], default="date_mod", help="Shard rule (date_mod uses YYYYMMDD, hash uses filename).")
+    ap.add_argument("--ratio", default="1:1", help="Split ratio 'Windows:Linux' (e.g., '1:2' for 33%% Win / 66%% Lin).")
+    ap.add_argument("--a-name", default="shard_windows1.txt", help="Shard A filename (Windows).")
+    ap.add_argument("--b-name", default="shard_linux.txt", help="Shard B filename (Linux).")
     args = ap.parse_args()
+
+    # Parse ratio
+    try:
+        parts = args.ratio.split(":")
+        ratio = (int(parts[0]), int(parts[1]))
+        if ratio[0] < 0 or ratio[1] < 0 or (ratio[0]+ratio[1]) == 0:
+            raise ValueError
+    except Exception:
+        print(f"[!] Invalid ratio: {args.ratio}. Use '1:1', '1:2', etc.")
+        return 1
 
     root = Path(args.root).expanduser().resolve()
     if not root.exists():
@@ -91,7 +111,7 @@ def main() -> int:
     shard_a: List[str] = []
     shard_b: List[str] = []
     for rel in rels:
-        shard = _pick_shard(rel, rule=str(args.rule))
+        shard = _pick_shard(rel, rule=str(args.rule), ratio=ratio)
         if shard == 0:
             shard_a.append(rel)
         else:
@@ -105,9 +125,10 @@ def main() -> int:
         "root": str(root),
         "ext": str(args.ext),
         "rule": str(args.rule),
+        "ratio": f"{ratio[0]}:{ratio[1]} (Win:Lin)",
         "total": len(rels),
-        "shard_a": len(shard_a),
-        "shard_b": len(shard_b),
+        "shard_a_win": len(shard_a),
+        "shard_b_lin": len(shard_b),
         "out_dir": str(out_dir),
     }
     print(json.dumps(summary, ensure_ascii=False))
@@ -116,4 +137,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

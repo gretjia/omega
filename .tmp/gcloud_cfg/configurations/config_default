@@ -1,0 +1,7 @@
+[core]
+account = ziqian.jia@gmail.com
+project = gen-lang-client-0250995579
+
+[storage]
+parallel_composite_upload_enabled = False
+

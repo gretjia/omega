@@ -38,10 +38,7 @@ from sklearn.preprocessing import StandardScaler
 sys.path.append(str(Path(__file__).parent.parent))
 
 from config import load_l2_pipeline_config, L2PipelineConfig
-try:
-    from omega_core.trainer_v51 import OmegaTrainerV3
-except ImportError:
-    from omega_core.trainer import OmegaTrainerV3
+from omega_core.trainer import OmegaTrainerV3
 from tools.multi_dir_loader import discover_l2_dirs
 
 
