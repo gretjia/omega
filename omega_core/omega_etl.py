@@ -365,23 +365,17 @@ def _lob_flux_expr(group_col: str | None = None) -> pl.Expr:
     return (b_diff.abs() + a_diff.abs()).alias("lob_flux")
 
 
-def build_l2_frames(path: str | List[str], cfg: L2PipelineConfig, target_frames: float | None = None) -> pl.DataFrame:
-    # --- ANTI-FRAGILE MEMORY & ISOLATION FIX ---
-    # Process files individually to cap Polars memory at ~100MB per dataset,
-    # rather than bursting to 50GB+ when resolving a 5000-stock LazyFrame DAG.
-    # This also guarantees cross-symbol isolation for chronological shift() ops.
+def build_l1_base_ticks(path: str | List[str], cfg: L2PipelineConfig) -> pl.DataFrame:
+    """Stage 1: Base Lake Extraction. Parses 7z/CSV -> Computes basic ticks (No Physics) -> L1 Parquet."""
     if isinstance(path, list):
         if not path:
             return pl.DataFrame()
             
-        # If this list is ALREADY a targeted split-CSV group for a single symbol,
-        # we bypass the chunking loop and fall through to the ETL engine below.
         is_split_group = len(path) <= 4 and any("行情.csv" in str(p) for p in path) and any("逐笔成交.csv" in str(p) for p in path)
         if not is_split_group:
             from collections import defaultdict
             from pathlib import Path
             
-            # Group flat list of thousands of CSVs into per-symbol lists
             grouped = defaultdict(list)
             for p in path:
                 grouped[str(Path(p).parent)].append(str(p))
@@ -389,13 +383,10 @@ def build_l2_frames(path: str | List[str], cfg: L2PipelineConfig, target_frames:
             collected = []
             for symbol_dir, group_files in grouped.items():
                 try:
-                    # Depending on whether it's 2024 unified CSVs (len=1) or 2023 split (len>1),
-                    # recursively call build_l2_frames. The targeted group will either bypass 
-                    # the list-check entirely or hit the is_split_group=True check.
                     if len(group_files) == 1:
-                        df = build_l2_frames(group_files[0], cfg, target_frames)
+                        df = build_l1_base_ticks(group_files[0], cfg)
                     else:
-                        df = build_l2_frames(group_files, cfg, target_frames)
+                        df = build_l1_base_ticks(group_files, cfg)
                         
                     if df.height > 0:
                         collected.append(df)
@@ -406,12 +397,10 @@ def build_l2_frames(path: str | List[str], cfg: L2PipelineConfig, target_frames:
                 return pl.DataFrame()
             return pl.concat(collected, how="vertical_relaxed")
 
-    # Standard single-file (or single split-group) processing
     lf = scan_l2_quotes(path, cfg)
     if lf is None:
         return pl.DataFrame()
     
-    # Check for symbol column to enable multi-symbol isolation
     schema_names = lf.collect_schema().names()
     group_col = "symbol" if "symbol" in schema_names else None
 
@@ -433,20 +422,42 @@ def build_l2_frames(path: str | List[str], cfg: L2PipelineConfig, target_frames:
     lf = lf.with_columns(_lob_flux_expr(group_col))
     lf = lf.with_columns(_time_of_day_ms_expr("time").alias("__time_ms"))
 
-    # Phase 1: 3-second snapshot aggregation handling (Anti-Aliasing Low-Pass Filter)
-    # MUST enforce deterministic temporal sorting for the Turing tape
+    return lf.collect()
+
+
+def build_l2_features_from_l1(lf: pl.LazyFrame, cfg: L2PipelineConfig, target_frames: float | None = None) -> pl.DataFrame:
+    """Stage 2: Physics Engine. Reads Base L1 -> Applies advanced math aggregations -> L2 Parquet."""
+    schema_names = lf.collect_schema().names()
+    group_col = "symbol" if "symbol" in schema_names else None
+
+    # Temporal Rolling fix: V62 demands absolute time `3s` rolling instead of row-based `window_size=3`.
+    # First, convert ms epoch to a Datetime object to satisfy Polars period rolling.
+    lf = lf.with_columns(
+        pl.from_epoch(pl.col("__time_ms"), time_unit="ms").alias("__time_dt")
+    )
+
     if group_col:
-        lf = lf.sort([group_col, "__time_ms"])
-        lf = lf.with_columns([
-            pl.col("v_ofi").rolling_mean(window_size=3, min_periods=1).over(group_col).alias("v_ofi"),
-            pl.col("depth").rolling_mean(window_size=3, min_periods=1).over(group_col).alias("depth")
+        lf = lf.sort([group_col, "__time_dt"])
+        # Use grouped temporal rolling
+        rolled = lf.rolling(index_column="__time_dt", period="3s", group_by=group_col).agg([
+            pl.col("v_ofi").mean().alias("v_ofi_mean"),
+            pl.col("depth").mean().alias("depth_mean")
         ])
+        lf = lf.join(rolled, on=[group_col, "__time_dt"], how="left")
     else:
-        lf = lf.sort(["__time_ms"])
-        lf = lf.with_columns([
-            pl.col("v_ofi").rolling_mean(window_size=3, min_periods=1).alias("v_ofi"),
-            pl.col("depth").rolling_mean(window_size=3, min_periods=1).alias("depth")
+        lf = lf.sort(["__time_dt"])
+        rolled = lf.rolling(index_column="__time_dt", period="3s").agg([
+            pl.col("v_ofi").mean().alias("v_ofi_mean"),
+            pl.col("depth").mean().alias("depth_mean")
         ])
+        lf = lf.join(rolled, on="__time_dt", how="left")
+        
+    # Override original scalar values with the temporaly smoothed anti-aliased ones
+    lf = lf.with_columns([
+        pl.col("v_ofi_mean").alias("v_ofi"),
+        pl.col("depth_mean").alias("depth")
+    ]).drop(["v_ofi_mean", "depth_mean"])
+
 
     vc = cfg.volume_clock
 
@@ -458,7 +469,6 @@ def build_l2_frames(path: str | List[str], cfg: L2PipelineConfig, target_frames:
             lower_bound=0.05, upper_bound=1.0
         )
 
-        # Cumulative volume must be per-symbol
         if group_col:
             cum_vol_expr = pl.col("vol_tick").cum_sum().over(group_col)
         else:
@@ -479,7 +489,6 @@ def build_l2_frames(path: str | List[str], cfg: L2PipelineConfig, target_frames:
             ]
         )
         
-        # Bucket ID Calculation
         if group_col:
             lf = lf.with_columns(
                 (pl.col("vol_tick") / pl.col("dynamic_bucket_sz"))
@@ -504,7 +513,6 @@ def build_l2_frames(path: str | List[str], cfg: L2PipelineConfig, target_frames:
             (pl.col("cum_vol") // float(vc.bucket_size)).cast(pl.Int64).alias("bucket_id")
         )
 
-    schema_names = set(lf.collect_schema().names())
     if {"bid_v1", "ask_v1"}.issubset(schema_names):
         singularity_eps = float(cfg.micro.limit_singularity_eps)
         singularity_expr = (
@@ -514,11 +522,12 @@ def build_l2_frames(path: str | List[str], cfg: L2PipelineConfig, target_frames:
         singularity_expr = pl.lit(False).alias("is_singularity")
     lf = lf.with_columns(singularity_expr)
 
-    # Group By (Must include Symbol if present)
     group_keys = ["bucket_id"]
     if group_col:
         group_keys = [group_col, "bucket_id"]
 
+    # Notice: list columns ('ofi_list', 'vol_list', 'trace') are dropped per V62 Codex Audit memory protections.
+    # Numba @njit matrix compute will be fed directly from pure scalar columns.
     frames = lf.group_by(group_keys).agg(
         [
             pl.col("microprice").first().alias("open"),
@@ -526,12 +535,9 @@ def build_l2_frames(path: str | List[str], cfg: L2PipelineConfig, target_frames:
             pl.col("microprice").std().alias("sigma"),
             pl.col("v_ofi").sum().alias("net_ofi"),
             pl.col("depth").mean().alias("depth"),
-            pl.col("microprice").alias("trace"),
-            pl.col("v_ofi").alias("ofi_list"),
-            pl.col("v_ofi").cum_sum().alias("ofi_trace"),
-            pl.col("vol_tick").alias("vol_list"),
-            pl.col("vol_tick").cum_sum().alias("vol_trace"),
-            (pl.col("__time_ms") - pl.col("__time_ms").first()).alias("time_trace"),
+            pl.col("v_ofi").cum_sum().last().alias("ofi_trace"),
+            pl.col("vol_tick").cum_sum().last().alias("vol_trace"),
+            (pl.col("__time_ms").last() - pl.col("__time_ms").first()).alias("time_trace_span"),
             pl.col("__time_ms").first().alias("time_start"),
             pl.col("__time_ms").last().alias("time_end"),
             pl.col("date").first().alias("_date_temp"),
@@ -544,7 +550,6 @@ def build_l2_frames(path: str | List[str], cfg: L2PipelineConfig, target_frames:
         maintain_order=True,
     )
     
-    # Rename temp columns to standard names if they were not group keys
     rename_rules = {}
     if "date" not in frames.collect_schema().names():
         rename_rules["_date_temp"] = "date"
