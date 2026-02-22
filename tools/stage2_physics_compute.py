@@ -27,6 +27,8 @@ from omega_core.omega_etl import build_l2_features_from_l1
 
 GLOBAL_CFG = load_l2_pipeline_config()
 
+from omega_core.kernel import apply_recursive_physics
+
 def process_chunk(kwargs):
     l1_file = kwargs['l1_file']
     out_dir = kwargs['out_dir']
@@ -67,8 +69,12 @@ def process_chunk(kwargs):
             else:
                 batch_lf = lf.filter(pl.col("symbol").is_in(batch))
                 
-            # Apply the mathematically verified V62 Physics pipeline
+            # Step 1: Base framing (Pure Polars)
             batch_df = build_l2_features_from_l1(batch_lf, GLOBAL_CFG)
+            
+            # Step 2: Phase 3 Physics Engine (Numba multi-core)
+            if batch_df is not None and batch_df.height > 0:
+                batch_df = apply_recursive_physics(batch_df, GLOBAL_CFG)
             
             if batch_df is not None and batch_df.height > 0:
                 total_rows += batch_df.height

@@ -446,14 +446,14 @@ def build_l2_features_from_l1(lf: pl.LazyFrame, cfg: L2PipelineConfig, target_fr
     if group_col:
         lf = lf.sort([group_col, "__time_dt"])
         # Use grouped temporal rolling
-        rolled = lf.rolling(index_column="__time_dt", period="3s", group_by=group_col).agg([
+        rolled = lf.rolling(index_column="__time_dt", period="3s", closed="left", group_by=group_col).agg([
             pl.col("v_ofi").mean().alias("v_ofi_mean"),
             pl.col("depth").mean().alias("depth_mean")
         ])
         lf = lf.join(rolled, on=[group_col, "__time_dt"], how="left")
     else:
         lf = lf.sort(["__time_dt"])
-        rolled = lf.rolling(index_column="__time_dt", period="3s").agg([
+        rolled = lf.rolling(index_column="__time_dt", period="3s", closed="left").agg([
             pl.col("v_ofi").mean().alias("v_ofi_mean"),
             pl.col("depth").mean().alias("depth_mean")
         ])

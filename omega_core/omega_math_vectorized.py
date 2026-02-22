@@ -272,7 +272,8 @@ def calc_srl_recursion_loop(
     depth_eff,
     cancel_vol,
     trade_vol,
-    initial_y,
+    base_y,
+    is_boundary,
     # Config Scalars
     depth_floor, sigma_floor, spoof_ratio_eps, spoof_penalty_gamma,
     implied_y_min_impact, implied_y_min_penalty,
@@ -287,9 +288,13 @@ def calc_srl_recursion_loop(
     out_y = np.zeros(n_rows, dtype=np.float64)
     out_spoof = np.zeros(n_rows, dtype=np.float64)
     
-    current_y = float(initial_y)
+    current_y = float(base_y)
     
     for i in range(n_rows):
+        # Fast Boundary Detect for Phase Transition
+        if is_boundary[i]:
+            current_y = float(base_y)
+
         # 1. Safety Floors
         safe_depth = max(depth_eff[i], depth_floor)
         safe_sigma = max(sigma_eff[i], sigma_floor)

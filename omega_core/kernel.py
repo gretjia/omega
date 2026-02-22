@@ -115,17 +115,9 @@ def _apply_recursive_physics(
     trade_vol = _safe_f64_col("trade_vol", default=0.0)
     cancel_vol = _safe_f64_col("cancel_vol", default=0.0)
 
-    def _safe_list_col(col_name: str) -> list:
-        if col_name in frames.columns:
-            return [x if x is not None else [] for x in frames.get_column(col_name).to_list()]
-        return [[] for _ in range(n_rows)]
-
-    trace_col = _safe_list_col("trace")
-    ofi_list_col = _safe_list_col("ofi_list")
-    ofi_trace_col = _safe_list_col("ofi_trace")
-    vol_list_col = _safe_list_col("vol_list")
-    vol_trace_col = _safe_list_col("vol_trace")
-    time_trace_col = _safe_list_col("time_trace")
+    # Codex Correction: List-columns are OOM vectors and cannot cross the Python GIL.
+    # We strictly use 1-D contiguous primitive arrays (e.g. close_px) and Numba sliding windows.
+    # Removed _safe_list_col entirely.
 
     # --- Vectorized Pre-computation (Batch) ---
     out_is_active = (not sigma_gate_enabled) | (sigma_eff >= sigma_gate)
@@ -138,105 +130,95 @@ def _apply_recursive_physics(
     else:
         has_singularity = np.zeros(n_rows, dtype=bool)
     
-    # Calculate Epiplexity in ONE GO
-    out_epi = calc_epiplexity_vectorized(trace_col, min_len=int(epi_cfg.min_trace_len), fallback=float(epi_cfg.fallback_value))
+    # Calculate Epiplexity in ONE GO using rolling JIT (GIL-free)
+    from omega_core.omega_math_rolling import calc_epiplexity_rolling, calc_holographic_topology_rolling
+    window_len = int(epi_cfg.min_trace_len)
+    
+    out_epi_raw = calc_epiplexity_rolling(close_px, window=window_len)
+    out_epi = np.where(out_epi_raw > 0, out_epi_raw, float(epi_cfg.fallback_value))
+    
     # Apply gate mask (zero out inactive)
     out_epi = np.where(out_is_active, out_epi, float(epi_cfg.fallback_value))
 
-    # Calculate Holographic Topology in ONE GO
-    out_topo_area, out_topo_energy = calc_holographic_topology_vectorized(
-        trace_col, ofi_list_col,
+    # Calculate Holographic Topology in ONE GO using rolling JIT
+    out_topo_area, out_topo_energy = calc_holographic_topology_rolling(
+        close_px, net_ofi, window=window_len,
         price_scale_floor=float(topo_cfg.price_scale_floor),
         ofi_scale_floor=float(topo_cfg.ofi_scale_floor),
         green_coeff=float(topo_cfg.green_coeff)
     )
 
+    from omega_core.omega_math_rolling import calc_topology_area_rolling
     manifolds = getattr(topo_cfg, "manifolds", ())
     out_manifolds = {}
     
-    trace_sources = {
-        "trace": trace_col,
-        "ofi_trace": ofi_trace_col, # Note: Vectorized func expects list of lists
-        "vol_trace": vol_trace_col,
-        "time_trace": time_trace_col
-    }
+    # We use sequential indices for time_trace proxy since buckets are ordered
+    time_trace_proxy = np.arange(n_rows, dtype=np.float64)
     
-    # Fix: fill None with empty list for vectorized calls if needed, but pad_traces handles empty lists
+    trace_sources = {
+        "trace": close_px,
+        "ofi_trace": net_ofi,
+        "vol_trace": trade_vol,
+        "time_trace": time_trace_proxy
+    }
     
     for feat in manifolds:
         feat_name, x_col, y_col, x_scale_attr, y_scale_attr = feat
         x_scale = float(getattr(topo_cfg, x_scale_attr, topo_cfg.price_scale_floor))
         y_scale = float(getattr(topo_cfg, y_scale_attr, topo_cfg.ofi_scale_floor))
         
-        arr_x = trace_sources.get(x_col, [])
-        arr_y = trace_sources.get(y_col, [])
-        
-        # If columns missing, fill zeros
-        if not arr_x: arr_x = [[]] * n_rows
-        if not arr_y: arr_y = [[]] * n_rows
+        arr_x = trace_sources.get(x_col, np.zeros(n_rows, dtype=np.float64))
+        arr_y = trace_sources.get(y_col, np.zeros(n_rows, dtype=np.float64))
             
-        out_manifolds[str(feat_name)] = calc_topology_area_vectorized(
-            arr_x, arr_y, x_scale, y_scale, float(topo_cfg.green_coeff)
+        out_manifolds[str(feat_name)] = calc_topology_area_rolling(
+            arr_x, arr_y, window=window_len,
+            x_scale_floor=x_scale, y_scale_floor=y_scale, green_coeff=float(topo_cfg.green_coeff)
         )
 
-    # --- Sequential Recursion (Scalar Loop - Fast) ---
-    # Extract symbols for boundary detection
-    if "symbol" in frames.columns:
-        syms = frames.get_column("symbol").cast(pl.String, strict=False).fill_null("").to_numpy()
-    else:
-        syms = np.full(n_rows, "", dtype=object)
+    # --- Vectorized Fast Boundary Detect ---
+    # Overnight Phase Transition — yesterday's resistance state must NOT contaminate today's opening auction
+    is_boundary = np.zeros(n_rows, dtype=bool)
+    if n_rows > 1 and "symbol" in frames.columns and "date" in frames.columns:
+        syms_srs = frames.get_column("symbol")
+        dates_srs = frames.get_column("date")
+        boundary_srs = (syms_srs != syms_srs.shift(1)) | (dates_srs != dates_srs.shift(1))
+        is_boundary = boundary_srs.fill_null(False).to_numpy()
 
-    # ACTION 2: Extract dates for overnight phase transition detection
-    if "date" in frames.columns:
-        dates = frames.get_column("date").cast(pl.String, strict=False).fill_null("").to_numpy()
-    else:
-        dates = np.full(n_rows, "", dtype=object)
-
-    out_srl_resid = np.zeros(n_rows, dtype=np.float64)
-    out_y = np.zeros(n_rows, dtype=np.float64)
-    out_spoof = np.zeros(n_rows, dtype=np.float64)
-    
     base_y = float(srl.y_coeff) if initial_y is None else float(initial_y)
-    current_y = base_y
 
     if os.environ.get("OMEGA_KERNEL_VERBOSE") == "1":
         print(f"    Running Recursive Physics on {n_rows} rows...", flush=True)
     
-    for i in range(n_rows):
-        # FAST BOUNDARY DETECT: Reset physics on new symbol OR new trading day
-        # ACTION 2: Overnight Phase Transition — yesterday's resistance state
-        # must NOT contaminate today's opening auction (耗散结构 phase boundary)
-        if i > 0 and (syms[i] != syms[i-1] or dates[i] != dates[i-1]):
-            current_y = base_y
-
-        # Universal SRL (Delta=0.5)
-        # Manually inlined for speed or call func? Func is fine for scalar ops.
-        # But for 100k rows, avoiding func call overhead is better.
-        # Let's keep calc_srl_state for correctness unless profiling demands it.
-        
-        resid, imp_y, eff_d, spoof = calc_srl_state(
-            price_change=price_change[i],
-            sigma=sigma_eff[i],
-            net_ofi=net_ofi[i],
-            depth=depth_eff[i],
-            current_y=current_y,
-            cfg=srl,
-            cancel_vol=cancel_vol[i],
-            trade_vol=trade_vol[i],
-        )
-        out_srl_resid[i] = resid
-        out_spoof[i] = spoof
-        
-        # Adaptive Y Update
-        if out_is_active[i] and out_epi[i] > peace_threshold and abs(net_ofi[i]) > min_ofi_for_y:
-            new_y = float(np.clip(imp_y, y_min, y_max))
-            current_y = (1.0 - y_alpha) * current_y + y_alpha * new_y
-            
-        if anchor_w > 0.0:
-            current_y = (1.0 - anchor_w) * current_y + anchor_w * anchor_y
-            
-        current_y = float(np.clip(current_y, clip_lo, clip_hi))
-        out_y[i] = current_y
+    # Unleash GIL-free Numba LLVM Compilation Pass for SRL & Adaptive Y Recursive State
+    from omega_core.omega_math_vectorized import calc_srl_recursion_loop
+    out_srl_resid, out_y, out_spoof = calc_srl_recursion_loop(
+        n_rows=n_rows,
+        price_change=price_change,
+        sigma_eff=sigma_eff,
+        net_ofi=net_ofi,
+        depth_eff=depth_eff,
+        cancel_vol=cancel_vol,
+        trade_vol=trade_vol,
+        base_y=base_y,
+        is_boundary=is_boundary,
+        depth_floor=float(srl.depth_floor),
+        sigma_floor=float(srl.sigma_floor),
+        spoof_ratio_eps=float(srl.spoof_ratio_eps),
+        spoof_penalty_gamma=float(srl.spoof_penalty_gamma),
+        implied_y_min_impact=float(srl.implied_y_min_impact),
+        implied_y_min_penalty=float(srl.implied_y_min_penalty),
+        y_min=y_min,
+        y_max=y_max,
+        y_alpha=y_alpha,
+        anchor_y=anchor_y,
+        anchor_w=anchor_w,
+        clip_lo=clip_lo,
+        clip_hi=clip_hi,
+        out_is_active=out_is_active,
+        out_epi=out_epi,
+        peace_threshold=peace_threshold,
+        min_ofi_for_y=min_ofi_for_y
+    )
 
     # v6.0: Mask Singularity Residuals
     # Force residuals to 0 where singularity was detected to prevent math explosion
@@ -291,6 +273,37 @@ def _apply_recursive_physics(
         ).alias("is_signal"),
         (pl.col("srl_resid").sign()).alias("direction"),
     ])
+
+    # === V62 PHASE 5: MDL DYNAMIC ARENA ===
+    # Real-time competition between the 3 structural probes
+    if "symbol" in res_df.columns:
+        group_expr = pl.col("symbol")
+        
+        # 1. Bits Linear (Already computed as Epiplexity)
+        bits_linear = pl.col("epiplexity").forward_fill()
+
+        # 2. Bits SRL (Time-Bounded R^2 of Residuals vs Price Change)
+        # delta_k = 1.0 (Y parameter)
+        var_srl_resid = pl.col("srl_resid").rolling_var(window_size=window_len).over(group_expr).forward_fill()
+        var_price_change = pl.col("price_change").rolling_var(window_size=window_len).over(group_expr).forward_fill()
+        r2_srl = (1.0 - (var_srl_resid / (var_price_change + 1e-12))).clip(0.0, 0.9999)
+        bits_srl = (-(window_len / 2.0) * (1.0 - r2_srl).log() - 0.5 * math.log(window_len)).clip(0.0, 999.0)
+
+        # 3. Bits Topology (Isoperimetric Structure bits)
+        # Using compactness structural gain
+        compactness = (4.0 * math.pi * pl.col("topo_area").abs()) / (pl.col("topo_energy")**2 + 1e-12)
+        bits_topo = (compactness * math.log(window_len)).forward_fill().clip(0.0, 999.0)
+
+        res_df = res_df.with_columns([
+            bits_linear.alias("bits_linear"),
+            bits_srl.alias("bits_srl"),
+            bits_topo.alias("bits_topology")
+        ])
+
+        # Argmax Competition: Select Dominant Probe (1=Linear, 2=SRL, 3=Topology)
+        dominant_probe = pl.concat_list(["bits_linear", "bits_srl", "bits_topology"]).list.arg_max() + 1
+        res_df = res_df.with_columns(dominant_probe.alias("dominant_probe"))
+        
     return res_df
 
 def apply_recursive_physics(

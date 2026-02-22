@@ -92,7 +92,19 @@ def run_global_training(args: argparse.Namespace) -> None:
 
     print("[*] Loading global manifold into RAM...", flush=True)
     started = time.time()
-    df = pl.read_parquet(local_matrix)
+
+    # V62 Handover Defense: 1. Data Gravity Tax
+    cloud_region = os.environ.get("CLOUD_ML_REGION", "us-central1")
+    if cloud_region != "us-central1":
+        raise RuntimeError(f"Data Gravity Violation: Running in {cloud_region}. Must match data in us-central1 strictly to avoid egress tax.")
+
+    # V62 Handover Defense: 2. Heavy Trace Memory Defenses (Lazy Load to Prevent OOM)
+    heavy_traces = ["ofi_list", "vol_list", "time_trace", "ofi_trace", "vol_trace"]
+    lf = pl.scan_parquet(local_matrix)
+    drop_cols = [c for c in heavy_traces if c in lf.collect_schema().names()]
+    if drop_cols:
+        lf = lf.drop(drop_cols)
+    df = lf.collect()
 
     required_cols = {
         "epiplexity",
@@ -108,10 +120,23 @@ def run_global_training(args: argparse.Namespace) -> None:
     if missing:
         raise RuntimeError(f"base_matrix missing columns: {missing}")
 
+    # V62 Handover Defense: 3. Dynamic Schema Preflight for Time Key
+    time_key = "time"
+    valid_time_keys = ["time", "time_end", "bucket_id", "time_start", "__time_dt"]
+    for cand in valid_time_keys:
+        if cand in df.columns:
+            time_key = cand
+            break
+            
+    if time_key not in df.columns:
+        # Fallback to creating a dummy row-index if absolutely no time-column found
+        df = df.with_row_index(name="time_idx")
+        time_key = "time_idx"
+
     # v61 Fix: Calculate Excess Return Target (Alpha) without Look-Ahead Bias
-    print("[*] Orthogonalizing target (Excess Return)...", flush=True)
+    print(f"[*] Orthogonalizing target (Excess Return) using temporal key: {time_key}...", flush=True)
     df = df.with_columns([
-        (pl.col("t1_fwd_return") - pl.col("t1_fwd_return").mean().over(["date", "time"])).alias("t1_excess_return")
+        (pl.col("t1_fwd_return") - pl.col("t1_fwd_return").mean().over(["date", time_key])).alias("t1_excess_return")
     ])
 
     epi = df.get_column("epiplexity").to_numpy()
