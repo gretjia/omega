@@ -47,7 +47,7 @@ def process_chunk(kwargs):
         
         # 1. Lazy evaluation to extract unique symbols in this chunk
         try:
-            symbols = lf.select("symbol").unique().collect(streamable=True).get_column("symbol").to_list()
+            symbols = lf.select("symbol").unique().collect().get_column("symbol").to_list()
         except pl.exceptions.ColumnNotFoundError:
             # Fallback if no symbol column exists
             symbols = [None]
@@ -55,7 +55,12 @@ def process_chunk(kwargs):
         batch_size = 50
         symbol_batches = [symbols[i:i + batch_size] for i in range(0, len(symbols), batch_size)]
         
-        computed_dfs = []
+        tmp_parquet = out_path.with_suffix(".parquet.tmp")
+        
+        import pyarrow.parquet as pq
+        writer = None
+        total_rows = 0
+        
         for batch in symbol_batches:
             if batch == [None]:
                 batch_lf = lf
@@ -66,25 +71,25 @@ def process_chunk(kwargs):
             batch_df = build_l2_features_from_l1(batch_lf, GLOBAL_CFG)
             
             if batch_df is not None and batch_df.height > 0:
-                computed_dfs.append(batch_df)
+                total_rows += batch_df.height
+                arrow_table = batch_df.to_arrow()
+                if writer is None:
+                    writer = pq.ParquetWriter(tmp_parquet, arrow_table.schema, compression="snappy")
+                writer.write_table(arrow_table)
+                del arrow_table
                 
-            # OOM Guard: Iterative GC sweep per batch
+            # OOM Guard: Iterative GC sweep per batch to prevent RSS creep
             del batch_lf
             del batch_df
             import gc
             gc.collect()
         
-        if computed_dfs:
-            frames_df = pl.concat(computed_dfs)
-            # Atomic write
-            tmp_parquet = out_path.with_suffix(".parquet.tmp")
-            frames_df.write_parquet(tmp_parquet, compression="snappy")
+        if writer is not None:
+            writer.close()
+            # Atomic write completion
             tmp_parquet.rename(out_path)
             done_path.touch()
-            return_msg = f"[{file_path.name}] Completed: {frames_df.height} rows"
-            
-            del frames_df
-            del computed_dfs
+            return_msg = f"[{file_path.name}] Completed: {total_rows} rows"
         else:
             return_msg = f"[{file_path.name}] Error: Empty physics frames generated"
             
