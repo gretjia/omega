@@ -42,33 +42,61 @@ def process_chunk(kwargs):
 
     try:
         # Codex Correction: DO NOT load full universe into memory blindly.
-        # We process files individually. Each file generally represents 1 date/chunk.
-        # We use pl.scan_parquet for lazy evaluation to minimize RAM pressure.
+        # We process files individually, and within each file, process by symbol batches.
         lf = pl.scan_parquet(l1_file)
         
-        # Apply the mathematically verified V62 Physics pipeline
-        frames_df = build_l2_features_from_l1(lf, GLOBAL_CFG)
+        # 1. Lazy evaluation to extract unique symbols in this chunk
+        try:
+            symbols = lf.select("symbol").unique().collect(streamable=True).get_column("symbol").to_list()
+        except pl.exceptions.ColumnNotFoundError:
+            # Fallback if no symbol column exists
+            symbols = [None]
+            
+        batch_size = 50
+        symbol_batches = [symbols[i:i + batch_size] for i in range(0, len(symbols), batch_size)]
         
-        if frames_df.height > 0:
+        computed_dfs = []
+        for batch in symbol_batches:
+            if batch == [None]:
+                batch_lf = lf
+            else:
+                batch_lf = lf.filter(pl.col("symbol").is_in(batch))
+                
+            # Apply the mathematically verified V62 Physics pipeline
+            batch_df = build_l2_features_from_l1(batch_lf, GLOBAL_CFG)
+            
+            if batch_df is not None and batch_df.height > 0:
+                computed_dfs.append(batch_df)
+                
+            # OOM Guard: Iterative GC sweep per batch
+            del batch_lf
+            del batch_df
+            import gc
+            gc.collect()
+        
+        if computed_dfs:
+            frames_df = pl.concat(computed_dfs)
             # Atomic write
             tmp_parquet = out_path.with_suffix(".parquet.tmp")
             frames_df.write_parquet(tmp_parquet, compression="snappy")
             tmp_parquet.rename(out_path)
             done_path.touch()
             return_msg = f"[{file_path.name}] Completed: {frames_df.height} rows"
+            
+            del frames_df
+            del computed_dfs
         else:
             return_msg = f"[{file_path.name}] Error: Empty physics frames generated"
             
-        # OOM Guard: Force garbage collection to prevent leak-like memory creep in long-lived workers
-        del frames_df
         del lf
-        import gc
-        gc.collect()
-        
         return return_msg
             
     except Exception as e:
         return f"[{file_path.name}] CRITICAL Error: {e}"
+    finally:
+        # OOM Guard: Force garbage collection on both success and exception paths
+        import gc
+        gc.collect()
 
 def main():
     ap = argparse.ArgumentParser(description="v62 Stage 2 Physics Compute Agent")
