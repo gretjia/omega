@@ -88,11 +88,12 @@ def main():
     ap.add_argument("--years", default="2023,2024,2025,2026")
     ap.add_argument("--workers", type=int, default=2,
                     help="Number of parallel workers. Default=2 to prevent swap thrash.")
-    ap.add_argument("--shard", type=int, default=1, help="Shard index (0 to N-1)")
-    ap.add_argument("--total-shards", type=int, default=2, help="Total number of shards")
+    ap.add_argument("--shard", type=str, default="3", help="Comma-separated shard indices (e.g., '3' out of N-1)")
+    ap.add_argument("--total-shards", type=int, default=4, help="Total number of shards")
     args = ap.parse_args()
 
     years = args.years.split(",")
+    active_shards = [int(s) for s in args.shard.split(",")]
     all_files = []
 
     OUTPUT_ROOT.mkdir(parents=True, exist_ok=True)
@@ -107,7 +108,7 @@ def main():
         hash_str = "unknown"
 
     print(f"Git hash: {hash_str}")
-    print(f"Shard: {args.shard}/{args.total_shards}, Workers: {args.workers}")
+    print(f"Active Shards: {active_shards}/{args.total_shards}, Workers: {args.workers}")
     print(f"POLARS_MAX_THREADS: {os.environ.get('POLARS_MAX_THREADS', 'unset')}")
 
     for year in years:
@@ -125,8 +126,9 @@ def main():
     tasks = []
     skipped_by_shard = 0
     for f in all_files:
-        if get_shard(f.name, args.total_shards) == args.shard:
-            tasks.append((f, hash_str, args.shard, args.total_shards))
+        shard_idx = get_shard(f.name, args.total_shards)
+        if shard_idx in active_shards:
+            tasks.append((f, hash_str, shard_idx, args.total_shards))
         else:
             skipped_by_shard += 1
 
