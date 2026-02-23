@@ -31,6 +31,13 @@ The V62 pipeline is strictly decoupled into three stages to maximize I/O through
   - Backtest: `tools/run_local_backtest.py`.
 - **Action:** Sync `L2.parquet` to GCS -> Spot VM Pulse (100+ nodes) -> Local validation.
 
+## Log Monitoring Index
+Detailed log guide: `handover/ops/PIPELINE_LOGS.md`
+
+- **Stage 1 (Linux):** `tail -f audit/stage1_linux_v62.log`
+- **Stage 1 (Windows):** `audit/stage1_windows_v62.log`
+- **Stage 2/3:** Generally `stdout`. Recommendation: `2>&1 | tee audit/stage2.log`
+
 ---
 
 ## Update 2026-02-24 04:16:00 +0800 (omega-vm -> windows Reachability Fix Landed)
