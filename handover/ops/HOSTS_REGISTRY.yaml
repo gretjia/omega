@@ -1,5 +1,5 @@
 version: 1
-updated_at: "2026-02-22T00:00:00+08:00"
+updated_at: "2026-02-23T18:55:00+08:00"
 notes:
   - "Non-secret host metadata only."
   - "Do not store passwords, private keys, or tokens."
@@ -7,7 +7,8 @@ notes:
 hosts:
   windows1:
     alias: windows1-w1
-    host: 192.168.3.112
+    host: 100.123.90.25
+    local_ip: 192.168.3.112
     user: jiazi
     os: windows
     repo_root: "D:\\work\\Omega_vNext"
@@ -18,7 +19,8 @@ hosts:
 
   linux1:
     alias: linux1-lx
-    host: 192.168.3.113
+    host: 100.64.97.113
+    local_ip: 192.168.3.113
     user: zepher
     os: linux
     repo_root: "/home/zepher/work/Omega_vNext"
@@ -26,5 +28,14 @@ hosts:
     cache_root: "/home/zepher/framing_cache"
     probe:
       - "ssh linux1-lx 'hostname; whoami; uptime'"
-      - "ssh zepher@192.168.3.113 'hostname; whoami; uptime'"
+      - "ssh zepher@100.64.97.113 'hostname; whoami; uptime'"
 
+  mac_workstation:
+    alias: mac-back
+    host: localhost
+    port: 2222
+    user: zephryj
+    os: darwin
+    notes: "Connected via reverse SSH tunnel from Mac to VM"
+    probe:
+      - "ssh mac-back 'uname -srm'"

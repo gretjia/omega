@@ -1,7 +1,57 @@
 # LATEST
 
-Last Updated: 2026-02-23 08:18:19 +0800
-Active Mission: Dual Stage1 Overnight Run (Linux Supervised)
+Last Updated: 2026-02-24 04:20:00 +0800 (V62 Pipeline Spec Update)
+Active Mission: Linux Stage1 completion + tailnet stability hardening
+
+## V62 Pipeline Architecture: Orthogonal Decoupling
+
+The V62 pipeline is strictly decoupled into three stages to maximize I/O throughput and enable rapid mathematical iteration.
+
+### Stage 1: Base Lake (Objective Extraction)
+- **Goal:** Extract raw `.7z` archives to `.parquet`. Objective price/volume data only (no physics). **Run once per dataset.**
+- **Files:**
+  - Linux: `tools/stage1_linux_base_etl.py` (Uses `/home/zepher/framing_cache` on NVMe to bypass ZFS).
+  - Windows: `tools/stage1_windows_base_etl.py` (Uses `D:\tmp\framing\`).
+- **Action:** `7z x` -> Clean CSV -> Polars ETL -> `Base_L1.parquet`.
+- **Primary Tooling:** `tools/build_7z_shards.py` (Generate shard lists).
+
+### Stage 2: Physics Engine (Mathematical Modeling)
+- **Goal:** Apply high-order physics (MDL, SRL, Topology) to `Base_L1.parquet`. **Run every time the math model changes.**
+- **Files:**
+  - `tools/stage2_physics_compute.py`
+  - Core Math: `omega_core/omega_math_core.py` (Numba JIT accelerated).
+- **Action:** Load Parquet -> Numba Parallel Compute -> `Feature_L2.parquet`.
+- **Requirement:** High RAM (128G nodes) for in-memory compute.
+
+### Stage 3: Training & Backtest (GCP Scale-out)
+- **Goal:** Train XGBoost models and verify via backtesting.
+- **Files:**
+  - Training: `tools/run_vertex_xgb_train.py` (Vertex AI / GCP Batch).
+  - Upload: `tools/gcp_upload.py`.
+  - Backtest: `tools/run_local_backtest.py`.
+- **Action:** Sync `L2.parquet` to GCS -> Spot VM Pulse (100+ nodes) -> Local validation.
+
+---
+
+## Update 2026-02-24 04:16:00 +0800 (omega-vm -> windows Reachability Fix Landed)
+
+- Corrected diagnosis: prior `CRITICAL / DOWN` call for Windows was a false-positive caused by intermittent tailnet path rebuild, not confirmed OS crash.
+- New RCA + landed-fix entry:
+  - `handover/ai-direct/entries/20260224_041600_omega_vm_windows_connectivity_rca_fix.md`
+- Landed stabilization:
+  - Windows keepalive task `Omega_Tailscale_Keepalive` (running)
+  - `C:\Omega_vNext\tools\windows_tailscale_keepalive.ps1` (120s loop keepalive)
+  - `tools/check_windows_from_omega.sh` (retry/multi-signal probe, anti-false-alarm)
+- Verification:
+  - omega->windows repeated probe window passed (5/5 ping+tcp22)
+  - Linux Stage1 still active (`DONE=426`)
+  - Windows Stage1 shard complete (`DONE=191`, task `Ready`)
+
+## Update 2026-02-23 04:05:00 +0000 (System Status Check)
+
+- **Linux (100.64.97.113):** 🟢 **ACTIVE**. Shards 0, 1, 2 processing early 2025. 422 files completed. Stable bypassing ZFS.
+- **Windows (100.123.90.25):** Historical note only. This CRITICAL conclusion was superseded by 2026-02-24 RCA (intermittent tailnet reachability, not confirmed OS crash).
+- **Handover Entry:** `handover/ai-direct/entries/20260223_stage1_status.md`
 
 ## Update 2026-02-23 08:18:19 +0800 (Stage2 Repeated-Scan Fix Landed)
 
@@ -218,3 +268,33 @@ Priority now:
   - Linux output: `64 parquet / 64 done / 0 tmp` (`fbd5c8b`)
   - Windows output: `126 parquet / 126 done / 0 tmp` (`b07c2229`)
 - Detailed handover: `handover/ai-direct/entries/20260223_105456_stage1_resume_crosshash_hardening.md`
+
+---
+
+## Update 2026-02-23 18:50:00 +0800 (V62 Framing Rebuild Alignment Summary)
+
+- New landed entry:
+  - `handover/ai-direct/entries/20260223_185000_v62_framing_rebuild_alignment_summary.md`
+- Confirmed full implementation of V62 blueprint mandates:
+  - Two-Stage Orthogonal Decoupling (Stage 1 I/O vs Stage 2 Physics).
+  - GIL Eradication via Numba JIT kernels (@njit parallel=True).
+  - Mathematical Safety (log(0) clipping) and Time-Arrow (Temporal Rolling) enforcement.
+  - Operational Stability (CPUQuota=2400% on Linux, NVMe Cache routing).
+- Current Mission: Monitoring Dual Stage 1 runs on Linux and Windows.
+
+---
+
+## Update 2026-02-24 04:22:00 +0800 (Append-Only: omega-vm Connectivity Hardening)
+
+- This block is append-only (no overwrite of existing LATEST content).
+- Connectivity RCA and landed fixes are recorded in:
+  - `handover/ai-direct/entries/20260224_041600_omega_vm_windows_connectivity_rca_fix.md`
+- False-positive correction:
+  - `omega-vm -> windows1-w1` intermittent timeout window is treated as transport path rebuild, not immediate OS hard-crash.
+- Landed mitigations:
+  - Windows keepalive task: `Omega_Tailscale_Keepalive` (running)
+  - Windows keepalive script: `C:\Omega_vNext\tools\windows_tailscale_keepalive.ps1`
+  - omega-vm retry probe: `tools/check_windows_from_omega.sh`
+- Operational gate update:
+  - Do not declare `CRITICAL / DOWN` from a single timeout sample.
+  - Require retry-window + multi-signal probe (`tailscale ping`, `TCP/22`, `ssh`) before escalation.
