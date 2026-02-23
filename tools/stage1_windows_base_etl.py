@@ -25,6 +25,7 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from config import load_l2_pipeline_config
 from omega_core.omega_etl import build_l1_base_ticks
+from tools.stage1_incremental_writer import write_l1_incremental_parquet
 
 RAW_ROOT = Path(r"E:\data\level2")
 OUTPUT_ROOT = Path(r"D:\Omega_frames\v62_base_l1\host=windows1")
@@ -39,7 +40,7 @@ def get_shard(filename, total_shards):
 
 def process_day(args):
     """Process a single trading day: 7z extract -> CSV scan -> Polars ETL -> Parquet."""
-    day_path, hash_str, shard_index, total_shards = args
+    day_path, hash_str, shard_index, total_shards, symbol_batch_size = args
 
     os.chdir(str(PROJECT_ROOT))
     date_str = day_path.stem
@@ -64,20 +65,25 @@ def process_day(args):
         cmd = [SEVEN_ZIP, "x", str(day_path), f"-o{tmp_dir}", "-y"]
         subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
-        csvs = list(tmp_dir.glob("**/*.csv"))
+        csvs = [str(p) for p in tmp_dir.glob("**/*.csv")]
         if not csvs:
             return f"[{date_str}] Error: No CSVs found"
 
-        # ETL with global config (no re-parse) - Pure Base L1 Generation
-        frames = build_l1_base_ticks([str(p) for p in csvs], GLOBAL_CFG)
+        # Incremental per-symbol/par-batch writing to avoid full-day materialization blowups.
+        tmp_parquet = out_path.with_suffix(".parquet.tmp")
+        written_rows = write_l1_incremental_parquet(
+            csv_paths=csvs,
+            cfg=GLOBAL_CFG,
+            tmp_parquet_path=tmp_parquet,
+            symbol_batch_size=symbol_batch_size,
+            build_fn=build_l1_base_ticks,
+        )
 
-        if frames.height > 0:
+        if written_rows > 0:
             # Atomic write: write to .tmp then rename
-            tmp_parquet = out_path.with_suffix(".parquet.tmp")
-            frames.write_parquet(tmp_parquet, compression="snappy")
             tmp_parquet.rename(out_path)
             done_path.touch()
-            return f"[{date_str}] Completed: {frames.height} rows"
+            return f"[{date_str}] Completed: {written_rows} rows"
         else:
             return f"[{date_str}] Error: Empty frames"
 
@@ -94,6 +100,12 @@ def main():
                     help="Number of parallel workers. Default=2 to prevent swap thrash.")
     ap.add_argument("--shard", type=str, default="3", help="Comma-separated shard indices (e.g., '3' out of N-1)")
     ap.add_argument("--total-shards", type=int, default=4, help="Total number of shards")
+    ap.add_argument(
+        "--symbol-batch-size",
+        type=int,
+        default=64,
+        help="Symbols processed per incremental write batch in Stage1.",
+    )
     args = ap.parse_args()
 
     years = args.years.split(",")
@@ -114,6 +126,7 @@ def main():
     print(f"Git hash: {hash_str}")
     print(f"Active Shards: {active_shards}/{args.total_shards}, Workers: {args.workers}")
     print(f"POLARS_MAX_THREADS: {os.environ.get('POLARS_MAX_THREADS', 'unset')}")
+    print(f"symbol_batch_size: {args.symbol_batch_size}")
 
     for year in years:
         year_path = RAW_ROOT / year
@@ -132,7 +145,7 @@ def main():
     for f in all_files:
         shard_idx = get_shard(f.name, args.total_shards)
         if shard_idx in active_shards:
-            tasks.append((f, hash_str, shard_idx, args.total_shards))
+            tasks.append((f, hash_str, shard_idx, args.total_shards, args.symbol_batch_size))
         else:
             skipped_by_shard += 1
 
