@@ -157,24 +157,23 @@ python tools/build_7z_shards.py --root <RAW_ROOT> --out-dir audit/runtime/curren
 
 将这 3 个小文件同步回 Mac Controller 的 repo 后，由 Mac 提交并 push（Workers 只 pull）。
 
-### 2) Workers 各跑各的 shard（核心入口：`--archive-list`）
+### 2) Workers 各跑各的 shard（v62 入口）
+
+`pipeline_runner.py` / `pipeline.engine.framer` 已归档并禁用，避免旧链路与 v62 混跑。
 
 Windows1：
 
 ```bash
-python pipeline_runner.py --stage frame --config configs/hardware/windows1.yaml --archive-list audit/runtime/current/shard_windows1.txt
+python tools/stage1_windows_base_etl.py --years 2023,2024,2025,2026 --total-shards 4 --shard 3 --workers 1
 ```
 
 Linux：
 
 ```bash
-python pipeline_runner.py --stage frame --config configs/hardware/linux.yaml --archive-list audit/runtime/current/shard_linux.txt
+bash tools/launch_linux_stage1_heavy_slice.sh -- --years 2023,2024,2025,2026 --total-shards 4 --shard 0,1,2 --workers 1
 ```
 
-`--archive-list` 支持：
-
-- 清单内为相对路径（相对 `storage.source_root`）
-- 或绝对路径（Windows/Linux 都可）
+v62 采用 `--total-shards` + `--shard` 做切分，不再走旧 `--archive-list` Framer 路径。
 
 ### 3) staging 与输出目录建议（重要）
 
@@ -238,29 +237,31 @@ python tools/compare_raw_manifests.py \
 
 ## 系统架构 (Modular Architecture)
 
-OMEGA adopts a **Modular Pipeline Architecture**, separating Configuration, Logic, and Execution.
+OMEGA adopts a **Modular Two-Stage Architecture**, separating extraction and physics.
 
 ```mermaid
 graph TD
-    Config[configs/*.yaml] --> Runner[pipeline_runner.py]
-    Runner --> Pipeline[pipeline/]
+    Config[configs/*.yaml] --> Stage1[tools/stage1_*_base_etl.py]
+    Stage1 --> L1[Base_L1.parquet]
+    L1 --> Stage2[tools/stage2_physics_compute.py]
+    Stage2 --> L2[Feature_L2.parquet]
     
-    subgraph "The Engine (pipeline/)"
-        Adapter[adapters/OmegaCoreAdapter] --> Interface[interfaces/IMathCore]
-        Framer[engine/framer.py] --> Adapter
+    subgraph "Legacy (Archived)"
+        Runner[pipeline_runner.py]
+        Framer[engine/framer.py]
     end
     
     subgraph "The Core (omega_core/)"
         Kernel[kernel.py] --> Math[omega_math_core.py]
         ETL[omega_etl.py] --> Math
     end
-    
-    Framer -- Calls --> Kernel
+
+    Stage2 -- Calls --> Kernel
 ```
 
 ### 目录结构 (Directory Structure)
 
-- **`pipeline/`**: **The Execution Engine.**
+- **`pipeline/`**: **Legacy execution engine (archived for v62 runtime).**
   - `config/`: Pydantic/Dataclass schemas for Hardware & Model.
   - `interfaces/`: Abstract Base Classes (IMathCore) for future-proofing.
   - `adapters/`: Glue code that binds `omega_core` to the pipeline.

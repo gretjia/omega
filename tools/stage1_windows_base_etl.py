@@ -26,6 +26,11 @@ if str(PROJECT_ROOT) not in sys.path:
 from config import load_l2_pipeline_config
 from omega_core.omega_etl import build_l1_base_ticks
 from tools.stage1_incremental_writer import write_l1_incremental_parquet
+from tools.stage1_resume_utils import (
+    clear_stale_done_marker,
+    ensure_done_for_existing_parquet,
+    find_existing_done_for_date,
+)
 
 RAW_ROOT = Path(r"E:\data\level2")
 OUTPUT_ROOT = Path(r"D:\Omega_frames\v62_base_l1\host=windows1")
@@ -47,8 +52,21 @@ def process_day(args):
     out_path = OUTPUT_ROOT / f"{date_str}_{hash_str}.parquet"
     done_path = OUTPUT_ROOT / f"{date_str}_{hash_str}.parquet.done"
 
-    if done_path.exists():
+    if done_path.exists() and out_path.exists():
         return f"[{date_str}] Skipped (Done)"
+
+    if clear_stale_done_marker(out_path, done_path):
+        print(
+            f"[{date_str}] WARN: removed stale done marker {done_path.name}",
+            flush=True,
+        )
+
+    if ensure_done_for_existing_parquet(out_path, done_path):
+        return f"[{date_str}] Skipped (Recovered Done Marker)"
+
+    existing_done = find_existing_done_for_date(OUTPUT_ROOT, date_str)
+    if existing_done is not None:
+        return f"[{date_str}] Skipped (Done: {existing_done.name})"
 
     print(f"[{date_str}] Starting processing (Shard {shard_index}/{total_shards})...", flush=True)
 
@@ -71,6 +89,8 @@ def process_day(args):
 
         # Incremental per-symbol/par-batch writing to avoid full-day materialization blowups.
         tmp_parquet = out_path.with_suffix(".parquet.tmp")
+        if tmp_parquet.exists():
+            tmp_parquet.unlink(missing_ok=True)
         written_rows = write_l1_incremental_parquet(
             csv_paths=csvs,
             cfg=GLOBAL_CFG,

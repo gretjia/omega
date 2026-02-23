@@ -32,6 +32,27 @@ def _iter_chunks(items: Sequence[list[str]], chunk_size: int) -> Iterable[Sequen
         yield items[i : i + step]
 
 
+def _align_batch_to_schema(
+    batch_df: pl.DataFrame,
+    base_schema: "OrderedDict[str, pl.DataType]",
+) -> pl.DataFrame:
+    """Normalize a batch to the writer schema (columns, order, dtypes)."""
+    for col, dtype in base_schema.items():
+        if col not in batch_df.columns:
+            batch_df = batch_df.with_columns(pl.lit(None).cast(dtype).alias(col))
+
+    batch_df = batch_df.select(list(base_schema.keys()))
+
+    cast_exprs = []
+    for col, dtype in base_schema.items():
+        if batch_df.schema.get(col) != dtype:
+            cast_exprs.append(pl.col(col).cast(dtype, strict=False).alias(col))
+    if cast_exprs:
+        batch_df = batch_df.with_columns(cast_exprs)
+
+    return batch_df
+
+
 def write_l1_incremental_parquet(
     csv_paths: Sequence[str],
     cfg,
@@ -52,6 +73,7 @@ def write_l1_incremental_parquet(
 
     out_path = Path(tmp_parquet_path)
     writer: pq.ParquetWriter | None = None
+    base_schema: "OrderedDict[str, pl.DataType]" | None = None
     total_rows = 0
 
     try:
@@ -73,7 +95,14 @@ def write_l1_incremental_parquet(
             if len(batch_frames) == 1:
                 batch_df = batch_frames[0]
             else:
-                batch_df = pl.concat(batch_frames, how="vertical_relaxed")
+                # Same-day symbols can have non-identical column sets in older
+                # archives; diagonal_relaxed unions columns and fills nulls.
+                batch_df = pl.concat(batch_frames, how="diagonal_relaxed")
+
+            if base_schema is None:
+                base_schema = OrderedDict(batch_df.schema)
+            else:
+                batch_df = _align_batch_to_schema(batch_df, base_schema)
 
             arrow_table = batch_df.to_arrow()
             if writer is None:
@@ -90,4 +119,3 @@ def write_l1_incremental_parquet(
             writer.close()
 
     return total_rows
-

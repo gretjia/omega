@@ -2,7 +2,7 @@
 
 > **DEPRECATION NOTICE**: This pipeline is for OMEGA v4.0.
 > For OMEGA v5.0 (Holographic Damper), please refer to the **root README.md**.
-> Use `python pipeline_runner.py --stage frame` for framing.
+> Legacy fallback only: `python archive/legacy_v50/pipeline_runner_v50.py --stage frame`.
 
 > Last updated: 2026-02-10 (full pipeline fixed-split launcher + pre-run clean + race winner summary output)
 

@@ -149,6 +149,106 @@ class TestStage1IncrementalWriterEquivalence(unittest.TestCase):
             self.assertEqual(written_rows, expected.height)
             self._assert_frame_equal(expected, actual)
 
+    def test_schema_alignment_across_batches(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            p_a = root / "20230103" / "000001.SZ" / "a.csv"
+            p_b = root / "20230103" / "000002.SZ" / "b.csv"
+            p_a.parent.mkdir(parents=True, exist_ok=True)
+            p_b.parent.mkdir(parents=True, exist_ok=True)
+            p_a.write_text("x", encoding="utf-8")
+            p_b.write_text("x", encoding="utf-8")
+
+            def fake_build(csv_path_or_paths, _cfg):
+                path_str = (
+                    str(csv_path_or_paths[0])
+                    if isinstance(csv_path_or_paths, list)
+                    else str(csv_path_or_paths)
+                )
+                if "000001.SZ" in path_str:
+                    return pl.DataFrame(
+                        {
+                            "symbol": ["000001.SZ"],
+                            "time": [93000000],
+                            "price": [10.1],
+                            "ask_v2": [1200.0],
+                        }
+                    )
+                return pl.DataFrame(
+                    {
+                        "symbol": ["000002.SZ"],
+                        "time": pl.Series("time", [93000000], dtype=pl.Int32),
+                        "price": [20],  # int on purpose
+                        # ask_v2 intentionally missing
+                    }
+                )
+
+            out = root / "out_schema_align.parquet"
+            written_rows = write_l1_incremental_parquet(
+                csv_paths=[str(p_a), str(p_b)],
+                cfg=self.cfg,
+                tmp_parquet_path=out,
+                symbol_batch_size=1,
+                build_fn=fake_build,
+            )
+            actual = pl.read_parquet(out)
+
+            self.assertEqual(written_rows, 2)
+            self.assertEqual(actual.columns, ["symbol", "time", "price", "ask_v2"])
+            self.assertEqual(actual.height, 2)
+            self.assertIsNone(actual.to_dict(as_series=False)["ask_v2"][1])
+
+    def test_schema_alignment_within_same_batch(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            p_a = root / "20230103" / "000001.SZ" / "a.csv"
+            p_b = root / "20230103" / "000002.SZ" / "b.csv"
+            p_a.parent.mkdir(parents=True, exist_ok=True)
+            p_b.parent.mkdir(parents=True, exist_ok=True)
+            p_a.write_text("x", encoding="utf-8")
+            p_b.write_text("x", encoding="utf-8")
+
+            def fake_build(csv_path_or_paths, _cfg):
+                path_str = (
+                    str(csv_path_or_paths[0])
+                    if isinstance(csv_path_or_paths, list)
+                    else str(csv_path_or_paths)
+                )
+                if "000001.SZ" in path_str:
+                    return pl.DataFrame(
+                        {
+                            "symbol": ["000001.SZ"],
+                            "time": [93000000],
+                            "price": [10.1],
+                            "ask_v2": [1200.0],
+                        }
+                    )
+                return pl.DataFrame(
+                    {
+                        "symbol": ["000002.SZ"],
+                        "time": [93000000],
+                        "price": [20.2],
+                        "bid_v2": [900.0],
+                    }
+                )
+
+            out = root / "out_schema_align_same_batch.parquet"
+            written_rows = write_l1_incremental_parquet(
+                csv_paths=[str(p_a), str(p_b)],
+                cfg=self.cfg,
+                tmp_parquet_path=out,
+                symbol_batch_size=2,  # force mixed schemas into one concat batch
+                build_fn=fake_build,
+            )
+            actual = pl.read_parquet(out)
+
+            self.assertEqual(written_rows, 2)
+            self.assertEqual(actual.columns, ["symbol", "time", "price", "ask_v2", "bid_v2"])
+            self.assertEqual(actual.height, 2)
+            rows = actual.to_dict(as_series=False)
+            self.assertIsNone(rows["bid_v2"][0])
+            self.assertIsNone(rows["ask_v2"][1])
+
 
 if __name__ == "__main__":
     unittest.main()

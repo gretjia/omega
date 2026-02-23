@@ -46,6 +46,7 @@ ssh linux1-lx 'hostname; whoami; uptime'
 
 - Stage 1 Linux:
   - `tools/stage1_linux_base_etl.py`
+  - `tools/launch_linux_stage1_heavy_slice.sh` (recommended launcher; enforces `heavy-workload.slice`, caller UID/GID, and Python `polars` preflight)
 - Stage 1 Windows:
   - `tools/stage1_windows_base_etl.py`
 - Stage 2 physics:
@@ -55,10 +56,22 @@ ssh linux1-lx 'hostname; whoami; uptime'
 - Incident watchdog:
   - `tools/ai_incident_watchdog.py`
 
+Linux Stage1 launch (best-practice guarded):
+
+```bash
+ssh zepher@192.168.3.113 'cd /home/zepher/work/Omega_vNext && bash tools/launch_linux_stage1_heavy_slice.sh -- --years 2026 --total-shards 4 --shard 0,1,2 --workers 1'
+```
+
+Linux overnight supervisor (deployed on Linux host):
+
+```bash
+ssh zepher@192.168.3.113 'tail -n 40 /home/zepher/work/Omega_vNext/audit/linux_stage1_supervisor.log'
+ssh zepher@192.168.3.113 'cat /home/zepher/work/Omega_vNext/artifacts/runtime/linux_stage1_supervisor.pid'
+```
+
 ## 5) Recommended Startup Sequence for Any Agent
 
 1. `bash tools/agent_handover_preflight.sh`
 2. `python3 .codex/skills/multi-agent-ops/scripts/deploy_and_check.py --repair`
 3. Read `handover/ai-direct/LATEST.md`
 4. Continue using skill-specific workflow docs.
-

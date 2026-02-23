@@ -13,7 +13,10 @@ This package manages the "How" of running OMEGA, while `omega_core` manages the 
     *   **`framer.py`**: A highly parallelized (ProcessPoolExecutor), map-reduce style ETL engine. It solves the "Slice Paradox" by grouping files by symbol before processing.
 
 ## Workflow
-1.  User runs `python pipeline_runner.py`.
-2.  `ConfigLoader` reads `configs/hardware/active_profile.yaml`.
-3.  `Framer` (or Trainer) is instantiated with the Hardware Profile.
-4.  The Engine calls `adapter.process_frame()` to delegate math to `omega_core`.
+1.  `pipeline_runner.py` and `pipeline/engine/framer.py` are archived legacy (v50/v52) and blocked.
+2.  Active framing path is v62 two-stage scripts under `tools/`:
+    - `tools/stage1_linux_base_etl.py` / `tools/stage1_windows_base_etl.py`
+    - `tools/stage2_physics_compute.py`
+3.  Archived legacy sources are preserved at:
+    - `archive/legacy_v50/pipeline_runner_v50.py`
+    - `archive/legacy_v50/pipeline_engine_framer_v52.py`
