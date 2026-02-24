@@ -1,77 +1,85 @@
 # Skills and Tools Index
 
-This is the operational index for "what can be used directly now".
+This file is the fast operational index for executable skills and pipeline tools.
 
-## 1) Executable Skills (Primary)
+## 1. AI Skills (Primary)
 
-- `.codex/skills/multi-agent-ops/SKILL.md`
-  - scripts:
-    - `.codex/skills/multi-agent-ops/scripts/deploy_and_check.py`
-    - `.codex/skills/multi-agent-ops/scripts/switch_profile.py`
-    - `.codex/skills/multi-agent-ops/scripts/log_debug_experience.py`
-- `.codex/skills/omega-run-ops/SKILL.md`
-  - scripts:
-    - `.codex/skills/omega-run-ops/scripts/ssh_ps.py`
-- `.codex/skills/v60-multi-agent-ops/SKILL.md`
-  - compatibility alias for `multi-agent-ops`.
+| Skill | Path | Use Case |
+|---|---|---|
+| multi-agent-ops | `.codex/skills/multi-agent-ops/SKILL.md` | governance checks, profile switching, memory refresh, recursive audit flow |
+| omega-run-ops | `.codex/skills/omega-run-ops/SKILL.md` | multi-host operations (Linux/Windows over SSH) |
+| v60-multi-agent-ops | `.codex/skills/v60-multi-agent-ops/SKILL.md` | compatibility alias of `multi-agent-ops` |
 
-## 2) Policy Templates (Secondary)
-
-- `.agent/skills/*`
-  - use as policy references.
-  - do not treat as the main executable skill surface in this repository.
-
-## 3) Operational Tools (Direct Use)
-
-Multi-agent governance:
+## 2. Governance Commands
 
 ```bash
 python3 .codex/skills/multi-agent-ops/scripts/deploy_and_check.py --repair
 python3 .codex/skills/multi-agent-ops/scripts/switch_profile.py --oracle codex_xhigh --mechanic gemini_flash --auditor-primary gemini_pro --auditor-secondary codex_xhigh --debug-scribe codex_medium
 ```
 
-Windows over SSH PowerShell:
+## 3. Pipeline Tools (v62)
+
+### 3.1 Stage 1 Base Lake
+
+- Linux: `tools/stage1_linux_base_etl.py`
+- Linux guarded launcher: `tools/launch_linux_stage1_heavy_slice.sh`
+- Windows: `tools/stage1_windows_base_etl.py`
+- Shared helper: `tools/stage1_incremental_writer.py`
+- Resume helper: `tools/stage1_resume_utils.py`
+- Shard builder: `tools/build_7z_shards.py`
+
+### 3.2 Stage 2 Physics
+
+- `tools/stage2_physics_compute.py`
+
+### 3.3 Stage 2.5 Base Matrix
+
+- `tools/forge_base_matrix.py`
+- compatibility check: `tools/check_frame_train_backtest_compat.py`
+
+### 3.4 Stage 3 Train/Backtest
+
+- Vertex train launcher: `tools/run_vertex_xgb_train.py`
+- Local backtest: `tools/run_local_backtest.py`
+- GCS upload helper: `tools/gcp_upload.py`
+
+## 4. Host Operations and Monitoring Tools
+
+- Agent preflight: `tools/agent_handover_preflight.sh`
+- Windows probe from omega-vm: `tools/check_windows_from_omega.sh`
+- Windows PowerShell over SSH wrapper: `.codex/skills/omega-run-ops/scripts/ssh_ps.py`
+- Linux night watchdog: `tools/night_watchdog.py`
+- Incident watchdog: `tools/ai_incident_watchdog.py`
+
+## 5. Core Code Modules
+
+- ETL engine: `omega_core/omega_etl.py`
+- Physics kernel: `omega_core/kernel.py`
+- Numerical core: `omega_core/omega_math_core.py`
+- Rolling math: `omega_core/omega_math_rolling.py`
+
+## 6. Quick Command Patterns
+
+### Linux status
 
 ```bash
-python3 .codex/skills/omega-run-ops/scripts/ssh_ps.py windows1-w1 --command 'hostname; whoami'
+ssh linux1-lx 'pgrep -af "stage1_linux_base_etl.py|stage2_physics_compute.py" || true'
 ```
 
-Linux direct:
+### Windows status
 
 ```bash
-ssh linux1-lx 'hostname; whoami; uptime'
+python3 .codex/skills/omega-run-ops/scripts/ssh_ps.py windows1-w1 --command '
+Get-CimInstance Win32_Process | Where-Object {
+  $_.CommandLine -like "*stage1_windows_base_etl.py*" -or
+  $_.CommandLine -like "*stage2_physics_compute.py*"
+} | Select-Object ProcessId,Name,CommandLine | Format-List
+'
 ```
 
-## 4) Pipeline Entry Scripts
-
-- Stage 1 Linux:
-  - `tools/stage1_linux_base_etl.py`
-  - `tools/launch_linux_stage1_heavy_slice.sh` (recommended launcher; enforces `heavy-workload.slice`, caller UID/GID, and Python `polars` preflight)
-- Stage 1 Windows:
-  - `tools/stage1_windows_base_etl.py`
-- Stage 2 physics:
-  - `tools/stage2_physics_compute.py`
-- Mac gateway upload:
-  - `tools/mac_gateway_sync.py`
-- Incident watchdog:
-  - `tools/ai_incident_watchdog.py`
-
-Linux Stage1 launch (best-practice guarded):
+### List all repository tools
 
 ```bash
-ssh zepher@192.168.3.113 'cd /home/zepher/work/Omega_vNext && bash tools/launch_linux_stage1_heavy_slice.sh -- --years 2026 --total-shards 4 --shard 0,1,2 --workers 1'
+find tools -maxdepth 1 -type f | sort
 ```
 
-Linux overnight supervisor (deployed on Linux host):
-
-```bash
-ssh zepher@192.168.3.113 'tail -n 40 /home/zepher/work/Omega_vNext/audit/linux_stage1_supervisor.log'
-ssh zepher@192.168.3.113 'cat /home/zepher/work/Omega_vNext/artifacts/runtime/linux_stage1_supervisor.pid'
-```
-
-## 5) Recommended Startup Sequence for Any Agent
-
-1. `bash tools/agent_handover_preflight.sh`
-2. `python3 .codex/skills/multi-agent-ops/scripts/deploy_and_check.py --repair`
-3. Read `handover/ai-direct/LATEST.md`
-4. Continue using skill-specific workflow docs.

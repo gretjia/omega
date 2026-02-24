@@ -1,21 +1,23 @@
-version: 1
-updated_at: "2026-02-23T18:55:00+08:00"
-notes:
-  - "Non-secret host metadata only."
-  - "Do not store passwords, private keys, or tokens."
+version: 2
+updated_at: "2026-02-24T11:15:00+08:00"
+policy:
+  - "Non-secret metadata only."
+  - "Never store private keys, passwords, or tokens."
 
 hosts:
-  windows1:
-    alias: windows1-w1
-    host: 100.123.90.25
-    local_ip: 192.168.3.112
-    user: jiazi
-    os: windows
-    repo_root: "D:\\work\\Omega_vNext"
-    frame_root: "D:\\Omega_frames\\v52\\frames\\host=windows1"
+  omega_vm:
+    alias: omega-vm
+    host: 100.122.223.27
+    user: zephryj
+    os: linux
+    role: "main control node / tailscale exit node"
+    repo_root: "/home/zephryj/work/Omega_vNext"
+    ssh_config: "/home/zephryj/.ssh/config"
+    gcloud_config: "/home/zephryj/.config/gcloud"
     probe:
-      - "ssh windows1-w1 \"hostname && whoami\""
-      - "python3 .codex/skills/omega-run-ops/scripts/ssh_ps.py windows1-w1 --command 'hostname; whoami'"
+      - "hostname"
+      - "tailscale status"
+      - "gcloud auth list"
 
   linux1:
     alias: linux1-lx
@@ -23,19 +25,35 @@ hosts:
     local_ip: 192.168.3.113
     user: zepher
     os: linux
+    role: "worker stage1/stage2"
     repo_root: "/home/zepher/work/Omega_vNext"
-    frame_root: "/omega_pool/parquet_data/v52/frames/host=linux1"
+    outputs:
+      stage1_base_l1: "/omega_pool/parquet_data/v62_base_l1/host=linux1"
+      stage2_feature_l2: "/omega_pool/parquet_data/v62_feature_l2/host=linux1"
     cache_root: "/home/zepher/framing_cache"
+    logs:
+      stage1: "/home/zepher/work/Omega_vNext/audit/stage1_linux_v62.log"
+      supervisor: "/home/zepher/work/Omega_vNext/audit/linux_stage1_supervisor.log"
+      stage2: "/home/zepher/work/Omega_vNext/audit/stage2_compute.log"
     probe:
       - "ssh linux1-lx 'hostname; whoami; uptime'"
-      - "ssh zepher@100.64.97.113 'hostname; whoami; uptime'"
+      - "ssh linux1-lx 'pgrep -af stage1_linux_base_etl.py || true'"
 
-  mac_workstation:
-    alias: mac-back
-    host: localhost
-    port: 2222
-    user: zephryj
-    os: darwin
-    notes: "Connected via reverse SSH tunnel from Mac to VM"
+  windows1:
+    alias: windows1-w1
+    host: 100.123.90.25
+    local_ip: 192.168.3.112
+    user: jiazi
+    os: windows
+    role: "worker stage1/stage2"
+    repo_root: "D:\\work\\Omega_vNext"
+    outputs:
+      stage1_base_l1: "D:\\Omega_frames\\v62_base_l1\\host=windows1"
+      stage2_feature_l2: "D:\\Omega_frames\\v62_feature_l2\\host=windows1"
+    logs:
+      stage1: "C:\\Omega_vNext\\audit\\stage1_windows_v62.log"
+      stage2: "D:\\work\\Omega_vNext\\audit\\stage2_compute.log"
     probe:
-      - "ssh mac-back 'uname -srm'"
+      - "ssh windows1-w1 'hostname && whoami'"
+      - "python3 .codex/skills/omega-run-ops/scripts/ssh_ps.py windows1-w1 --command 'Get-ScheduledTask -TaskName \"Omega_v62_stage1_win\" | Select-Object TaskName,State'"
+

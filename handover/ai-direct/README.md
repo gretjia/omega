@@ -1,39 +1,45 @@
-# AI Direct-Read Guide
+# AI Direct Guide
 
-## Purpose
+This folder is the runtime handoff surface for agent-to-agent continuation.
 
-This folder is designed for fast resume when:
+## 1. Read Order
 
-- a new AI takes over;
-- the same AI loses context and needs to continue safely.
+1. `handover/ENTRYPOINT.md`
+2. `handover/ai-direct/LATEST.md`
+3. newest file in `handover/ai-direct/entries/`
+4. `handover/ai-direct/live/00_Lesson_Recall.md`
+5. `handover/ai-direct/live/01..05_*.md` (only for multi-agent gate flow)
 
-Before this folder, always read:
-- `../ENTRYPOINT.md`
+## 2. File Roles
 
-## 30-Second Resume Steps
+- `LATEST.md`: single current truth for all agents.
+- `HANDOVER_TEMPLATE.md`: mandatory format for each new entry.
+- `entries/*.md`: append-only session records.
+- `live/01..05_*.md`: oracle/mechanic/auditor gate artifacts.
 
-1. Read `LATEST.md` to get current objective, blockers, and next action.
-2. Read the newest file under `entries/` for operation details.
-3. Run `bash tools/agent_handover_preflight.sh`.
-4. Run `python3 .codex/skills/multi-agent-ops/scripts/deploy_and_check.py` to sync memory index and generate pre-task recall.
-5. Read `live/00_Lesson_Recall.md` first (Top-K by task_id/keywords/components).
-6. For multi-agent tasks, read `live/01_Raw_Context.md` -> `live/05_Final_Audit_Decision.md` in order.
-7. Read `../DEBUG_LESSONS.md` for full historical detail if needed.
-8. Run the quick verification commands in `LATEST.md`.
-9. Continue only after verifying machine reachability and run status.
+## 3. Update Rules
 
-## Session-End Rules
+- At session start: read `LATEST.md` and latest `entries` note.
+- At session end:
+  - create one new `entries/*.md` file from template
+  - update `LATEST.md`
+- Keep `LATEST.md` short and current. Move detailed history to `entries/`.
 
-1. Create a new note in `entries/` using `HANDOVER_TEMPLATE.md`.
-2. Update `LATEST.md` with:
-   - latest timestamp;
-   - what is done;
-   - what is pending;
-   - exact next command(s).
-3. Keep references concrete (paths, host aliases, commit hashes, run IDs).
+## 4. Naming Rule for Entries
 
-## Scope Discipline
+`YYYYMMDD_HHMMSS_short_topic.md`
 
-- Put only operational facts and reproducible commands here.
-- Do not store secrets, passwords, or private keys.
-- In `live/` files, always include `task_id`, `git_hash`, `timestamp_utc`.
+Example:
+`20260224_131500_stage2_windows_eta_update.md`
+
+## 5. Mandatory Fields (Per Entry)
+
+- `task_id`
+- `timestamp_local`
+- `timestamp_utc`
+- `operator`
+- `git_head`
+- `hosts_touched`
+- `summary`
+- `next_actions`
+
