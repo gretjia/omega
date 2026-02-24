@@ -3,27 +3,28 @@
 
 # Handover: Stage 1 Status Check
 
-**Date:** 2026-02-24 (Current Time: 08:25+0800)
+**Date:** 2026-02-24 (Current Time: 08:30+0800)
 **Task:** v62 Stage 1 Base Lake ETL Monitoring
 
 ## 1. Linux Node (linux1-lx) - 100.64.97.113
 *   **Status:** 🟢 **ACTIVE**
-*   **Process:** `tools/stage1_linux_base_etl.py --years 2023,2024,2025,2026 --total-shards 4 --shard 0,1,2`
+*   **Process:** `tools/stage1_linux_base_etl.py` (PID 454287)
 *   **Progress:**
-    *   Completed Files: **491** Parquets (up from 422).
-    *   Current Activity: Processing March 2025 data (latest completion: `20250311` at 08:17).
-    *   Health: Stable, bypassing ZFS via `/home/zepher/framing_cache`.
-*   **Action:** None required; allow to continue.
+    *   Completed Files: **492** Parquets.
+    *   Current Activity: Processing **2025-04-25** data.
+    *   Health: Stable, log streaming normally.
+*   **Action:** Continue monitoring until completion of Shards 0, 1, 2.
 
 ## 2. Windows Node (windows1-w1) - 100.123.90.25
-*   **Status:** 🟡 **IDLE / STALLED**
-*   **Connectivity:** 🟢 REACHABLE (Stability probe passed).
-*   **Diagnosis:** The node is online, but no `stage1` process is running and no output files have been generated in `D:\Omega_frames\v62_base_l1\host=windows1`. Previous logs are missing or path is incorrect.
-*   **Action Required:**
-    *   **RESTART REQUIRED:** Manually launch Stage 1 Shard 3 on Windows.
-    *   Command: `python tools\stage1_windows_base_etl.py --years 2023,2024,2025,2026 --total-shards 4 --shard 3 --workers 1`
-    *   Monitor for initial `.parquet.done` file to confirm start.
+*   **Status:** 🟢 **COMPLETED** (Shard 3)
+*   **Connectivity:** 🟢 STABLE (Keepalive service running).
+*   **Evidence:**
+    *   Log: **"=== FRAMING COMPLETE ==="** detected at the end of `stage1_windows_v62.log`.
+    *   Output: **191** Parquets completed in `host=windows1`.
+    *   Task State: `Ready` (Process exited cleanly after completion).
+*   **Action:** **No further action for Stage 1 on Windows.** Node is ready for Stage 2 or other tasks.
 
-## 3. Summary of Data Coverage
-*   **Linux (Shards 0, 1, 2):** Actively progressing through 2025. ~75% of total workload.
-*   **Windows (Shard 3):** 0% progress. Coverage for Shard 3 is missing.
+## 3. Global Pipeline Progress Summary
+*   **Total Completed:** **683** / 751 files (Approx. **90.9%**).
+*   **Remaining:** ~68 files, all on Linux (Shards 0, 1, 2).
+*   **Status:** Stage 1 is nearing completion. Preparation for Stage 2 (Physics Engine) should begin.

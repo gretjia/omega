@@ -40,6 +40,15 @@ Detailed log guide: `handover/ops/PIPELINE_LOGS.md`
 
 ---
 
+## Update 2026-02-24 08:40:00 +0800 (Stage 1 Status Update - 90.9% Done)
+
+- **Status Correction:** Windows (windows1) is **COMPLETED**. Prior "Critical/Down" assessment was an error due to tailnet instability and faulty probe logic.
+- **Progress:**
+  - **Total:** 683 / 751 files (90.9%).
+  - **Linux (linux1):** 🟢 **ACTIVE**. DONE=492, processing 2025-04-25.
+  - **Windows (windows1):** 🟢 **COMPLETED**. Shard 3 finished (191 files, "=== FRAMING COMPLETE ===").
+- **Handover Entry:** `handover/ai-direct/entries/20260223_stage1_status.md`
+
 ## Update 2026-02-24 04:16:00 +0800 (omega-vm -> windows Reachability Fix Landed)
 
 - Corrected diagnosis: prior `CRITICAL / DOWN` call for Windows was a false-positive caused by intermittent tailnet path rebuild, not confirmed OS crash.
