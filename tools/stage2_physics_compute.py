@@ -241,12 +241,20 @@ def main():
         print("Nothing to do. Exiting.")
         return
 
-    # Use spawn for safety across different OS
-    ctx = get_context("spawn")
-    with ctx.Pool(args.workers, maxtasksperchild=10) as p:
-        for res in p.imap_unordered(process_chunk, tasks):
+    if args.workers <= 1:
+        # Stability path: avoid multiprocessing SemLock/spawn regressions in single-worker mode.
+        print("[GUARDRAIL] workers<=1 detected, using single-process execution.", flush=True)
+        for task in tasks:
+            res = process_chunk(task)
             if res:
                 print(res, flush=True)
+    else:
+        # Use spawn for safety across different OS
+        ctx = get_context("spawn")
+        with ctx.Pool(args.workers, maxtasksperchild=10) as p:
+            for res in p.imap_unordered(process_chunk, tasks):
+                if res:
+                    print(res, flush=True)
 
     print("=== STAGE 2 PHYSICS COMPUTE COMPLETE ===")
 
