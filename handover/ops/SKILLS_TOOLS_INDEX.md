@@ -30,7 +30,9 @@ python3 .codex/skills/multi-agent-ops/scripts/switch_profile.py --oracle codex_x
 
 ### 3.2 Stage 2 Physics
 
-- `tools/stage2_physics_compute.py`
+- `tools/stage2_physics_compute.py` (Linux hard-guard: refuse non-`heavy-workload.slice` unless override env)
+- `tools/stage2_targeted_resume.py` (per-file timeout isolation + deterministic pending/failed ledgers)
+- `tools/launch_linux_stage2_heavy_slice.sh` (systemd-run launcher pinned to `heavy-workload.slice`)
 
 ### 3.3 Stage 2.5 Base Matrix
 
@@ -46,10 +48,11 @@ python3 .codex/skills/multi-agent-ops/scripts/switch_profile.py --oracle codex_x
 ## 4. Host Operations and Monitoring Tools
 
 - Agent preflight: `tools/agent_handover_preflight.sh`
+- Linux runtime preflight: `tools/linux_runtime_preflight.py`
+- Linux preflight timer installer: `tools/install_linux_preflight_timer.sh`
 - Windows probe from omega-vm: `tools/check_windows_from_omega.sh`
 - Windows PowerShell over SSH wrapper: `.codex/skills/omega-run-ops/scripts/ssh_ps.py`
 - Linux night watchdog: `tools/night_watchdog.py`
-- Incident watchdog: `tools/ai_incident_watchdog.py`
 
 ## 5. Core Code Modules
 
@@ -63,7 +66,7 @@ python3 .codex/skills/multi-agent-ops/scripts/switch_profile.py --oracle codex_x
 ### Linux status
 
 ```bash
-ssh linux1-lx 'pgrep -af "stage1_linux_base_etl.py|stage2_physics_compute.py" || true'
+ssh linux1-lx 'pgrep -af "stage1_linux_base_etl.py|stage2_physics_compute.py|stage2_targeted_resume.py" || true'
 ```
 
 ### Windows status
@@ -82,4 +85,3 @@ Get-CimInstance Win32_Process | Where-Object {
 ```bash
 find tools -maxdepth 1 -type f | sort
 ```
-

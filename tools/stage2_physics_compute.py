@@ -33,6 +33,92 @@ from omega_core.kernel import apply_recursive_physics
 
 
 DATE_HASH_PARQUET_RE = re.compile(r"^(?P<date>\d{8})_[0-9a-f]{7}\.parquet$")
+ALLOW_USER_SLICE_ENV = "OMEGA_STAGE2_ALLOW_USER_SLICE"
+TARGET_OOM_SCORE_ADJ = 300
+
+
+def _read_self_cgroup_path():
+    """Return cgroup v2 path for current process, best-effort."""
+    cgroup_file = Path("/proc/self/cgroup")
+    if not cgroup_file.exists():
+        return ""
+    try:
+        for line in cgroup_file.read_text(encoding="utf-8").splitlines():
+            # cgroup v2 format: 0::/some/path
+            parts = line.split(":", 2)
+            if len(parts) == 3 and parts[2]:
+                return parts[2]
+    except Exception:
+        return ""
+    return ""
+
+
+def _ensure_heavy_workload_slice():
+    """
+    Hard guardrail:
+    Refuse to run stage2 outside heavy-workload.slice unless explicitly bypassed.
+    """
+    if sys.platform != "linux":
+        return
+
+    if os.environ.get(ALLOW_USER_SLICE_ENV, "").strip().lower() in {"1", "true", "yes"}:
+        print(
+            f"[WARN] {ALLOW_USER_SLICE_ENV}=1 set, bypassing heavy-workload.slice guardrail.",
+            flush=True,
+        )
+        return
+
+    cgroup_path = _read_self_cgroup_path()
+    in_heavy_slice = (
+        "/heavy-workload.slice/" in cgroup_path or cgroup_path.endswith("/heavy-workload.slice")
+    )
+    if in_heavy_slice:
+        return
+
+    print(
+        "[FATAL] stage2 is not running in heavy-workload.slice.\n"
+        f"Detected cgroup path: {cgroup_path or '<unknown>'}\n"
+        "Refusing to continue to avoid user.slice OOM storms.\n"
+        "Launch with: bash tools/launch_linux_stage2_heavy_slice.sh\n"
+        f"(Emergency override only: export {ALLOW_USER_SLICE_ENV}=1)",
+        file=sys.stderr,
+        flush=True,
+    )
+    raise SystemExit(101)
+
+
+def _raise_oom_score_adj(target=TARGET_OOM_SCORE_ADJ):
+    """
+    Make stage2 easier to kill under pressure, so desktop/session services survive.
+    """
+    if sys.platform != "linux":
+        return
+
+    oom_adj_file = Path("/proc/self/oom_score_adj")
+    if not oom_adj_file.exists():
+        return
+
+    try:
+        current = int(oom_adj_file.read_text(encoding="utf-8").strip())
+    except Exception:
+        return
+
+    if current >= target:
+        return
+
+    try:
+        oom_adj_file.write_text(str(target), encoding="utf-8")
+        print(f"[GUARDRAIL] oom_score_adj raised from {current} to {target}.", flush=True)
+    except Exception as exc:
+        print(
+            f"[WARN] Could not raise oom_score_adj from {current} to {target}: {exc}",
+            flush=True,
+        )
+
+
+def _pool_initializer():
+    _ensure_heavy_workload_slice()
+    _raise_oom_score_adj()
 
 
 def _dedupe_l1_files_by_date(l1_files):
@@ -217,6 +303,9 @@ def main():
     ap.add_argument("--workers", type=int, default=4, help="Number of parallel workers")
     args = ap.parse_args()
 
+    _ensure_heavy_workload_slice()
+    _raise_oom_score_adj()
+
     input_path = Path(args.input_dir)
     output_path = Path(args.output_dir)
     output_path.mkdir(parents=True, exist_ok=True)
@@ -251,7 +340,7 @@ def main():
     else:
         # Use spawn for safety across different OS
         ctx = get_context("spawn")
-        with ctx.Pool(args.workers, maxtasksperchild=10) as p:
+        with ctx.Pool(args.workers, maxtasksperchild=10, initializer=_pool_initializer) as p:
             for res in p.imap_unordered(process_chunk, tasks):
                 if res:
                     print(res, flush=True)
