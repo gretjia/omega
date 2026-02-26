@@ -16,7 +16,7 @@ except ImportError:
 from numpy.lib.stride_tricks import sliding_window_view 
 
 @njit(parallel=True, fastmath=True, cache=True)
-def calc_epiplexity_rolling(prices: np.ndarray, window: int) -> np.ndarray:
+def calc_epiplexity_rolling(prices: np.ndarray, window: int, is_boundary: np.ndarray) -> np.ndarray:
     """
     Computes Time-Bounded MDL Gain (R^2 of linear fit) using Numba array operations.
     Replaces the list-based intra-bucket trace logic.
@@ -35,6 +35,15 @@ def calc_epiplexity_rolling(prices: np.ndarray, window: int) -> np.ndarray:
         return out
 
     for i in prange(window - 1, n):
+        # Boundary guard: check if any element in the current window (except the first) crosses a boundary
+        crosses_boundary = False
+        for j in range(i - window + 2, i + 1):
+            if is_boundary[j]:
+                crosses_boundary = True
+                break
+        if crosses_boundary:
+            continue
+
         # The window slice
         y = prices[i - window + 1 : i + 1]
         
@@ -69,7 +78,8 @@ def calc_holographic_topology_rolling(
     window: int,
     price_scale_floor: float,
     ofi_scale_floor: float,
-    green_coeff: float
+    green_coeff: float,
+    is_boundary: np.ndarray
 ) -> tuple[np.ndarray, np.ndarray]:
     """
     Vectorized Holographic Topology Area and Energy using rolling 1D contiguous arrays.
@@ -82,6 +92,14 @@ def calc_holographic_topology_rolling(
         return out_area, out_energy
 
     for i in prange(window - 1, n):
+        crosses_boundary = False
+        for j in range(i - window + 2, i + 1):
+            if is_boundary[j]:
+                crosses_boundary = True
+                break
+        if crosses_boundary:
+            continue
+
         X = prices[i - window + 1 : i + 1]
         # We need cumulative OFI within the window window to form the 'Y' shape coordinate
         Y = np.zeros(window, dtype=np.float64)
@@ -127,7 +145,8 @@ def calc_topology_area_rolling(
     window: int,
     x_scale_floor: float, 
     y_scale_floor: float, 
-    green_coeff: float
+    green_coeff: float,
+    is_boundary: np.ndarray
 ) -> np.ndarray:
     """
     Vectorized Green's Theorem Area for arbitrary Manifolds (X, Y) using rolling 1D contiguous arrays.
@@ -139,6 +158,14 @@ def calc_topology_area_rolling(
         return out_area
 
     for i in prange(window - 1, n):
+        crosses_boundary = False
+        for j in range(i - window + 2, i + 1):
+            if is_boundary[j]:
+                crosses_boundary = True
+                break
+        if crosses_boundary:
+            continue
+
         X = x_arr[i - window + 1 : i + 1]
         Y = y_arr[i - window + 1 : i + 1]
         

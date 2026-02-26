@@ -130,11 +130,20 @@ def _apply_recursive_physics(
     else:
         has_singularity = np.zeros(n_rows, dtype=bool)
     
+    # --- Vectorized Fast Boundary Detect ---
+    # Overnight Phase Transition — yesterday's resistance state must NOT contaminate today's opening auction
+    is_boundary = np.zeros(n_rows, dtype=bool)
+    if n_rows > 1 and "symbol" in frames.columns and "date" in frames.columns:
+        syms_srs = frames.get_column("symbol")
+        dates_srs = frames.get_column("date")
+        boundary_srs = (syms_srs != syms_srs.shift(1)) | (dates_srs != dates_srs.shift(1))
+        is_boundary = boundary_srs.fill_null(False).to_numpy()
+
     # Calculate Epiplexity in ONE GO using rolling JIT (GIL-free)
     from omega_core.omega_math_rolling import calc_epiplexity_rolling, calc_holographic_topology_rolling
     window_len = int(epi_cfg.min_trace_len)
     
-    out_epi_raw = calc_epiplexity_rolling(close_px, window=window_len)
+    out_epi_raw = calc_epiplexity_rolling(close_px, window=window_len, is_boundary=is_boundary)
     out_epi = np.where(out_epi_raw > 0, out_epi_raw, float(epi_cfg.fallback_value))
     
     # Apply gate mask (zero out inactive)
@@ -145,7 +154,8 @@ def _apply_recursive_physics(
         close_px, net_ofi, window=window_len,
         price_scale_floor=float(topo_cfg.price_scale_floor),
         ofi_scale_floor=float(topo_cfg.ofi_scale_floor),
-        green_coeff=float(topo_cfg.green_coeff)
+        green_coeff=float(topo_cfg.green_coeff),
+        is_boundary=is_boundary
     )
 
     from omega_core.omega_math_rolling import calc_topology_area_rolling
@@ -172,17 +182,9 @@ def _apply_recursive_physics(
             
         out_manifolds[str(feat_name)] = calc_topology_area_rolling(
             arr_x, arr_y, window=window_len,
-            x_scale_floor=x_scale, y_scale_floor=y_scale, green_coeff=float(topo_cfg.green_coeff)
+            x_scale_floor=x_scale, y_scale_floor=y_scale, green_coeff=float(topo_cfg.green_coeff),
+            is_boundary=is_boundary
         )
-
-    # --- Vectorized Fast Boundary Detect ---
-    # Overnight Phase Transition — yesterday's resistance state must NOT contaminate today's opening auction
-    is_boundary = np.zeros(n_rows, dtype=bool)
-    if n_rows > 1 and "symbol" in frames.columns and "date" in frames.columns:
-        syms_srs = frames.get_column("symbol")
-        dates_srs = frames.get_column("date")
-        boundary_srs = (syms_srs != syms_srs.shift(1)) | (dates_srs != dates_srs.shift(1))
-        is_boundary = boundary_srs.fill_null(False).to_numpy()
 
     base_y = float(srl.y_coeff) if initial_y is None else float(initial_y)
 
@@ -280,19 +282,19 @@ def _apply_recursive_physics(
         group_expr = pl.col("symbol")
         
         # 1. Bits Linear (Already computed as Epiplexity)
-        bits_linear = pl.col("epiplexity").forward_fill()
+        bits_linear = pl.col("epiplexity").forward_fill().over(group_expr)
 
         # 2. Bits SRL (Time-Bounded R^2 of Residuals vs Price Change)
         # delta_k = 1.0 (Y parameter)
-        var_srl_resid = pl.col("srl_resid").rolling_var(window_size=window_len).over(group_expr).forward_fill()
-        var_price_change = pl.col("price_change").rolling_var(window_size=window_len).over(group_expr).forward_fill()
+        var_srl_resid = pl.col("srl_resid").rolling_var(window_size=window_len).over(group_expr).forward_fill().over(group_expr)
+        var_price_change = pl.col("price_change").rolling_var(window_size=window_len).over(group_expr).forward_fill().over(group_expr)
         r2_srl = (1.0 - (var_srl_resid / (var_price_change + 1e-12))).clip(0.0, 0.9999)
         bits_srl = (-(window_len / 2.0) * (1.0 - r2_srl).log() - 0.5 * math.log(window_len)).clip(0.0, 999.0)
 
         # 3. Bits Topology (Isoperimetric Structure bits)
         # Using compactness structural gain
         compactness = (4.0 * math.pi * pl.col("topo_area").abs()) / (pl.col("topo_energy")**2 + 1e-12)
-        bits_topo = (compactness * math.log(window_len)).forward_fill().clip(0.0, 999.0)
+        bits_topo = (compactness * math.log(window_len)).forward_fill().over(group_expr).clip(0.0, 999.0)
 
         res_df = res_df.with_columns([
             bits_linear.alias("bits_linear"),
