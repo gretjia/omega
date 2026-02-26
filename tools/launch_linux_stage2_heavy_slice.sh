@@ -147,6 +147,8 @@ cmd=(
   --property=TimeoutStopSec=30s
   --property="StandardOutput=append:${log_path}"
   --property="StandardError=append:${log_path}"
+  --property="Environment=OMEGA_STAGE2_SYMBOL_BATCH_SIZE=10"
+  --property="Environment=POLARS_MAX_THREADS=4"
   --collect
   --no-block
   "${python_bin}" -u tools/stage2_targeted_resume.py

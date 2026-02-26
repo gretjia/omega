@@ -459,12 +459,21 @@ def _iter_complete_symbol_frames_from_parquet(l1_file):
         elif symbol == current_symbol:
             current_parts.append(part)
         else:
-            yield pa.concat_tables(current_parts, promote_options="default")
+            yield _filter_pathological(pa.concat_tables(current_parts, promote_options="default"))
             current_symbol = symbol
             current_parts = [part]
 
     if current_parts:
-        yield pa.concat_tables(current_parts, promote_options="default")
+        yield _filter_pathological(pa.concat_tables(current_parts, promote_options="default"))
+
+def _filter_pathological(tbl):
+    import pyarrow.compute as pc
+    if tbl.num_rows > 10000 and "time" in tbl.column_names:
+        u_times = len(pc.unique(tbl.column("time")))
+        if u_times <= 5:
+            print(f"[GUARDRAIL] Proactively dropping pathological symbol (rows={tbl.num_rows}, unique_times={u_times}).", flush=True)
+            return tbl.slice(0, 0)
+    return tbl
 
 
 def _list_symbols_from_parquet(l1_file):
@@ -888,6 +897,13 @@ def process_chunk(kwargs):
             flush=True,
         )
         tmp_parquet = out_path.with_suffix(".parquet.tmp")
+        # Ensure any leftover tmp files from previous OOMs/crashes are cleared before we start
+        if tmp_parquet.exists():
+            try:
+                tmp_parquet.unlink()
+            except OSError:
+                pass
+                
         writer = None
         total_rows = 0
 
@@ -1019,6 +1035,13 @@ def process_chunk(kwargs):
             }
             
     except Exception as e:
+        # Cleanup incomplete temporary files to avoid stale caches on failure
+        try:
+            if 'tmp_parquet' in locals() and tmp_parquet.exists():
+                tmp_parquet.unlink()
+        except OSError:
+            pass
+            
         return {
             "ok": False,
             "status": "exception",
