@@ -38,6 +38,40 @@
 
 <!-- New session debriefs go here. Most recent on top. -->
 
+#### [2026-02-27 01:44] Agent: Codex (GPT-5) | Session: Stage2 Dual-Host Stall Snapshot + Handover Refresh
+
+**What I did:**
+
+- Re-polled Linux Stage2 with 3-cycle interval checks and confirmed hard stall pattern.
+- Re-checked Windows Stage2 scheduler/log counters and confirmed stopped task state.
+- Updated `handover/ai-direct/LATEST.md` with current snapshot metadata, project statuses, and immediate actions.
+- Added detailed run-state record to `handover/ai-direct/entries/20260227_014448_stage2_dual_host_stall_snapshot.md`.
+
+**What I discovered:**
+
+- Linux Stage2 is still running but non-progressing: done count stuck at `207/552` with `.tmp` and log timestamps unchanged for hours.
+- Linux worker process remains high memory (`~94GB RSS`) with full swap, indicating high risk of repeated freeze behavior.
+- Windows Stage2 remains at `179/191`, scheduler task stopped (`LastTaskResult=-1`), with runtime panic family unresolved under current environment.
+
+**What confused me / blocked me:**
+
+- `audit/constitution_v2.md` does not exist in this repository root (references to it remain in historical docs/policies).
+- Worker git states are not clean, so deployment provenance requires explicit normalization in next session.
+
+**What the next agent should do:**
+
+1. Stabilize Linux Stage2 execution envelope (stop/relaunch) before any further polling-only cycle.
+2. Rebuild Windows Stage2 runtime to a stable package matrix, then validate first on `20250828_b07c2229.parquet`.
+3. Resume both queues only after deterministic run behavior is confirmed; then refresh `LATEST.md` counters again.
+
+**Files I changed:**
+
+- `handover/ai-direct/LATEST.md` — refreshed authoritative snapshot and next actions.
+- `handover/ai-direct/entries/20260227_014448_stage2_dual_host_stall_snapshot.md` — new session entry with evidence and exact next steps.
+- `handover/BOARD.md` — added this mandatory debrief block.
+
+---
+
 #### [2026-02-26 19:50] Agent: Antigravity | Session: Agent Architecture Restructuring
 
 **What I did:**

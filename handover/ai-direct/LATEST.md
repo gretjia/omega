@@ -10,21 +10,21 @@ This file is the single source of current operational truth for all agents.
 
 ## 1. Snapshot Metadata
 
-- `updated_at_local`: 2026-02-26 15:42:17 +0800 (CST)
-- `updated_at_utc`: 2026-02-26 07:42:17 +0000 (UTC)
+- `updated_at_local`: 2026-02-27 01:44:48 +0800 (CST)
+- `updated_at_utc`: 2026-02-26 17:44:48 +0000 (UTC)
 - `updated_by`: Codex (GPT-5)
-- `controller_repo_head`: `8ebadb1` (branch: `perf/stage2-speedup-v62`)
-- `worker_repo_head_linux`: `fd0f5e1` (branch: `main`)
-- `worker_repo_head_windows`: `6c9fead` (branch: `main`, runtime hotfix file dirty)
+- `controller_repo_head`: `c55c869` (branch: `perf/stage2-speedup-v62`, working tree dirty)
+- `worker_repo_head_linux`: `8356a4c` (branch: `perf/stage2-speedup-v62`, untracked preflight artifacts)
+- `worker_repo_head_windows`: `cb6e609` (branch: `perf/stage2-speedup-v62`, runtime hotfix files dirty)
 
 ## 2. Active Projects Board
 
 | Project ID | Scope | Status | Last Verified | Owner Host |
 |---|---|---|---|---|
 | V62-STAGE1-LINUX | Stage1 Base_L1 for shards `0,1,2` | COMPLETED | 2026-02-24 16:47 +0800 | `linux1-lx` |
-| V62-STAGE2-WINDOWS | Stage2 Physics from `v62_base_l1` to `v62_feature_l2` | IN_PROGRESS (targeted resume + pathological-symbol guard) | 2026-02-26 15:42 +0800 | `windows1-w1` |
-| V62-STAGE2-LINUX | Stage2 Physics for `host=linux1` | BLOCKED (dependency) | 2026-02-24 16:53 +0800 | `linux1-lx` |
-| V62-STAGE2-SPEEDUP | Output-preserving perf refactor (branch `perf/stage2-speedup-v62`) | PARTIALLY_DEPLOYED (runtime hotfix on Windows) | 2026-02-26 15:42 +0800 | `controller` |
+| V62-STAGE2-WINDOWS | Stage2 Physics from `v62_base_l1` to `v62_feature_l2` | BLOCKED (runtime panic, task stopped) | 2026-02-27 01:04 +0800 | `windows1-w1` |
+| V62-STAGE2-LINUX | Stage2 Physics for `host=linux1` | STALLED (high-memory long-run no output progress) | 2026-02-27 01:13 +0800 | `linux1-lx` |
+| V62-STAGE2-SPEEDUP | Output-preserving perf refactor (branch `perf/stage2-speedup-v62`) | IN_PROGRESS (local patches not yet merged) | 2026-02-27 01:44 +0800 | `controller` |
 | HANDOVER-MAINTENANCE | keep handover as entrypoint + run-state truth | IN_PROGRESS | 2026-02-26 12:51 +0800 | `controller` |
 
 Detailed board:
@@ -41,28 +41,34 @@ Detailed board:
   - final metrics: `ASSIGNED=555`, `COMPLETED=10`, `SKIPPED=545`, `ERROR=0`, `FRAMING_COMPLETE=1`
   - `STAGE1_DONE=552` (`/omega_pool/parquet_data/v62_base_l1/host=linux1/*.parquet.done`)
 - Stage2 status:
-  - currently not running
-  - blocker: `.venv` missing `numba` (`ModuleNotFoundError`)
-  - `LNX_STAGE2_DONE=0`
+  - running unit: `omega_stage2_linux_20260226_200518_safe.service`
+  - snapshot: `LNX_STAGE2_DONE=207 / 552`
+  - active file: `20230315_fbd5c8b.parquet`
+  - stuck signals (3 polls, 2-minute interval):
+    - `.tmp` unchanged: `/omega_pool/parquet_data/v62_feature_l2/host=linux1/20230315_fbd5c8b.parquet.tmp` (`mtime=2026-02-26 20:06`, size constant)
+    - log unchanged: `/home/zepher/work/Omega_vNext/audit/stage2_targeted_resume_linux.log` (`mtime=2026-02-26 20:05:18`, size constant)
+    - done count unchanged: `207`
+  - resource state during stall:
+    - worker RSS about `94GB`, CPU about `389%`
+    - host memory high pressure (`113/121Gi used`), swap full (`8/8Gi`)
 
 ### 3.2 Windows `windows1-w1` (`100.123.90.25`)
 
 - Stage1 status:
   - completed (`STAGE1_DONE=191`)
 - Stage2 status:
-  - scheduler task running: `Omega_v62_stage2_isolated_v2` (targeted resume, per-file isolation)
-  - snapshot: `WIN_STAGE2_DONE=178 / 191`
-  - pending list: `13` files (`audit/stage2_pending_isolated_v2.txt`)
-  - current blockers under active processing: `20250704_b07c2229.parquet`, `20250725_b07c2229.parquet`
-  - mitigation deployed in runtime:
-    - `tools/stage2_physics_compute.py` now includes pathological-symbol crash guard
-    - key knob: `OMEGA_STAGE2_SKIP_PATHOLOGICAL_SYMBOL_ON_FAIL`
-  - progress evidence while log is quiet (subprocess stdout capture mode):
-    - `D:\Omega_frames\v62_feature_l2\host=windows1\20250704_b07c2229.parquet.tmp` growth observed (`5.14MB -> 6.57MB -> 8.01MB -> 9.88MB`)
-  - current fail ledger file (`audit/stage2_targeted_failed_isolated_v2.txt`) is empty in this run (started with `--reset-fail-file`)
-  - git state note:
-    - worker repo head remains `main@6c9fead`
-    - runtime hotfix file is locally modified: `M tools/stage2_physics_compute.py`
+  - scheduler task: `Omega_v62_stage2_isolated_v2` is stopped (`LastTaskResult=-1`)
+  - snapshot: `WIN_STAGE2_DONE=179 / 191`
+  - log last update: `D:\work\Omega_vNext\audit\stage2_targeted_resume_isolated_v2.log` at `2026-02-26 21:31:50 +0800`
+  - critical runtime blocker:
+    - deterministic Polars panic on Stage2 path:
+      - `integer: ParseIntError { kind: InvalidDigit }`
+      - subsequent `LazyLock instance has previously been poisoned`
+    - reproduced on `20250828_b07c2229.parquet` and many `000xxx.SZ` symbols under current Windows runtime
+  - temporary scheduler script was missing once and has been restored:
+    - `D:\work\Omega_vNext\audit\run_stage2_retry_isolated_v2.cmd`
+  - operator safety action:
+    - task intentionally ended to prevent non-deterministic production output under unstable runtime
 
 ### 3.3 Data Recovery Note
 
@@ -83,12 +89,11 @@ Historical broken files are kept as backups:
 
 ## 5. Immediate Next Actions (User-Directed Sequence)
 
-1. Continue monitoring `Omega_v62_stage2_isolated_v2` until `20250704_b07c2229.parquet.done` appears.
-2. Confirm whether skip guard line appears in log:
-   - `Skip pathological symbol after native crash`.
-3. Verify next blocker `20250725_b07c2229.parquet` status and update fail ledger outcome.
-4. Commit/push hotfix from branch and normalize worker git state (avoid long-term runtime dirty patch).
-5. After Windows blockers clear, return to Linux Stage2 dependency unblock (`numba`) and relaunch.
+1. Linux: stop stalled Stage2 unit and relaunch with lower per-process memory pressure before resuming queue.
+2. Windows: rebuild Stage2 runtime to stable package matrix (avoid current Polars panic path) and validate on `20250828_b07c2229.parquet`.
+3. After runtime validation, resume Windows pending queue from `179/191` and verify fail ledger stays bounded.
+4. Normalize worker git states (commit or discard runtime hotfix dirtiness intentionally; no hidden dirty deploy).
+5. Run post-resume parity check against `audit/v62.md` and `audit/v62_framing_rebuild.md` expectations.
 
 ## 6. Quick Verification Commands
 
@@ -106,6 +111,7 @@ ssh linux1-lx '/home/zepher/work/Omega_vNext/.venv/bin/python -c "import numba, 
 
 ## 7. Latest Related Entries
 
+- `handover/ai-direct/entries/20260227_014448_stage2_dual_host_stall_snapshot.md`
 - `handover/ai-direct/entries/20260226_154217_windows_stage2_pathological_symbol_debug_fix.md`
 - `handover/ai-direct/entries/20260224_165312_linux_stage1_repair_and_stage2_gate.md`
 - `handover/ai-direct/entries/20260224_041600_omega_vm_windows_connectivity_rca_fix.md`
