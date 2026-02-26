@@ -1,36 +1,47 @@
 ---
 name: hardcode_guard
-description: Top-level design guidance for this skill domain.
+description: Detect and prevent hardcoded values that cause multi-node deployment failures.
 ---
 
 # Skill: hardcode_guard
 
-## Intent
-Top-level design guidance for this skill domain.
-
 ## When To Use
-- Use when the task clearly falls into this skill domain.
-- Prioritize this skill over ad-hoc instructions in the same domain.
-- Combine with other skills only when responsibilities are non-overlapping.
 
-## Core Principles
-- Keep the guidance abstract and reusable across versions, environments, and machines.
-- Prefer safe, incremental, and verifiable execution.
-- Separate policy decisions from implementation details.
-- Preserve consistency with project-wide governance and audit expectations.
+- Reviewing any code that touches file paths, IP addresses, or hostnames
+- Before deploying to worker nodes (Linux/Windows)
+- When adding new tools or scripts
 
-## Standard Workflow
-1. Clarify task objective, constraints, and acceptance criteria.
-2. Assess current state and identify key risks.
-3. Choose the minimum viable approach for forward progress.
-4. Execute changes in small steps and validate outcomes.
-5. Summarize decisions, evidence, and follow-up actions.
+## What to Catch
 
-## Expected Output
-- A concise decision summary with assumptions.
-- A traceable list of actions taken and validation results.
-- Explicit risks, tradeoffs, and next-step recommendations.
+| Category | Bad Example | Correct Pattern |
+|---|---|---|
+| Host paths | `/home/zepher/framing_cache` | `NODE.cache_dir` from `configs/node_paths.py` |
+| IP addresses | `192.168.3.113` | SSH alias from `HOSTS_REGISTRY.yaml` |
+| Windows paths | `D:\\Omega_frames\\...` | `NODE.stage1_output` from `configs/node_paths.py` |
+| Column names | `df["time"]` | Dynamic resolution: `time|time_end|bucket_id` |
+| Git hashes | `cb6e609` in scripts | `git rev-parse --short HEAD` at runtime |
+| Model names | `"Codex 5.3 xhigh"` | Role-based: `"orchestrator"`, `"implementer"` |
+| Version strings | `v62_base_l1` in 10 scripts | Single constant in `configs/` |
 
-## Boundaries
-- Do not hardcode version-specific paths, one-off commands, or runtime-local artifacts in this top-level skill file.
-- Put implementation details in task-specific docs/scripts, not in the skill definition.
+## Quick Scan Command
+
+```bash
+# Find hardcoded paths in tools/
+grep -rn '/omega_pool/\|/home/zepher\|D:\\\\' tools/ --include='*.py'
+
+# Find hardcoded IPs
+grep -rn '192\.168\.3\.' tools/ --include='*.py'
+```
+
+## Lesson: The Zombie Branch Incident
+
+Hardcoded version strings (`v52` scattered in file paths) caused the "zombie branch" incident where a worker node appeared functional but was running v52 code against v60 data. Always use `VERSION.txt` + git hash verification.
+
+## Prevention
+
+New code must use:
+
+```python
+from configs.node_paths import get_node_config
+cfg = get_node_config()  # auto-detects controller/linux1/windows1
+```

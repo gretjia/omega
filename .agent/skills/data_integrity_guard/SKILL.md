@@ -1,36 +1,52 @@
 ---
 name: data_integrity_guard
-description: Top-level design guidance for this skill domain.
+description: Guard rails for data pipeline safety, schema contracts, and atomic writes.
 ---
 
 # Skill: data_integrity_guard
 
-## Intent
-Top-level design guidance for this skill domain.
-
 ## When To Use
-- Use when the task clearly falls into this skill domain.
-- Prioritize this skill over ad-hoc instructions in the same domain.
-- Combine with other skills only when responsibilities are non-overlapping.
 
-## Core Principles
-- Keep the guidance abstract and reusable across versions, environments, and machines.
-- Prefer safe, incremental, and verifiable execution.
-- Separate policy decisions from implementation details.
-- Preserve consistency with project-wide governance and audit expectations.
+- Modifying Stage 1 ETL or Stage 2 physics pipeline
+- Changing parquet read/write logic
+- Adding new data sources or modifying schema
+- Debugging data corruption or missing files
 
-## Standard Workflow
-1. Clarify task objective, constraints, and acceptance criteria.
-2. Assess current state and identify key risks.
-3. Choose the minimum viable approach for forward progress.
-4. Execute changes in small steps and validate outcomes.
-5. Summarize decisions, evidence, and follow-up actions.
+## Core Rules
 
-## Expected Output
-- A concise decision summary with assumptions.
-- A traceable list of actions taken and validation results.
-- Explicit risks, tradeoffs, and next-step recommendations.
+1. **Atomic writes**: Always write to `.tmp` first, then `os.rename()` to final path. Never write directly to the final file — a crash mid-write corrupts the parquet.
+2. **Done markers**: When a file is fully processed, create `filename.parquet.done` alongside it. This enables resume without reprocessing.
+3. **Fail ledger**: Failed files are recorded in a `fail_ledger.json`. Check it before retrying — the error may be deterministic (pathological symbol, OOM).
+4. **Schema first**: Before bulk processing, validate schema on the *first* file. Catch `ColumnNotFoundError` before burning hours.
 
-## Boundaries
-- Do not hardcode version-specific paths, one-off commands, or runtime-local artifacts in this top-level skill file.
-- Put implementation details in task-specific docs/scripts, not in the skill definition.
+## Schema Contract
+
+Stage 1 output (base L1):
+
+```
+Required: symbol, date, time_end, close, volume, bid_v1, ask_v1, ...
+```
+
+Stage 2 output (features L2):
+
+```
+Required: all Stage 1 columns + srl_resid, implied_y, topo_micro, topo_classic,
+          epiplexity, effective_depth, spoof_ratio, ...
+```
+
+## Progress Monitoring
+
+```bash
+# Quick check: how many files processed?
+python3 tools/cluster_health.py --quick
+
+# Manual check on Linux:
+ls /omega_pool/parquet_data/v62_feature_l2/host=linux1/*.parquet.done | wc -l
+ls /omega_pool/parquet_data/v62_base_l1/host=linux1/*.parquet | wc -l
+```
+
+## Lessons from Production
+
+- **Stage 2 total ≠ Stage 2 done count**. Stage 2 progress = done files / Stage 1 input files (not Stage 2 output files, where done==parquet always)
+- **Timeout files**: Some symbols (pathological market data) consistently timeout at 5400s. These go in the fail ledger — don't keep retrying
+- **Cross-symbol diff bleeding**: When computing `lob_flux` (bid/ask volume deltas), always isolate by symbol to prevent phantom values at stock boundaries

@@ -1,40 +1,98 @@
-# AGENTS.md (Omega_vNext)
+# AGENTS.md — OMEGA Unified Agent Entry Point
+
+> **This is the ONE file all AI agents must read first, regardless of IDE or CLI.**
+> It is IDE-agnostic — the same rules apply to Gemini, Claude, Codex, Cursor, or any future agent.
+> For the full project manual, see `handover/README.md`.
+
+## Quick Start
+
+1. Read this file
+2. Read `handover/README.md` for project map and file locations
+3. Read `handover/ai-direct/LATEST.md` for live runtime state
+4. Read `OMEGA_CONSTITUTION.md` before any physics-related work
 
 ## Scope
-Applies to the full repository at `/Users/zephryj/work/Omega_vNext`.
 
-## Priority Sources
-1. `audit/constitution_v2.md` (immutable, highest authority)
-2. `audit/multi_agents.md` (canonical multi-agent governance)
-3. `audit/runtime/multi_agent/agent_profiles.yaml` (runtime profile source)
-4. `.codex/skills/*/SKILL.md` (executable workflows)
-5. `.agent/principles.yaml` (cross-agent rule source)
+**OMEGA vNext** — a high-fidelity algorithmic trading system for China A-Shares.
+Built on the Mathematical Trinity: TDA, SRL (δ=0.5), Epiplexity (MDL).
 
-## Agent Role Policy (Stable)
-- Oracle/Planner/Orchestrator: Codex 5.3 xhigh (read only)
-- Mechanic/Implementer: Gemini 3 Flash (writer by default)
-- Debug Scribe/Lesson Writer: Codex 5.3 medium (writes to `handover/DEBUG_LESSONS.md`)
-- Recursive Auditor A: Gemini CLI (read only, independent from B)
-- Recursive Auditor B: Codex 5.3 xhigh in read-only mode (independent from A)
-- Human: final dispatcher and final merge owner
+## Core Architecture
 
-## Skill Routing
-- Use `.codex/skills/multi-agent-ops/SKILL.md` for:
-  - multi-agent deployment checks
-  - model profile switching
-  - governance drift repair
-- Use `.codex/skills/omega-run-ops/SKILL.md` for distributed framing/upload/watchdog operations.
-
-## Important Clarification
-- `.agent/skills/*` are mostly policy templates in this repository.
-- Executable operations should prefer `.codex/skills/*` scripts and workflows.
-- Historical compatibility documents may retain versioned filenames, but they are not primary decision anchors.
+| Layer | Location | Description |
+| --- | --- | --- |
+| Math engines | `omega_core/` | `kernel.py`, `omega_math_core.py`, `omega_etl.py` |
+| Pipeline tools | `tools/` | Stage1 ETL, Stage2 Physics, deploy, health checks |
+| Configuration | `config.py`, `configs/` | Math params + node-specific paths |
+| Tests | `tests/` | Math invariant tests, logging tests |
+| Governance | `.agent/`, `handover/` | Skills, principles, handover state |
+| Logging | `omega_core/omega_log.py` | Structured logger + progress tracker |
 
 ## Hard Rules
-- Before any planning/implementation/audit task, every agent must read `audit/constitution_v2.md` once.
-- `audit/constitution_v2.md` is immutable in normal task flow; agents must not modify it.
-- Do not auto-merge code across multiple agent CLIs.
-- Keep handoff through `handover/ai-direct/live/01..05_*.md`.
-- `deploy_and_check.py` must auto-maintain anti-regression debug memory in `handover/DEBUG_LESSONS.md` (manual append is override-only).
-- Log model/profile switches in `handover/ai-direct/LATEST.md`.
-- Default control policy: `oracle=codex_xhigh`, `mechanic=gemini_flash`, `auditor_primary=gemini_pro`, `auditor_secondary=codex_xhigh`, `debug_scribe=codex_medium`.
+
+1. **Constitution First**: Read `OMEGA_CONSTITUTION.md` before any task. It is immutable.
+2. **ECONOPHYSICS > SWE**: Physics supersedes standard engineering heuristics.
+3. **δ = 0.5 is a constant**: Never optimize, never race exponents.
+4. **No Hardcoded Paths**: Use `configs/node_paths.py` for hosts, `config.py` for math.
+5. **Volume Clock**: Prefer volume bars over time bars. No time-axis sharding.
+6. **Float64 Only**: Never downcast physics math.
+7. **Dataset Isolation**: Train/val/test/backtest are disjoint by construction.
+8. **Canonical Core**: `omega_core/*` is the single source of truth for math.
+9. **Tests Before Merge**: `python3 -m pytest tests/ -q` must pass.
+
+## Security
+
+- **No secrets in git.** Keys, tokens, passwords are in `~/.ssh/`, OS keychain, or cloud secret manager.
+- **Credential locations only.** See `handover/ops/ACCESS_BOOTSTRAP.md` for bootstrap.
+- **No raw IPs in code.** Use SSH aliases from `handover/ops/HOSTS_REGISTRY.yaml`.
+
+## Git Workflow
+
+- **Commit before deploy.** No dirty-tree deployments.
+- **No SCP.** Deploy via `git push` only (`python3 tools/deploy.py`).
+- **Workers are read-only.** They receive code via `git push`, never `git pull`.
+- **Branch naming:** `feature/<name>`, `fix/<name>`, `perf/<name>`.
+
+## Deployment Protocol
+
+```bash
+# Step 1: Commit
+git add . && git commit -m "..." && git push origin HEAD
+
+# Step 2: Deploy to workers
+python3 tools/deploy.py                # or: --nodes linux --dry-run
+
+# Step 3: Verify
+python3 tools/cluster_health.py        # all nodes synced?
+python3 tools/env_verify.py --strict   # deps match?
+```
+
+## Skills
+
+Skills live in `.agent/skills/`. Each has a `SKILL.md` with domain-specific rules.
+
+| Skill | Trigger |
+| --- | --- |
+| `math_core` | SRL/TDA/Epiplexity kernel changes |
+| `physics` | Physics model changes |
+| `engineering` | Refactoring, testing, code standards |
+| `hardcode_guard` | Reviewing for hardcoded values |
+| `data_integrity_guard` | Data pipeline and schema changes |
+| `ops` | Deployment and infrastructure |
+| `omega_development` | Development workflow |
+| `ai_handover` | Session handover |
+
+## Testing
+
+```bash
+python3 -m pytest tests/test_omega_math_core.py -q   # Math (28 tests, <0.2s)
+python3 -m pytest tests/test_omega_log.py -q          # Logging (16 tests)
+python3 tools/env_verify.py                            # Environment
+python3 tools/cluster_health.py --quick                # Cluster
+```
+
+## Handover
+
+- `handover/README.md` — full project manual (READ THIS)
+- `handover/ai-direct/LATEST.md` — live runtime state
+- `handover/DEBUG_LESSONS.md` — searchable debug database
+- `handover/COSTLY_LESSONS.md` — expensive mistakes ledger

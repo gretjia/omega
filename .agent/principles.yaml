@@ -1,90 +1,39 @@
-{
-  "meta": {
-    "version": "2026-02-17",
-    "maintainer": "OMEGA",
-    "format_note": "JSON content saved as .yaml so it is valid YAML 1.2 and can be parsed without external deps."
-  },
-  "global": {
-    "constitution_path": "audit/constitution_v2.md",
-    "skills_root": ".agent/skills",
-    "project_root_hint": ".",
-    "env_hint": "Conda OMEGA",
-    "core_paths": {
-      "primary_kernel": "omega_core/kernel.py",
-      "primary_math_core": "omega_core/omega_math_core.py",
-      "secondary_kernel": "N/A",
-      "secondary_math_core": "N/A"
-    }
-  },
-  "shared_principles": [
-    "Read audit/constitution_v2.md before any task (planning/implementation/audit).",
-    "Treat audit/constitution_v2.md as immutable; do not edit in normal task execution.",
-    "Use OMEGA_CONSTITUTION.md only as historical reference.",
-    "No static hardcoded trading thresholds in code paths used for production.",
-    "Use volume clock and enforce boundary checks (T+1, limit-up/limit-down).",
-    "Train/val/test/backtest datasets must be role-isolated and overlap-free; enforce with manifests and fail-closed runtime checks.",
-    "Only audited train/test outputs may be promoted into config.py; every promotion must be versioned and snapshotted to artifacts.",
-    "Allow fast innovation in sandbox paths, but promote to mainline only after audit gates pass.",
-    "Keep always-on skills minimal (target <= 6); treat governance/process skills as on-demand."
-  ],
-  "codex": {
-    "title": "OMEGA Rules for Codex/Cursor",
-    "rules": [
-      "Prefer omega_core/omega_math_core.py functions as canonical implementation.",
-      "No hardcoding of trading thresholds. Route tunables through config or audited runtime snapshots.",
-      "Do not place new business logic in compatibility shims.",
-      "Prototype fast in sandbox paths, but move into omega_core only after evidence and guard checks.",
-      "When changing cross-agent rules, edit .agent/principles.yaml and run tools/sync_agent_rules.py.",
-      "Before trade-logic suggestions, verify Settlement (T+1) and Boundary (Limit Up/Down) constraints.",
-      "For pipeline changes, enforce train/backtest role split with disjoint manifests; reject overlap by default.",
-      "Keep edits reproducible: update docs/handover when behavior or workflow changes."
-    ],
-    "style": [
-      "Python 3.9+",
-      "Type hints",
-      "Docstrings"
-    ]
-  },
-  "gemini": {
-    "title": "OMEGA Context for Gemini CLI",
-    "identity": "You are the OMEGA Agent.",
-    "critical_instruction": [
-      "Before answering any task, consult audit/constitution_v2.md first.",
-      "Do not introduce heuristics that contradict Trinity (TDA, SRL, Epiplexity).",
-      "Prioritize omega_core/* as canonical core."
-    ]
-  },
-  "trae": {
-    "title": "OMEGA Trae Agent Instructions",
-    "prime_directives": [
-      "Read audit/constitution_v2.md first in each session.",
-      "Use modular skills under .agent/skills/ instead of generic assumptions.",
-      "When implementing: Plan -> Verify -> Execute -> Audit."
-    ],
-    "context": {
-      "root": ".",
-      "environment": "Conda OMEGA",
-      "key_files": [
-        "omega_core/kernel.py",
-        "omega_core/omega_math_core.py"
-      ],
-      "archive_note": "Archived paths are intentionally marked N/A in current repository baseline."
-    }
-  },
-  "cursor": {
-    "title": "Cursor Rules for OMEGA",
-    "includes": [
-      "audit/constitution_v2.md",
-      ".agent/skills/math_core/SKILL.md",
-      ".agent/skills/physics/SKILL.md",
-      ".agent/skills/engineering/SKILL.md",
-      ".agent/skills/hardcode_guard/SKILL.md"
-    ],
-    "rules": [
-      "Follow the Constitution: all code must align with TDA, SRL, and Epiplexity.",
-      "Use Volume Clock: prefer Volume Bars over Time Bars.",
-      "Verify constraints: check T+1 and boundary conditions explicitly.",
-      "Prefer omega_core/* as canonical implementation."
-    ]
-  }
-}
+# OMEGA Agent Principles (Machine-Readable)
+# Last updated: 2026-02-26
+# Maintainer: OMEGA
+
+global:
+  constitution: OMEGA_CONSTITUTION.md
+  agents_entry: AGENTS.md
+  project_manual: handover/README.md
+  skills_root: .agent/skills
+
+core_paths:
+  kernel: omega_core/kernel.py
+  math_core: omega_core/omega_math_core.py
+  etl: omega_core/omega_etl.py
+  config: config.py
+  node_paths: configs/node_paths.py
+  logger: omega_core/omega_log.py
+
+shared_principles:
+  - Read OMEGA_CONSTITUTION.md before any task.
+  - ECONOPHYSICS SUPERSEDES SWE.
+  - Delta = 0.5 is a universal constant (Sato 2025). Never optimize.
+  - No hardcoded trading thresholds in production code.
+  - Use Volume Clock. Never shard across Time axis.
+  - Float64 only for physics math. Never downcast.
+  - Train/val/test/backtest must be role-isolated and overlap-free.
+  - Atomic parquet writes (.tmp then rename). Done markers for resume.
+  - All node paths via configs/node_paths.py. No hardcoded paths.
+  - Run PHYSICS_AUDIT before any engineering decision.
+
+active_skills:
+  - math_core
+  - physics
+  - engineering
+  - hardcode_guard
+  - data_integrity_guard
+  - ops
+  - omega_development
+  - ai_handover

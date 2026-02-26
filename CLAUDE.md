@@ -1,23 +1,19 @@
-# Gemini Agent Entry Point
+# Claude Agent Entry Point
 
 > **All agent rules are in [`AGENTS.md`](AGENTS.md).** Read that file first.
 
-This file exists because Gemini CLI and Gemini-based tools (Antigravity, Code Assist) auto-load `gemini.md`.
+This file exists because Claude Code and some Claude-based tools auto-load `CLAUDE.md`.
 It is a pointer — do not add rules here. All rules belong in `AGENTS.md`.
 
-## Quick Context for Gemini
+## Quick Context for Claude
 
 - **Project:** OMEGA vNext — quant trading system (Python 3.9+, Polars, Numba)
 - **Constitution:** `OMEGA_CONSTITUTION.md` — read before any physics task
 - **Project manual:** `handover/README.md` — complete file map and onboarding
 - **Live state:** `handover/ai-direct/LATEST.md`
+- **Math kernels:** `omega_core/omega_math_core.py`, `omega_core/kernel.py`
+- **Config:** `config.py` (math params), `configs/node_paths.py` (host paths)
 - **Tests:** `python3 -m pytest tests/ -q`
-
-## Gemini CLI Includes
-
-@AGENTS.md
-@handover/README.md
-@handover/ENTRYPOINT.md
 
 ## References
 

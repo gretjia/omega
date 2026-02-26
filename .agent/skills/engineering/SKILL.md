@@ -1,36 +1,46 @@
 ---
 name: engineering
-description: Top-level design guidance for this skill domain.
+description: Code quality, testing, and refactoring standards for OMEGA.
 ---
 
 # Skill: engineering
 
-## Intent
-Top-level design guidance for this skill domain.
-
 ## When To Use
-- Use when the task clearly falls into this skill domain.
-- Prioritize this skill over ad-hoc instructions in the same domain.
-- Combine with other skills only when responsibilities are non-overlapping.
 
-## Core Principles
-- Keep the guidance abstract and reusable across versions, environments, and machines.
-- Prefer safe, incremental, and verifiable execution.
-- Separate policy decisions from implementation details.
-- Preserve consistency with project-wide governance and audit expectations.
+- Refactoring existing code
+- Adding new modules or functions
+- Reviewing PRs or performing code audits
+- Setting up CI/CD or test infrastructure
 
-## Standard Workflow
-1. Clarify task objective, constraints, and acceptance criteria.
-2. Assess current state and identify key risks.
-3. Choose the minimum viable approach for forward progress.
-4. Execute changes in small steps and validate outcomes.
-5. Summarize decisions, evidence, and follow-up actions.
+## Code Standards
 
-## Expected Output
-- A concise decision summary with assumptions.
-- A traceable list of actions taken and validation results.
-- Explicit risks, tradeoffs, and next-step recommendations.
+1. **Python 3.9+** with type hints on all function signatures
+2. **Docstrings** on all public functions (purpose, params, returns)
+3. **No hardcoded paths** — use `configs/node_paths.py` for host-specific paths, `config.py` for math parameters
+4. **Polars over Pandas** — all new data pipelines must use Polars LazyFrames
+5. **Atomic writes** — parquet outputs use `.tmp` → `rename()` pattern to prevent corrupted files on crash
 
-## Boundaries
-- Do not hardcode version-specific paths, one-off commands, or runtime-local artifacts in this top-level skill file.
-- Put implementation details in task-specific docs/scripts, not in the skill definition.
+## Testing Requirements
+
+| Test Type | Command | When Required |
+|---|---|---|
+| Math invariants | `pytest tests/test_omega_math_core.py` | Any math change |
+| Output equivalence | `pytest tests/test_stage2_output_equivalence.py` | ETL/pipeline refactors |
+| Env verification | `python3 tools/env_verify.py --strict` | Before deployment |
+
+## Refactoring Checklist
+
+Before refactoring any module:
+
+1. ✅ Run existing tests first — establish baseline
+2. ✅ Check `__init__.py` shims — renaming files may break import paths
+3. ✅ Check `handover/DEBUG_LESSONS.md` — has this been tried before?
+4. ✅ Check cross-module imports — `grep -r "from old_module"` across codebase
+5. ✅ Run tests after — zero regressions allowed
+
+## Lessons Learned (from DEBUG_LESSONS.md)
+
+- **Refactoring residue**: When renaming files, always check `__init__.py` shims for stale import paths
+- **Recursive import audit**: Always check dependencies of imported modules when moving code to new environments
+- **Schema contracts**: Never hardcode column names (e.g., `"time"`) — derive dynamically and fail fast if missing
+- **GC in hot loops**: `gc.collect()` inside inner loops kills Numba/Polars performance. Remove.

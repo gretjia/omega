@@ -1,0 +1,28 @@
+---
+description: Data pipeline rules (ETL, physics compute, deployment)
+globs: "tools/stage*.py,tools/deploy.py,tools/cluster_health.py,tools/env_verify.py"
+---
+
+# Pipeline & Ops Rules
+
+Read `.agent/skills/ops/SKILL.md` and `.agent/skills/data_integrity_guard/SKILL.md`.
+
+## Data Integrity
+
+- Atomic writes: `.tmp` → `rename()` for all parquet output
+- Done markers: `filename.parquet.done` after successful processing
+- Fail ledger: `fail_ledger.json` tracks deterministic failures
+- Schema-first: validate on first file before bulk processing
+
+## Deployment
+
+- Deploy via `git push` only — no SCP
+- Commit before deploy — no dirty-tree deployments
+- Workers never push code (read-only pull model)
+- Run `tools/env_verify.py --strict` after every sync
+
+## Logging
+
+- Use `omega_core/omega_log.py` for structured output
+- Available levels: DEBUG, INFO, WARN, GUARDRAIL, ERROR, FATAL
+- JSON mode: set `OMEGA_LOG_FORMAT=json`

@@ -1,0 +1,30 @@
+---
+description: OMEGA project-wide rules for all AI agents
+globs: "**/*"
+---
+
+# OMEGA Project Rules
+
+Read `AGENTS.md` first. It is the single source of truth for all agent rules.
+
+## Key Principles
+
+- ECONOPHYSICS > SWE — physics supersedes standard engineering
+- δ = 0.5 is a universal constant (Sato 2025)
+- Constitution: `OMEGA_CONSTITUTION.md`
+- Project manual: `handover/README.md`
+- Live state: `handover/ai-direct/LATEST.md`
+
+## Commands
+
+- Tests: `python3 -m pytest tests/ -q`
+- Deploy: `python3 tools/deploy.py`
+- Health: `python3 tools/cluster_health.py`
+- Env: `python3 tools/env_verify.py --strict`
+
+## Banned
+
+- No SCP for code deployment
+- No hardcoded paths — use `configs/node_paths.py`
+- No secrets in git
+- No Float32 for physics math

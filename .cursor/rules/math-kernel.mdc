@@ -1,0 +1,29 @@
+---
+description: Physics math kernel rules (SRL, TDA, Epiplexity)
+globs: "omega_core/omega_math_*.py,omega_core/kernel.py,omega_core/omega_math_rolling.py"
+---
+
+# Math Kernel Rules
+
+Read `.agent/skills/math_core/SKILL.md` for full invariants.
+
+## Invariants
+
+- δ = 0.5 is a physics constant, never optimize
+- Epiplexity gain ≥ 0 (MDL discipline)
+- Zero-variance traces → 0.0 gain, not NaN
+- Topology area is antisymmetric (Green's theorem)
+- All scalars must be finite — use safe floors
+
+## Safe Floors
+
+- `sigma_floor` prevents sqrt(Q/D) / 0
+- `depth_floor` prevents division by zero depth
+- `price_scale_floor` prevents topology normalization explosion
+- `min_trace_len` prevents OLS on < 3 points
+
+## Verification
+
+```bash
+python3 -m pytest tests/test_omega_math_core.py -v  # 28 tests, <0.2s
+```

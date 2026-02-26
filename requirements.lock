@@ -1,0 +1,23 @@
+# OMEGA vNext — Pinned Dependencies (Controller Baseline: Mac M4 Max)
+# Generated: 2026-02-26
+# Usage: pip install -r requirements.lock
+#
+# This file pins EXACT versions used on the Controller (Mac).
+# All worker nodes (Linux, Windows) MUST match these versions.
+# Verify with: python3 tools/env_verify.py
+
+# ── Core Compute ──
+polars==1.36.1
+numpy==1.26.4
+pyarrow==21.0.0
+numba==0.60.0
+llvmlite==0.43.0
+
+# ── ML / Stats ──
+scikit-learn==1.6.1
+xgboost==2.1.4
+pandas==2.3.3
+
+# ── System / Ops ──
+psutil==7.2.1
+PyYAML==6.0.3
