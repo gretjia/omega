@@ -301,7 +301,22 @@ def _apply_recursive_physics(
         ])
 
         # Argmax Competition: Select Dominant Probe (1=Linear, 2=SRL, 3=Topology)
-        dominant_probe = pl.concat_list(["bits_linear", "bits_srl", "bits_topology"]).list.arg_max() + 1
+        # Perf: scalar when/then avoids allocating a List column per row
+        # (memory fragmentation bomb). Tie-break matches original arg_max
+        # behavior (first-index wins: Linear > SRL > Topology).
+        dominant_probe = (
+            pl.when(
+                (pl.col("bits_srl") > pl.col("bits_linear"))
+                & (pl.col("bits_srl") >= pl.col("bits_topology"))
+            )
+            .then(pl.lit(2))
+            .when(
+                (pl.col("bits_topology") > pl.col("bits_linear"))
+                & (pl.col("bits_topology") > pl.col("bits_srl"))
+            )
+            .then(pl.lit(3))
+            .otherwise(pl.lit(1))
+        )
         res_df = res_df.with_columns(dominant_probe.alias("dominant_probe"))
         
     return res_df

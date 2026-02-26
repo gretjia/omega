@@ -443,27 +443,33 @@ def build_l2_features_from_l1(lf: pl.LazyFrame, cfg: L2PipelineConfig, target_fr
         pl.from_epoch(pl.col("__time_ms"), time_unit="ms").alias("__time_dt")
     )
 
+    # Perf/stage2-speedup-v62: Inline rolling_mean_by replaces the prior
+    # .rolling().agg() + .join() pattern.  This avoids materializing a full
+    # intermediate DataFrame for the join, halving peak RAM and simplifying the
+    # query graph.  The mathematical result is identical (3-second left-closed
+    # temporal rolling mean).
     if group_col:
         lf = lf.sort([group_col, "__time_dt"])
-        # Use grouped temporal rolling
-        rolled = lf.rolling(index_column="__time_dt", period="3s", closed="left", group_by=group_col).agg([
-            pl.col("v_ofi").mean().alias("v_ofi_mean"),
-            pl.col("depth").mean().alias("depth_mean")
+        lf = lf.with_columns([
+            pl.col("v_ofi")
+                .rolling_mean_by("__time_dt", window_size="3s", closed="left")
+                .over(group_col)
+                .alias("v_ofi"),
+            pl.col("depth")
+                .rolling_mean_by("__time_dt", window_size="3s", closed="left")
+                .over(group_col)
+                .alias("depth"),
         ])
-        lf = lf.join(rolled, on=[group_col, "__time_dt"], how="left")
     else:
         lf = lf.sort(["__time_dt"])
-        rolled = lf.rolling(index_column="__time_dt", period="3s", closed="left").agg([
-            pl.col("v_ofi").mean().alias("v_ofi_mean"),
-            pl.col("depth").mean().alias("depth_mean")
+        lf = lf.with_columns([
+            pl.col("v_ofi")
+                .rolling_mean_by("__time_dt", window_size="3s", closed="left")
+                .alias("v_ofi"),
+            pl.col("depth")
+                .rolling_mean_by("__time_dt", window_size="3s", closed="left")
+                .alias("depth"),
         ])
-        lf = lf.join(rolled, on="__time_dt", how="left")
-        
-    # Override original scalar values with the temporaly smoothed anti-aliased ones
-    lf = lf.with_columns([
-        pl.col("v_ofi_mean").alias("v_ofi"),
-        pl.col("depth_mean").alias("depth")
-    ]).drop(["v_ofi_mean", "depth_mean"])
 
 
     vc = cfg.volume_clock

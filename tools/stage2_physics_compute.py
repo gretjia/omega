@@ -18,8 +18,10 @@ import polars as pl
 from pathlib import Path
 from multiprocessing import get_context
 
-# Prevent Polars Rayon Thread Explosion
-os.environ["POLARS_MAX_THREADS"] = "8"
+# Prevent Polars Rayon Thread Explosion.
+# Default to a reasonable cap; main() will refine based on --workers.
+_DEFAULT_POLARS_THREADS = os.environ.get("OMEGA_STAGE2_POLARS_THREADS", "8")
+os.environ.setdefault("POLARS_MAX_THREADS", _DEFAULT_POLARS_THREADS)
 
 # Add project root to sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -223,7 +225,8 @@ def _run_feature_physics_batch(batch_frames, writer, tmp_parquet):
         del arrow_table
         del batch_df
         del input_df
-        gc.collect()
+        # NOTE: gc.collect() removed from inner batch loop (perf/stage2-speedup-v62).
+        # File-level GC in process_chunk's finally block is sufficient.
 
     return writer, rows_written
 
@@ -262,7 +265,6 @@ def process_chunk(kwargs):
                     )
                     total_rows += rows_written
                     symbol_frames = []
-                    gc.collect()
 
             if symbol_frames:
                 writer, rows_written = _run_feature_physics_batch(
@@ -270,7 +272,6 @@ def process_chunk(kwargs):
                 )
                 total_rows += rows_written
                 symbol_frames = []
-                gc.collect()
         else:
             # Rare fallback: no symbol column, process file once.
             full_df = pl.read_parquet(l1_file)
@@ -296,6 +297,33 @@ def process_chunk(kwargs):
         # OOM Guard: Force garbage collection on both success and exception paths
         gc.collect()
 
+def _apply_worker_thread_budget(workers):
+    """
+    Keep Stage2 worker/process parallelism from oversubscribing the host.
+    Dynamically pins POLARS_MAX_THREADS so workers * threads <= physical cores.
+    This is an execution-only guardrail and does not change feature math.
+    """
+    if workers <= 1:
+        return
+    cpu_count = max(1, int(os.cpu_count() or 1))
+    current_threads = int(os.environ.get("POLARS_MAX_THREADS", _DEFAULT_POLARS_THREADS))
+    thread_budget = max(1, cpu_count // max(1, int(workers)))
+    tuned_threads = min(current_threads, thread_budget)
+    if tuned_threads != current_threads:
+        os.environ["POLARS_MAX_THREADS"] = str(tuned_threads)
+        print(
+            f"[GUARDRAIL] POLARS_MAX_THREADS capped {current_threads} -> {tuned_threads} "
+            f"for workers={workers} (cpu_count={cpu_count})",
+            flush=True,
+        )
+    else:
+        print(
+            f"[GUARDRAIL] POLARS_MAX_THREADS kept at {current_threads} "
+            f"for workers={workers} (cpu_count={cpu_count})",
+            flush=True,
+        )
+
+
 def main():
     ap = argparse.ArgumentParser(description="v62 Stage 2 Physics Compute Agent")
     ap.add_argument("--input-dir", required=True, help="Directory containing Base_L1.parquet files")
@@ -305,6 +333,7 @@ def main():
 
     _ensure_heavy_workload_slice()
     _raise_oom_score_adj()
+    _apply_worker_thread_budget(args.workers)
 
     input_path = Path(args.input_dir)
     output_path = Path(args.output_dir)
