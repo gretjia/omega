@@ -74,3 +74,15 @@ handover/
 - Include verification timestamps.
 - Never store secret material.
 
+## 6. Stage2 Incident Entry Points
+
+When the task is Stage2 monitoring/debug/recovery, start from these files:
+
+1. `handover/ai-direct/entries/20260226_123046_stage2_multiround_incident_matrix_and_gapfill.md`
+2. `handover/ai-direct/LATEST.md` (latest status board and action queue)
+3. `handover/ops/PIPELINE_LOGS.md` (canonical logs, done-markers, fail/pending ledgers)
+
+Purpose:
+- Avoid re-diagnosing already fixed failure classes.
+- Use consistent metric semantics (`FAILED_TOTAL`, `RUN_FAILED`, `DEFER not-started`).
+- Keep all new Stage2 incidents appended under `handover/ai-direct/entries/`.
