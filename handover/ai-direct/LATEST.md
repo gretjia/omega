@@ -10,21 +10,21 @@ This file is the single source of current operational truth for all agents.
 
 ## 1. Snapshot Metadata
 
-- `updated_at_local`: 2026-02-26 12:51:00 +0800 (CST)
-- `updated_at_utc`: 2026-02-26 04:51:00 +0000 (UTC)
-- `updated_by`: Antigravity (Claude)
-- `controller_repo_head`: `a0c08ab` (branch: `perf/stage2-speedup-v62`)
-- `worker_repo_head_linux`: `e26f3dc` (last known; pending sync)
-- `worker_repo_head_windows`: `b42f110` (last known; pending sync)
+- `updated_at_local`: 2026-02-26 15:42:17 +0800 (CST)
+- `updated_at_utc`: 2026-02-26 07:42:17 +0000 (UTC)
+- `updated_by`: Codex (GPT-5)
+- `controller_repo_head`: `8ebadb1` (branch: `perf/stage2-speedup-v62`)
+- `worker_repo_head_linux`: `fd0f5e1` (branch: `main`)
+- `worker_repo_head_windows`: `6c9fead` (branch: `main`, runtime hotfix file dirty)
 
 ## 2. Active Projects Board
 
 | Project ID | Scope | Status | Last Verified | Owner Host |
 |---|---|---|---|---|
 | V62-STAGE1-LINUX | Stage1 Base_L1 for shards `0,1,2` | COMPLETED | 2026-02-24 16:47 +0800 | `linux1-lx` |
-| V62-STAGE2-WINDOWS | Stage2 Physics from `v62_base_l1` to `v62_feature_l2` | IN_PROGRESS | 2026-02-24 16:53 +0800 | `windows1-w1` |
+| V62-STAGE2-WINDOWS | Stage2 Physics from `v62_base_l1` to `v62_feature_l2` | IN_PROGRESS (targeted resume + pathological-symbol guard) | 2026-02-26 15:42 +0800 | `windows1-w1` |
 | V62-STAGE2-LINUX | Stage2 Physics for `host=linux1` | BLOCKED (dependency) | 2026-02-24 16:53 +0800 | `linux1-lx` |
-| V62-STAGE2-SPEEDUP | Output-preserving perf refactor (branch `perf/stage2-speedup-v62`) | READY_TO_DEPLOY | 2026-02-26 12:51 +0800 | `controller` |
+| V62-STAGE2-SPEEDUP | Output-preserving perf refactor (branch `perf/stage2-speedup-v62`) | PARTIALLY_DEPLOYED (runtime hotfix on Windows) | 2026-02-26 15:42 +0800 | `controller` |
 | HANDOVER-MAINTENANCE | keep handover as entrypoint + run-state truth | IN_PROGRESS | 2026-02-26 12:51 +0800 | `controller` |
 
 Detailed board:
@@ -50,9 +50,19 @@ Detailed board:
 - Stage1 status:
   - completed (`STAGE1_DONE=191`)
 - Stage2 status:
-  - running process: `stage2_physics_compute.py --workers 1`
-  - snapshot: `WIN_STAGE2_DONE=113 / 191`
-  - active log: `D:\work\Omega_vNext\audit\stage2_compute.log`
+  - scheduler task running: `Omega_v62_stage2_isolated_v2` (targeted resume, per-file isolation)
+  - snapshot: `WIN_STAGE2_DONE=178 / 191`
+  - pending list: `13` files (`audit/stage2_pending_isolated_v2.txt`)
+  - current blockers under active processing: `20250704_b07c2229.parquet`, `20250725_b07c2229.parquet`
+  - mitigation deployed in runtime:
+    - `tools/stage2_physics_compute.py` now includes pathological-symbol crash guard
+    - key knob: `OMEGA_STAGE2_SKIP_PATHOLOGICAL_SYMBOL_ON_FAIL`
+  - progress evidence while log is quiet (subprocess stdout capture mode):
+    - `D:\Omega_frames\v62_feature_l2\host=windows1\20250704_b07c2229.parquet.tmp` growth observed (`5.14MB -> 6.57MB -> 8.01MB -> 9.88MB`)
+  - current fail ledger file (`audit/stage2_targeted_failed_isolated_v2.txt`) is empty in this run (started with `--reset-fail-file`)
+  - git state note:
+    - worker repo head remains `main@6c9fead`
+    - runtime hotfix file is locally modified: `M tools/stage2_physics_compute.py`
 
 ### 3.3 Data Recovery Note
 
@@ -73,11 +83,12 @@ Historical broken files are kept as backups:
 
 ## 5. Immediate Next Actions (User-Directed Sequence)
 
-1. Sync updated `handover/` docs to GitHub.
-2. Run `git pull` on `windows1`, `linux1`, and `omega-vm`.
-3. Install `numba` into Linux `.venv` if still missing.
-4. Start Linux Stage2 in `heavy-workload.slice`.
-5. Verify Linux Stage2 done-marker growth.
+1. Continue monitoring `Omega_v62_stage2_isolated_v2` until `20250704_b07c2229.parquet.done` appears.
+2. Confirm whether skip guard line appears in log:
+   - `Skip pathological symbol after native crash`.
+3. Verify next blocker `20250725_b07c2229.parquet` status and update fail ledger outcome.
+4. Commit/push hotfix from branch and normalize worker git state (avoid long-term runtime dirty patch).
+5. After Windows blockers clear, return to Linux Stage2 dependency unblock (`numba`) and relaunch.
 
 ## 6. Quick Verification Commands
 
@@ -95,6 +106,7 @@ ssh linux1-lx '/home/zepher/work/Omega_vNext/.venv/bin/python -c "import numba, 
 
 ## 7. Latest Related Entries
 
+- `handover/ai-direct/entries/20260226_154217_windows_stage2_pathological_symbol_debug_fix.md`
 - `handover/ai-direct/entries/20260224_165312_linux_stage1_repair_and_stage2_gate.md`
 - `handover/ai-direct/entries/20260224_041600_omega_vm_windows_connectivity_rca_fix.md`
 
@@ -210,3 +222,29 @@ ssh linux1-lx '/home/zepher/work/Omega_vNext/.venv/bin/python -c "import numba, 
   2. Sync to Linux/Windows worker nodes.
   3. Single-file A/B validation on real L2 output before full cutover.
 - Detailed entry: `handover/ai-direct/entries/20260226_125100_stage2_perf_refactor_branch_ready.md`
+
+## Update 2026-02-26 15:42 +0800 (Windows Stage2 Fail-Ledger Deep Debug + Live Hotfix)
+
+- Target issue:
+  - `20250704_b07c2229.parquet` (plus adjacent blocker `20250725_b07c2229.parquet`) repeatedly crashed Windows Stage2 run.
+- Hard evidence:
+  - native exit codes: `rc=3221225477`, `rc=3221226505`
+  - allocator failures up to:
+    - `33045445984` bytes
+    - `103308592388` bytes
+    - `117181513728` bytes
+    - `234364076032` bytes
+- Symbol-level RCA:
+  - `20250704` contains `123257.SZ` with `rows=60284` but only `2` distinct `time` values.
+  - `20250725` contains `127110.SZ` with `rows=223507` and only `2` distinct `time` values.
+- Mitigation landed (execution-layer, no formula rewrite):
+  - added pathological symbol profiler and crash-conditional skip guard in `tools/stage2_physics_compute.py`
+  - guard is only used when isolated symbol subprocess crashes and threshold matches.
+- Validation:
+  - local regression suite: `12 passed`
+  - function-level probe on Windows confirms skip-eligibility for both pathological symbols.
+- Runtime:
+  - official task `Omega_v62_stage2_isolated_v2` relaunched
+  - progress currently evidenced by active process CPU/RSS and `20250704` tmp parquet growth.
+- Detailed entry:
+  - `handover/ai-direct/entries/20260226_154217_windows_stage2_pathological_symbol_debug_fix.md`

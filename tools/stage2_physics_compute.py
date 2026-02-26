@@ -14,14 +14,60 @@ import glob
 import argparse
 import gc
 import re
+import time
+import shutil
+import tempfile
+import subprocess
+import platform
+
+
+def _apply_windows_machine_probe_bypass():
+    """
+    Windows/Python 3.14 guardrail:
+    platform.machine() may block on WMI in some hosts, which can deadlock
+    `import polars`. Use environment-backed architecture as a stable fallback.
+    """
+    if sys.platform != "win32":
+        return
+
+    enabled = os.environ.get("OMEGA_WINDOWS_WMI_MACHINE_BYPASS", "1").strip().lower()
+    if enabled not in {"1", "true", "yes"}:
+        return
+
+    raw_arch = (
+        os.environ.get("PROCESSOR_ARCHITEW6432")
+        or os.environ.get("PROCESSOR_ARCHITECTURE")
+        or "AMD64"
+    ).strip()
+    lowered = raw_arch.lower()
+    if lowered in {"amd64", "x86_64", "x64"}:
+        machine = "x86_64"
+    elif lowered in {"arm64", "aarch64"}:
+        machine = "arm64"
+    else:
+        machine = raw_arch or "x86_64"
+
+    platform.machine = lambda: machine
+
+
+_apply_windows_machine_probe_bypass()
 import polars as pl
 from pathlib import Path
 from multiprocessing import get_context
 
-# Prevent Polars Rayon Thread Explosion.
-# Default to a reasonable cap; main() will refine based on --workers.
-_DEFAULT_POLARS_THREADS = os.environ.get("OMEGA_STAGE2_POLARS_THREADS", "8")
-os.environ.setdefault("POLARS_MAX_THREADS", _DEFAULT_POLARS_THREADS)
+# Prevent Polars Rayon thread explosion; allow operator override for stability tuning.
+_DEFAULT_POLARS_THREADS = "2" if sys.platform == "win32" else "8"
+os.environ["POLARS_MAX_THREADS"] = os.environ.get(
+    "OMEGA_STAGE2_POLARS_THREADS",
+    _DEFAULT_POLARS_THREADS,
+)
+# Windows guardrail: numba import can stall/hard-hang in cp314 runtime on some hosts.
+# Keep Stage2 productive by defaulting to non-JIT math path on Windows.
+if sys.platform == "win32":
+    os.environ.setdefault("OMEGA_DISABLE_NUMBA", "1")
+    # Windows native-extension crash guardrail:
+    # run heavy symbol batches in isolated subprocesses by default.
+    os.environ.setdefault("OMEGA_STAGE2_ISOLATE_SYMBOL_BATCH", "1")
 
 # Add project root to sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -37,6 +83,9 @@ from omega_core.kernel import apply_recursive_physics
 DATE_HASH_PARQUET_RE = re.compile(r"^(?P<date>\d{8})_[0-9a-f]{7}\.parquet$")
 ALLOW_USER_SLICE_ENV = "OMEGA_STAGE2_ALLOW_USER_SLICE"
 TARGET_OOM_SCORE_ADJ = 300
+WINDOWS_RISKY_PYTHON_MAJOR_MINOR = (3, 14)
+PATHO_SYMBOL_MIN_ROWS_DEFAULT = 50000
+PATHO_SYMBOL_MAX_UNIQUE_TIMES_DEFAULT = 2
 
 
 def _read_self_cgroup_path():
@@ -123,6 +172,190 @@ def _pool_initializer():
     _raise_oom_score_adj()
 
 
+def _is_truthy_env(name):
+    return os.environ.get(name, "").strip().lower() in {"1", "true", "yes"}
+
+
+def _coerce_positive_int(value, fallback):
+    try:
+        parsed = int(str(value).strip())
+        if parsed > 0:
+            return parsed
+    except Exception:
+        pass
+    return int(fallback)
+
+
+def _is_truthy_env_default(name, default):
+    raw = os.environ.get(name)
+    if raw is None:
+        raw = default
+    return str(raw).strip().lower() in {"1", "true", "yes"}
+
+
+def _profile_symbol_time_density(l1_file, symbol, *, unique_cap):
+    """
+    Probe a symbol's row count and distinct `time` cardinality with a low-memory parquet scan.
+    Used only on isolated native-crash symbols to decide whether we can safely skip.
+    """
+    import pyarrow as pa
+    import pyarrow.compute as pc
+    import pyarrow.parquet as pq
+
+    target = str(symbol)
+    total_rows = 0
+    unique_times = set()
+    has_time = False
+
+    parquet = pq.ParquetFile(l1_file)
+    for rg_idx in range(parquet.num_row_groups):
+        rg = parquet.read_row_group(rg_idx, columns=["symbol", "time"])
+        if "symbol" not in rg.column_names:
+            continue
+        has_time = "time" in rg.column_names
+
+        try:
+            sym_col = pc.cast(rg.column("symbol"), pa.string(), safe=False)
+            mask = pc.equal(sym_col, pa.scalar(target, type=pa.string()))
+            matched = rg.filter(mask)
+        except Exception:
+            # Conservative fallback for Arrow kernel edge cases.
+            syms = rg.column("symbol").to_pylist()
+            idx = [i for i, v in enumerate(syms) if str(v) == target]
+            if not idx:
+                continue
+            matched = rg.take(pa.array(idx, type=pa.int32()))
+
+        n = int(matched.num_rows)
+        if n <= 0:
+            continue
+
+        total_rows += n
+        if has_time:
+            for t in matched.column("time").to_pylist():
+                unique_times.add(t)
+                if len(unique_times) > unique_cap:
+                    # Early exit: once unique time count exceeds cap, it is not skip-eligible.
+                    return {
+                        "rows": total_rows,
+                        "unique_times": len(unique_times),
+                        "has_time": has_time,
+                        "early_stop": True,
+                    }
+
+    return {
+        "rows": total_rows,
+        "unique_times": len(unique_times),
+        "has_time": has_time,
+        "early_stop": False,
+    }
+
+
+def _maybe_skip_pathological_symbol_failure(*, l1_file, file_name, symbol, rc):
+    """
+    For Windows native crash symbols, optionally skip only clearly pathological symbols
+    (huge rows with extremely low distinct-time support). This keeps the file progressing
+    while preserving fail-fast for normal symbols/errors.
+    """
+    default_enabled = "1" if sys.platform == "win32" else "0"
+    if not _is_truthy_env_default(
+        "OMEGA_STAGE2_SKIP_PATHOLOGICAL_SYMBOL_ON_FAIL", default_enabled
+    ):
+        return False
+
+    min_rows = _coerce_positive_int(
+        os.environ.get("OMEGA_STAGE2_PATHO_SYMBOL_MIN_ROWS"),
+        PATHO_SYMBOL_MIN_ROWS_DEFAULT,
+    )
+    max_unique_times = _coerce_positive_int(
+        os.environ.get("OMEGA_STAGE2_PATHO_SYMBOL_MAX_UNIQUE_TIMES"),
+        PATHO_SYMBOL_MAX_UNIQUE_TIMES_DEFAULT,
+    )
+
+    prof = _profile_symbol_time_density(
+        l1_file,
+        symbol,
+        unique_cap=max_unique_times,
+    )
+    rows = int(prof.get("rows", 0))
+    unique_times = int(prof.get("unique_times", 0))
+    has_time = bool(prof.get("has_time", False))
+
+    if has_time and rows >= min_rows and unique_times <= max_unique_times:
+        print(
+            f"[{file_name}] [WARN] Skip pathological symbol after native crash rc={rc}: "
+            f"symbol={symbol} rows={rows} unique_time={unique_times} "
+            f"(threshold rows>={min_rows}, unique_time<={max_unique_times}).",
+            flush=True,
+        )
+        return True
+
+    return False
+
+
+def _apply_worker_thread_budget(workers):
+    """
+    Keep Stage2 worker/process parallelism from oversubscribing the host.
+    This is an execution-only guardrail and does not change feature math.
+    """
+    if workers <= 1:
+        return
+
+    if _is_truthy_env("OMEGA_STAGE2_DISABLE_THREAD_BUDGET"):
+        print(
+            "[WARN] OMEGA_STAGE2_DISABLE_THREAD_BUDGET=1 set; skipping thread budget cap.",
+            flush=True,
+        )
+        return
+
+    cpu_count = max(1, int(os.cpu_count() or 1))
+    current_threads = _coerce_positive_int(
+        os.environ.get("POLARS_MAX_THREADS"),
+        _coerce_positive_int(_DEFAULT_POLARS_THREADS, 1),
+    )
+    thread_budget = max(1, cpu_count // max(1, int(workers)))
+    tuned_threads = min(current_threads, thread_budget)
+
+    if tuned_threads != current_threads:
+        os.environ["POLARS_MAX_THREADS"] = str(tuned_threads)
+        print(
+            "[GUARDRAIL] POLARS_MAX_THREADS capped "
+            f"{current_threads} -> {tuned_threads} for workers={workers} "
+            f"(cpu_count={cpu_count})",
+            flush=True,
+        )
+    else:
+        print(
+            "[GUARDRAIL] POLARS_MAX_THREADS kept at "
+            f"{current_threads} for workers={workers} (cpu_count={cpu_count})",
+            flush=True,
+        )
+
+
+def _windows_runtime_risk_notes():
+    """
+    Best-effort runtime risk probe for Windows native extension stability.
+    """
+    if sys.platform != "win32":
+        return []
+
+    notes = []
+    if sys.version_info[:2] >= WINDOWS_RISKY_PYTHON_MAJOR_MINOR:
+        notes.append(
+            f"python {sys.version_info.major}.{sys.version_info.minor} detected "
+            "(known crash risk in some native-extension workloads)"
+        )
+
+    try:
+        polars_path = str(Path(pl.__file__).resolve())
+    except Exception:
+        polars_path = str(getattr(pl, "__file__", ""))
+    if "AppData\\Roaming\\Python" in polars_path:
+        notes.append(f"polars imported from user-site path: {polars_path}")
+
+    return notes
+
+
 def _dedupe_l1_files_by_date(l1_files):
     """
     Keep one Base_L1 parquet per trading date.
@@ -163,6 +396,7 @@ def _iter_complete_symbol_frames_from_parquet(l1_file):
     Iterate complete symbol blocks in file order with a single parquet pass.
     Assumes Stage1 output is sorted by symbol/date/time.
     """
+    import pyarrow as pa
     import pyarrow.parquet as pq
 
     parquet = pq.ParquetFile(l1_file)
@@ -171,29 +405,59 @@ def _iter_complete_symbol_frames_from_parquet(l1_file):
 
     for rg_idx in range(parquet.num_row_groups):
         rg_table = parquet.read_row_group(rg_idx)
-        rg_df = pl.from_arrow(rg_table)
-        if rg_df.height == 0:
+        if rg_table.num_rows == 0:
             continue
 
-        # Keep row order from Stage1 sort; split row-group into contiguous symbol segments.
-        for part in rg_df.partition_by("symbol", maintain_order=True):
-            symbol = part.get_column("symbol")[0]
+        # Windows hardening:
+        # Avoid Polars partition_by("symbol") panic seen on certain mixed symbol chunks.
+        # Split contiguous symbol segments on Arrow side, then convert slices to Polars.
+        if "symbol" not in rg_table.column_names:
+            if rg_table.num_rows > 0:
+                yield rg_table
+            continue
+
+        symbol_values = rg_table.column("symbol").to_pylist()
+        if not symbol_values:
+            continue
+
+        seg_start = 0
+        current_seg_symbol = symbol_values[0]
+
+        for i in range(1, len(symbol_values)):
+            if symbol_values[i] == current_seg_symbol:
+                continue
+
+            part = rg_table.slice(seg_start, i - seg_start)
+            symbol = current_seg_symbol
 
             if current_symbol is None:
                 current_symbol = symbol
                 current_parts = [part]
-                continue
-
-            if symbol == current_symbol:
+            elif symbol == current_symbol:
                 current_parts.append(part)
-                continue
+            else:
+                yield pa.concat_tables(current_parts, promote_options="default")
+                current_symbol = symbol
+                current_parts = [part]
 
-            yield pl.concat(current_parts, how="vertical_relaxed")
+            seg_start = i
+            current_seg_symbol = symbol_values[i]
+
+        # Tail segment
+        part = rg_table.slice(seg_start, len(symbol_values) - seg_start)
+        symbol = current_seg_symbol
+        if current_symbol is None:
+            current_symbol = symbol
+            current_parts = [part]
+        elif symbol == current_symbol:
+            current_parts.append(part)
+        else:
+            yield pa.concat_tables(current_parts, promote_options="default")
             current_symbol = symbol
             current_parts = [part]
 
     if current_parts:
-        yield pl.concat(current_parts, how="vertical_relaxed")
+        yield pa.concat_tables(current_parts, promote_options="default")
 
 
 def _run_feature_physics_batch(batch_frames, writer, tmp_parquet):
@@ -201,6 +465,7 @@ def _run_feature_physics_batch(batch_frames, writer, tmp_parquet):
     Run Stage2 feature + physics on a symbol batch and append to parquet writer.
     Returns updated writer and rows written for this batch.
     """
+    import pyarrow as pa
     import pyarrow.parquet as pq
 
     rows_written = 0
@@ -209,7 +474,14 @@ def _run_feature_physics_batch(batch_frames, writer, tmp_parquet):
     arrow_table = None
 
     try:
-        input_df = pl.concat(batch_frames, how="vertical_relaxed")
+        if not batch_frames:
+            return writer, 0
+
+        if isinstance(batch_frames[0], pl.DataFrame):
+            input_df = pl.concat(batch_frames, how="vertical_relaxed")
+        else:
+            input_table = pa.concat_tables(batch_frames, promote_options="default")
+            input_df = pl.from_arrow(input_table)
         batch_df = build_l2_features_from_l1(input_df.lazy(), GLOBAL_CFG)
 
         if batch_df is not None and batch_df.height > 0:
@@ -225,10 +497,263 @@ def _run_feature_physics_batch(batch_frames, writer, tmp_parquet):
         del arrow_table
         del batch_df
         del input_df
-        # NOTE: gc.collect() removed from inner batch loop (perf/stage2-speedup-v62).
-        # File-level GC in process_chunk's finally block is sufficient.
+        gc.collect()
 
     return writer, rows_written
+
+
+def _process_file_via_symbol_scan_fallback(
+    *,
+    l1_file,
+    batch_size,
+    writer,
+    tmp_parquet,
+    total_rows,
+    file_name,
+    diag_every_batches,
+    t0,
+    symbol_subset=None,
+):
+    """
+    Robust fallback path for files that trigger Polars panic in Arrow conversion path.
+    Uses lazy scan + symbol filter batches (slower but resilient).
+    """
+    lf = pl.scan_parquet(l1_file)
+    symbol_expr = pl.col("symbol").cast(pl.Utf8, strict=False)
+    all_symbols = (
+        lf.select(symbol_expr.alias("symbol").unique().sort())
+        .collect()
+        .get_column("symbol")
+        .to_list()
+    )
+    if symbol_subset:
+        subset = {str(x) for x in symbol_subset if str(x)}
+        all_symbols = [s for s in all_symbols if str(s) in subset]
+    print(
+        f"[{file_name}] Fallback path enabled: scan/filter by symbol batches ({len(all_symbols)} symbols).",
+        flush=True,
+    )
+
+    isolate_batches = (
+        sys.platform == "win32" and _is_truthy_env("OMEGA_STAGE2_ISOLATE_SYMBOL_BATCH")
+    )
+
+    batch_idx = 0
+    for start in range(0, len(all_symbols), batch_size):
+        sym_batch = all_symbols[start : start + batch_size]
+        batch_idx += 1
+        rows_written = 0
+
+        if isolate_batches:
+            writer, rows_written, rc, iso_out, iso_err = _run_windows_isolated_symbol_batch(
+                l1_file=l1_file,
+                symbols=sym_batch,
+                writer=writer,
+                tmp_parquet=tmp_parquet,
+            )
+            if iso_out:
+                print(iso_out.rstrip(), flush=True)
+            if iso_err:
+                print(iso_err.rstrip(), flush=True)
+
+            if rc != 0:
+                # rc=4 means this symbol subset yielded no output rows.
+                # Treat as non-fatal so one sparse/invalid symbol does not poison
+                # the whole file resume run.
+                if rc == 4 and len(sym_batch) <= 1:
+                    one = sym_batch[0] if sym_batch else "<none>"
+                    print(
+                        f"[{file_name}] [WARN] Isolated symbol returned empty output, skip symbol={one}.",
+                        flush=True,
+                    )
+                    continue
+                if len(sym_batch) <= 1:
+                    one = sym_batch[0] if sym_batch else "<none>"
+                    if one != "<none>" and _maybe_skip_pathological_symbol_failure(
+                        l1_file=l1_file,
+                        file_name=file_name,
+                        symbol=one,
+                        rc=rc,
+                    ):
+                        continue
+                    raise RuntimeError(
+                        f"isolated symbol batch failed rc={rc} symbol={one}"
+                    )
+                # Split fallback: isolate each symbol to bypass batch-level native crashes.
+                print(
+                    f"[{file_name}] [WARN] Isolated batch failed (rc={rc}) on {len(sym_batch)} symbols, retrying single-symbol mode.",
+                    flush=True,
+                )
+                for one_sym in sym_batch:
+                    writer, one_rows, rc1, out1, err1 = _run_windows_isolated_symbol_batch(
+                        l1_file=l1_file,
+                        symbols=[one_sym],
+                        writer=writer,
+                        tmp_parquet=tmp_parquet,
+                    )
+                    if out1:
+                        print(out1.rstrip(), flush=True)
+                    if err1:
+                        print(err1.rstrip(), flush=True)
+                    if rc1 == 4:
+                        print(
+                            f"[{file_name}] [WARN] Single-symbol returned empty output, skip symbol={one_sym}.",
+                            flush=True,
+                        )
+                        continue
+                    if rc1 != 0:
+                        if _maybe_skip_pathological_symbol_failure(
+                            l1_file=l1_file,
+                            file_name=file_name,
+                            symbol=one_sym,
+                            rc=rc1,
+                        ):
+                            continue
+                        raise RuntimeError(
+                            f"single-symbol isolated failure rc={rc1} symbol={one_sym}"
+                        )
+                    rows_written += one_rows
+        else:
+            batch_df = lf.filter(symbol_expr.is_in(sym_batch)).collect()
+            writer, rows_written = _run_feature_physics_batch([batch_df], writer, tmp_parquet)
+            del batch_df
+            gc.collect()
+
+        total_rows += rows_written
+        if diag_every_batches > 0 and (batch_idx % diag_every_batches == 0):
+            elapsed = time.time() - t0
+            print(
+                f"[{file_name}] Fallback progress batch={batch_idx} symbols_done={min(start + batch_size, len(all_symbols))}/{len(all_symbols)} rows_written={total_rows} elapsed={elapsed:.1f}s",
+                flush=True,
+            )
+
+    return writer, total_rows
+
+
+def _run_single_symbol_batch_file(l1_file, symbols_file, output_parquet):
+    """
+    Child-process entrypoint:
+    process one symbol subset into one parquet chunk.
+    """
+    import pyarrow as pa
+
+    symbols = [
+        line.strip()
+        for line in Path(symbols_file).read_text(encoding="utf-8", errors="replace").splitlines()
+        if line.strip()
+    ]
+    if not symbols:
+        return 4
+
+    symbol_set = {str(s) for s in symbols if str(s)}
+    symbol_tables = []
+    try:
+        # Fast path: iterate parquet once and only materialize requested symbols.
+        for symbol_tbl in _iter_complete_symbol_frames_from_parquet(l1_file):
+            if symbol_tbl.num_rows <= 0 or "symbol" not in symbol_tbl.column_names:
+                continue
+            try:
+                symbol_name = str(symbol_tbl.column("symbol")[0].as_py())
+            except Exception:
+                symbol_name = str(symbol_tbl.column("symbol")[0])
+            if symbol_name in symbol_set:
+                symbol_tables.append(symbol_tbl)
+                symbol_set.discard(symbol_name)
+                if not symbol_set:
+                    break
+        if symbol_tables:
+            if len(symbol_tables) == 1:
+                batch_df = pl.from_arrow(symbol_tables[0])
+            else:
+                batch_df = pl.from_arrow(pa.concat_tables(symbol_tables, promote_options="default"))
+        else:
+            batch_df = pl.DataFrame()
+    except Exception:
+        # Compatibility fallback for unexpected parquet-layout edge cases.
+        lf = pl.scan_parquet(l1_file)
+        symbol_expr = pl.col("symbol").cast(pl.Utf8, strict=False)
+        batch_df = lf.filter(symbol_expr.is_in(symbols)).collect()
+
+    if batch_df.height <= 0:
+        return 4
+
+    feat_df = build_l2_features_from_l1(batch_df.lazy(), GLOBAL_CFG)
+    if feat_df is None or feat_df.height <= 0:
+        return 4
+    feat_df = apply_recursive_physics(feat_df, GLOBAL_CFG)
+    if feat_df is None or feat_df.height <= 0:
+        return 4
+
+    # Keep output schema stable with legacy Stage2 artifacts.
+    cast_exprs = []
+    if "n_ticks" in feat_df.columns:
+        cast_exprs.append(pl.col("n_ticks").cast(pl.UInt32, strict=False).alias("n_ticks"))
+    if "dominant_probe" in feat_df.columns:
+        cast_exprs.append(
+            pl.col("dominant_probe").cast(pl.UInt32, strict=False).alias("dominant_probe")
+        )
+    if cast_exprs:
+        feat_df = feat_df.with_columns(cast_exprs)
+
+    Path(output_parquet).parent.mkdir(parents=True, exist_ok=True)
+    feat_df.write_parquet(output_parquet, compression="snappy")
+    return 0
+
+
+def _run_windows_isolated_symbol_batch(*, l1_file, symbols, writer, tmp_parquet):
+    """
+    Run one symbol subset in a fresh Python subprocess to isolate native crashes.
+    Returns: writer, rows_written, rc, stdout, stderr
+    """
+    import pyarrow.parquet as pq
+
+    tmp_dir = Path(tempfile.mkdtemp(prefix="omega_stage2_iso_"))
+    symbols_file = tmp_dir / "symbols.txt"
+    chunk_out = tmp_dir / "chunk.parquet"
+    symbols_file.write_text("\n".join(str(s) for s in symbols) + "\n", encoding="utf-8")
+
+    code = (
+        "import sys; "
+        "from tools.stage2_physics_compute import _run_single_symbol_batch_file; "
+        "raise SystemExit(_run_single_symbol_batch_file(sys.argv[1], sys.argv[2], sys.argv[3]))"
+    )
+    env = dict(os.environ)
+    env["OMEGA_STAGE2_ISOLATE_SYMBOL_BATCH"] = "0"
+    repo_root = str(Path(__file__).resolve().parents[1])
+    env["PYTHONPATH"] = (
+        repo_root if not env.get("PYTHONPATH") else repo_root + os.pathsep + env.get("PYTHONPATH")
+    )
+
+    cp = subprocess.run(
+        [
+            sys.executable,
+            "-u",
+            "-c",
+            code,
+            str(l1_file),
+            str(symbols_file),
+            str(chunk_out),
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+        env=env,
+        cwd=repo_root,
+    )
+
+    rows_written = 0
+    try:
+        if cp.returncode == 0 and chunk_out.exists():
+            table = pq.read_table(str(chunk_out))
+            rows_written = int(table.num_rows)
+            if rows_written > 0:
+                if writer is None:
+                    writer = pq.ParquetWriter(tmp_parquet, table.schema, compression="snappy")
+                writer.write_table(table)
+    finally:
+        shutil.rmtree(tmp_dir, ignore_errors=True)
+
+    return writer, rows_written, cp.returncode, cp.stdout or "", cp.stderr or ""
 
 
 def process_chunk(kwargs):
@@ -240,38 +765,149 @@ def process_chunk(kwargs):
     done_path = Path(out_dir) / (file_path.name.replace("Base_L1", "Feature_L2") + ".done")
     
     if done_path.exists():
-        return f"[{file_path.name}] Skipped (Done)"
+        return {
+            "ok": True,
+            "status": "skipped",
+            "file": file_path.name,
+            "message": f"[{file_path.name}] Skipped (Done)",
+        }
         
     print(f"[{file_path.name}] Starting Stage 2 Physics Computation...", flush=True)
 
     try:
+        t0 = time.time()
         # Single parquet pass path: avoid N-times re-scan from repeated lf.filter(...).collect().
+        file_size_mb = Path(l1_file).stat().st_size / (1024 * 1024)
+        parquet_meta = None
+        try:
+            import pyarrow.parquet as pq
+
+            parquet_meta = pq.ParquetFile(l1_file).metadata
+        except Exception:
+            parquet_meta = None
+
+        if parquet_meta is not None:
+            print(
+                f"[{file_path.name}] Input size={file_size_mb:.2f}MB rows={parquet_meta.num_rows} row_groups={parquet_meta.num_row_groups}",
+                flush=True,
+            )
+        else:
+            print(
+                f"[{file_path.name}] Input size={file_size_mb:.2f}MB rows=<unknown> row_groups=<unknown>",
+                flush=True,
+            )
+
         schema_names = pl.scan_parquet(l1_file).collect_schema().names()
         has_symbol = "symbol" in schema_names
 
-        batch_size = 50
+        default_batch_size = "20" if sys.platform == "win32" else "50"
+        batch_size = max(1, int(os.environ.get("OMEGA_STAGE2_SYMBOL_BATCH_SIZE", default_batch_size)))
+        diag_every_batches = max(0, int(os.environ.get("OMEGA_STAGE2_DIAG_EVERY_BATCHES", "0")))
+        print(
+            f"[{file_path.name}] Stage2 batch_size={batch_size}, polars_threads={os.environ.get('POLARS_MAX_THREADS')}",
+            flush=True,
+        )
         tmp_parquet = out_path.with_suffix(".parquet.tmp")
         writer = None
         total_rows = 0
 
         if has_symbol:
-            symbol_frames = []
+            force_scan_env = os.environ.get("OMEGA_STAGE2_FORCE_SCAN_FALLBACK", "").strip().lower()
+            if force_scan_env in {"0", "false", "no"}:
+                force_scan_fallback = False
+            elif force_scan_env in {"1", "true", "yes"}:
+                force_scan_fallback = True
+            else:
+                force_scan_fallback = sys.platform == "win32"
 
-            for symbol_df in _iter_complete_symbol_frames_from_parquet(l1_file):
-                symbol_frames.append(symbol_df)
-                if len(symbol_frames) >= batch_size:
-                    writer, rows_written = _run_feature_physics_batch(
-                        symbol_frames, writer, tmp_parquet
-                    )
-                    total_rows += rows_written
-                    symbol_frames = []
-
-            if symbol_frames:
-                writer, rows_written = _run_feature_physics_batch(
-                    symbol_frames, writer, tmp_parquet
+            if force_scan_fallback:
+                print(
+                    f"[{file_path.name}] Using scan/filter fallback path (platform/override).",
+                    flush=True,
                 )
-                total_rows += rows_written
+                writer, total_rows = _process_file_via_symbol_scan_fallback(
+                    l1_file=l1_file,
+                    batch_size=batch_size,
+                    writer=writer,
+                    tmp_parquet=tmp_parquet,
+                    total_rows=total_rows,
+                    file_name=file_path.name,
+                    diag_every_batches=diag_every_batches,
+                    t0=t0,
+                )
+            else:
                 symbol_frames = []
+                symbols_seen = 0
+                batch_idx = 0
+                try:
+                    for symbol_df in _iter_complete_symbol_frames_from_parquet(l1_file):
+                        symbol_frames.append(symbol_df)
+                        symbols_seen += 1
+                        if len(symbol_frames) >= batch_size:
+                            batch_idx += 1
+                            writer, rows_written = _run_feature_physics_batch(
+                                symbol_frames, writer, tmp_parquet
+                            )
+                            total_rows += rows_written
+                            if diag_every_batches > 0 and (batch_idx % diag_every_batches == 0):
+                                elapsed = time.time() - t0
+                                print(
+                                    f"[{file_path.name}] Progress batch={batch_idx} symbols_seen={symbols_seen} rows_written={total_rows} elapsed={elapsed:.1f}s",
+                                    flush=True,
+                                )
+                            symbol_frames = []
+                            gc.collect()
+
+                    if symbol_frames:
+                        batch_idx += 1
+                        writer, rows_written = _run_feature_physics_batch(
+                            symbol_frames, writer, tmp_parquet
+                        )
+                        total_rows += rows_written
+                        if diag_every_batches > 0:
+                            elapsed = time.time() - t0
+                            print(
+                                f"[{file_path.name}] Progress batch={batch_idx} symbols_seen={symbols_seen} rows_written={total_rows} elapsed={elapsed:.1f}s",
+                                flush=True,
+                            )
+                        symbol_frames = []
+                        gc.collect()
+                except BaseException as stream_exc:
+                    err_txt = str(stream_exc)
+                    is_polars_panic = (
+                        "ParseIntError" in err_txt
+                        or "PanicException" in stream_exc.__class__.__name__
+                        or "pyo3_runtime" in stream_exc.__class__.__module__
+                    )
+                    if not is_polars_panic:
+                        raise
+
+                    print(
+                        f"[{file_path.name}] [WARN] Arrow symbol path panic detected: {stream_exc}. Falling back to scan/filter path.",
+                        flush=True,
+                    )
+                    try:
+                        if writer is not None:
+                            writer.close()
+                    except Exception:
+                        pass
+                    writer = None
+                    total_rows = 0
+                    try:
+                        tmp_parquet.unlink()
+                    except FileNotFoundError:
+                        pass
+
+                    writer, total_rows = _process_file_via_symbol_scan_fallback(
+                        l1_file=l1_file,
+                        batch_size=batch_size,
+                        writer=writer,
+                        tmp_parquet=tmp_parquet,
+                        total_rows=total_rows,
+                        file_name=file_path.name,
+                        diag_every_batches=diag_every_batches,
+                        t0=t0,
+                    )
         else:
             # Rare fallback: no symbol column, process file once.
             full_df = pl.read_parquet(l1_file)
@@ -285,55 +921,57 @@ def process_chunk(kwargs):
             # Atomic write completion
             tmp_parquet.rename(out_path)
             done_path.touch()
-            return_msg = f"[{file_path.name}] Completed: {total_rows} rows"
+            elapsed = time.time() - t0
+            return_msg = f"[{file_path.name}] Completed: {total_rows} rows in {elapsed:.1f}s"
+            return {
+                "ok": True,
+                "status": "completed",
+                "file": file_path.name,
+                "message": return_msg,
+            }
         else:
             return_msg = f"[{file_path.name}] Error: Empty physics frames generated"
-            
-        return return_msg
+            return {
+                "ok": False,
+                "status": "empty_output",
+                "file": file_path.name,
+                "message": return_msg,
+            }
             
     except Exception as e:
-        return f"[{file_path.name}] CRITICAL Error: {e}"
+        return {
+            "ok": False,
+            "status": "exception",
+            "file": file_path.name,
+            "message": f"[{file_path.name}] CRITICAL Error: {e}",
+        }
     finally:
         # OOM Guard: Force garbage collection on both success and exception paths
         gc.collect()
-
-def _apply_worker_thread_budget(workers):
-    """
-    Keep Stage2 worker/process parallelism from oversubscribing the host.
-    Dynamically pins POLARS_MAX_THREADS so workers * threads <= physical cores.
-    This is an execution-only guardrail and does not change feature math.
-    """
-    if workers <= 1:
-        return
-    cpu_count = max(1, int(os.cpu_count() or 1))
-    current_threads = int(os.environ.get("POLARS_MAX_THREADS", _DEFAULT_POLARS_THREADS))
-    thread_budget = max(1, cpu_count // max(1, int(workers)))
-    tuned_threads = min(current_threads, thread_budget)
-    if tuned_threads != current_threads:
-        os.environ["POLARS_MAX_THREADS"] = str(tuned_threads)
-        print(
-            f"[GUARDRAIL] POLARS_MAX_THREADS capped {current_threads} -> {tuned_threads} "
-            f"for workers={workers} (cpu_count={cpu_count})",
-            flush=True,
-        )
-    else:
-        print(
-            f"[GUARDRAIL] POLARS_MAX_THREADS kept at {current_threads} "
-            f"for workers={workers} (cpu_count={cpu_count})",
-            flush=True,
-        )
-
 
 def main():
     ap = argparse.ArgumentParser(description="v62 Stage 2 Physics Compute Agent")
     ap.add_argument("--input-dir", required=True, help="Directory containing Base_L1.parquet files")
     ap.add_argument("--output-dir", required=True, help="Directory to output Feature_L2.parquet files")
-    ap.add_argument("--workers", type=int, default=4, help="Number of parallel workers")
+    ap.add_argument("--workers", type=int, default=2, help="Number of parallel workers")
     args = ap.parse_args()
 
     _ensure_heavy_workload_slice()
     _raise_oom_score_adj()
     _apply_worker_thread_budget(args.workers)
+
+    runtime_notes = _windows_runtime_risk_notes()
+    if runtime_notes:
+        joined = "; ".join(runtime_notes)
+        print(f"[WARN] Windows runtime risk detected: {joined}", flush=True)
+        if _is_truthy_env("OMEGA_STAGE2_STRICT_RUNTIME"):
+            print(
+                "[FATAL] OMEGA_STAGE2_STRICT_RUNTIME=1 and runtime risk detected. "
+                "Refusing to run Stage2 in this environment.",
+                file=sys.stderr,
+                flush=True,
+            )
+            raise SystemExit(103)
 
     input_path = Path(args.input_dir)
     output_path = Path(args.output_dir)
@@ -359,22 +997,54 @@ def main():
         print("Nothing to do. Exiting.")
         return
 
+    failures = 0
+    successes = 0
+
     if args.workers <= 1:
         # Stability path: avoid multiprocessing SemLock/spawn regressions in single-worker mode.
         print("[GUARDRAIL] workers<=1 detected, using single-process execution.", flush=True)
         for task in tasks:
             res = process_chunk(task)
             if res:
-                print(res, flush=True)
+                if isinstance(res, dict):
+                    print(res.get("message", str(res)), flush=True)
+                    if res.get("ok"):
+                        successes += 1
+                    else:
+                        failures += 1
+                else:
+                    msg = str(res)
+                    print(msg, flush=True)
+                    if "Completed" in msg or "Skipped (Done)" in msg:
+                        successes += 1
+                    else:
+                        failures += 1
     else:
         # Use spawn for safety across different OS
         ctx = get_context("spawn")
         with ctx.Pool(args.workers, maxtasksperchild=10, initializer=_pool_initializer) as p:
             for res in p.imap_unordered(process_chunk, tasks):
                 if res:
-                    print(res, flush=True)
+                    if isinstance(res, dict):
+                        print(res.get("message", str(res)), flush=True)
+                        if res.get("ok"):
+                            successes += 1
+                        else:
+                            failures += 1
+                    else:
+                        msg = str(res)
+                        print(msg, flush=True)
+                        if "Completed" in msg or "Skipped (Done)" in msg:
+                            successes += 1
+                        else:
+                            failures += 1
 
-    print("=== STAGE 2 PHYSICS COMPUTE COMPLETE ===")
+    print(
+        f"=== STAGE 2 PHYSICS COMPUTE COMPLETE (success={successes}, failed={failures}) ===",
+        flush=True,
+    )
+    if failures > 0:
+        raise SystemExit(2)
 
 if __name__ == "__main__":
     main()

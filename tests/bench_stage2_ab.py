@@ -133,9 +133,14 @@ def new_argmax(df):
     compactness = (4.0 * math.pi * pl.col("topo_area").abs()) / (pl.col("topo_energy")**2 + 1e-12)
     bits_topo = (compactness * math.log(window_len)).forward_fill().clip(0.0, 999.0)
     df = df.with_columns([bits_linear.alias("bits_linear"), bits_srl.alias("bits_srl"), bits_topo.alias("bits_topology")])
+    # Match concat_list().list.arg_max() null semantics by comparing
+    # null/NaN-normalized values.
+    bits_linear_cmp = pl.col("bits_linear").fill_null(float("-inf")).fill_nan(float("-inf"))
+    bits_srl_cmp = pl.col("bits_srl").fill_null(float("-inf")).fill_nan(float("-inf"))
+    bits_topology_cmp = pl.col("bits_topology").fill_null(float("-inf")).fill_nan(float("-inf"))
     dominant_probe = (
-        pl.when((pl.col("bits_srl") > pl.col("bits_linear")) & (pl.col("bits_srl") >= pl.col("bits_topology"))).then(pl.lit(2))
-        .when((pl.col("bits_topology") > pl.col("bits_linear")) & (pl.col("bits_topology") > pl.col("bits_srl"))).then(pl.lit(3))
+        pl.when((bits_srl_cmp > bits_linear_cmp) & (bits_srl_cmp >= bits_topology_cmp)).then(pl.lit(2))
+        .when((bits_topology_cmp > bits_linear_cmp) & (bits_topology_cmp > bits_srl_cmp)).then(pl.lit(3))
         .otherwise(pl.lit(1))
     )
     return df.with_columns(dominant_probe.alias("dominant_probe"))

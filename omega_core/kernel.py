@@ -304,16 +304,20 @@ def _apply_recursive_physics(
         # Perf: scalar when/then avoids allocating a List column per row
         # (memory fragmentation bomb). Tie-break matches original arg_max
         # behavior (first-index wins: Linear > SRL > Topology).
+        # Important: keep exact arg_max semantics with nulls.
+        # concat_list(...).list.arg_max() effectively ignores null candidates.
+        # Fill null/NaN to -inf for comparison so tie-break and null behavior match
+        # the old implementation.
+        bits_linear_cmp = pl.col("bits_linear").fill_null(float("-inf")).fill_nan(float("-inf"))
+        bits_srl_cmp = pl.col("bits_srl").fill_null(float("-inf")).fill_nan(float("-inf"))
+        bits_topology_cmp = (
+            pl.col("bits_topology").fill_null(float("-inf")).fill_nan(float("-inf"))
+        )
+
         dominant_probe = (
-            pl.when(
-                (pl.col("bits_srl") > pl.col("bits_linear"))
-                & (pl.col("bits_srl") >= pl.col("bits_topology"))
-            )
+            pl.when((bits_srl_cmp > bits_linear_cmp) & (bits_srl_cmp >= bits_topology_cmp))
             .then(pl.lit(2))
-            .when(
-                (pl.col("bits_topology") > pl.col("bits_linear"))
-                & (pl.col("bits_topology") > pl.col("bits_srl"))
-            )
+            .when((bits_topology_cmp > bits_linear_cmp) & (bits_topology_cmp > bits_srl_cmp))
             .then(pl.lit(3))
             .otherwise(pl.lit(1))
         )

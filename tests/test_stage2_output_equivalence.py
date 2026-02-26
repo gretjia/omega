@@ -123,6 +123,44 @@ class TestStage2OutputEquivalence(unittest.TestCase):
         for v in probe_vals:
             self.assertIn(v, {1, 2, 3}, f"Invalid dominant_probe value: {v}")
 
+    def test_dominant_probe_null_semantics_match_concat_argmax(self):
+        """
+        when/then argmax optimization must match concat_list().list.arg_max()+1
+        semantics even when some bits_* values are null.
+        """
+        df = pl.DataFrame(
+            {
+                "bits_linear": [0.0, 0.2, 0.2, None, 0.0, 0.5, None],
+                "bits_srl": [None, 0.3, None, 0.1, 0.5, 0.5, None],
+                "bits_topology": [0.4, 0.1, 0.2, 0.1, None, 0.5, 0.2],
+            }
+        )
+
+        expected = df.with_columns(
+            (pl.concat_list(["bits_linear", "bits_srl", "bits_topology"]).list.arg_max() + 1)
+            .alias("expected_probe")
+        )
+
+        bits_linear_cmp = pl.col("bits_linear").fill_null(float("-inf")).fill_nan(float("-inf"))
+        bits_srl_cmp = pl.col("bits_srl").fill_null(float("-inf")).fill_nan(float("-inf"))
+        bits_topology_cmp = (
+            pl.col("bits_topology").fill_null(float("-inf")).fill_nan(float("-inf"))
+        )
+        optimized = expected.with_columns(
+            pl.when((bits_srl_cmp > bits_linear_cmp) & (bits_srl_cmp >= bits_topology_cmp))
+            .then(pl.lit(2))
+            .when((bits_topology_cmp > bits_linear_cmp) & (bits_topology_cmp > bits_srl_cmp))
+            .then(pl.lit(3))
+            .otherwise(pl.lit(1))
+            .alias("optimized_probe")
+        )
+
+        self.assertEqual(
+            optimized.get_column("expected_probe").to_list(),
+            optimized.get_column("optimized_probe").to_list(),
+            "optimized dominant_probe logic diverged from concat argmax null semantics",
+        )
+
     def test_epiplexity_turing_discipline(self):
         """epiplexity should be non-negative (MDL gain <= 0 returns 0.0 per v62)."""
         l2_df = build_l2_features_from_l1(self.l1_df.lazy(), self.cfg)

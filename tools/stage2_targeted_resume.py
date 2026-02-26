@@ -3,8 +3,8 @@
 v62 Stage2 targeted resume runner.
 
 Purpose:
-- Isolate each Stage2 file in its own Python subprocess.
-- Enforce per-file timeout so one pathological file cannot block the whole host.
+- Isolate Stage2 execution into bounded subprocess batches.
+- Enforce per-subprocess timeout so one pathological chunk cannot block the host.
 - Maintain explicit pending/failed ledgers for deterministic resume.
 
 This runner does not change feature logic/output schema. It only changes
@@ -21,11 +21,29 @@ from datetime import datetime
 from pathlib import Path
 
 
-PROCESS_CHUNK_CODE = (
-    "import sys; "
-    "from tools.stage2_physics_compute import process_chunk; "
-    "print(process_chunk({'l1_file': sys.argv[1], 'out_dir': sys.argv[2]}), flush=True)"
-)
+PROCESS_CHUNK_BATCH_CODE = """
+import sys
+from pathlib import Path
+from tools.stage2_physics_compute import process_chunk
+
+out_dir = sys.argv[1]
+files = sys.argv[2:]
+any_fail = False
+
+for f in files:
+    name = Path(f).name
+    print(f"__BATCH_START__ {name}", flush=True)
+    r = process_chunk({"l1_file": f, "out_dir": out_dir})
+    msg = r.get("message") if isinstance(r, dict) else str(r)
+    print(msg, flush=True)
+
+    done = Path(out_dir, f"{name}.done").exists()
+    ok = done or (bool(r.get("ok")) if isinstance(r, dict) else False)
+    print(f"__BATCH_{'OK' if ok else 'FAIL'}__ {name}", flush=True)
+    any_fail = any_fail or (not ok)
+
+raise SystemExit(0 if not any_fail else 2)
+""".strip()
 
 
 def _now() -> str:
@@ -63,21 +81,45 @@ def _enforce_linux_heavy_slice() -> None:
         )
 
 
-def _run_one_file(
+def _chunk_paths(items: list[Path], chunk_size: int):
+    size = max(1, int(chunk_size))
+    for i in range(0, len(items), size):
+        yield items[i : i + size]
+
+
+def _parse_batch_markers(stdout: str, stderr: str) -> tuple[set[str], set[str], set[str]]:
+    started: set[str] = set()
+    ok: set[str] = set()
+    failed: set[str] = set()
+    for raw in f"{stdout}\n{stderr}".splitlines():
+        line = raw.strip()
+        if line.startswith("__BATCH_START__ "):
+            started.add(line[len("__BATCH_START__ ") :].strip())
+        elif line.startswith("__BATCH_OK__ "):
+            ok.add(line[len("__BATCH_OK__ ") :].strip())
+        elif line.startswith("__BATCH_FAIL__ "):
+            failed.add(line[len("__BATCH_FAIL__ ") :].strip())
+    return started, ok, failed
+
+
+def _run_file_batch(
     *,
     python_bin: str,
     repo_root: Path,
-    l1_file: Path,
+    l1_files: list[Path],
     out_dir: Path,
     timeout_sec: int,
 ) -> tuple[int, str, str, bool]:
+    if not l1_files:
+        return 0, "", "", False
+
     cmd = [
         python_bin,
         "-u",
         "-c",
-        PROCESS_CHUNK_CODE,
-        str(l1_file),
+        PROCESS_CHUNK_BATCH_CODE,
         str(out_dir),
+        *[str(p) for p in l1_files],
     ]
     try:
         cp = subprocess.run(
@@ -110,7 +152,7 @@ def main() -> int:
     ap = argparse.ArgumentParser(description="v62 Stage2 targeted timeout-isolated runner")
     ap.add_argument("--input-dir", required=True, help="Directory containing Base_L1 parquet files")
     ap.add_argument("--output-dir", required=True, help="Directory for Feature_L2 parquet outputs")
-    ap.add_argument("--timeout-sec", type=int, default=900, help="Per-file timeout seconds")
+    ap.add_argument("--timeout-sec", type=int, default=900, help="Per-subprocess timeout seconds")
     ap.add_argument(
         "--log-file",
         default="audit/stage2_targeted_resume.log",
@@ -122,6 +164,11 @@ def main() -> int:
         help="Failed file list (absolute or repo-relative)",
     )
     ap.add_argument(
+        "--reset-fail-file",
+        action="store_true",
+        help="Reset fail ledger before this run (default keeps/extends previous failures).",
+    )
+    ap.add_argument(
         "--pending-file",
         default="audit/stage2_pending_list.txt",
         help="Pending file list (absolute or repo-relative)",
@@ -129,9 +176,15 @@ def main() -> int:
     ap.add_argument(
         "--python-bin",
         default=sys.executable,
-        help="Python interpreter used for per-file subprocess runs",
+        help="Python interpreter used for subprocess runs",
     )
     ap.add_argument("--max-files", type=int, default=0, help="Optional cap for pending files (0 means all)")
+    ap.add_argument(
+        "--files-per-process",
+        type=int,
+        default=max(1, int(os.environ.get("OMEGA_STAGE2_FILES_PER_PROCESS", "1"))),
+        help="How many input files to process in one subprocess (default: 1)",
+    )
     ap.add_argument(
         "--allow-user-slice",
         action="store_true",
@@ -155,15 +208,27 @@ def main() -> int:
     fail_file.parent.mkdir(parents=True, exist_ok=True)
     pending_file.parent.mkdir(parents=True, exist_ok=True)
 
+    existing_failed: set[str] = set()
+    if fail_file.exists() and not args.reset_fail_file:
+        existing_failed = {
+            line.strip()
+            for line in fail_file.read_text(encoding="utf-8", errors="replace").splitlines()
+            if line.strip()
+        }
+    if args.reset_fail_file:
+        fail_file.write_text("", encoding="utf-8")
+
     _append_line(log_file, f"=== TARGETED_RESUME_START {_now()} ===")
     _append_line(log_file, f"PYTHON_EXE={args.python_bin}")
     _append_line(log_file, f"TIMEOUT_SEC={args.timeout_sec}")
+    _append_line(log_file, f"FILES_PER_PROCESS={max(1, args.files_per_process)}")
+    _append_line(log_file, f"FAILED_CARRY_IN={len(existing_failed)}")
 
     inputs = sorted(p for p in input_dir.glob("*.parquet") if p.is_file())
     pending: list[Path] = []
     for src in inputs:
         done = output_dir / f"{src.name}.done"
-        if not done.exists():
+        if not done.exists() and src.name not in existing_failed:
             pending.append(src)
 
     if args.max_files > 0:
@@ -173,49 +238,83 @@ def main() -> int:
         "\n".join(p.name for p in pending) + ("\n" if pending else ""),
         encoding="utf-8",
     )
-    fail_file.write_text("", encoding="utf-8")
-
     _append_line(log_file, f"INPUT_TOTAL={len(inputs)}")
     _append_line(log_file, f"PENDING_TOTAL={len(pending)}")
 
-    failed_names: list[str] = []
-    total = len(pending)
+    failed_names: set[str] = set(existing_failed)
+    run_failures = 0
+    files_per_process = max(1, args.files_per_process)
+    batches = list(_chunk_paths(pending, files_per_process))
+    _append_line(log_file, f"BATCH_TOTAL={len(batches)}")
 
-    for idx, src in enumerate(pending, 1):
-        done_path = output_dir / f"{src.name}.done"
-        tmp_path = output_dir / f"{src.name}.tmp"
-        try:
-            tmp_path.unlink()
-        except FileNotFoundError:
-            pass
+    for batch_idx, batch in enumerate(batches, 1):
+        batch_total = len(batches)
+        batch_names = [p.name for p in batch]
+        if batch_names:
+            _append_line(
+                log_file,
+                f"[batch {batch_idx}/{batch_total}] START n={len(batch)} "
+                f"first={batch_names[0]} last={batch_names[-1]}",
+            )
+        else:
+            _append_line(log_file, f"[batch {batch_idx}/{batch_total}] START n=0")
 
-        _append_line(log_file, f"[{idx}/{total}] START {src.name}")
-        rc, stdout, stderr, timed_out = _run_one_file(
+        for src in batch:
+            tmp_path = output_dir / f"{src.name}.tmp"
+            try:
+                tmp_path.unlink()
+            except FileNotFoundError:
+                pass
+
+        rc, stdout, stderr, timed_out = _run_file_batch(
             python_bin=args.python_bin,
             repo_root=repo_root,
-            l1_file=src,
+            l1_files=batch,
             out_dir=output_dir,
             timeout_sec=args.timeout_sec,
         )
 
         if timed_out:
-            _append_line(log_file, f"[{idx}/{total}] TIMEOUT {src.name} after {args.timeout_sec}s")
+            _append_line(
+                log_file,
+                f"[batch {batch_idx}/{batch_total}] TIMEOUT after {args.timeout_sec}s",
+            )
         _log_multiline(log_file, stdout)
         _log_multiline(log_file, stderr)
 
-        ok = done_path.exists() and rc == 0
-        if ok:
-            _append_line(log_file, f"[{idx}/{total}] OK {src.name}")
-        else:
-            _append_line(log_file, f"[{idx}/{total}] FAIL rc={rc} {src.name}")
-            failed_names.append(src.name)
-            _append_line(fail_file, src.name)
+        started, marker_ok, marker_fail = _parse_batch_markers(stdout, stderr)
+        _append_line(
+            log_file,
+            f"[batch {batch_idx}/{batch_total}] END rc={rc} started={len(started)} "
+            f"ok_markers={len(marker_ok)} fail_markers={len(marker_fail)}",
+        )
+
+        for src in batch:
+            done_path = output_dir / f"{src.name}.done"
+            if done_path.exists():
+                _append_line(log_file, f"[batch {batch_idx}/{batch_total}] OK {src.name}")
+                continue
+
+            if timed_out and src.name not in started:
+                # Do not poison fail ledger for files not started before timeout.
+                _append_line(
+                    log_file,
+                    f"[batch {batch_idx}/{batch_total}] DEFER not-started {src.name}",
+                )
+                continue
+
+            _append_line(log_file, f"[batch {batch_idx}/{batch_total}] FAIL rc={rc} {src.name}")
+            run_failures += 1
+            if src.name not in failed_names:
+                failed_names.add(src.name)
+                _append_line(fail_file, src.name)
 
     done_now = len(list(output_dir.glob("*.parquet.done")))
     _append_line(log_file, f"DONE_NOW={done_now}")
     _append_line(log_file, f"FAILED_TOTAL={len(failed_names)}")
+    _append_line(log_file, f"RUN_FAILED={run_failures}")
     _append_line(log_file, f"=== TARGETED_RESUME_END {_now()} ===")
-    return 0
+    return 0 if run_failures == 0 else 2
 
 
 if __name__ == "__main__":
