@@ -139,11 +139,21 @@ def _apply_recursive_physics(
         boundary_srs = (syms_srs != syms_srs.shift(1)) | (dates_srs != dates_srs.shift(1))
         is_boundary = boundary_srs.fill_null(False).to_numpy()
 
+    # ULTRATHINK: O(N) precompute distance to last boundary for O(1) rolling window checks
+    dist_to_boundary = np.zeros(n_rows, dtype=np.int32)
+    curr_dist = 999999
+    for i in range(n_rows):
+        if is_boundary[i]:
+            curr_dist = 0
+        else:
+            curr_dist += 1
+        dist_to_boundary[i] = curr_dist
+
     # Calculate Epiplexity in ONE GO using rolling JIT (GIL-free)
     from omega_core.omega_math_rolling import calc_epiplexity_rolling, calc_holographic_topology_rolling
     window_len = int(epi_cfg.min_trace_len)
     
-    out_epi_raw = calc_epiplexity_rolling(close_px, window=window_len, is_boundary=is_boundary)
+    out_epi_raw = calc_epiplexity_rolling(close_px, window=window_len, dist_to_boundary=dist_to_boundary)
     out_epi = np.where(out_epi_raw > 0, out_epi_raw, float(epi_cfg.fallback_value))
     
     # Apply gate mask (zero out inactive)
@@ -155,7 +165,7 @@ def _apply_recursive_physics(
         price_scale_floor=float(topo_cfg.price_scale_floor),
         ofi_scale_floor=float(topo_cfg.ofi_scale_floor),
         green_coeff=float(topo_cfg.green_coeff),
-        is_boundary=is_boundary
+        dist_to_boundary=dist_to_boundary
     )
 
     from omega_core.omega_math_rolling import calc_topology_area_rolling
@@ -183,7 +193,7 @@ def _apply_recursive_physics(
         out_manifolds[str(feat_name)] = calc_topology_area_rolling(
             arr_x, arr_y, window=window_len,
             x_scale_floor=x_scale, y_scale_floor=y_scale, green_coeff=float(topo_cfg.green_coeff),
-            is_boundary=is_boundary
+            dist_to_boundary=dist_to_boundary
         )
 
     base_y = float(srl.y_coeff) if initial_y is None else float(initial_y)
