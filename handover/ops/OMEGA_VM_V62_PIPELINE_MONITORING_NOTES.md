@@ -69,20 +69,20 @@ ls -la ~/.config/gcloud/application_default_credentials.json
 
 Requirement:
 
-- `omega-vm` advertises exit node.
-- Linux and Windows use `omega-vm` (`100.122.223.27`) as exit node.
+- `omega-vm` uses WireGuard connection via HK.
+- Linux and Windows use `omega-vm` (`10.88.0.1`) directly via WireGuard subnet route over Tailscale.
 
 Set/verify:
 
 ```bash
 # omega-vm
-sudo tailscale set --advertise-exit-node=true
+sudo wg show
 
 # linux1-lx
-sudo tailscale set --exit-node=100.122.223.27 --exit-node-allow-lan-access=true
+# SSH directly via 10.88.0.1
 
 # windows1-w1 (PowerShell)
-& "C:\Program Files\Tailscale\tailscale.exe" set --exit-node=100.122.223.27 --exit-node-allow-lan-access=true
+# SSH directly via 10.88.0.1
 ```
 
 Verification:

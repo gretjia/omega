@@ -22,7 +22,7 @@ Conclusion: classify as **intermittent transport reachability**, not immediate h
 - Script path: `C:\Omega_vNext\tools\windows_tailscale_keepalive.ps1`
 - Scheduled task: `Omega_Tailscale_Keepalive`
 - Runtime model: long-running loop (`120s` interval), pinging:
-  - `100.122.223.27` (omega-vm)
+  - `10.88.0.1` (omega-vm via WireGuard)
   - `100.64.97.113` (linux1-lx)
 - Current state: task `Running`
 
