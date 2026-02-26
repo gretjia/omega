@@ -1,6 +1,16 @@
 import numpy as np
-from numba import njit, prange
 import math
+
+try:
+    from numba import njit, prange
+except ImportError:
+    def njit(*args, **kwargs):
+        def decorator(func):
+            return func
+
+        return decorator
+
+    prange = range
 
 # Use numpy's 1.20+ sliding window view to create 2D strides with 0 memory copies
 from numpy.lib.stride_tricks import sliding_window_view 

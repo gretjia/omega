@@ -423,9 +423,17 @@ def build_l1_base_ticks(path: str | List[str], cfg: L2PipelineConfig) -> pl.Data
     return lf.collect()
 
 
-def build_l2_features_from_l1(lf: pl.LazyFrame, cfg: L2PipelineConfig, target_frames: float | None = None) -> pl.DataFrame:
+def build_l2_features_from_l1(
+    lf: pl.LazyFrame | pl.DataFrame,
+    cfg: L2PipelineConfig,
+    target_frames: float | None = None,
+) -> pl.DataFrame:
     """Stage 2: Physics Engine. Reads Base L1 -> Applies advanced math aggregations -> L2 Parquet."""
-    schema_names = lf.collect_schema().names()
+    if isinstance(lf, pl.DataFrame):
+        schema_names = list(lf.columns)
+        lf = lf.lazy()
+    else:
+        schema_names = lf.collect_schema().names()
     group_col = "symbol" if "symbol" in schema_names else None
 
     # Codex Correction: Apply Physics (microprice, depth, OFI, flux) ONLY IN STAGE 2
@@ -563,12 +571,10 @@ def build_l2_features_from_l1(lf: pl.LazyFrame, cfg: L2PipelineConfig, target_fr
         maintain_order=True,
     )
     
-    rename_rules = {}
-    if "date" not in frames.collect_schema().names():
-        rename_rules["_date_temp"] = "date"
-    if "symbol" not in frames.collect_schema().names():
+    rename_rules = {"_date_temp": "date"}
+    if not group_col:
         rename_rules["_symbol_temp"] = "symbol"
-        
+
     frames = frames.rename(rename_rules)
     frames = frames.drop(["_date_temp", "_symbol_temp"], strict=False)
 

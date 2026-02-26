@@ -258,6 +258,13 @@ def _maybe_skip_pathological_symbol_failure(*, l1_file, file_name, symbol, rc):
     while preserving fail-fast for normal symbols/errors.
     """
     default_enabled = "1" if sys.platform == "win32" else "0"
+    if _is_truthy_env("OMEGA_STAGE2_SKIP_ANY_CRASH_SYMBOL"):
+        print(
+            f"[{file_name}] [WARN] Skip crash symbol by override rc={rc}: symbol={symbol}.",
+            flush=True,
+        )
+        return True
+
     if not _is_truthy_env_default(
         "OMEGA_STAGE2_SKIP_PATHOLOGICAL_SYMBOL_ON_FAIL", default_enabled
     ):
@@ -460,6 +467,26 @@ def _iter_complete_symbol_frames_from_parquet(l1_file):
         yield pa.concat_tables(current_parts, promote_options="default")
 
 
+def _list_symbols_from_parquet(l1_file):
+    """
+    Build symbol list via pyarrow row-group streaming without Polars scan.
+    Preserves first-seen order in file.
+    """
+    symbols = []
+    seen = set()
+    for symbol_tbl in _iter_complete_symbol_frames_from_parquet(l1_file):
+        if symbol_tbl.num_rows <= 0 or "symbol" not in symbol_tbl.column_names:
+            continue
+        try:
+            sym = str(symbol_tbl.column("symbol")[0].as_py())
+        except Exception:
+            sym = str(symbol_tbl.column("symbol")[0])
+        if sym not in seen:
+            seen.add(sym)
+            symbols.append(sym)
+    return symbols
+
+
 def _run_feature_physics_batch(batch_frames, writer, tmp_parquet):
     """
     Run Stage2 feature + physics on a symbol batch and append to parquet writer.
@@ -481,8 +508,26 @@ def _run_feature_physics_batch(batch_frames, writer, tmp_parquet):
             input_df = pl.concat(batch_frames, how="vertical_relaxed")
         else:
             input_table = pa.concat_tables(batch_frames, promote_options="default")
-            input_df = pl.from_arrow(input_table)
-        batch_df = build_l2_features_from_l1(input_df.lazy(), GLOBAL_CFG)
+            try:
+                input_df = pl.from_arrow(input_table)
+            except BaseException as arrow_exc:
+                # Windows/Polars hardening:
+                # Some parquet/arrow payloads trigger pyo3 panic in from_arrow().
+                # Round-trip through parquet to normalize buffers before ingest.
+                tmp_norm = Path(tempfile.mkstemp(prefix="omega_stage2_norm_", suffix=".parquet")[1])
+                try:
+                    pq.write_table(input_table, str(tmp_norm), compression="snappy")
+                    input_df = pl.read_parquet(str(tmp_norm))
+                    print(
+                        f"[WARN] pl.from_arrow() failed, recovered via parquet round-trip: {arrow_exc}",
+                        flush=True,
+                    )
+                finally:
+                    try:
+                        tmp_norm.unlink()
+                    except Exception:
+                        pass
+        batch_df = build_l2_features_from_l1(input_df, GLOBAL_CFG)
 
         if batch_df is not None and batch_df.height > 0:
             batch_df = apply_recursive_physics(batch_df, GLOBAL_CFG)
@@ -518,24 +563,27 @@ def _process_file_via_symbol_scan_fallback(
     Robust fallback path for files that trigger Polars panic in Arrow conversion path.
     Uses lazy scan + symbol filter batches (slower but resilient).
     """
-    lf = pl.scan_parquet(l1_file)
+    lf = None
     symbol_expr = pl.col("symbol").cast(pl.Utf8, strict=False)
-    all_symbols = (
-        lf.select(symbol_expr.alias("symbol").unique().sort())
-        .collect()
-        .get_column("symbol")
-        .to_list()
+    isolate_batches = (
+        sys.platform == "win32" and _is_truthy_env("OMEGA_STAGE2_ISOLATE_SYMBOL_BATCH")
     )
+    if isolate_batches:
+        all_symbols = _list_symbols_from_parquet(l1_file)
+    else:
+        lf = pl.scan_parquet(l1_file)
+        all_symbols = (
+            lf.select(symbol_expr.alias("symbol").unique().sort())
+            .collect()
+            .get_column("symbol")
+            .to_list()
+        )
     if symbol_subset:
         subset = {str(x) for x in symbol_subset if str(x)}
         all_symbols = [s for s in all_symbols if str(s) in subset]
     print(
         f"[{file_name}] Fallback path enabled: scan/filter by symbol batches ({len(all_symbols)} symbols).",
         flush=True,
-    )
-
-    isolate_batches = (
-        sys.platform == "win32" and _is_truthy_env("OMEGA_STAGE2_ISOLATE_SYMBOL_BATCH")
     )
 
     batch_idx = 0
@@ -614,6 +662,8 @@ def _process_file_via_symbol_scan_fallback(
                         )
                     rows_written += one_rows
         else:
+            if lf is None:
+                lf = pl.scan_parquet(l1_file)
             batch_df = lf.filter(symbol_expr.is_in(sym_batch)).collect()
             writer, rows_written = _run_feature_physics_batch([batch_df], writer, tmp_parquet)
             del batch_df
@@ -636,6 +686,7 @@ def _run_single_symbol_batch_file(l1_file, symbols_file, output_parquet):
     process one symbol subset into one parquet chunk.
     """
     import pyarrow as pa
+    import pyarrow.parquet as pq
 
     symbols = [
         line.strip()
@@ -663,9 +714,21 @@ def _run_single_symbol_batch_file(l1_file, symbols_file, output_parquet):
                     break
         if symbol_tables:
             if len(symbol_tables) == 1:
-                batch_df = pl.from_arrow(symbol_tables[0])
+                input_table = symbol_tables[0]
             else:
-                batch_df = pl.from_arrow(pa.concat_tables(symbol_tables, promote_options="default"))
+                input_table = pa.concat_tables(symbol_tables, promote_options="default")
+            try:
+                batch_df = pl.from_arrow(input_table)
+            except BaseException:
+                tmp_norm = Path(tempfile.mkstemp(prefix="omega_stage2_iso_norm_", suffix=".parquet")[1])
+                try:
+                    pq.write_table(input_table, str(tmp_norm), compression="snappy")
+                    batch_df = pl.read_parquet(str(tmp_norm))
+                finally:
+                    try:
+                        tmp_norm.unlink()
+                    except Exception:
+                        pass
         else:
             batch_df = pl.DataFrame()
     except Exception:
@@ -677,7 +740,7 @@ def _run_single_symbol_batch_file(l1_file, symbols_file, output_parquet):
     if batch_df.height <= 0:
         return 4
 
-    feat_df = build_l2_features_from_l1(batch_df.lazy(), GLOBAL_CFG)
+    feat_df = build_l2_features_from_l1(batch_df, GLOBAL_CFG)
     if feat_df is None or feat_df.height <= 0:
         return 4
     feat_df = apply_recursive_physics(feat_df, GLOBAL_CFG)
@@ -797,7 +860,24 @@ def process_chunk(kwargs):
                 flush=True,
             )
 
-        schema_names = pl.scan_parquet(l1_file).collect_schema().names()
+        # Avoid Polars schema panic on certain corrupted/mixed parquet metadata.
+        # Probe columns via pyarrow first; fall back to Polars only if needed.
+        schema_names = []
+        try:
+            import pyarrow.parquet as pq
+
+            schema_names = list(pq.ParquetFile(l1_file).schema.names or [])
+        except Exception:
+            try:
+                schema_names = pl.scan_parquet(l1_file).collect_schema().names()
+            except Exception as schema_exc:
+                return {
+                    "ok": False,
+                    "status": "schema_probe_failed",
+                    "file": file_path.name,
+                    "message": f"[{file_path.name}] CRITICAL Error: schema probe failed: {schema_exc}",
+                }
+
         has_symbol = "symbol" in schema_names
 
         default_batch_size = "20" if sys.platform == "win32" else "50"
