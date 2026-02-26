@@ -325,6 +325,12 @@ def sync_batch(host_key, files_to_sync, gcs_bucket):
 def run_sync(bucket_name, git_hash, target_host=None, year_filter=None):
     check_dependencies()
     
+    # Global cleanup of old artifacts before starting
+    print("[*] Performing global cleanup of local buffer...")
+    if BUFFER_DIR.exists():
+        shutil.rmtree(BUFFER_DIR, ignore_errors=True)
+    BUFFER_DIR.mkdir(parents=True, exist_ok=True)
+    
     hosts_to_sync = [target_host] if target_host else HOSTS.keys()
     
     for host_key in hosts_to_sync:
