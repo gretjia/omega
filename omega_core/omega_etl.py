@@ -116,7 +116,7 @@ def scan_l2_quotes(path: str | List[str], cfg: L2PipelineConfig) -> pl.LazyFrame
     cols_to_cast = [c for c in num_cols if c in existing_cols]
     
     lf = lf.with_columns(
-        [pl.col("time").cast(pl.Int64, strict=False)]
+        [pl.col("time").cast(pl.Float64, strict=False).cast(pl.Int64, strict=False)]
         + [pl.col(c).cast(pl.Float64, strict=False) for c in cols_to_cast]
     )
     return lf
@@ -144,7 +144,7 @@ def _scan_split_l2_quotes(quote_file: str, trade_file: str, cfg: L2PipelineConfi
         print(f"[DEBUG] Quitting: no time col in quote. Columns: {q_lf.collect_schema().names()}")
         return None
         
-    q_lf = q_lf.with_columns(pl.col("time").cast(pl.Int64, strict=False))
+    q_lf = q_lf.with_columns(pl.col("time").cast(pl.Float64, strict=False).cast(pl.Int64, strict=False))
     q_lf = q_lf.sort("time")
 
     # Drop intersecting columns from quotes explicitly via select to avoid Polars optimizer join bugs
@@ -175,7 +175,7 @@ def _scan_split_l2_quotes(quote_file: str, trade_file: str, cfg: L2PipelineConfi
         print(f"[DEBUG] Quitting: no time col in trade. Columns: {t_lf.collect_schema().names()}")
         return None
         
-    t_lf = t_lf.with_columns(pl.col("time").cast(pl.Int64, strict=False))
+    t_lf = t_lf.with_columns(pl.col("time").cast(pl.Float64, strict=False).cast(pl.Int64, strict=False))
     t_lf = t_lf.sort("time")
 
     # 3. Asof Join Trades into Quotes (Trades -> Quotes)
@@ -221,7 +221,7 @@ def _apply_session_filter(lf: pl.LazyFrame, cfg: L2PipelineConfig) -> pl.LazyFra
 
 
 def _hhmmssmmm_to_ms_expr(time_expr: pl.Expr) -> pl.Expr:
-    t = time_expr.cast(pl.Int64, strict=False)
+    t = time_expr.cast(pl.Float64, strict=False).cast(pl.Int64, strict=False)
     hh = t // 10_000_000
     mm = (t // 100_000) % 100
     ss = (t // 1_000) % 100
@@ -237,7 +237,7 @@ def _time_of_day_ms_expr(time_col: str = "time") -> pl.Expr:
     - ms-of-day (0~86400000)
     - epoch ms/us
     """
-    t = pl.col(time_col).cast(pl.Int64, strict=False)
+    t = pl.col(time_col).cast(pl.Float64, strict=False).cast(pl.Int64, strict=False)
     hhmmssmmm_ms = _hhmmssmmm_to_ms_expr(t)
     return (
         pl.when(t.is_null())
@@ -450,6 +450,11 @@ def build_l2_features_from_l1(
     lf = lf.with_columns(
         pl.from_epoch(pl.col("__time_ms"), time_unit="ms").alias("__time_dt")
     )
+
+    # Force early materialization to prevent Polars query optimizer from building a massive
+    # physical plan that explodes RAM to 94GB during the `over()` windowing.
+    df_inter = lf.collect()
+    lf = df_inter.lazy()
 
     # Perf/stage2-speedup-v62: Inline rolling_mean_by replaces the prior
     # .rolling().agg() + .join() pattern.  This avoids materializing a full
