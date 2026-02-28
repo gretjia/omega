@@ -346,7 +346,7 @@ def submit_job(
     job = aiplatform.CustomJob.from_local_script(
         display_name=job_name,
         script_path=script_path,
-        container_uri="us-docker.pkg.dev/vertex-ai/training/scikit-learn-cpu.0-23:latest",
+        container_uri="us-docker.pkg.dev/vertex-ai/training/tf-cpu.2-17.py310:latest",
         replica_count=1,
         machine_type=machine_type,
         args=script_args,
