@@ -1,0 +1,1815 @@
+=======================================================================
+OMEGA V62 CORE MATHEMATICAL SOURCE CODE FOR PRINCIPAL QUANT ARCHITECT AUDIT
+=======================================================================
+
+The following files represent the core mathematics and logic engines for the V62 pipeline.
+They encompass the MDL calculations, structural bounds, and Numba acceleration.
+
+
+================================================================================
+FILE: omega_core/omega_math_core.py
+================================================================================
+
+"""
+omega_math_core.py
+
+Level-2 (v5) deterministic math kernels (vectorized).
+Physics: Sato & Kanazawa (2025) - Strict SRL Universality (delta=0.5)
+Info: Finzi et al. (2026) - Epiplexity as Structural Compression Gain
+"""
+
+from __future__ import annotations
+
+from typing import Iterable, List, Sequence
+
+import math
+import numpy as np
+
+from config import L2EpiplexityConfig, L2SRLConfig, L2TopoSNRConfig, L2TopologyRaceConfig
+
+_TOPO_DEFAULTS = L2TopologyRaceConfig()
+
+
+def calc_epiplexity(trace: Sequence[float], cfg: L2EpiplexityConfig) -> float:
+    """
+    v5.0 Entry Point: Compression Gain.
+    Replaces LZ76. Measures structural information S_T.
+    """
+    return calc_compression_gain(trace, cfg)
+
+
+def calc_compression_gain(trace: Sequence[float], cfg: L2EpiplexityConfig) -> float:
+    """
+    v5.0 Epiplexity: Compression Gain (Finzi et al., 2026).
+    
+    Measures structural information (S_T) by comparing the error of a 
+    Linear Predictor vs a Naive (Mean/Random Walk) Predictor.
+    
+    Gain = 1 - (Variance_Residual / Variance_Total)
+    
+    Gain > 0 implies extractable structure (Signal).
+    Gain <= 0 implies pure entropy (Noise).
+    """
+    arr = np.asarray(trace, dtype=float)
+    n = arr.size
+    min_len = int(getattr(cfg, "min_trace_len", 10))
+    
+    if n < min_len:
+        return float(cfg.fallback_value)
+    
+    # 1. Null Model (Entropy Baseline)
+    # Null Hypothesis: Process is unstructured noise around a mean.
+    # Error = Total Sum of Squares (Variance)
+    var_total = np.var(arr)
+    
+    if var_total < 1e-12:
+        # Zero energy = Zero structure (Dead/Flat)
+        return 0.0
+
+    # 2. Time-Bounded Model (Linear Predictor)
+    # We fit y = mx + c analytically (O(N)).
+    # This represents the simplest "Computational Observer".
+    t = np.arange(n, dtype=float)
+    t_mean = (n - 1) / 2.0
+    x_mean = np.mean(arr)
+    
+    # Covariance / Variance_T
+    numerator = np.sum((t - t_mean) * (arr - x_mean))
+    denominator = np.sum((t - t_mean) ** 2)
+    
+    if denominator < 1e-9:
+        slope = 0.0
+    else:
+        slope = numerator / denominator
+        
+    intercept = x_mean - slope * t_mean
+    
+    # 3. Compression Gain
+    # Calculate residual variance after removing linear structure
+    trend = slope * t + intercept
+    residuals = arr - trend
+    var_resid = np.mean(residuals ** 2)
+
+    # Gain = 1 - (Unexplained_Entropy / Total_Entropy)
+    # Equivalent to R-squared for the linear fit.
+    ratio = var_resid / var_total
+    R_squared = float(np.clip(1.0 - ratio, 0.0, 0.9999))
+    
+    # V62 Upgrade: Time-Bounded Minimum Description Length (MDL) Gain
+    # delta_k = 2 for linear probe (slope, intercept)
+    delta_k = 2.0
+    
+    # Turing Discipline: Require enough degrees of freedom
+    if n < 3:
+        return 0.0
+        
+    mdl_gain_bits = -(n / 2.0) * np.log(1.0 - R_squared) - (delta_k / 2.0) * np.log(n)
+    
+    # Turing Discipline: If the model costs more bits to describe than the raw data itself, it is pure noise.
+    if mdl_gain_bits <= 0:
+        return 0.0
+        
+    return float(mdl_gain_bits)
+
+
+def calc_srl_state(
+    price_change: float,
+    sigma: float,
+    net_ofi: float,
+    depth: float,
+    current_y: float,
+    cfg: L2SRLConfig,
+    cancel_vol: float = 0.0,
+    trade_vol: float = 0.0,
+) -> tuple[float, float, float, float]:
+    """
+    v5.0 Universal Physics Kernel (Sato 2025).
+    
+    Enforces Delta = 0.5 (Universal Constant).
+    No Race. Physics is invariant.
+    
+    Returns:
+    - srl_resid: The violation of the law (Force).
+    - implied_y: The instantaneous Y required to explain the move.
+    - effective_depth: Depth adjusted for spoofing.
+    - spoof_ratio: Cancel/Trade ratio.
+    """
+    # 1. Safety Floors
+    safe_depth = max(float(depth), float(cfg.depth_floor))
+    safe_sigma = max(float(sigma), float(cfg.sigma_floor))
+
+    # 2. Spoofing Penalty (Microstructure Correction)
+    eps = float(getattr(cfg, "spoof_ratio_eps", 1e-9))
+    safe_trade = max(float(trade_vol), eps)
+    spoof_ratio = max(float(cancel_vol), 0.0) / safe_trade
+
+    gamma = float(getattr(cfg, "spoof_penalty_gamma", 0.0))
+    penalty = math.exp(-gamma * spoof_ratio)
+    effective_depth = max(safe_depth * penalty, float(cfg.depth_floor))
+
+    # 3. The Square Root Law (Delta = 0.5 Hardcoded)
+    # Impact = Y * Sigma * sqrt(|OFI| / Depth)
+    q_over_d = abs(float(net_ofi)) / effective_depth
+    
+    # Sato 2025: "delta is exactly 0.5"
+    raw_impact_unit = safe_sigma * math.sqrt(q_over_d) 
+    
+    sign = float(np.sign(float(net_ofi)))
+    
+    # Theoretical Impact based on current structural rigidity (Y)
+    theory_impact = sign * float(current_y) * raw_impact_unit
+    
+    # Residual: How much did Price violate Physics?
+    srl_resid = float(price_change) - float(theory_impact)
+
+    # 4. Implied Y (Inverse Problem)
+    min_impact = float(getattr(cfg, "implied_y_min_impact", 0.0))
+    min_penalty = float(getattr(cfg, "implied_y_min_penalty", 0.0))
+
+    if raw_impact_unit > min_impact and penalty > min_penalty:
+        # Y = |dP| / (Sigma * sqrt(Q/D))
+        implied_y = abs(float(price_change)) / (raw_impact_unit + 1e-9)
+    else:
+        # Signal too weak to update Y, hold state.
+        implied_y = float(current_y)
+
+    return srl_resid, implied_y, effective_depth, float(spoof_ratio)
+
+
+def calc_srl_race(*args, **kwargs):
+    """
+    DEPRECATED in v5.0.
+    The 'Race' is cancelled. Physics won. Delta is 0.5.
+    Redirects to single-lane calculation for backward compatibility.
+    """
+    resid, imp_y, eff_d, spoof = calc_srl_state(*args, **kwargs)
+    # Return list format to satisfy legacy unpacking expected by v4 callers
+    return [resid], imp_y, eff_d, spoof
+
+
+def calc_topology_area(
+    x_trace: Sequence[float],
+    y_trace: Sequence[float],
+    x_scale_floor: float,
+    y_scale_floor: float,
+    green_coeff: float,
+) -> float:
+    """
+    Manifold Area (Green's Theorem proxy).
+    """
+    x = np.asarray(x_trace, dtype=float)
+    y = np.asarray(y_trace, dtype=float)
+    if x.size < 2 or y.size < 2:
+        return 0.0
+
+    n = min(x.size, y.size)
+    x = x[:n]
+    y = y[:n]
+
+    x_std = max(float(np.std(x)), float(x_scale_floor))
+    y_std = max(float(np.std(y)), float(y_scale_floor))
+    x_norm = (x - float(np.mean(x))) / x_std
+    y_norm = (y - float(np.mean(y))) / y_std
+
+    cross_terms = x_norm[:-1] * y_norm[1:] - x_norm[1:] * y_norm[:-1]
+    return float(green_coeff) * float(np.sum(cross_terms))
+
+
+def calc_holographic_topology(
+    trace: List[float],
+    ofi_list: List[float],
+    price_scale_floor: float | None = None,
+    ofi_scale_floor: float | None = None,
+    green_coeff: float | None = None,
+) -> tuple[float, float]:
+    """
+    Holographic Topology: Signed Area and Energy.
+    """
+    if len(trace) < 2:
+        return 0.0, 0.0
+
+    p = np.array(trace)
+    ofi_flow = np.array(ofi_list)
+    q = np.cumsum(ofi_flow)
+
+    x = p
+    y = q
+    n = min(len(x), len(y))
+    x = x[:n]
+    y = y[:n]
+
+    if price_scale_floor is None:
+        price_scale_floor = float(_TOPO_DEFAULTS.price_scale_floor)
+    if ofi_scale_floor is None:
+        ofi_scale_floor = float(_TOPO_DEFAULTS.ofi_scale_floor)
+    if green_coeff is None:
+        green_coeff = float(_TOPO_DEFAULTS.green_coeff)
+
+    x_std = max(float(np.std(x)), float(price_scale_floor))
+    y_std = max(float(np.std(y)), float(ofi_scale_floor))
+    x = (x - float(np.mean(x))) / x_std
+    y = (y - float(np.mean(y))) / y_std
+
+    cross_terms = x[:-1] * y[1:] - x[1:] * y[:-1]
+    signed_area = float(green_coeff) * float(np.sum(cross_terms))
+
+    d_x = np.diff(x)
+    d_y = np.diff(y)
+    energy = float(np.sum(np.sqrt(d_x * d_x + d_y * d_y)))
+
+    return signed_area, energy
+
+
+def topo_snr_from_traces(traces: Iterable[Sequence[float]], cfg: L2TopoSNRConfig, epi_cfg: L2EpiplexityConfig) -> float:
+    traces_list = list(traces)
+    if len(traces_list) == 0:
+        return float("nan")
+
+    real_vals: List[float] = []
+    for t in traces_list:
+        real_vals.append(calc_epiplexity(t, epi_cfg))
+
+    rng = np.random.default_rng(cfg.seed)
+    shuffled_vals: List[float] = []
+    n_shuffle = int(cfg.n_shuffle)
+    for _ in range(n_shuffle):
+        for t in traces_list:
+            arr = np.asarray(t, dtype=float)
+            if arr.size == 0:
+                continue
+            idx = rng.permutation(arr.size)
+            shuffled_vals.append(calc_epiplexity(arr[idx], epi_cfg))
+
+    if len(shuffled_vals) < int(cfg.min_shuffles):
+        return float("nan")
+
+    mu = float(np.mean(shuffled_vals))
+    sd = float(np.std(shuffled_vals))
+    sd = max(sd, float(cfg.std_floor))
+    return float((np.mean(real_vals) - mu) / sd)
+
+================================================================================
+FILE: omega_core/omega_math_rolling.py
+================================================================================
+
+import numpy as np
+import math
+
+try:
+    from numba import njit, prange
+except ImportError:
+    def njit(*args, **kwargs):
+        def decorator(func):
+            return func
+
+        return decorator
+
+    prange = range
+
+# Use numpy's 1.20+ sliding window view to create 2D strides with 0 memory copies
+from numpy.lib.stride_tricks import sliding_window_view 
+
+@njit(parallel=True, fastmath=True, cache=True)
+def calc_epiplexity_rolling(prices: np.ndarray, window: int, dist_to_boundary: np.ndarray) -> np.ndarray:
+    """
+    Computes Time-Bounded MDL Gain (R^2 of linear fit) using Numba array operations.
+    Replaces the list-based intra-bucket trace logic.
+    """
+    n = len(prices)
+    out = np.zeros(n, dtype=np.float64)
+    if n < window:
+        return out
+        
+    T = np.arange(window, dtype=np.float64)
+    sum_t = np.sum(T)
+    sum_t2 = np.sum(T**2)
+    var_t = sum_t2 - (sum_t**2 / window)
+    
+    if var_t < 1e-12:
+        return out
+
+    for i in prange(window - 1, n):
+        # ULTRATHINK O(1) Boundary guard: If the distance to the last boundary is less than our window size (minus 1 for the current element), 
+        # it means the window crosses a boundary.
+        if dist_to_boundary[i] < window - 1:
+            continue
+
+        # The window slice
+        y = prices[i - window + 1 : i + 1]
+        
+        sum_y = np.sum(y)
+        sum_y2 = np.sum(y**2)
+        sum_ty = np.sum(T * y)
+        
+        cov = sum_ty - (sum_t * sum_y / window)
+        var_y = sum_y2 - (sum_y**2 / window)
+        
+        if var_y < 1e-12:
+            out[i] = 0.0
+            continue
+            
+        r2 = (cov**2) / (var_t * var_y)
+        if r2 < 0.0: r2 = 0.0
+        if r2 > 0.9999: r2 = 0.9999
+        
+        # Bits Saved MDL
+        delta_k = 2.0
+        mdl_gain = -(window / 2.0) * math.log(1.0 - r2) - (delta_k / 2.0) * math.log(window)
+        
+        if mdl_gain > 0.0:
+            out[i] = mdl_gain
+            
+    return out
+
+@njit(parallel=True, fastmath=True, cache=True)
+def calc_holographic_topology_rolling(
+    prices: np.ndarray, 
+    ofis: np.ndarray, 
+    window: int,
+    price_scale_floor: float,
+    ofi_scale_floor: float,
+    green_coeff: float,
+    dist_to_boundary: np.ndarray
+) -> tuple[np.ndarray, np.ndarray]:
+    """
+    Vectorized Holographic Topology Area and Energy using rolling 1D contiguous arrays.
+    """
+    n = len(prices)
+    out_area = np.zeros(n, dtype=np.float64)
+    out_energy = np.zeros(n, dtype=np.float64)
+    
+    if n < window:
+        return out_area, out_energy
+
+    for i in prange(window - 1, n):
+        if dist_to_boundary[i] < window - 1:
+            continue
+
+        X = prices[i - window + 1 : i + 1]
+        # We need cumulative OFI within the window window to form the 'Y' shape coordinate
+        # ULTRATHINK: Use np.empty instead of np.zeros to avoid redundant memory zeroing inside inner loop
+        Y = np.empty(window, dtype=np.float64)
+        Y[0] = ofis[i - window + 1]
+        for j in range(1, window):
+            Y[j] = Y[j-1] + ofis[i - window + 1 + j]
+
+        mx = np.sum(X) / window
+        my = np.sum(Y) / window
+        
+        # Stdev
+        vx = np.sum((X - mx)**2) / window
+        vy = np.sum((Y - my)**2) / window
+        sx = math.sqrt(vx)
+        sy = math.sqrt(vy)
+        
+        if sx < price_scale_floor: sx = price_scale_floor
+        if sy < ofi_scale_floor: sy = ofi_scale_floor
+        
+        # Normalize
+        Xn = (X - mx) / sx
+        Yn = (Y - my) / sy
+        
+        area_sum = 0.0
+        energy_sum = 0.0
+        for j in range(window - 1):
+            # Area cross product: x[j]*y[j+1] - x[j+1]*y[j]
+            area_sum += Xn[j] * Yn[j+1] - Xn[j+1] * Yn[j]
+            # Energy path length
+            dx = Xn[j+1] - Xn[j]
+            dy = Yn[j+1] - Yn[j]
+            energy_sum += math.sqrt(dx*dx + dy*dy)
+            
+        out_area[i] = area_sum * green_coeff
+        out_energy[i] = energy_sum
+        
+    return out_area, out_energy
+
+@njit(parallel=True, fastmath=True, cache=True)
+def calc_topology_area_rolling(
+    x_arr: np.ndarray, 
+    y_arr: np.ndarray, 
+    window: int,
+    x_scale_floor: float, 
+    y_scale_floor: float, 
+    green_coeff: float,
+    dist_to_boundary: np.ndarray
+) -> np.ndarray:
+    """
+    Vectorized Green's Theorem Area for arbitrary Manifolds (X, Y) using rolling 1D contiguous arrays.
+    """
+    n = len(x_arr)
+    out_area = np.zeros(n, dtype=np.float64)
+    
+    if n < window:
+        return out_area
+
+    for i in prange(window - 1, n):
+        if dist_to_boundary[i] < window - 1:
+            continue
+
+        X = x_arr[i - window + 1 : i + 1]
+        Y = y_arr[i - window + 1 : i + 1]
+        
+        mx = np.sum(X) / window
+        my = np.sum(Y) / window
+        
+        vx = np.sum((X - mx)**2) / window
+        vy = np.sum((Y - my)**2) / window
+        sx = math.sqrt(vx)
+        sy = math.sqrt(vy)
+        
+        if sx < x_scale_floor: sx = x_scale_floor
+        if sy < y_scale_floor: sy = y_scale_floor
+        
+        Xn = (X - mx) / sx
+        Yn = (Y - my) / sy
+        
+        area_sum = 0.0
+        for j in range(window - 1):
+            area_sum += Xn[j] * Yn[j+1] - Xn[j+1] * Yn[j]
+            
+        out_area[i] = area_sum * green_coeff
+        
+    return out_area
+
+
+================================================================================
+FILE: omega_core/omega_math_vectorized.py
+================================================================================
+
+"""
+omega_math_vectorized.py
+
+Vectorized implementations of OMEGA math kernels to avoid Python loops.
+Optimized for batch processing of variable-length traces using NaN padding.
+"""
+
+import numpy as np
+from typing import List, Sequence
+import math
+
+def pad_traces(traces: List[Sequence[float]], max_len: int = None) -> tuple[np.ndarray, np.ndarray]:
+    """
+    Convert list of variable-length traces to (N, L) array with NaN padding.
+    Returns:
+        padded_array: (N, L) float array
+        lengths: (N,) int array
+    """
+    n = len(traces)
+    if n == 0:
+        return np.zeros((0, 0)), np.zeros(0)
+        
+    lens = np.array([len(t) for t in traces])
+    L = max_len if max_len is not None else (lens.max() if n > 0 else 0)
+    
+    arr = np.full((n, L), np.nan, dtype=np.float64)
+    for i, t in enumerate(traces):
+        if len(t) > 0:
+            arr[i, :len(t)] = t
+            
+    return arr, lens
+
+def calc_epiplexity_vectorized(traces: List[Sequence[float]], min_len: int = 10, fallback: float = 0.0) -> np.ndarray:
+    """
+    Vectorized Compression Gain (Epiplexity).
+    G = 1 - Var(Resid) / Var(Total) = R^2 of Linear Fit.
+    
+    Computes R^2 for N traces simultaneously.
+    """
+    n = len(traces)
+    if n == 0: return np.array([])
+    
+    # 1. Pad
+    # Optimization: Chunking could be used if N is huge, but for 1 day (100k rows) it fits in RAM.
+    X, lengths = pad_traces(traces)
+    L = X.shape[1]
+    
+    # 2. Time Index T (0, 1, 2...)
+    # T is (1, L), broadcasted to (N, L)
+    T = np.arange(L, dtype=np.float64)
+    
+    # Mask for valid values
+    mask = ~np.isnan(X)
+    
+    # Counts (N,)
+    cnt = lengths.astype(np.float64)
+    
+    # Filter short traces
+    valid_mask = (lengths >= min_len)
+    
+    # We only compute for valid rows to save time/warnings, but masking logic handles it.
+    # To avoid div by zero, we set invalid counts to infinity or handle at end.
+    safe_cnt = np.where(valid_mask, cnt, np.inf)
+    
+    # --- Statistics ---
+    
+    # Sums
+    Sx = np.nansum(X, axis=1)
+    St = np.sum(np.where(mask, T, 0), axis=1) # Sum of indices present
+    
+    # Means
+    Mx = Sx / safe_cnt
+    Mt = St / safe_cnt
+    
+    # Centered T and X (Implicitly)
+    # Cov(X, T) = E[X*T] - E[X]E[T]
+    # Var(X) = E[X^2] - E[X]^2
+    
+    Sxx = np.nansum(X**2, axis=1)
+    Stt = np.sum(np.where(mask, T**2, 0), axis=1)
+    Sxt = np.nansum(X * T, axis=1)
+    
+    # Numerators for Covariance/Variance
+    # Cov * N = Sxt - Sx * Mt (approx, careful with sums)
+    # Using Sum of Squares formula: Sum((x-mx)(t-mt)) = Sum(xt) - Sum(x)Sum(t)/n
+    
+    num_cov = Sxt - (Sx * St / safe_cnt)
+    num_var_x = Sxx - (Sx**2 / safe_cnt)
+    num_var_t = Stt - (St**2 / safe_cnt)
+    
+    # R^2 = Cov(X,T)^2 / (Var(X) * Var(T))
+    #     = num_cov^2 / (num_var_x * num_var_t)
+    
+    # Denominator
+    denom = num_var_x * num_var_t
+    
+    # Avoid div by zero or almost zero
+    # Var(T) is 0 if len < 2. Var(X) is 0 if constant.
+    with np.errstate(divide='ignore', invalid='ignore'):
+        r2 = (num_cov**2) / denom
+        
+    # Result
+    out = np.full(n, fallback, dtype=np.float64)
+    
+    # Valid where length ok AND denominator > eps
+    is_computable = valid_mask & (denom > 1e-12)
+    out[is_computable] = r2[is_computable]
+    
+    # V62 Upgrade: Time-Bounded Minimum Description Length (MDL) Gain
+    R_squared = np.clip(out, 0.0, 0.9999)
+    delta_k = 2.0
+    
+    with np.errstate(divide='ignore', invalid='ignore'):
+        mdl_gain = -(safe_cnt / 2.0) * np.log(1.0 - R_squared) - (delta_k / 2.0) * np.log(safe_cnt)
+        
+    out_mdl = np.full(n, fallback, dtype=np.float64)
+    is_mdl_valid = valid_mask & (safe_cnt >= 3)
+    out_mdl[is_mdl_valid] = mdl_gain[is_mdl_valid]
+    
+    out_mdl[out_mdl <= 0.0] = 0.0
+    return out_mdl
+
+def calc_topology_area_vectorized(
+    x_traces: List[Sequence[float]], 
+    y_traces: List[Sequence[float]], 
+    x_scale: float, 
+    y_scale: float, 
+    green_coeff: float
+) -> np.ndarray:
+    """
+    Vectorized Green's Theorem Area.
+    Area = sum(x[i]*y[i+1] - x[i+1]*y[i])
+    """
+    n = len(x_traces)
+    if n == 0: return np.array([])
+    
+    # Pad both
+    # Note: x and y must be same length per row
+    X, lx = pad_traces(x_traces)
+    Y, ly = pad_traces(y_traces)
+    
+    # Lengths should match, take min
+    lens = np.minimum(lx, ly)
+    L = X.shape[1]
+    
+    # Normalize (Vectorized)
+    # Mean and Std per row
+    # Keep dims for broadcasting: (N, 1)
+    
+    # Mask
+    mask = ~np.isnan(X) & ~np.isnan(Y)
+    cnt = np.sum(mask, axis=1)
+    safe_cnt = np.where(cnt > 1, cnt, np.inf)
+    
+    mx = np.nansum(X, axis=1) / safe_cnt
+    my = np.nansum(Y, axis=1) / safe_cnt
+    
+    sx = np.nanstd(X, axis=1)
+    sy = np.nanstd(Y, axis=1)
+    
+    # Apply floors
+    sx = np.maximum(sx, x_scale)
+    sy = np.maximum(sy, y_scale)
+    
+    # Normalize: (X - mx) / sx
+    Xn = (X - mx[:, None]) / sx[:, None]
+    Yn = (Y - my[:, None]) / sy[:, None]
+    
+    # Cross terms: x[i] * y[i+1] - x[i+1] * y[i]
+    # Slice views
+    x_i = Xn[:, :-1]
+    x_ip1 = Xn[:, 1:]
+    y_i = Yn[:, :-1]
+    y_ip1 = Yn[:, 1:]
+    
+    cross = x_i * y_ip1 - x_ip1 * y_i
+    
+    # Sum (Green's Area)
+    # Handle NaNs: if any component is NaN, cross is NaN. nansum treats as 0.
+    # We must ensure we don't sum garbage padding.
+    # Padding is NaN. NaNs propagate.
+    # nansum is correct IF valid data is contiguous.
+    
+    area = np.nansum(cross, axis=1) * green_coeff
+    
+    # Where count < 2, area = 0
+    area[cnt < 2] = 0.0
+    
+    return area
+
+def calc_holographic_topology_vectorized(
+    trace: List[Sequence[float]],
+    ofi_list: List[Sequence[float]],
+    price_scale_floor: float,
+    ofi_scale_floor: float,
+    green_coeff: float,
+) -> tuple[np.ndarray, np.ndarray]:
+    """
+    Vectorized Holographic Topology (Area + Energy).
+    x = trace (Price)
+    y = cumsum(ofi_list) (Flow)
+    """
+    n = len(trace)
+    if n == 0: return np.zeros(0), np.zeros(0)
+    
+    # 1. Prepare Y (Cumulative Flow)
+    # Since ofi_list is variable length, we must pad then cumsum.
+    # But cumsum on NaNs is tricky.
+    # Better: pad, replace NaN with 0, cumsum, then mask back.
+    # Wait, ofi_list is list of lists.
+    
+    Y_raw, ly = pad_traces(ofi_list)
+    # Mask NaNs
+    mask_y = ~np.isnan(Y_raw)
+    Y_filled = np.nan_to_num(Y_raw, nan=0.0)
+    Y_cum = np.cumsum(Y_filled, axis=1)
+    # Restore NaNs (optional, but normalization handles it)
+    Y = np.where(mask_y, Y_cum, np.nan)
+    
+    X, lx = pad_traces(trace)
+    
+    # Lengths should match
+    mask = ~np.isnan(X) & ~np.isnan(Y)
+    cnt = np.sum(mask, axis=1)
+    safe_cnt = np.where(cnt > 1, cnt, np.inf)
+    
+    # Normalize
+    mx = np.nansum(X, axis=1) / safe_cnt
+    my = np.nansum(Y, axis=1) / safe_cnt
+    sx = np.maximum(np.nanstd(X, axis=1), price_scale_floor)
+    sy = np.maximum(np.nanstd(Y, axis=1), ofi_scale_floor)
+    
+    Xn = (X - mx[:, None]) / sx[:, None]
+    Yn = (Y - my[:, None]) / sy[:, None]
+    
+    # Area (Cross Product)
+    x_i, x_ip1 = Xn[:, :-1], Xn[:, 1:]
+    y_i, y_ip1 = Yn[:, :-1], Yn[:, 1:]
+    cross = x_i * y_ip1 - x_ip1 * y_i
+    area = np.nansum(cross, axis=1) * green_coeff
+    area[cnt < 2] = 0.0
+    
+    # Energy (Path Length)
+    dx = np.diff(Xn, axis=1)
+    dy = np.diff(Yn, axis=1)
+    # ds = sqrt(dx^2 + dy^2)
+    ds = np.sqrt(dx**2 + dy**2)
+    energy = np.nansum(ds, axis=1)
+    energy[cnt < 2] = 0.0
+    
+    return area, energy
+
+# --- JIT Compilation Block ---
+
+try:
+    from numba import njit
+    NUMBA_AVAILABLE = True
+except ImportError:
+    NUMBA_AVAILABLE = False
+    # Dummy decorator if numba missing
+    def njit(*args, **kwargs):
+        def decorator(func):
+            return func
+        return decorator
+
+@njit(cache=True, fastmath=True)
+def calc_srl_recursion_loop(
+    n_rows,
+    price_change,
+    sigma_eff,
+    net_ofi,
+    depth_eff,
+    cancel_vol,
+    trade_vol,
+    base_y,
+    is_boundary,
+    # Config Scalars
+    depth_floor, sigma_floor, spoof_ratio_eps, spoof_penalty_gamma,
+    implied_y_min_impact, implied_y_min_penalty,
+    y_min, y_max, y_alpha, anchor_y, anchor_w, clip_lo, clip_hi,
+    out_is_active, out_epi, peace_threshold, min_ofi_for_y
+):
+    """
+    JIT-compiled scalar recursion loop for Universal SRL + Adaptive Y + Spoofing.
+    Speeds up physics by >50x vs Python loop.
+    """
+    out_srl_resid = np.zeros(n_rows, dtype=np.float64)
+    out_y = np.zeros(n_rows, dtype=np.float64)
+    out_spoof = np.zeros(n_rows, dtype=np.float64)
+    
+    current_y = float(base_y)
+    
+    for i in range(n_rows):
+        # Fast Boundary Detect for Phase Transition
+        if is_boundary[i]:
+            current_y = float(base_y)
+
+        # 1. Safety Floors
+        safe_depth = max(depth_eff[i], depth_floor)
+        safe_sigma = max(sigma_eff[i], sigma_floor)
+
+        # 2. Spoofing Penalty
+        safe_trade = max(trade_vol[i], spoof_ratio_eps)
+        c_vol = max(cancel_vol[i], 0.0)
+        spoof_ratio = c_vol / safe_trade
+
+        penalty = math.exp(-spoof_penalty_gamma * spoof_ratio)
+        effective_depth = max(safe_depth * penalty, depth_floor)
+
+        # 3. SRL (Delta=0.5)
+        q_over_d = abs(net_ofi[i]) / effective_depth
+        raw_impact_unit = safe_sigma * math.sqrt(q_over_d) 
+        
+        sign = 1.0 if net_ofi[i] > 0 else (-1.0 if net_ofi[i] < 0 else 0.0)
+        theory_impact = sign * current_y * raw_impact_unit
+        
+        resid = price_change[i] - theory_impact
+        
+        # 4. Implied Y
+        # Recalculate implied only if impact is significant
+        implied_y = current_y
+        if raw_impact_unit > implied_y_min_impact and penalty > implied_y_min_penalty:
+            implied_y = abs(price_change[i]) / (raw_impact_unit + 1e-9)
+
+        out_srl_resid[i] = resid
+        out_spoof[i] = spoof_ratio
+        
+        # Adaptive Y Update
+        if out_is_active[i] and out_epi[i] > peace_threshold and abs(net_ofi[i]) > min_ofi_for_y:
+            # Clip implied before update
+            if implied_y < y_min: implied_y = y_min
+            elif implied_y > y_max: implied_y = y_max
+            
+            current_y = (1.0 - y_alpha) * current_y + y_alpha * implied_y
+            
+        if anchor_w > 0.0:
+            current_y = (1.0 - anchor_w) * current_y + anchor_w * anchor_y
+            
+        if current_y < clip_lo: current_y = clip_lo
+        elif current_y > clip_hi: current_y = clip_hi
+        
+        out_y[i] = current_y
+        
+    return out_srl_resid, out_y, out_spoof
+
+
+================================================================================
+FILE: omega_core/omega_etl.py
+================================================================================
+
+"""
+omega_etl.py
+
+Level-2 (v5) vectorized ETL pipeline using Polars.
+Fixes Paradox 3: Causal Volume Projection.
+"""
+
+from __future__ import annotations
+
+from typing import Dict, List, Tuple
+
+import polars as pl
+
+from config import L2PipelineConfig
+
+
+def _rename_map(cfg: L2PipelineConfig) -> Dict[str, str]:
+    m = cfg.mapping
+    rename: Dict[str, str] = {
+        m.col_symbol: "symbol",
+        m.col_exchange: "exchange",
+        m.col_date: "date",
+        m.col_time: "time",
+        m.col_price: "price",
+        m.col_volume: "vol",
+        m.col_turnover: "turnover",
+        m.col_bs_flag: "bs_flag",
+    }
+    for i in range(1, int(m.book_levels) + 1):
+        rename[f"{m.bid_price_prefix}{i}"] = f"bid_p{i}"
+        rename[f"{m.bid_volume_prefix}{i}"] = f"bid_v{i}"
+        rename[f"{m.ask_price_prefix}{i}"] = f"ask_p{i}"
+        rename[f"{m.ask_volume_prefix}{i}"] = f"ask_v{i}"
+    return rename
+
+
+def _sum_expr(exprs: List[pl.Expr]) -> pl.Expr:
+    return pl.fold(pl.lit(0.0), lambda acc, x: acc + x, exprs)
+
+
+def _numeric_cols(cfg: L2PipelineConfig) -> List[str]:
+    m = cfg.mapping
+    cols = ["price", "vol", "turnover"]
+    for i in range(1, int(m.book_levels) + 1):
+        cols.extend([f"bid_p{i}", f"bid_v{i}", f"ask_p{i}", f"ask_v{i}"])
+    return cols
+
+
+def scan_l2_quotes(path: str | List[str], cfg: L2PipelineConfig) -> pl.LazyFrame | None:
+    if isinstance(path, list):
+        if not path:
+            return None
+        # Check if it's the split CSVs format (has 行情.csv and 逐笔成交.csv)
+        path_strs = [str(p) for p in path]
+        quote_file = next((p for p in path_strs if "行情.csv" in p), None)
+        trade_file = next((p for p in path_strs if "逐笔成交.csv" in p), None)
+        
+        if quote_file and trade_file:
+            print(f"[DEBUG] Processing split files: {quote_file} & {trade_file}")
+            return _scan_split_l2_quotes(quote_file, trade_file, cfg)
+        else:
+            # Fallback for other list formats (e.g. chunked CSVs)
+            lfs = []
+            for p in path:
+                lf = scan_l2_quotes(p, cfg)
+                if lf is not None:
+                    lfs.append(lf)
+            if not lfs:
+                return None
+            # diagonal_relaxed: allow CSVs with different column sets (e.g. early 2023
+            # archives missing L2 depth columns). Missing cols filled with null.
+            return pl.concat(lfs, how="diagonal_relaxed")
+
+    is_parquet = path.lower().endswith(".parquet")
+    
+    if is_parquet or cfg.io.input_format == "parquet":
+        lf = pl.scan_parquet(path)
+    elif cfg.io.input_format == "csv":
+        enc = cfg.io.csv_encoding.lower()
+        if enc not in ["utf8", "utf-8"]:
+            try:
+                lf = pl.read_csv(path, encoding=cfg.io.csv_encoding, infer_schema_length=0).lazy()
+            except Exception as e:
+                if is_parquet:
+                     return pl.scan_parquet(path)
+                raise e
+        else:
+            lf = pl.scan_csv(path, encoding=cfg.io.csv_encoding)
+    else:
+        if is_parquet:
+            lf = pl.scan_parquet(path)
+        else:
+            raise ValueError(f"Unknown input_format: {cfg.io.input_format}")
+            
+    rename = _rename_map(cfg)
+    schema = lf.collect_schema()
+    valid_rename = {k: v for k, v in rename.items() if k in schema.names()}
+    
+    valid_mapped_cols = set(valid_rename.values())
+    if not valid_mapped_cols:
+        if "microprice" in schema.names():
+            return lf
+        return None
+
+    # CRITICAL: L2 pipeline requires BOTH depth and trade columns.
+    # Early 2023 archives feature split data (行情.csv, 逐笔成交.csv). We skip these 
+    # unifiedly instead of creating diagonal garbage frames.
+    required = {"bid_p1", "ask_p1", "price", "vol"}
+    if not required.issubset(valid_mapped_cols) and "microprice" not in valid_mapped_cols:
+        return None
+            
+    lf = lf.select([pl.col(c) for c in valid_rename.keys()]).rename(valid_rename)
+
+    num_cols = _numeric_cols(cfg)
+    existing_cols = lf.collect_schema().names()
+    cols_to_cast = [c for c in num_cols if c in existing_cols]
+    
+    lf = lf.with_columns(
+        [pl.col("time").cast(pl.Float64, strict=False).cast(pl.Int64, strict=False)]
+        + [pl.col(c).cast(pl.Float64, strict=False) for c in cols_to_cast]
+    )
+    return lf
+
+
+def _scan_split_l2_quotes(quote_file: str, trade_file: str, cfg: L2PipelineConfig) -> pl.LazyFrame | None:
+    """
+    Dedicated parser for early 2023 split format (行情.csv + 逐笔成交.csv).
+    Fuses microsecond trades backward onto 3-second L2 snapshot quotes.
+    """
+    enc = cfg.io.csv_encoding.lower() if cfg.io.csv_encoding else "utf8"
+    
+    # 1. Load Quotes (行情.csv)
+    if enc not in ["utf8", "utf-8"]:
+        q_lf = pl.read_csv(quote_file, encoding=cfg.io.csv_encoding, infer_schema_length=0).lazy()
+    else:
+        q_lf = pl.scan_csv(quote_file, encoding=enc, infer_schema_length=0)
+    q_rename = _rename_map(cfg)
+    q_schema = q_lf.collect_schema().names()
+    q_valid_rename = {k: v for k, v in q_rename.items() if k in q_schema}
+    
+    q_lf = q_lf.select([pl.col(c) for c in q_valid_rename.keys()]).rename(q_valid_rename)
+    
+    if "time" not in q_lf.collect_schema().names():
+        print(f"[DEBUG] Quitting: no time col in quote. Columns: {q_lf.collect_schema().names()}")
+        return None
+        
+    q_lf = q_lf.with_columns(pl.col("time").cast(pl.Float64, strict=False).cast(pl.Int64, strict=False))
+    q_lf = q_lf.sort("time")
+
+    # Drop intersecting columns from quotes explicitly via select to avoid Polars optimizer join bugs
+    intersecting = {"price", "vol", "turnover", "bs_flag", "symbol", "exchange", "date"}
+    q_keep_cols = [c for c in q_lf.collect_schema().names() if c not in intersecting]
+    if "time" not in q_keep_cols:
+        q_keep_cols.append("time")
+    q_lf = q_lf.select(q_keep_cols)
+
+    # 2. Load Trades (逐笔成交.csv)
+    if enc not in ["utf8", "utf-8"]:
+        t_lf = pl.read_csv(trade_file, encoding=cfg.io.csv_encoding, infer_schema_length=0).lazy()
+    else:
+        t_lf = pl.scan_csv(trade_file, encoding=enc, infer_schema_length=0)
+    t_rename = _rename_map(cfg)
+    # Add alias mappings for split trades format
+    t_rename["成交价格"] = "price"
+    t_rename["成交数量"] = "vol"
+    t_rename["成交金额"] = "turnover"  # Sometimes named 成交金额 instead of 成交额
+    t_rename["成交额"] = "turnover"
+    
+    t_schema = t_lf.collect_schema().names()
+    t_valid_rename = {k: v for k, v in t_rename.items() if k in t_schema}
+    
+    t_lf = t_lf.select([pl.col(c) for c in t_valid_rename.keys()]).rename(t_valid_rename)
+    
+    if "time" not in t_lf.collect_schema().names():
+        print(f"[DEBUG] Quitting: no time col in trade. Columns: {t_lf.collect_schema().names()}")
+        return None
+        
+    t_lf = t_lf.with_columns(pl.col("time").cast(pl.Float64, strict=False).cast(pl.Int64, strict=False))
+    t_lf = t_lf.sort("time")
+
+    # 3. Asof Join Trades into Quotes (Trades -> Quotes)
+    lf = t_lf.join_asof(q_lf, on="time", strategy="backward")
+
+    # 4. Standard validation
+    valid_mapped_cols = set(lf.collect_schema().names())
+    required = {"bid_p1", "ask_p1", "price", "vol"}
+    if not required.issubset(valid_mapped_cols) and "microprice" not in valid_mapped_cols:
+        print(f"[DEBUG] Quitting: missing required col. Required: {required}, found: {valid_mapped_cols}")
+        return None
+
+    print(f"[DEBUG] _scan_split_l2_quotes SUCCESS for {quote_file}")
+
+    # 5. Type Casting
+    num_cols = _numeric_cols(cfg)
+    existing_cols = lf.collect_schema().names()
+    cols_to_cast = [c for c in num_cols if c in existing_cols]
+    
+    lf = lf.with_columns(
+        [pl.col(c).cast(pl.Float64, strict=False) for c in cols_to_cast]
+    )
+    return lf
+
+
+def _apply_session_filter(lf: pl.LazyFrame, cfg: L2PipelineConfig) -> pl.LazyFrame:
+    s = cfg.session
+    if not s.enable_session_filter or s.allow_auction:
+        return lf
+    cond_hhmmssmmm = (
+        (pl.col("time") >= int(s.session_1_start)) & (pl.col("time") <= int(s.session_1_end))
+    ) | (
+        (pl.col("time") >= int(s.session_2_start)) & (pl.col("time") <= int(s.session_2_end))
+    )
+    ashare = cfg.ashare_session
+    t_ms = _time_of_day_ms_expr("time")
+    cond_ms = (
+        (t_ms >= int(ashare.morning_start_ms)) & (t_ms <= int(ashare.morning_end_ms))
+    ) | (
+        (t_ms >= int(ashare.afternoon_start_ms)) & (t_ms <= int(ashare.afternoon_end_ms))
+    )
+    return lf.filter(cond_hhmmssmmm | cond_ms)
+
+
+def _hhmmssmmm_to_ms_expr(time_expr: pl.Expr) -> pl.Expr:
+    t = time_expr.cast(pl.Float64, strict=False).cast(pl.Int64, strict=False)
+    hh = t // 10_000_000
+    mm = (t // 100_000) % 100
+    ss = (t // 1_000) % 100
+    ms = t % 1_000
+    return ((((hh * 60) + mm) * 60 + ss) * 1_000 + ms).cast(pl.Int64, strict=False)
+
+
+def _time_of_day_ms_expr(time_col: str = "time") -> pl.Expr:
+    """
+    Normalize mixed time formats to milliseconds since midnight.
+    Supported inputs:
+    - HHMMSSmmm (e.g. 93000000)
+    - ms-of-day (0~86400000)
+    - epoch ms/us
+    """
+    t = pl.col(time_col).cast(pl.Float64, strict=False).cast(pl.Int64, strict=False)
+    hhmmssmmm_ms = _hhmmssmmm_to_ms_expr(t)
+    return (
+        pl.when(t.is_null())
+        .then(None)
+        .when(t >= 1_000_000_000_000_000)
+        .then((t // 1_000) % 86_400_000)  # epoch microseconds
+        .when(t >= 100_000_000_000)
+        .then(t % 86_400_000)  # epoch milliseconds
+        .when((t >= 10_000_000) & (t <= 235_959_999))
+        .then(hhmmssmmm_ms)  # HHMMSSmmm
+        .otherwise(t)  # already ms-of-day
+        .cast(pl.Int64, strict=False)
+    )
+
+
+def _ashare_elapsed_expr(t_ms: pl.Expr, cfg: L2PipelineConfig) -> pl.Expr:
+    ashare = cfg.ashare_session
+    morning_len = int(ashare.morning_end_ms - ashare.morning_start_ms)
+    return (
+        pl.when(t_ms <= int(ashare.morning_end_ms))
+        .then(t_ms - int(ashare.morning_start_ms))
+        .when(t_ms >= int(ashare.afternoon_start_ms))
+        .then((t_ms - int(ashare.afternoon_start_ms)) + morning_len)
+        .otherwise(morning_len)
+    ).clip(lower_bound=0)
+
+
+def _apply_quality_filter(lf: pl.LazyFrame, cfg: L2PipelineConfig) -> pl.LazyFrame:
+    q = cfg.quality
+    conds = []
+    if q.drop_zero_price:
+        conds.append(pl.col("price") > float(q.min_price))
+    if q.drop_zero_volume:
+        conds.append(pl.col("vol") > float(q.min_volume))
+    if q.require_valid_top_book:
+        schema_names = set(lf.collect_schema().names())
+        required = {"bid_p1", "ask_p1", "bid_v1", "ask_v1"}
+        missing = sorted(required - schema_names)
+        if missing:
+            pass # Skip strict check for flexibility
+        else:
+            conds.append(
+                (pl.col("bid_p1") > float(q.min_book_price))
+                & (pl.col("ask_p1") > float(q.min_book_price))
+            )
+    if not conds:
+        return lf
+    cond = conds[0]
+    for c in conds[1:]:
+        cond = cond & c
+    return lf.filter(cond)
+
+
+def _volume_tick_expr(cfg: L2PipelineConfig) -> pl.Expr:
+    vc = cfg.volume_clock
+    if vc.volume_mode == "cumulative":
+        diff = pl.col("vol") - pl.col("vol").shift(1)
+        return (
+            pl.when(diff > float(vc.volume_floor))
+            .then(diff)
+            .otherwise(float(vc.volume_floor))
+            .alias("vol_tick")
+        )
+    if vc.volume_mode == "delta":
+        return pl.col("vol").alias("vol_tick")
+    raise ValueError(f"Unknown volume_mode: {vc.volume_mode}")
+
+
+def _microprice_expr(cfg: L2PipelineConfig) -> pl.Expr:
+    depth = int(cfg.microprice.depth_level)
+    depth = max(1, depth)
+    bid_terms, ask_terms, denom_terms = [], [], []
+    for i in range(1, depth + 1):
+        bid_terms.append(pl.col(f"bid_p{i}") * pl.col(f"ask_v{i}"))
+        ask_terms.append(pl.col(f"ask_p{i}") * pl.col(f"bid_v{i}"))
+        denom_terms.append(pl.col(f"bid_v{i}") + pl.col(f"ask_v{i}"))
+    num = _sum_expr(bid_terms + ask_terms)
+    denom = _sum_expr(denom_terms).clip(lower_bound=float(cfg.microprice.depth_floor))
+    return (num / denom).alias("microprice")
+
+
+def _depth_expr(cfg: L2PipelineConfig) -> pl.Expr:
+    depth = int(max(cfg.microprice.depth_level, cfg.ofi.depth_levels))
+    depth = max(1, depth)
+    bid_v = [pl.col(f"bid_v{i}") for i in range(1, depth + 1)]
+    ask_v = [pl.col(f"ask_v{i}") for i in range(1, depth + 1)]
+    denom = float(2 * depth)
+    return (_sum_expr(bid_v + ask_v) / denom).alias("depth")
+
+
+def _ofi_expr(cfg: L2PipelineConfig) -> pl.Expr:
+    ofi_cfg = cfg.ofi
+    if ofi_cfg.ofi_mode == "price_change":
+        return (
+            pl.when(pl.col("price") > pl.col("price").shift(1)).then(pl.col("vol_tick"))
+            .when(pl.col("price") < pl.col("price").shift(1)).then(-pl.col("vol_tick"))
+            .otherwise(float(ofi_cfg.ofi_zero_value)).alias("v_ofi")
+        )
+    if ofi_cfg.ofi_mode == "queue_delta":
+        depth = int(max(1, ofi_cfg.depth_levels))
+        decay = float(ofi_cfg.ofi_weight_decay)
+        parts = []
+        for i in range(1, depth + 1):
+            weight = decay ** (i - 1)
+            bid_contrib = (
+                pl.when(pl.col(f"bid_p{i}") > pl.col(f"bid_p{i}").shift(1)).then(pl.col(f"bid_v{i}"))
+                .when(pl.col(f"bid_p{i}") < pl.col(f"bid_p{i}").shift(1)).then(-pl.col(f"bid_v{i}").shift(1))
+                .otherwise(pl.col(f"bid_v{i}") - pl.col(f"bid_v{i}").shift(1))
+            )
+            ask_contrib = (
+                pl.when(pl.col(f"ask_p{i}") < pl.col(f"ask_p{i}").shift(1)).then(pl.col(f"ask_v{i}"))
+                .when(pl.col(f"ask_p{i}") > pl.col(f"ask_p{i}").shift(1)).then(-pl.col(f"ask_v{i}").shift(1))
+                .otherwise(pl.col(f"ask_v{i}") - pl.col(f"ask_v{i}").shift(1))
+            )
+            parts.append((bid_contrib - ask_contrib) * weight)
+        return _sum_expr(parts).alias("v_ofi")
+    raise ValueError(f"Unknown ofi_mode: {ofi_cfg.ofi_mode}")
+
+
+def _lob_flux_expr(group_col: str | None = None) -> pl.Expr:
+    """LOB flux = |Δbid_v1| + |Δask_v1|. Must isolate by symbol to prevent
+    cross-symbol diff bleeding (stock B open - stock A close = phantom flux)."""
+    b_diff = pl.col("bid_v1").diff().over(group_col) if group_col else pl.col("bid_v1").diff()
+    a_diff = pl.col("ask_v1").diff().over(group_col) if group_col else pl.col("ask_v1").diff()
+    return (b_diff.abs() + a_diff.abs()).alias("lob_flux")
+
+
+def build_l1_base_ticks(path: str | List[str], cfg: L2PipelineConfig) -> pl.DataFrame:
+    """Stage 1: Base Lake Extraction. Parses 7z/CSV -> Computes basic ticks (No Physics) -> L1 Parquet."""
+    if isinstance(path, list):
+        if not path:
+            return pl.DataFrame()
+            
+        is_split_group = len(path) <= 4 and any("行情.csv" in str(p) for p in path) and any("逐笔成交.csv" in str(p) for p in path)
+        if not is_split_group:
+            from collections import defaultdict
+            from pathlib import Path
+            
+            grouped = defaultdict(list)
+            for p in path:
+                grouped[str(Path(p).parent)].append(str(p))
+                
+            collected = []
+            for symbol_dir, group_files in grouped.items():
+                try:
+                    if len(group_files) == 1:
+                        df = build_l1_base_ticks(group_files[0], cfg)
+                    else:
+                        df = build_l1_base_ticks(group_files, cfg)
+                        
+                    if df.height > 0:
+                        collected.append(df)
+                except Exception as e:
+                    print(f"Error processing {symbol_dir}: {e}")
+                    continue
+            if not collected:
+                return pl.DataFrame()
+            return pl.concat(collected, how="vertical_relaxed")
+
+    lf = scan_l2_quotes(path, cfg)
+    if lf is None:
+        return pl.DataFrame()
+    
+    schema_names = lf.collect_schema().names()
+    group_col = "symbol" if "symbol" in schema_names else None
+
+    # Sort strictly by symbol then time (Causal Ordering)
+    sort_cols = ["date", "time"]
+    if group_col:
+        sort_cols = [group_col, "date", "time"]
+    lf = lf.sort(sort_cols)
+    
+    lf = _apply_session_filter(lf, cfg)
+    lf = _apply_quality_filter(lf, cfg)
+
+    # Codex Correction: Stage 1 should ONLY extract Base Lake Parquets. 
+    # NO mathematical aggregation (microprice, ofi, depth) should happen here. 
+    # It takes 72 hours otherwise. We just output the valid sorted ticks.
+    lf = lf.with_columns(
+        [_volume_tick_expr(cfg), _time_of_day_ms_expr("time").alias("__time_ms")]
+    )
+
+    return lf.collect()
+
+
+def build_l2_features_from_l1(
+    lf: pl.LazyFrame | pl.DataFrame,
+    cfg: L2PipelineConfig,
+    target_frames: float | None = None,
+) -> pl.DataFrame:
+    """Stage 2: Physics Engine. Reads Base L1 -> Applies advanced math aggregations -> L2 Parquet."""
+    if isinstance(lf, pl.DataFrame):
+        schema_names = list(lf.columns)
+        lf = lf.lazy()
+    else:
+        schema_names = lf.collect_schema().names()
+    group_col = "symbol" if "symbol" in schema_names else None
+
+    # Codex Correction: Apply Physics (microprice, depth, OFI, flux) ONLY IN STAGE 2
+    lf = lf.with_columns(
+        [_microprice_expr(cfg), _depth_expr(cfg)]
+    )
+    if cfg.quality.drop_nonpositive_frame_price:
+        lf = lf.filter(pl.col("microprice") > float(cfg.quality.min_frame_price))
+    lf = lf.with_columns(_ofi_expr(cfg))
+    lf = lf.with_columns(_lob_flux_expr(group_col))
+
+    # Temporal Rolling fix: V62 demands absolute time `3s` rolling instead of row-based `window_size=3`.
+    # First, convert ms epoch to a Datetime object to satisfy Polars period rolling.
+    lf = lf.with_columns(
+        pl.from_epoch(pl.col("__time_ms"), time_unit="ms").alias("__time_dt")
+    )
+
+    # Force early materialization to prevent Polars query optimizer from building a massive
+    # physical plan that explodes RAM to 94GB during the `over()` windowing.
+    df_inter = lf.collect()
+    lf = df_inter.lazy()
+
+    # Perf/stage2-speedup-v62: Inline rolling_mean_by replaces the prior
+    # .rolling().agg() + .join() pattern.  This avoids materializing a full
+    # intermediate DataFrame for the join, halving peak RAM and simplifying the
+    # query graph.  The mathematical result is identical (3-second left-closed
+    # temporal rolling mean).
+    if group_col:
+        lf = lf.sort([group_col, "__time_dt"])
+        lf = lf.with_columns([
+            pl.col("v_ofi")
+                .rolling_mean_by("__time_dt", window_size="3s", closed="left")
+                .over(group_col)
+                .alias("v_ofi"),
+            pl.col("depth")
+                .rolling_mean_by("__time_dt", window_size="3s", closed="left")
+                .over(group_col)
+                .alias("depth"),
+        ])
+    else:
+        lf = lf.sort(["__time_dt"])
+        lf = lf.with_columns([
+            pl.col("v_ofi")
+                .rolling_mean_by("__time_dt", window_size="3s", closed="left")
+                .alias("v_ofi"),
+            pl.col("depth")
+                .rolling_mean_by("__time_dt", window_size="3s", closed="left")
+                .alias("depth"),
+        ])
+
+
+    vc = cfg.volume_clock
+
+    if getattr(vc, "dynamic_bucket_size", False) or target_frames is not None:
+        frames_target = float(target_frames) if target_frames is not None else float(vc.daily_volume_proxy_div)
+
+        elapsed = _ashare_elapsed_expr(pl.col("__time_ms"), cfg)
+        time_fraction = (elapsed / float(cfg.ashare_session.total_duration_ms)).clip(
+            lower_bound=0.05, upper_bound=1.0
+        )
+
+        if group_col:
+            cum_vol_expr = pl.col("vol_tick").cum_sum().over(group_col)
+        else:
+            cum_vol_expr = pl.col("vol_tick").cum_sum()
+            
+        est_daily_vol = cum_vol_expr / time_fraction
+        target_bucket_size = est_daily_vol / frames_target
+        bucket_size_expr = (
+            pl.when(target_bucket_size > float(vc.min_bucket_size))
+            .then(target_bucket_size)
+            .otherwise(float(vc.min_bucket_size))
+        )
+
+        lf = lf.with_columns(
+            [
+                cum_vol_expr.alias("cum_vol"),
+                bucket_size_expr.alias("dynamic_bucket_sz"),
+            ]
+        )
+        
+        if group_col:
+            lf = lf.with_columns(
+                (pl.col("vol_tick") / pl.col("dynamic_bucket_sz"))
+                .cum_sum().over(group_col)
+                .cast(pl.Int64)
+                .alias("bucket_id")
+            )
+        else:
+            lf = lf.with_columns(
+                (pl.col("vol_tick") / pl.col("dynamic_bucket_sz"))
+                .cum_sum()
+                .cast(pl.Int64)
+                .alias("bucket_id")
+            )
+    else:
+        if group_col:
+            lf = lf.with_columns(pl.col("vol_tick").cum_sum().over(group_col).alias("cum_vol"))
+        else:
+            lf = lf.with_columns(pl.col("vol_tick").cum_sum().alias("cum_vol"))
+            
+        lf = lf.with_columns(
+            (pl.col("cum_vol") // float(vc.bucket_size)).cast(pl.Int64).alias("bucket_id")
+        )
+
+    if {"bid_v1", "ask_v1"}.issubset(schema_names):
+        singularity_eps = float(cfg.micro.limit_singularity_eps)
+        singularity_expr = (
+            (pl.col("bid_v1") <= singularity_eps) | (pl.col("ask_v1") <= singularity_eps)
+        ).alias("is_singularity")
+    else:
+        singularity_expr = pl.lit(False).alias("is_singularity")
+    lf = lf.with_columns(singularity_expr)
+
+    group_keys = ["bucket_id"]
+    if group_col:
+        group_keys = [group_col, "bucket_id"]
+
+    # Notice: list columns ('ofi_list', 'vol_list', 'trace') are dropped per V62 Codex Audit memory protections.
+    # Numba @njit matrix compute will be fed directly from pure scalar columns.
+    frames = lf.group_by(group_keys).agg(
+        [
+            pl.col("microprice").first().alias("open"),
+            pl.col("microprice").last().alias("close"),
+            pl.col("microprice").std().alias("sigma"),
+            pl.col("v_ofi").sum().alias("net_ofi"),
+            pl.col("depth").mean().alias("depth"),
+            pl.col("v_ofi").cum_sum().last().alias("ofi_trace"),
+            pl.col("vol_tick").cum_sum().last().alias("vol_trace"),
+            (pl.col("__time_ms").last() - pl.col("__time_ms").first()).alias("time_trace_span"),
+            pl.col("__time_ms").first().alias("time_start"),
+            pl.col("__time_ms").last().alias("time_end"),
+            pl.col("date").first().alias("_date_temp"),
+            pl.col("symbol").first().alias("_symbol_temp"),
+            pl.len().alias("n_ticks"),
+            pl.col("vol_tick").sum().alias("trade_vol"),
+            pl.col("lob_flux").sum().alias("cancel_vol"),
+            pl.col("is_singularity").max().alias("has_singularity"),
+        ],
+        maintain_order=True,
+    )
+    
+    rename_rules = {"_date_temp": "date"}
+    if not group_col:
+        rename_rules["_symbol_temp"] = "symbol"
+
+    frames = frames.rename(rename_rules)
+    frames = frames.drop(["_date_temp", "_symbol_temp"], strict=False)
+
+    frames = frames.filter(pl.col("n_ticks") >= int(vc.min_ticks_per_bucket))
+    if cfg.quality.drop_nonpositive_frame_price:
+        min_frame_px = float(cfg.quality.min_frame_price)
+        frames = frames.filter(
+            (pl.col("open") > min_frame_px) & (pl.col("close") > min_frame_px)
+        )
+    frames = frames.with_columns(
+        [
+            (pl.col("time_end") - pl.col("time_start")).alias("bar_duration_ms"),
+            (~pl.col("has_singularity")).alias("is_physics_valid"),
+        ]
+    )
+    return frames.collect()
+
+
+================================================================================
+FILE: omega_core/kernel.py
+================================================================================
+
+"""
+kernel.py (OMEGA v5.2)
+
+Level-2 (v5.2) deterministic kernel pipeline. (The Epistemic Release)
+Implements:
+- Algebraic Dimensionality Reduction (Zero-Memory-Explosion IIR Operator)
+- Universal SRL (Fixed Delta=0.5)
+- Epiplexity (Compression Gain)
+- Holographic Damper (Adaptive Y)
+"""
+
+from __future__ import annotations
+
+import math
+import os
+import numpy as np
+import polars as pl
+
+from config import L2PipelineConfig, load_l2_pipeline_config
+from omega_core.omega_etl import build_l2_features_from_l1, scan_l2_quotes
+from omega_core.omega_math_core import (
+    calc_srl_state,
+)
+from omega_core.omega_math_vectorized import (
+    calc_epiplexity_vectorized,
+    calc_topology_area_vectorized,
+    calc_holographic_topology_vectorized
+)
+
+def _apply_recursive_physics(
+    frames: pl.DataFrame,
+    cfg: L2PipelineConfig,
+    initial_y: float | None = None,
+) -> pl.DataFrame:
+    if frames.height == 0:
+        return frames
+
+    srl = cfg.srl
+    sig = cfg.signal
+    epi_cfg = cfg.epiplexity
+    topo_cfg = cfg.topology_race
+
+    peace_threshold = float(getattr(sig, "peace_threshold", getattr(sig, "epiplexity_min", 0.5)))
+    spoofing_ratio_max = float(getattr(sig, "spoofing_ratio_max", 2.5))
+    min_ofi_for_y = float(getattr(sig, "min_ofi_for_y_update", 100.0))
+    topo_energy_sigma_mult = float(getattr(sig, "topo_energy_sigma_mult", 10.0))
+
+    y_min = float(getattr(srl, "y_min", 0.1))
+    y_max = float(getattr(srl, "y_max", 5.0))
+    y_alpha = float(getattr(srl, "y_ema_alpha", 0.05))
+    anchor_y = float(getattr(srl, "anchor_y", srl.y_coeff))
+    anchor_w = float(np.clip(float(getattr(srl, "anchor_weight", 0.0)), 0.0, 1.0))
+    
+    clip_lo = min(float(getattr(srl, "anchor_clip_min", y_min)), float(getattr(srl, "anchor_clip_max", y_max)))
+    clip_hi = max(float(getattr(srl, "anchor_clip_min", y_min)), float(getattr(srl, "anchor_clip_max", y_max)))
+
+    sigma_gate_enabled = bool(getattr(epi_cfg, "sigma_gate_enabled", False))
+    sigma_gate = float(getattr(epi_cfg, "sigma_gate", 0.0))
+
+    # =========================================================================
+    # v5.2 Fix: O(1) Memory Array Projection (Avoids to_dicts MemoryError)
+    # =========================================================================
+    n_rows = frames.height
+
+    def _to_f64(v: object, default: float = 0.0) -> float:
+        if v is None:
+            return float(default)
+        if isinstance(v, (int, float, np.integer, np.floating)):
+            out = float(v)
+            return out if np.isfinite(out) else float(default)
+        s = str(v).strip().replace(",", "")
+        if not s:
+            return float(default)
+        if s.lower() in {"nan", "none", "null", "na", "nat", "inf", "+inf", "-inf"}:
+            return float(default)
+        try:
+            out = float(s)
+            return out if np.isfinite(out) else float(default)
+        except Exception:
+            return float(default)
+
+    def _safe_f64_col(col_name: str, default: float = 0.0) -> np.ndarray:
+        if col_name not in frames.columns:
+            return np.full(n_rows, float(default), dtype=np.float64)
+        arr = frames.get_column(col_name).cast(pl.Float64, strict=False).fill_null(default).fill_nan(default).to_numpy()
+        # Ring-0 Physics Shield: Cleanse all infinities that Polars ignores
+        return np.nan_to_num(arr, nan=default, posinf=default, neginf=default)
+
+    def _to_bool(v: object) -> bool:
+        if isinstance(v, bool):
+            return v
+        if v is None:
+            return False
+        if isinstance(v, (int, np.integer)):
+            return int(v) != 0
+        s = str(v).strip().lower()
+        return s in {"1", "true", "t", "yes", "y"}
+
+    def _safe_bool_col(col_name: str) -> np.ndarray:
+        if col_name not in frames.columns:
+            return np.zeros(n_rows, dtype=bool)
+        return frames.get_column(col_name).cast(pl.Boolean, strict=False).fill_null(False).to_numpy()
+
+    open_px = _safe_f64_col("open", default=0.0)
+    close_px = _safe_f64_col("close", default=0.0)
+    price_change = close_px - open_px
+
+    sigma_raw = _safe_f64_col("sigma", default=0.0)
+    sigma_eff = np.maximum(sigma_raw, float(srl.sigma_floor))
+
+    depth_raw = _safe_f64_col("depth", default=0.0)
+    depth_eff = np.maximum(depth_raw, float(srl.depth_floor))
+
+    net_ofi = _safe_f64_col("net_ofi", default=0.0)
+    trade_vol = _safe_f64_col("trade_vol", default=0.0)
+    cancel_vol = _safe_f64_col("cancel_vol", default=0.0)
+
+    # Codex Correction: List-columns are OOM vectors and cannot cross the Python GIL.
+    # We strictly use 1-D contiguous primitive arrays (e.g. close_px) and Numba sliding windows.
+    # Removed _safe_list_col entirely.
+
+    # --- Vectorized Pre-computation (Batch) ---
+    out_is_active = (not sigma_gate_enabled) | (sigma_eff >= sigma_gate)
+    
+    # v6.0: A-Share Singularity Mask
+    if "has_singularity" in frames.columns:
+        has_singularity = _safe_bool_col("has_singularity")
+        # Disable physics active state during singularity
+        out_is_active = out_is_active & (~has_singularity)
+    else:
+        has_singularity = np.zeros(n_rows, dtype=bool)
+    
+    # --- Vectorized Fast Boundary Detect ---
+    # Overnight Phase Transition — yesterday's resistance state must NOT contaminate today's opening auction
+    is_boundary = np.zeros(n_rows, dtype=bool)
+    if n_rows > 1 and "symbol" in frames.columns and "date" in frames.columns:
+        syms_srs = frames.get_column("symbol")
+        dates_srs = frames.get_column("date")
+        boundary_srs = (syms_srs != syms_srs.shift(1)) | (dates_srs != dates_srs.shift(1))
+        is_boundary = boundary_srs.fill_null(False).to_numpy()
+
+    # ULTRATHINK: O(N) precompute distance to last boundary for O(1) rolling window checks
+    dist_to_boundary = np.zeros(n_rows, dtype=np.int32)
+    curr_dist = 999999
+    for i in range(n_rows):
+        if is_boundary[i]:
+            curr_dist = 0
+        else:
+            curr_dist += 1
+        dist_to_boundary[i] = curr_dist
+
+    # Calculate Epiplexity in ONE GO using rolling JIT (GIL-free)
+    from omega_core.omega_math_rolling import calc_epiplexity_rolling, calc_holographic_topology_rolling
+    window_len = int(epi_cfg.min_trace_len)
+    
+    out_epi_raw = calc_epiplexity_rolling(close_px, window=window_len, dist_to_boundary=dist_to_boundary)
+    out_epi = np.where(out_epi_raw > 0, out_epi_raw, float(epi_cfg.fallback_value))
+    
+    # Apply gate mask (zero out inactive)
+    out_epi = np.where(out_is_active, out_epi, float(epi_cfg.fallback_value))
+
+    # Calculate Holographic Topology in ONE GO using rolling JIT
+    out_topo_area, out_topo_energy = calc_holographic_topology_rolling(
+        close_px, net_ofi, window=window_len,
+        price_scale_floor=float(topo_cfg.price_scale_floor),
+        ofi_scale_floor=float(topo_cfg.ofi_scale_floor),
+        green_coeff=float(topo_cfg.green_coeff),
+        dist_to_boundary=dist_to_boundary
+    )
+
+    from omega_core.omega_math_rolling import calc_topology_area_rolling
+    manifolds = getattr(topo_cfg, "manifolds", ())
+    out_manifolds = {}
+    
+    # We use sequential indices for time_trace proxy since buckets are ordered
+    time_trace_proxy = np.arange(n_rows, dtype=np.float64)
+    
+    trace_sources = {
+        "trace": close_px,
+        "ofi_trace": net_ofi,
+        "vol_trace": trade_vol,
+        "time_trace": time_trace_proxy
+    }
+    
+    for feat in manifolds:
+        feat_name, x_col, y_col, x_scale_attr, y_scale_attr = feat
+        x_scale = float(getattr(topo_cfg, x_scale_attr, topo_cfg.price_scale_floor))
+        y_scale = float(getattr(topo_cfg, y_scale_attr, topo_cfg.ofi_scale_floor))
+        
+        arr_x = trace_sources.get(x_col, np.zeros(n_rows, dtype=np.float64))
+        arr_y = trace_sources.get(y_col, np.zeros(n_rows, dtype=np.float64))
+            
+        out_manifolds[str(feat_name)] = calc_topology_area_rolling(
+            arr_x, arr_y, window=window_len,
+            x_scale_floor=x_scale, y_scale_floor=y_scale, green_coeff=float(topo_cfg.green_coeff),
+            dist_to_boundary=dist_to_boundary
+        )
+
+    base_y = float(srl.y_coeff) if initial_y is None else float(initial_y)
+
+    if os.environ.get("OMEGA_KERNEL_VERBOSE") == "1":
+        print(f"    Running Recursive Physics on {n_rows} rows...", flush=True)
+    
+    # Unleash GIL-free Numba LLVM Compilation Pass for SRL & Adaptive Y Recursive State
+    from omega_core.omega_math_vectorized import calc_srl_recursion_loop
+    out_srl_resid, out_y, out_spoof = calc_srl_recursion_loop(
+        n_rows=n_rows,
+        price_change=price_change,
+        sigma_eff=sigma_eff,
+        net_ofi=net_ofi,
+        depth_eff=depth_eff,
+        cancel_vol=cancel_vol,
+        trade_vol=trade_vol,
+        base_y=base_y,
+        is_boundary=is_boundary,
+        depth_floor=float(srl.depth_floor),
+        sigma_floor=float(srl.sigma_floor),
+        spoof_ratio_eps=float(srl.spoof_ratio_eps),
+        spoof_penalty_gamma=float(srl.spoof_penalty_gamma),
+        implied_y_min_impact=float(srl.implied_y_min_impact),
+        implied_y_min_penalty=float(srl.implied_y_min_penalty),
+        y_min=y_min,
+        y_max=y_max,
+        y_alpha=y_alpha,
+        anchor_y=anchor_y,
+        anchor_w=anchor_w,
+        clip_lo=clip_lo,
+        clip_hi=clip_hi,
+        out_is_active=out_is_active,
+        out_epi=out_epi,
+        peace_threshold=peace_threshold,
+        min_ofi_for_y=min_ofi_for_y
+    )
+
+    # v6.0: Mask Singularity Residuals
+    # Force residuals to 0 where singularity was detected to prevent math explosion
+    if "has_singularity" in frames.columns:
+        out_srl_resid[has_singularity] = 0.0
+
+    # --- Assembly ---
+    # Overwrite topo_area with micro feature if present
+    if str(topo_cfg.micro_feature) in out_manifolds:
+        out_topo_area = out_manifolds[str(topo_cfg.micro_feature)]
+
+    columns_to_add = [
+        pl.Series("price_change", price_change),
+        pl.Series("sigma_eff", sigma_eff),
+        # depth_eff calculated below
+    ]
+    
+    # Vectorized Depth Eff
+    spoof_gamma = float(getattr(srl, "spoof_penalty_gamma", 0.0))
+    depth_eff_arr = depth_eff * np.exp(-spoof_gamma * out_spoof)
+    columns_to_add.append(pl.Series("depth_eff", depth_eff_arr))
+
+    columns_to_add.extend([
+        pl.Series("epiplexity", out_epi),
+        pl.Series("topo_area", out_topo_area),
+        pl.Series("topo_energy", out_topo_energy),
+        pl.Series("srl_resid", out_srl_resid),
+        pl.Series("srl_resid_050", out_srl_resid),
+        pl.Series("adaptive_y", out_y),
+        pl.Series("spoof_ratio", out_spoof),
+        pl.Series("is_energy_active", out_is_active),
+        pl.Series("is_physics_valid", ~has_singularity),
+        pl.lit(float(sigma_gate)).alias("sigma_gate"),
+    ])
+    
+    # Emit all manifold features (including micro). `topo_area` is the canonical
+    # alias (kept for backward compatibility), but training expects explicit
+    # `topo_micro/topo_classic/topo_trend` columns as configured in `config.py`.
+    for m_name, m_arr in out_manifolds.items():
+        columns_to_add.append(pl.Series(m_name, m_arr))
+            
+    res_df = frames.with_columns(columns_to_add)
+
+    res_df = res_df.with_columns([
+        (
+            (pl.col("is_energy_active") == True)
+            & (pl.col("epiplexity") > peace_threshold) 
+            & (pl.col("srl_resid").abs() > float(sig.srl_resid_sigma_mult) * pl.col("sigma_eff"))
+            & (pl.col("topo_area").abs() > float(sig.topo_area_min_abs))
+            & (pl.col("topo_energy") > pl.col("sigma_eff") * topo_energy_sigma_mult)
+            & (pl.col("spoof_ratio") < spoofing_ratio_max)
+        ).alias("is_signal"),
+        (pl.col("srl_resid").sign()).alias("direction"),
+    ])
+
+    # === V62 PHASE 5: MDL DYNAMIC ARENA ===
+    # Real-time competition between the 3 structural probes
+    if "symbol" in res_df.columns:
+        group_expr = pl.col("symbol")
+        
+        # 1. Bits Linear (Already computed as Epiplexity)
+        bits_linear = pl.col("epiplexity").forward_fill().over(group_expr)
+
+        # 2. Bits SRL (Time-Bounded R^2 of Residuals vs Price Change)
+        # delta_k = 1.0 (Y parameter)
+        var_srl_resid = pl.col("srl_resid").rolling_var(window_size=window_len).over(group_expr).forward_fill().over(group_expr)
+        var_price_change = pl.col("price_change").rolling_var(window_size=window_len).over(group_expr).forward_fill().over(group_expr)
+        r2_srl = (1.0 - (var_srl_resid / (var_price_change + 1e-12))).clip(0.0, 0.9999)
+        bits_srl = (-(window_len / 2.0) * (1.0 - r2_srl).log() - 0.5 * math.log(window_len)).clip(0.0, 999.0)
+
+        # 3. Bits Topology (Isoperimetric Structure bits)
+        # Using compactness structural gain
+        compactness = (4.0 * math.pi * pl.col("topo_area").abs()) / (pl.col("topo_energy")**2 + 1e-12)
+        bits_topo = (compactness * math.log(window_len)).forward_fill().over(group_expr).clip(0.0, 999.0)
+
+        res_df = res_df.with_columns([
+            bits_linear.alias("bits_linear"),
+            bits_srl.alias("bits_srl"),
+            bits_topo.alias("bits_topology")
+        ])
+
+        # Argmax Competition: Select Dominant Probe (1=Linear, 2=SRL, 3=Topology)
+        # Perf: scalar when/then avoids allocating a List column per row
+        # (memory fragmentation bomb). Tie-break matches original arg_max
+        # behavior (first-index wins: Linear > SRL > Topology).
+        # Important: keep exact arg_max semantics with nulls.
+        # concat_list(...).list.arg_max() effectively ignores null candidates.
+        # Fill null/NaN to -inf for comparison so tie-break and null behavior match
+        # the old implementation.
+        bits_linear_cmp = pl.col("bits_linear").fill_null(float("-inf")).fill_nan(float("-inf"))
+        bits_srl_cmp = pl.col("bits_srl").fill_null(float("-inf")).fill_nan(float("-inf"))
+        bits_topology_cmp = (
+            pl.col("bits_topology").fill_null(float("-inf")).fill_nan(float("-inf"))
+        )
+
+        dominant_probe = (
+            pl.when((bits_srl_cmp > bits_linear_cmp) & (bits_srl_cmp >= bits_topology_cmp))
+            .then(pl.lit(2))
+            .when((bits_topology_cmp > bits_linear_cmp) & (bits_topology_cmp > bits_srl_cmp))
+            .then(pl.lit(3))
+            .otherwise(pl.lit(1))
+        )
+        res_df = res_df.with_columns(dominant_probe.alias("dominant_probe"))
+        
+    return res_df
+
+def apply_recursive_physics(
+    frames: pl.DataFrame,
+    cfg: L2PipelineConfig,
+    initial_y: float | None = None,
+) -> pl.DataFrame:
+    return _apply_recursive_physics(frames, cfg, initial_y=initial_y)
+
+def run_l2_kernel(
+    path: str,
+    cfg: L2PipelineConfig,
+    initial_y: float | None = None,
+    target_frames: float | None = None,
+) -> tuple[pl.DataFrame, pl.DataFrame]:
+    lf = scan_l2_quotes(path, cfg)
+    if lf is None:
+        frames = pl.DataFrame()
+    else:
+        frames = build_l2_features_from_l1(lf, cfg, target_frames=target_frames)
+    frames = _apply_recursive_physics(frames, cfg, initial_y=initial_y)
+    signals = frames.filter(pl.col("is_signal") == True)
+    return frames, signals
+
+class OmegaKernel:
+    def __init__(self, file_path: str, cfg: L2PipelineConfig | None = None):
+        self.file_path = file_path
+        self.cfg = cfg or load_l2_pipeline_config()
+
+    def run(
+        self,
+        initial_y: float | None = None,
+        target_frames: float | None = None,
+        debug_mode: bool = False,
+    ) -> pl.DataFrame:
+        frames, _ = run_l2_kernel(
+            self.file_path,
+            self.cfg,
+            initial_y=initial_y,
+            target_frames=target_frames,
+        )
+        if debug_mode:
+            return frames
+        return frames
+
