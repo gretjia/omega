@@ -127,7 +127,7 @@ Write only reproducible, technical lessons.
 - root_cause: Monitoring tracked liveness/state only, not semantic validity. Old backtest path processed single-day files independently while label logic requires T+1 (`t_plus_1_horizon_days=1`), so `_prepare_frames` returned empty for each file (`empty_processed`) and only hard-failed at end when `per_file` stayed empty.
 - fix: Introduce hard fail-fast controls at 3 layers. (1) Preflight gate before submit: if T+1 labels are enabled and execution unit is single-day file, block submit unless global/causal materialization mode is used. (2) Runtime watchdog: cancel job when any of these trigger: `completed_files >= 10 && files_used == 0`, or `elapsed >= 15m && total_proc_rows == 0`, or `empty_processed_ratio >= 0.95` over a sliding window. (3) Cost guard: set max wall-clock budget and cancel when exceeded without non-zero semantic progress.
 - guardrail: Do not rely on `JOB_STATE_RUNNING` as health signal. A backtest run is healthy only if semantic counters move (`files_used > 0` and `total_proc_rows > 0`) within early runtime. Enforce automatic cancel on semantic stall to cap loss.
-- refs: `tools/run_cloud_backtest.py`, `omega_core/trainer.py`, `config.py`, `audit/v60_backtest_audit.md`, `audit/v60_backtest_final.md`, `audit/runtime/v52/backtest_takeover_aa8abb7.log`
+- refs: `tools/run_cloud_backtest.py`, `omega_core/trainer.py`, `config.py`, `audit/_archived/v60_backtest_audit.md`, `audit/_archived/v60_backtest_final.md`, `audit/runtime/v52/backtest_takeover_aa8abb7.log`
 
 ## 2026-02-19T16:56:18Z | n2-standard-80 Backtest Schema Contract Break (time vs time_end)
 - task_id: TASK-20260220-N2STD80-SCHEMA-CONTRACT
@@ -181,7 +181,7 @@ Write only reproducible, technical lessons.
 - root_cause: Requirement-level observability was incomplete: mandatory PHASE-1 3-second snapshot handling had no explicit runtime marker or metric field in produced evidence package.
 - fix: Add requirement coverage telemetry into backtest/base-matrix artifacts (for example snapshot_interval_ms, aggregation_mode, session_filter_mode, singularity_mask_hit_count) and publish a per-run requirement-evidence manifest.
 - guardrail: No run can be marked VALIDATED unless every mandatory requirement has at least one direct artifact field/log marker linked in the validation matrix.
-- refs: `audit/v6.md`, `audit/v60_v6_validation_results.md`, `audit/runtime/v60_factual_evidence/backtest_metrics_global_causal_rewrite_n2highmem80_reusephysics_dw16_20260220-024848.json`, `audit/runtime/v60_factual_evidence/job_1959559432727691264.logs.json`
+- refs: `audit/_archived/v6.md`, `audit/_archived/v60_v6_validation_results.md`, `audit/runtime/v60_factual_evidence/backtest_metrics_global_causal_rewrite_n2highmem80_reusephysics_dw16_20260220-024848.json`, `audit/runtime/v60_factual_evidence/job_1959559432727691264.logs.json`
 
 ## 2026-02-20T02:34:29Z | Backtest KPI Contract Mismatch (Architect Metrics Baseline)
 - task_id: TASK-20260220-V60-KPI-CONTRACT

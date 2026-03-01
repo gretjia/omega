@@ -50,8 +50,8 @@
 - Research entry:
   - `handover/ai-direct/entries/20260223_002256_linux_freeze_best_practice_research.md`
 - Supporting local evidence references:
-  - `audit/20260221_linux_crash_root_cause.md`
-  - `audit/20260221_linux_crash_investigation.md`
+  - `audit/_archived/20260221_linux_crash_root_cause.md`
+  - `audit/_archived/20260221_linux_crash_investigation.md`
 
 ## 6) Commands Executed (Key Only)
 

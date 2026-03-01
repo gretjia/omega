@@ -27,7 +27,7 @@
 
 ### What Changed (v60 → v61)
 
-Based on `audit/v61.md` (Chief Architect audit) and `audit/v61_fix.md` (surgical patches):
+Based on `audit/_archived/v61.md` (Chief Architect audit) and `audit/_archived/v61_fix.md` (surgical patches):
 
 1. **Momentum Sign Fix** (`kernel.py`): Removed `-` from `(-pl.col("srl_resid").sign())` → A-shares follow momentum, not mean-reversion
 2. **Anti-Aliasing Low-Pass Filter** (`omega_etl.py`): `rolling_mean(window_size=3)` on `v_ofi`/`depth` to handle 3-second snapshot aliasing
@@ -128,9 +128,9 @@ ssh jiazi@192.168.3.112 "cd C:\Omega_vNext && python tools/v61_windows_framing.p
 
 ## 7. Evidence Artifacts
 
-- [Linux crash root cause](file:///Users/zephryj/work/Omega_vNext/audit/20260221_linux_crash_root_cause.md)
-- [v61 Chief Architect audit](file:///Users/zephryj/work/Omega_vNext/audit/v61.md)
-- [v61 surgical patches](file:///Users/zephryj/work/Omega_vNext/audit/v61_fix.md)
+- [Linux crash root cause](file:///Users/zephryj/work/Omega_vNext/audit/_archived/20260221_linux_crash_root_cause.md)
+- [v61 Chief Architect audit](file:///Users/zephryj/work/Omega_vNext/audit/_archived/v61.md)
+- [v61 surgical patches](file:///Users/zephryj/work/Omega_vNext/audit/_archived/v61_fix.md)
 - [Linux framing script](file:///Users/zephryj/work/Omega_vNext/tools/v61_linux_framing.py)
 - [Windows framing script](file:///Users/zephryj/work/Omega_vNext/tools/v61_windows_framing.py)
 - [Sharding test](file:///Users/zephryj/work/Omega_vNext/tests/test_sharding_v61.py)

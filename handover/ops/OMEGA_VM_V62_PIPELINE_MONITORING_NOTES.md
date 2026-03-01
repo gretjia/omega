@@ -285,7 +285,7 @@ cat audit/backtest_metrics.json
 Run a schema/sample gate before expensive Train/Backtest:
 
 ```bash
-python3 tools/check_frame_train_backtest_compat.py \
+python3 tools/_archived/check_frame_train_backtest_compat.py \
   --input-pattern "/omega_pool/parquet_data/v62_feature_l2/host=linux1/*.parquet"
 ```
 

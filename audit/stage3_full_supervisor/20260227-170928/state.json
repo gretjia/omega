@@ -1,0 +1,9 @@
+{
+  "run_id": "20260227-170928",
+  "started_at": "2026-02-27T17:09:28Z",
+  "status": "running",
+  "base_matrix_uri": "gs://omega_v52_central/omega/staging/base_matrix/v62/20260227-170928/base_matrix.parquet",
+  "base_matrix_meta_uri": "gs://omega_v52_central/omega/staging/base_matrix/v62/20260227-170928/base_matrix.meta.json",
+  "model_output_prefix": "gs://omega_v52_central/omega/staging/models/v62/20260227-170928",
+  "backtest_output_uri": "gs://omega_v52_central/omega/staging/backtest/v62/20260227-170928/backtest_metrics_local.json"
+}

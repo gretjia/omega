@@ -6,7 +6,7 @@
 Guarantee long-running v60 delivery (frame -> upload -> train -> backtest) without wasting frame compute or breaking v6 physics constraints.
 
 ## 2. Non-Negotiables
-1. Keep architecture aligned to `audit/v6.md` at all times.
+1. Keep architecture aligned to `audit/_archived/v6.md` at all times.
 2. Do not modify mathematical logic for speed hacks.
 3. Run smoke gate before expensive full framing.
 4. Never trust PID files alone; verify by log + done-count movement.
@@ -28,7 +28,7 @@ Why:
 - Linux is materially faster than Windows for framing.
 - Use shard ratio `windows:linux = 1:2` (~33% : ~67%).
 - Generate shard manifests with:
-  - `python3 tools/build_7z_shards.py --root /omega_pool/raw_7z_archives --ratio 1:2`
+  - `python3 tools/_archived/build_7z_shards.py --root /omega_pool/raw_7z_archives --ratio 1:2`
 
 ## 5. Uplink Policy (Frame While Uploading)
 Use Mac as gateway with disk guardrails:

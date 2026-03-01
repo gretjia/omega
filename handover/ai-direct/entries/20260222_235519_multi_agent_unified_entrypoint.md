@@ -20,12 +20,12 @@
   - `handover/ops/ACCESS_BOOTSTRAP.md`
   - `handover/ops/HOSTS_REGISTRY.yaml`
 - Added preflight checker:
-  - `tools/agent_handover_preflight.sh`
+  - `tools/_archived/agent_handover_preflight.sh`
 - Updated readme routing:
   - `handover/README.md`
   - `handover/ai-direct/README.md`
 - Ran verification:
-  - `bash tools/agent_handover_preflight.sh`
+  - `bash tools/_archived/agent_handover_preflight.sh`
   - `python3 .codex/skills/multi-agent-ops/scripts/deploy_and_check.py --repair`
 
 ## 3) Current Runtime Status
@@ -53,14 +53,14 @@
 - `handover/ops/SKILLS_TOOLS_INDEX.md`
 - `handover/ops/ACCESS_BOOTSTRAP.md`
 - `handover/ops/HOSTS_REGISTRY.yaml`
-- `tools/agent_handover_preflight.sh`
+- `tools/_archived/agent_handover_preflight.sh`
 - `handover/README.md`
 - `handover/ai-direct/README.md`
 - `handover/ai-direct/LATEST.md`
 
 ## 6) Commands Executed (Key Only)
 
-- `bash tools/agent_handover_preflight.sh`
+- `bash tools/_archived/agent_handover_preflight.sh`
 - `python3 .codex/skills/multi-agent-ops/scripts/deploy_and_check.py --repair`
 - `rg -n ... handover .codex/skills tools audit`
 - `sed -n ... README.md handover/*.md .codex/skills/*`
@@ -74,7 +74,7 @@
    - `windows1-w1`
    - `linux1-lx`
 2. Re-run:
-   - `bash tools/agent_handover_preflight.sh`
+   - `bash tools/_archived/agent_handover_preflight.sh`
    until alias check is green.
 3. Keep all future takeover agents starting from:
    - `handover/ENTRYPOINT.md`

@@ -5,7 +5,7 @@ This is the authoritative map of the `handover/` folder.
 ## 1. Read-First Flow
 
 1. `audit/constitution_v2.md`
-2. `audit/multi_agents.md`
+2. `audit/_archived/multi_agents.md`
 3. `handover/ENTRYPOINT.md`
 4. `handover/ai-direct/LATEST.md`
 5. newest `handover/ai-direct/entries/*.md`
@@ -36,7 +36,7 @@ This is the authoritative map of the `handover/` folder.
 ## 3. Project Governance Anchors
 
 - Constitution: `audit/constitution_v2.md`
-- Multi-agent contract: `audit/multi_agents.md`
+- Multi-agent contract: `audit/_archived/multi_agents.md`
 - Runtime profile routing: `audit/runtime/multi_agent/agent_profiles.yaml`
 - Cross-agent principles: `.agent/principles.yaml`
 

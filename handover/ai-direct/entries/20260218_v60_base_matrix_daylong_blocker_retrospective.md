@@ -4,7 +4,7 @@
 **Status:** BLOCKED at `build_base_matrix` (not yet entered optimization/train/backtest)
 
 ## 1) Objective and Constraints
-- Objective: complete v60 full chain (`frame -> upload -> base_matrix -> optimization -> train -> backtest`) under `audit/v60_optimization_audit_final.md`.
+- Objective: complete v60 full chain (`frame -> upload -> base_matrix -> optimization -> train -> backtest`) under `audit/_archived/v60_optimization_audit_final.md`.
 - Hard constraints respected throughout:
   - no change to v6 math principles;
   - train/test split guard kept (`train=2023,2024`, `test=2025,2026`, `test-ym=2025,202601`);
@@ -109,5 +109,5 @@
   - `/Users/zephryj/work/Omega_vNext/audit/runtime/v52/autopilot_aa8abb7.status.json`
   - `/Users/zephryj/work/Omega_vNext/audit/runtime/v52/ai_watchdog_aa8abb7.state.json`
 - Design constraints:
-  - `/Users/zephryj/work/Omega_vNext/audit/v6.md`
-  - `/Users/zephryj/work/Omega_vNext/audit/v60_optimization_audit_final.md`
+  - `/Users/zephryj/work/Omega_vNext/audit/_archived/v6.md`
+  - `/Users/zephryj/work/Omega_vNext/audit/_archived/v60_optimization_audit_final.md`

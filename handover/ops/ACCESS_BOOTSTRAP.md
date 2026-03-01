@@ -52,7 +52,7 @@ Host mac-back
 ## 4. Bootstrap Steps
 
 1. Run preflight:
-   - `bash tools/agent_handover_preflight.sh`
+   - `bash tools/_archived/agent_handover_preflight.sh`
 2. If alias missing, update `~/.ssh/config`.
 3. If auth fails, refresh remote `authorized_keys`.
 4. Validate connectivity:

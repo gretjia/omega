@@ -24,9 +24,9 @@ python3 .codex/skills/multi-agent-ops/scripts/switch_profile.py --oracle codex_x
 - Linux: `tools/stage1_linux_base_etl.py`
 - Linux guarded launcher: `tools/launch_linux_stage1_heavy_slice.sh`
 - Windows: `tools/stage1_windows_base_etl.py`
-- Shared helper: `tools/stage1_incremental_writer.py`
-- Resume helper: `tools/stage1_resume_utils.py`
-- Shard builder: `tools/build_7z_shards.py`
+- Shared helper: `tools/_archived/stage1_incremental_writer.py`
+- Resume helper: `tools/_archived/stage1_resume_utils.py`
+- Shard builder: `tools/_archived/build_7z_shards.py`
 
 ### 3.2 Stage 2 Physics
 
@@ -37,20 +37,20 @@ python3 .codex/skills/multi-agent-ops/scripts/switch_profile.py --oracle codex_x
 ### 3.3 Stage 2.5 Base Matrix
 
 - `tools/forge_base_matrix.py`
-- compatibility check: `tools/check_frame_train_backtest_compat.py`
+- compatibility check: `tools/_archived/check_frame_train_backtest_compat.py`
 
 ### 3.4 Stage 3 Train/Backtest
 
 - Vertex train launcher: `tools/run_vertex_xgb_train.py`
 - Local backtest: `tools/run_local_backtest.py`
-- GCS upload helper: `tools/gcp_upload.py`
+- GCS upload helper: `tools/_archived/gcp_upload.py`
 
 ## 4. Host Operations and Monitoring Tools
 
-- Agent preflight: `tools/agent_handover_preflight.sh`
+- Agent preflight: `tools/_archived/agent_handover_preflight.sh`
 - Linux runtime preflight: `tools/linux_runtime_preflight.py`
 - Linux preflight timer installer: `tools/install_linux_preflight_timer.sh`
-- Windows probe from omega-vm: `tools/check_windows_from_omega.sh`
+- Windows probe from omega-vm: `tools/_archived/check_windows_from_omega.sh`
 - Windows PowerShell over SSH wrapper: `.codex/skills/omega-run-ops/scripts/ssh_ps.py`
 - Linux night watchdog: `tools/night_watchdog.py`
 

@@ -1,7 +1,7 @@
 # Handover: The GEMINI Protocol (Vibe Coding Philosophy)
 **Date:** 2026-02-16
 **Source:** Gemini 3 Pro (The Architect)
-**Context:** Based on `audit/v6.md` (Chief Architect Blueprint)
+**Context:** Based on `audit/_archived/v6.md` (Chief Architect Blueprint)
 
 ## 1. The Core Axiom: "Compression is Intelligence" (压缩即智能)
 We are not just writing Python; we are encoding **Market Physics**.
@@ -32,4 +32,4 @@ Reality has boundary conditions. Code must match reality.
 4.  **No Versioned Files:** Do not create `trainer_v60.py`. Refactor `trainer.py` in place. Use Git tags for history.
 
 ---
-**Directive:** Future agents, align with `audit/v6.md`. This is the blueprint.
+**Directive:** Future agents, align with `audit/_archived/v6.md`. This is the blueprint.

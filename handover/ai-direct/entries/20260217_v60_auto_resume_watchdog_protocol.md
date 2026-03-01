@@ -27,7 +27,7 @@ Enabled in watchdog via `--auto-resume`:
 3. On incident signatures (traceback/stall/status stale), watchdog captures snapshot and can trigger `codex exec` for autonomous debug.
 
 ## 5. Safety Constraints
-1. Do not alter v6 math logic/principles (`audit/v6.md`).
+1. Do not alter v6 math logic/principles (`audit/_archived/v6.md`).
 2. Keep fixes operational (process recovery, cloud/runtime robustness), not model-physics changes.
 3. Preserve reproducibility: keep hash-pinned artifacts and explicit logs.
 

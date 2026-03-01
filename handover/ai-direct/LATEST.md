@@ -10,21 +10,21 @@ This file is the single source of current operational truth for all agents.
 
 ## 1. Snapshot Metadata
 
-- `updated_at_local`: 2026-02-27 01:44:48 +0800 (CST)
-- `updated_at_utc`: 2026-02-26 17:44:48 +0000 (UTC)
-- `updated_by`: Codex (GPT-5)
-- `controller_repo_head`: `c55c869` (branch: `perf/stage2-speedup-v62`, working tree dirty)
-- `worker_repo_head_linux`: `8356a4c` (branch: `perf/stage2-speedup-v62`, untracked preflight artifacts)
-- `worker_repo_head_windows`: `cb6e609` (branch: `perf/stage2-speedup-v62`, runtime hotfix files dirty)
+- `updated_at_local`: 2026-02-27 08:24:43 +0000 (UTC)
+- `updated_at_utc`: 2026-02-27 08:24:43 +0000 (UTC)
+- `updated_by`: Codex
+- `controller_repo_head`: `afcb663` (branch: `perf/stage2-speedup-v62`, working tree dirty)
+- `worker_repo_head_linux`: `afcb663` (branch: `perf/stage2-speedup-v62`, runtime audit/preflight artifacts dirty)
+- `worker_repo_head_windows`: `afcb663` (branch: `perf/stage2-speedup-v62`, runtime audit ledgers dirty)
 
 ## 2. Active Projects Board
 
 | Project ID | Scope | Status | Last Verified | Owner Host |
 |---|---|---|---|---|
 | V62-STAGE1-LINUX | Stage1 Base_L1 for shards `0,1,2` | COMPLETED | 2026-02-24 16:47 +0800 | `linux1-lx` |
-| V62-STAGE2-WINDOWS | Stage2 Physics from `v62_base_l1` to `v62_feature_l2` | BLOCKED (runtime panic, task stopped) | 2026-02-27 01:04 +0800 | `windows1-w1` |
-| V62-STAGE2-LINUX | Stage2 Physics for `host=linux1` | STALLED (high-memory long-run no output progress) | 2026-02-27 01:13 +0800 | `linux1-lx` |
-| V62-STAGE2-SPEEDUP | Output-preserving perf refactor (branch `perf/stage2-speedup-v62`) | IN_PROGRESS (local patches not yet merged) | 2026-02-27 01:44 +0800 | `controller` |
+| V62-STAGE2-WINDOWS | Stage2 Physics from `v62_base_l1` to `v62_feature_l2` | COMPLETED (Linux assist backfill + cleanup finished) | 2026-02-27 15:52 +0800 | `windows1-w1` |
+| V62-STAGE2-LINUX | Stage2 Physics for `host=linux1` | COMPLETED (queue drained) | 2026-02-27 15:48 +0800 | `linux1-lx` |
+| V62-STAGE2-SPEEDUP | Output-preserving perf refactor (branch `perf/stage2-speedup-v62`) | IN_PROGRESS (deployed+validated; pending merge policy) | 2026-02-27 15:52 +0800 | `controller` |
 | HANDOVER-MAINTENANCE | keep handover as entrypoint + run-state truth | IN_PROGRESS | 2026-02-26 12:51 +0800 | `controller` |
 
 Detailed board:
@@ -41,34 +41,20 @@ Detailed board:
   - final metrics: `ASSIGNED=555`, `COMPLETED=10`, `SKIPPED=545`, `ERROR=0`, `FRAMING_COMPLETE=1`
   - `STAGE1_DONE=552` (`/omega_pool/parquet_data/v62_base_l1/host=linux1/*.parquet.done`)
 - Stage2 status:
-  - running unit: `omega_stage2_linux_20260226_200518_safe.service`
-  - snapshot: `LNX_STAGE2_DONE=207 / 552`
-  - active file: `20230315_fbd5c8b.parquet`
-  - stuck signals (3 polls, 2-minute interval):
-    - `.tmp` unchanged: `/omega_pool/parquet_data/v62_feature_l2/host=linux1/20230315_fbd5c8b.parquet.tmp` (`mtime=2026-02-26 20:06`, size constant)
-    - log unchanged: `/home/zepher/work/Omega_vNext/audit/stage2_targeted_resume_linux.log` (`mtime=2026-02-26 20:05:18`, size constant)
-    - done count unchanged: `207`
-  - resource state during stall:
-    - worker RSS about `94GB`, CPU about `389%`
-    - host memory high pressure (`113/121Gi used`), swap full (`8/8Gi`)
+  - completed: `LNX_STAGE2_DONE=552 / 552`
+  - process state: no active Stage2 worker processes
+  - resource state: healthy; no fresh OOM/freeze signal during final completion window
+  - assist lane cleanup: `/omega_pool/parquet_data/v62_{base_l1,feature_l2}/host=windows1_assist_2` emptied
 
 ### 3.2 Windows `windows1-w1` (`100.123.90.25`)
 
 - Stage1 status:
   - completed (`STAGE1_DONE=191`)
 - Stage2 status:
-  - scheduler task: `Omega_v62_stage2_isolated_v2` is stopped (`LastTaskResult=-1`)
-  - snapshot: `WIN_STAGE2_DONE=179 / 191`
-  - log last update: `D:\work\Omega_vNext\audit\stage2_targeted_resume_isolated_v2.log` at `2026-02-26 21:31:50 +0800`
-  - critical runtime blocker:
-    - deterministic Polars panic on Stage2 path:
-      - `integer: ParseIntError { kind: InvalidDigit }`
-      - subsequent `LazyLock instance has previously been poisoned`
-    - reproduced on `20250828_b07c2229.parquet` and many `000xxx.SZ` symbols under current Windows runtime
-  - temporary scheduler script was missing once and has been restored:
-    - `D:\work\Omega_vNext\audit\run_stage2_retry_isolated_v2.cmd`
-  - operator safety action:
-    - task intentionally ended to prevent non-deterministic production output under unstable runtime
+  - completed: `WIN_STAGE2_DONE=191 / 191` (`missing=0`)
+  - final scheduler state: `Omega_v62_stage2_isolated_v2` switched to `Ready` after completion (ended to avoid duplicate compute)
+  - process state: no active Stage2 python process chain
+  - temp cleanup: removed `omega_stage2_iso_*` scratch dirs (`25` removed)
 
 ### 3.3 Data Recovery Note
 
@@ -89,11 +75,11 @@ Historical broken files are kept as backups:
 
 ## 5. Immediate Next Actions (User-Directed Sequence)
 
-1. Linux: stop stalled Stage2 unit and relaunch with lower per-process memory pressure before resuming queue.
-2. Windows: rebuild Stage2 runtime to stable package matrix (avoid current Polars panic path) and validate on `20250828_b07c2229.parquet`.
-3. After runtime validation, resume Windows pending queue from `179/191` and verify fail ledger stays bounded.
-4. Normalize worker git states (commit or discard runtime hotfix dirtiness intentionally; no hidden dirty deploy).
-5. Run post-resume parity check against `audit/v62.md` and `audit/v62_framing_rebuild.md` expectations.
+1. Stage3: run full-train/backtest sweep on finalized V62 L2 outputs (both hosts now complete).
+2. Run parity/integrity gates against `audit/v62.md` and `audit/v62_framing_rebuild.md` on final dual-host outputs.
+3. Normalize worker runtime dirty ledgers intentionally (commit/archive/clean policy), keeping code heads fixed at `afcb663`.
+4. Update `handover/ops/ACTIVE_PROJECTS.md` and `handover/BOARD.md` with final Stage2 completion snapshot.
+5. Preserve assist run evidence logs for RCA/audit, then rotate large transient logs if needed.
 
 ## 6. Quick Verification Commands
 
@@ -111,10 +97,85 @@ ssh linux1-lx '/home/zepher/work/Omega_vNext/.venv/bin/python -c "import numba, 
 
 ## 7. Latest Related Entries
 
+- `handover/ai-direct/entries/20260227_082443_stage2_dual_host_completion_linux_assist.md`
+- `handover/ai-direct/entries/20260227_031200_turingos_week2_guard_mvp_pushed.md`
+- `handover/ai-direct/entries/20260227_025500_turingos_week1_schema_gate_completed.md`
+- `handover/ai-direct/entries/20260227_105238_stage3_smoke_test.md`
+- `handover/ai-direct/entries/20260227_104435_stage2_v62_alignment_audit.md`
+- `handover/ai-direct/entries/20260227_100712_turingos_trisync_state_and_gate.md`
+- `handover/ai-direct/entries/20260227_015810_stage2_dual_host_progress_update.md`
+- `handover/ai-direct/entries/20260227_032500_stage2_ultrathink_optimizations_and_relaunch.md`
 - `handover/ai-direct/entries/20260227_014448_stage2_dual_host_stall_snapshot.md`
 - `handover/ai-direct/entries/20260226_154217_windows_stage2_pathological_symbol_debug_fix.md`
 - `handover/ai-direct/entries/20260224_165312_linux_stage1_repair_and_stage2_gate.md`
 - `handover/ai-direct/entries/20260224_041600_omega_vm_windows_connectivity_rca_fix.md`
+
+## Update 2026-02-27 08:24 +0000 (V62 Stage2 Dual-Host Completion + Linux Assist Cutover)
+
+- Git alignment completed:
+  - `omega-vm`, `linux1-lx`, `windows1-w1` all on `perf/stage2-speedup-v62@afcb663`
+  - worker divergence vs `origin/perf/stage2-speedup-v62`: `0 0`
+- Completion milestones:
+  - Linux native queue finished at `552/552`.
+  - Windows reached `190/191` after Linux assist backfilled 10 pending files (`20251103 ... 20260128`).
+  - Linux assist processed final `20251022_b07c2229.parquet` and backfilled result.
+- Final runtime state:
+  - Windows `191/191`, `missing=0`
+  - scheduler moved to `Ready`; Stage2 python chain terminated cleanly to avoid duplicate compute
+  - Linux/Windows Stage2 process count both `0`
+- Cleanup completed:
+  - Linux assist input/output caches emptied.
+  - Windows temp scratch dirs `omega_stage2_iso_*` cleaned (`25` removed).
+
+## Update 2026-02-27 03:12 +0000 (TuringOS Week-2 Guard MVP Pushed)
+
+- `turingos` main branch pushed to `556ffb4` (from `9865c0e`), with Week-2 Guard MVP:
+  - machine-readable trap frames (`[TRAP_FRAME]` in journal)
+  - in-state trap JSON block (`[OS_TRAP_FRAME_JSON]`)
+  - bounded panic reset budget and fail-closed stop route (`sys://trap/unrecoverable_loop`, pointer `HALT`)
+- Gate and regression status:
+  - `typecheck` PASS
+  - `bench:topology-v4-gate` PASS (8/8; includes new trap-frame assertion)
+  - `bench:syscall-schema-gate` PASS (59/59 malformed reject)
+  - `bench:staged-acceptance-recursive` PASS
+  - `bench:ci-gates` PASS
+- Mac sync completed to same head `556ffb4`:
+  - created protective stash `autosync_mac_20260227_031100_before_556ffb4`
+  - `git pull --ff-only origin main` success
+
+## Update 2026-02-27 02:55 +0000 (TuringOS Week-1 Schema Gate Completed)
+
+- Week-1 protocol standardization landed in `projects/turingos`:
+  - new SSOT schema module: `src/kernel/syscall-schema.ts`
+  - Oracle/Engine duplicate syscall validators removed and unified
+  - benchmark prompt builders switched to shared opcode field docs
+  - new adversarial gate with 59 malformed fixtures (`bench:syscall-schema-gate`)
+- Dual-pass audit outcome:
+  - Gemini pass-1 found `SYS_WRITE.semantic_cap` type fail-close gap (NO-GO)
+  - issue fixed + fixtures added + pass-2 re-audit => GO
+- Current verification result:
+  - `typecheck` PASS
+  - `bench:topology-v4-gate` PASS (8/8)
+  - `bench:staged-acceptance-recursive` PASS
+  - `bench:ci-gates` PASS (includes schema gate + AC2.1~AC3.2)
+- Git state snapshot recorded in:
+  - `handover/ai-direct/entries/20260227_025500_turingos_week1_schema_gate_completed.md`
+
+## Update 2026-02-27 10:07 +0800 (TuringOS Tri-Sync + Gate)
+
+- Completed tri-party Git state audit and sync for TuringOS:
+  - GitHub `origin/main`: `ef52a4d`
+  - omega-vm repo: `ef52a4d` clean, divergence `0 0`
+  - mac repo: moved from `5db107e` (behind 1, dirty) to `ef52a4d` clean, divergence `0 0`
+- Preserved Mac pre-sync local state via stash:
+  - `presync_mac_20260227_100343_before_ef52a4d`
+- Post-sync verification on Mac passed:
+  - `typecheck`
+  - `bench:topology-v4-gate` (8/8)
+  - `bench:ac42-deadlock-reflex`
+  - `bench:staged-acceptance-recursive`
+  - `bench:ci-gates` (AC2.1~AC3.2 PASS)
+- Next queued action: `npm run bench:os-longrun -- --repeats 10` on Mac with live monitoring.
 
 ## Update 2026-02-24 21:41:50 +0800
 

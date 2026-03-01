@@ -1,0 +1,43 @@
+{
+  "run_id": "20260227-171313",
+  "started_at": "2026-02-27T17:33:40Z",
+  "status": "failed",
+  "base_matrix_uri": "gs://omega_v52_central/omega/staging/base_matrix/v62/20260227-171313/base_matrix.parquet",
+  "base_matrix_meta_uri": "gs://omega_v52_central/omega/staging/base_matrix/v62/20260227-171313/base_matrix.meta.json",
+  "model_output_prefix": "gs://omega_v52_central/omega/staging/models/v62/20260227-171313",
+  "backtest_output_uri": "gs://omega_v52_central/omega/staging/backtest/v62/20260227-171313/backtest_metrics_local.json",
+  "base_matrix": {
+    "done": false,
+    "alive": true,
+    "pid_status": "alive",
+    "shard_count": 12,
+    "restarts": 0,
+    "process_snapshot": {
+      "pid_file": "audit/stage3_full/linux1_forge_fast.pid",
+      "pid": "11976",
+      "pid_status": "alive",
+      "pid_stat": "Sl",
+      "match_pids": [
+        "11976"
+      ],
+      "match_count": 1,
+      "zombie_pids": [],
+      "orphan_pids": [],
+      "has_anomaly": false
+    },
+    "housekeeping": {
+      "pid_file_removed": false,
+      "killed_pids": [],
+      "deleted_tmp_files": [],
+      "deleted_pid_files": [],
+      "deleted_cache_files": [],
+      "deleted_tmp_count": 0,
+      "deleted_pid_count": 0,
+      "deleted_cache_count": 0,
+      "killed_pid_count": 0
+    },
+    "updated_at": "2026-02-27T19:55:17Z"
+  },
+  "error": "Command failed rc=127: ssh -o BatchMode=yes -o ConnectTimeout=8 linux1-lx cd /home/zepher/work/Omega_vNext && python3 - <<'PY'\nimport json, os, signal, subprocess, time\ncfg = json.loads(\"{\\\"pid_file\\\": \\\"audit/stage3_full/linux1_forge_fast.pid\\\", \\\"cmd_pattern\\\": \\\"^python3 tools/forge_base_matrix\\\\\\\\.py( |$)\\\", \\\"tmp_dirs\\\": [\\\"audit/stage3_full/linux1_base_matrix_full_fast_shards\\\", \\\"audit/stage3_full\\\"], \\\"symbol_cache_path\\\": \\\"audit/stage3_full/linux1_base_matrix_full_fast_shards/_symbols_cache.json\\\", \\\"kill_processes\\\": false, \\\"tmp_cleanup_age_min\\\": 45, \\\"cache_max_age_hours\\\": 168, \\\"cache_max_mb\\\": 64}\")\npid_file = str(cfg.get('pid_file', '')).strip()\npattern = str(cfg.get('cmd_pattern', '')).strip()\ntmp_dirs = [str(x) for x in (cfg.get('tmp_dirs', []) or []) if str(x).strip()]\nsymbol_cache_path = str(cfg.get('symbol_cache_path', '')).strip()\nkill_processes = bool(cfg.get('kill_processes', False))\ntmp_cleanup_age_min = max(1, int(cfg.get('tmp_cleanup_age_min', 45)))\ncache_max_age_hours = max(1, int(cfg.get('cache_max_age_hours', 168)))\ncache_max_mb = max(1, int(cfg.get('cache_max_mb', 64)))\nnow = time.time()\nout = {\n  'pid_file_removed': False,\n  'killed_pids': [],\n  'deleted_tmp_files': [],\n  'deleted_pid_files': [],\n  'deleted_cache_files': [],\n}\nmatch_pids = []\nif pattern:\n    p = subprocess.run(['pgrep', '-f', pattern], text=True, capture_output=True)\n    if p.returncode in (0, 1):\n        match_pids = sorted({x.strip() for x in (p.stdout or '').splitlines() if x.strip().isdigit()}, key=int)\nif kill_processes and match_pids:\n    for one in match_pids:\n        try:\n            os.kill(int(one), signal.SIGTERM)\n            out['killed_pids'].append(one)\n        except Exception:\n            pass\n    time.sleep(2.0)\n    for one in list(match_pids):\n        p = subprocess.run(['ps', '-p', one, '-o', 'pid='], text=True, capture_output=True)\n        if p.returncode == 0 and (p.stdout or '').strip():\n            try:\n                os.kill(int(one), signal.SIGKILL)\n            except Exception:\n                pass\nif pid_file and os.path.isfile(pid_file):\n    stale = False\n    try:\n        pid = open(pid_file, 'r', encoding='utf-8', errors='replace').read().strip()\n    except Exception:\n        pid = ''\n    if (not pid) or (not pid.isdigit()):\n        stale = True\n    else:\n        p = subprocess.run(['ps', '-p', pid, '-o', 'stat='], text=True, capture_output=True)\n        stat = (p.stdout or '').strip() if p.returncode == 0 else ''\n        stale = (not stat) or ('Z' in stat)\n    if stale:\n        try:\n            os.remove(pid_file)\n            out['pid_file_removed'] = True\n        except Exception:\n            pass\nfor d in tmp_dirs:\n    if not os.path.isdir(d):\n        continue\n    for name in os.listdir(d):\n        lower = name.lower()\n        if not (lower.endswith('.tmp') or lower.endswith('.part') or lower.endswith('.lock')):\n            continue\n        path = os.path.join(d, name)\n        try:\n            st = os.stat(path)\n        except Exception:\n            continue\n        age_min = (now - st.st_mtime) / 60.0\n        if age_min >= float(tmp_cleanup_age_min):\n            try:\n                os.remove(path)\n                out['deleted_tmp_files'].append(path)\n            except Exception:\n                pass\naudit_dir = 'audit/stage3_full'\nif os.path.isdir(audit_dir):\n    for name in os.listdir(audit_dir):\n        if not name.endswith('.pid'):\n            continue\n        p = os.path.join(audit_dir, name)\n        try:\n            if os.path.getsize(p) <= 0:\n                os.remove(p)\n                out['deleted_pid_files'].append(p)\n        except Exception:\n            pass\nif symbol_cache_path and os.path.isfile(symbol_cache_path):\n    try:\n        st = os.stat(symbol_cache_path)\n        too_old = ((now - st.st_mtime) >= (float(cache_max_age_hours) * 3600.0))\n        too_big = (st.st_size >= int(cache_max_mb) * 1024 * 1024)\n        if too_old or too_big:\n            os.remove(symbol_cache_path)\n            out['deleted_cache_files'].append(symbol_cache_path)\n    except Exception:\n        pass\nout['deleted_tmp_count'] = len(out['deleted_tmp_files'])\nout['deleted_pid_count'] = len(out['deleted_pid_files'])\nout['deleted_cache_count'] = len(out['deleted_cache_files'])\nout['killed_pid_count'] = len(out['killed_pids'])\nprint(json.dumps(out, ensure_ascii=False))\nPY\nstdout=\nstderr=",
+  "finished_at": "2026-02-27T20:15:02Z"
+}

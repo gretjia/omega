@@ -27,7 +27,7 @@ Conclusion: classify as **intermittent transport reachability**, not immediate h
 - Current state: task `Running`
 
 ### B. omega-vm retry-based probe (prevent false CRITICAL)
-- Script added: `tools/check_windows_from_omega.sh`
+- Script added: `tools/_archived/check_windows_from_omega.sh`
 - Logic: 5 attempts with delay; evaluate 3 independent signals each round:
   1. `tailscale ping`
   2. `TCP/22` connect test
@@ -38,7 +38,7 @@ Conclusion: classify as **intermittent transport reachability**, not immediate h
 
 ## 4) Verification Evidence
 - Repeated omega->windows probe: 5/5 rounds `PING_OK` + `TCP22_OK`
-- `tools/check_windows_from_omega.sh` output: `RESULT=REACHABLE_OR_RECOVERING`
+- `tools/_archived/check_windows_from_omega.sh` output: `RESULT=REACHABLE_OR_RECOVERING`
 - Windows task status:
   - `Omega_Tailscale_Keepalive`: `Running`
 - Current Stage1 snapshot:

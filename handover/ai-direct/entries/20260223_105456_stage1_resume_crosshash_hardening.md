@@ -14,7 +14,7 @@
 ## 2) Landed Code Changes (Local Repo)
 
 1. New Stage1 resume utility module:
-   - `tools/stage1_resume_utils.py`
+   - `tools/_archived/stage1_resume_utils.py`
    - Adds:
      - `find_existing_done_for_date(...)` (hash-agnostic date resume)
      - `clear_stale_done_marker(...)`
@@ -56,7 +56,7 @@
     - `stage1_resume_utils.py`
     - `stage1_linux_base_etl.py`
   - verified:
-    - `python3 -m py_compile tools/stage1_resume_utils.py tools/stage1_linux_base_etl.py`
+    - `python3 -m py_compile tools/_archived/stage1_resume_utils.py tools/stage1_linux_base_etl.py`
 
 - Windows (`C:\Omega_vNext\tools`):
   - synced:

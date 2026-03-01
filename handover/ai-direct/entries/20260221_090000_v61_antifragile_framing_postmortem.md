@@ -185,7 +185,7 @@ Whether 1 or 5, the memory problem is WITHIN a single task execution. The worker
 | `tools/v61_windows_framing.py` | `maxtasksperchild=1` |
 | `tools/v61_fix_final.md` | [NEW] First set of patch directives |
 | `tools/v61_fix_final_2.md` | [NEW] Second set of patch directives |
-| `audit/v61_audit_README.md` | [NEW] Audit zip topology guide |
+| `audit/_archived/v61_audit_README.md` | [NEW] Audit zip topology guide |
 | `audit/v61.zip` | Regenerated with all patches |
 
 ---
