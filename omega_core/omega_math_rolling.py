@@ -155,3 +155,50 @@ def calc_residual_epiplexity_rolling(
             out[i] = mdl_gain
 
     return out
+@njit(parallel=True, cache=True)
+def calc_topology_area_rolling(
+    x_arr: np.ndarray, 
+    y_arr: np.ndarray, 
+    window: int,
+    x_scale_floor: float, 
+    y_scale_floor: float, 
+    green_coeff: float,
+    dist_to_boundary: np.ndarray
+) -> np.ndarray:
+    """
+    Vectorized Green's Theorem Area for arbitrary Manifolds (X, Y) using rolling 1D contiguous arrays.
+    """
+    n = len(x_arr)
+    out_area = np.zeros(n, dtype=np.float64)
+    
+    if n < window:
+        return out_area
+
+    for i in prange(window - 1, n):
+        if dist_to_boundary[i] < window - 1:
+            continue
+
+        X = x_arr[i - window + 1 : i + 1]
+        Y = y_arr[i - window + 1 : i + 1]
+        
+        mx = np.sum(X) / window
+        my = np.sum(Y) / window
+        
+        vx = np.sum((X - mx)**2) / window
+        vy = np.sum((Y - my)**2) / window
+        sx = math.sqrt(vx)
+        sy = math.sqrt(vy)
+        
+        if sx < x_scale_floor: sx = x_scale_floor
+        if sy < y_scale_floor: sy = y_scale_floor
+        
+        Xn = (X - mx) / sx
+        Yn = (Y - my) / sy
+        
+        area_sum = 0.0
+        for j in range(window - 1):
+            area_sum += Xn[j] * Yn[j+1] - Xn[j+1] * Yn[j]
+            
+        out_area[i] = area_sum * green_coeff
+        
+    return out_area
