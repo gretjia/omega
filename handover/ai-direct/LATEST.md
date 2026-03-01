@@ -41,18 +41,18 @@ Detailed board:
   - final metrics: `ASSIGNED=555`, `COMPLETED=10`, `SKIPPED=545`, `ERROR=0`, `FRAMING_COMPLETE=1`
   - `STAGE1_DONE=552` (`/omega_pool/parquet_data/v62_base_l1/host=linux1/*.parquet.done`)
 - Stage2 status:
-  - completed: `LNX_STAGE2_DONE=552 / 552`
-  - process state: no active Stage2 worker processes
-  - resource state: healthy; no fresh OOM/freeze signal during final completion window
-  - assist lane cleanup: `/omega_pool/parquet_data/v62_{base_l1,feature_l2}/host=windows1_assist_2` emptied
+  - V62 completed: `LNX_STAGE2_DONE=552 / 552`
+  - **V63 (latest) completed**: `LNX_STAGE2_DONE=552 / 552` (`latest_feature_l2/host=linux1/*.done`)
+- Stage3 status:
+  - **BaseMatrix Forging (V63)**: Running via `tools/forge_base_matrix.py` (aggregating both linux1 and windows1 hosts). Output: `audit/v63_basematrix.parquet`.
 
 ### 3.2 Windows `windows1-w1` (`100.123.90.25`)
 
 - Stage1 status:
   - completed (`STAGE1_DONE=191`)
 - Stage2 status:
-  - completed: `WIN_STAGE2_DONE=191 / 191` (`missing=0`)
-  - final scheduler state: `Omega_v62_stage2_isolated_v2` switched to `Ready` after completion (ended to avoid duplicate compute)
+  - V62 completed: `WIN_STAGE2_DONE=191 / 191` (`missing=0`)
+  - **V63 (latest) completed**: `WIN_STAGE2_DONE=191 / 191` (`latest_feature_l2/host=windows1/*.parquet`). Note: `.done` markers were manually created due to a Python `touch()` failure on Windows. Data was subsequently synced to `linux1-lx` for Stage 3 BaseMatrix.
   - process state: no active Stage2 python process chain
   - temp cleanup: removed `omega_stage2_iso_*` scratch dirs (`25` removed)
 
@@ -111,6 +111,11 @@ ssh linux1-lx '/home/zepher/work/Omega_vNext/.venv/bin/python -c "import numba, 
 - `handover/ai-direct/entries/20260224_041600_omega_vm_windows_connectivity_rca_fix.md`
 
 ## Update 2026-02-27 08:24 +0000 (V62 Stage2 Dual-Host Completion + Linux Assist Cutover)
+## Update 2026-03-01 22:45 +0000 (V63 Stage 2 Completion & Stage 3 Launch)
+
+- **Windows Stage 2 Completion**: Verified the V63 (latest) run finished on March 1st (191 files) despite the Python `.done` marker creation failing silently. Missing markers were manually retrofitted.
+- **Data Sync**: Transferred the Windows V63 data (`host=windows1`) to `linux1-lx` over LAN.
+- **BaseMatrix (Stage 3) Initiated**: Launched `forge_base_matrix.py` on `linux1-lx` targeting `host=*` to ingest all 743 combined files into `v63_basematrix.parquet`. It is currently processing safely.
 
 - Git alignment completed:
   - `omega-vm`, `linux1-lx`, `windows1-w1` all on `perf/stage2-speedup-v62@afcb663`

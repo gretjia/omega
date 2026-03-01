@@ -45,6 +45,28 @@
 ### Entries
 
 <!-- New session debriefs go here. Most recent on top. -->
+#### [2026-03-01 22:45] Agent: Gemini CLI | Session: Windows `.done` Bug Fix & Stage 3 BaseMatrix Launch
+
+**What I did:**
+- Investigated why Windows `latest_feature_l2` reported 0 completion despite being "done".
+- Discovered 191 large `.parquet` files generated on March 1st lacked `.done` markers due to a silent `touch()` failure on Windows.
+- Created the missing 191 `.done` files manually on Windows.
+- Synced the 7.1GB Windows V63 data to `linux1-lx` over LAN using `scp`.
+- Launched the final Stage 3 `forge_base_matrix.py` on Linux using data from both `host=*`.
+
+**What I discovered:**
+- The Python `pathlib.Path.touch()` method fails silently on the Windows node (`windows1-w1`) when writing to the SMB share / local disk, which disrupted the orchestration flow. The data itself was perfectly valid and completed on March 1st.
+
+**What confused me / blocked me:**
+- Initial assumptions based on `LATEST.md` stating Windows was done (which referred to V62) and the empty `latest` done count caused a false start of redundant computations.
+
+**What the next agent should do:**
+- Wait for the `forge_base_matrix.py` process to complete on `linux1-lx`. Check `audit/stage3_v63_forge.log`.
+- Proceed with Stage 3 model training once the `v63_basematrix.parquet` is fully forged.
+
+**Files I changed:**
+- Transferred 191 `host=windows1` files to Linux.
+- `handover/ai-direct/entries/20260301_224500_stage2_windows_done_bug_and_stage3_basematrix_launch.md` (New)
 
 #### [2026-02-27 01:44] Agent: Codex (GPT-5) | Session: Stage2 Dual-Host Stall Snapshot + Handover Refresh
 
