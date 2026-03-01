@@ -33,7 +33,7 @@ from tools.stage1_resume_utils import (
 )
 
 RAW_ROOT = Path(r"E:\data\level2")
-OUTPUT_ROOT = Path(r"D:\Omega_frames\v62_base_l1\host=windows1")
+OUTPUT_ROOT = Path(r"D:\Omega_frames\latest_base_l1\host=windows1")
 SEVEN_ZIP = r"C:\Program Files\7-Zip\7z.exe"
 
 # 【FIX 2】Global config — load once, not per-file

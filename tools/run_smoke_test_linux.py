@@ -25,7 +25,7 @@ from config import load_l2_pipeline_config
 from omega_core.trainer import OmegaTrainerV3, evaluate_frames
 
 def main():
-    base_dir = "/omega_pool/parquet_data/v62_feature_l2/host=linux1"
+    base_dir = "/omega_pool/parquet_data/latest_feature_l2/host=linux1"
     tmp_train_dir = "/omega_pool/smoke_test_train"
     tmp_test_dir = "/omega_pool/smoke_test_test"
     model_path = "/omega_pool/smoke_test_model.pkl"

@@ -627,7 +627,7 @@ def _submit_training(args: argparse.Namespace, repo_root: pathlib.Path, state: D
         )
         raise RuntimeError(f"training submission failed rc={proc.returncode}")
 
-    model_uri = f"{args.model_output_prefix.rstrip('/')}/omega_v6_xgb_final.pkl"
+    model_uri = f"{args.model_output_prefix.rstrip('/')}/omega_xgb_final.pkl"
     metrics_uri = f"{args.model_output_prefix.rstrip('/')}/train_metrics.json"
     _run(["gsutil", "ls", model_uri], check=True, log_file=local_log)
     _run(["gsutil", "ls", metrics_uri], check=True, log_file=local_log)
@@ -777,7 +777,7 @@ def parse_args() -> argparse.Namespace:
     ap.add_argument("--run-id", default=dt.datetime.utcnow().strftime("%Y%m%d-%H%M%S"))
     ap.add_argument("--remote-host", default="linux1-lx")
     ap.add_argument("--remote-repo", default="/home/zepher/work/Omega_vNext")
-    ap.add_argument("--input-pattern", default="/omega_pool/parquet_data/v62_feature_l2/host=linux1/*.parquet")
+    ap.add_argument("--input-pattern", default="/omega_pool/parquet_data/latest_feature_l2/host=linux1/*.parquet")
     ap.add_argument("--years", default="2023,2024,2025,2026")
     ap.add_argument("--symbols-per-batch", type=int, default=200)
     ap.add_argument("--forge-workers", type=int, default=2)
@@ -808,25 +808,25 @@ def parse_args() -> argparse.Namespace:
 
     ap.add_argument("--backtest-workers", type=int, default=2)
     ap.add_argument("--backtest-symbols-per-batch", type=int, default=50)
-    ap.add_argument("--backtest-frames-dir", default="/omega_pool/parquet_data/v62_feature_l2/host=linux1")
+    ap.add_argument("--backtest-frames-dir", default="/omega_pool/parquet_data/latest_feature_l2/host=linux1")
 
     args = ap.parse_args()
 
     args.base_matrix_uri = (
-        f"gs://omega_v52_central/omega/staging/base_matrix/v62/{args.run_id}/base_matrix.parquet"
+        f"gs://omega_central/omega/staging/base_matrix/latest/{args.run_id}/base_matrix.parquet"
     )
     args.base_matrix_meta_uri = (
-        f"gs://omega_v52_central/omega/staging/base_matrix/v62/{args.run_id}/base_matrix.meta.json"
+        f"gs://omega_central/omega/staging/base_matrix/latest/{args.run_id}/base_matrix.meta.json"
     )
     args.code_bundle_uri = (
-        f"gs://omega_v52_central/omega/staging/code/omega_core_{args.run_id}.zip"
+        f"gs://omega_central/omega/staging/code/omega_core_{args.run_id}.zip"
     )
     args.model_output_prefix = (
-        f"gs://omega_v52_central/omega/staging/models/v62/{args.run_id}"
+        f"gs://omega_central/omega/staging/models/latest/{args.run_id}"
     )
-    args.model_uri = f"{args.model_output_prefix}/omega_v6_xgb_final.pkl"
+    args.model_uri = f"{args.model_output_prefix}/omega_xgb_final.pkl"
     args.backtest_output_uri = (
-        f"gs://omega_v52_central/omega/staging/backtest/v62/{args.run_id}/backtest_metrics_local.json"
+        f"gs://omega_central/omega/staging/backtest/latest/{args.run_id}/backtest_metrics_local.json"
     )
     return args
 

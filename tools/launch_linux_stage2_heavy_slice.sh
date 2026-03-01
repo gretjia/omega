@@ -13,8 +13,8 @@ Options:
   --unit <name>        Systemd unit name. Default: omega_stage2_linux_<timestamp>
   --log <path>         Launcher log path (absolute or repo-relative). Default: audit/stage2_targeted_resume_linux.launch.log
   --python <path>      Python interpreter. Default: <repo-root>/.venv/bin/python (fallback: /usr/bin/python3)
-  --input-dir <path>   Base_L1 input directory. Default: /omega_pool/parquet_data/v62_base_l1/host=linux1
-  --output-dir <path>  Feature_L2 output directory. Default: /omega_pool/parquet_data/v62_feature_l2/host=linux1
+  --input-dir <path>   Base_L1 input directory. Default: /omega_pool/parquet_data/latest_base_l1/host=linux1
+  --output-dir <path>  Feature_L2 output directory. Default: /omega_pool/parquet_data/latest_feature_l2/host=linux1
   --timeout-sec <n>    Per-file timeout seconds. Default: 900
   --dry-run            Print command only, do not execute.
   -h, --help           Show help.
@@ -29,8 +29,8 @@ repo_root="/home/zepher/work/Omega_vNext"
 unit="omega_stage2_linux_$(date +%Y%m%d_%H%M%S)"
 log_path="audit/stage2_targeted_resume_linux.launch.log"
 python_bin=""
-input_dir="/omega_pool/parquet_data/v62_base_l1/host=linux1"
-output_dir="/omega_pool/parquet_data/v62_feature_l2/host=linux1"
+input_dir="/omega_pool/parquet_data/latest_base_l1/host=linux1"
+output_dir="/omega_pool/parquet_data/latest_feature_l2/host=linux1"
 timeout_sec="900"
 dry_run=0
 

@@ -206,7 +206,7 @@ def run_global_training(args: argparse.Namespace) -> None:
         "scaler": None,
         "feature_cols": list(FEATURE_COLS),
     }
-    model_name = "omega_v6_xgb_final.pkl"
+    model_name = "omega_xgb_final.pkl"
     with open(model_name, "wb") as f:
         pickle.dump(payload, f)
 

@@ -38,7 +38,7 @@ from tools.stage1_resume_utils import (
 )
 
 RAW_ROOT = Path("/omega_pool/raw_7z_archives")
-OUTPUT_ROOT = Path("/omega_pool/parquet_data/v62_base_l1/host=linux1")
+OUTPUT_ROOT = Path("/omega_pool/parquet_data/latest_base_l1/host=linux1")
 SEVEN_ZIP = "/usr/bin/7z"
 
 # 【FIX 2】Global config — load once, not per-file

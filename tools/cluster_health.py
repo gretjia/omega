@@ -51,8 +51,8 @@ NODES = {
         "role": "worker stage1/stage2",
         "repo_root": "/home/zepher/work/Omega_vNext",
         "outputs": {
-            "stage1": "/omega_pool/parquet_data/v62_base_l1/host=linux1",
-            "stage2": "/omega_pool/parquet_data/v62_feature_l2/host=linux1",
+            "stage1": "/omega_pool/parquet_data/latest_base_l1/host=linux1",
+            "stage2": "/omega_pool/parquet_data/latest_feature_l2/host=linux1",
         },
     },
     "windows1": {
@@ -61,8 +61,8 @@ NODES = {
         "role": "worker stage1/stage2",
         "repo_root": "D:\\work\\Omega_vNext",
         "outputs": {
-            "stage1": "D:\\Omega_frames\\v62_base_l1\\host=windows1",
-            "stage2": "D:\\Omega_frames\\v62_feature_l2\\host=windows1",
+            "stage1": "D:\\Omega_frames\\latest_base_l1\\host=windows1",
+            "stage2": "D:\\Omega_frames\\latest_feature_l2\\host=windows1",
         },
     },
 }

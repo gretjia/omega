@@ -149,61 +149,32 @@ def _apply_recursive_physics(
             curr_dist += 1
         dist_to_boundary[i] = curr_dist
 
-    # Calculate Epiplexity in ONE GO using rolling JIT (GIL-free)
-    from omega_core.omega_math_rolling import calc_epiplexity_rolling, calc_holographic_topology_rolling
     window_len = int(epi_cfg.min_trace_len)
-    
-    out_epi_raw = calc_epiplexity_rolling(close_px, window=window_len, dist_to_boundary=dist_to_boundary)
-    out_epi = np.where(out_epi_raw > 0, out_epi_raw, float(epi_cfg.fallback_value))
-    
-    # Apply gate mask (zero out inactive)
-    out_epi = np.where(out_is_active, out_epi, float(epi_cfg.fallback_value))
 
-    # Calculate Holographic Topology in ONE GO using rolling JIT
-    out_topo_area, out_topo_energy = calc_holographic_topology_rolling(
-        close_px, net_ofi, window=window_len,
+    # 1) Topology first
+    from omega_core.omega_math_rolling import calc_isoperimetric_topology_rolling, calc_residual_epiplexity_rolling
+    out_topo_area, out_topo_energy, out_q_topo = calc_isoperimetric_topology_rolling(
+        prices=close_px,
+        ofis=net_ofi,
+        window=window_len,
         price_scale_floor=float(topo_cfg.price_scale_floor),
         ofi_scale_floor=float(topo_cfg.ofi_scale_floor),
-        green_coeff=float(topo_cfg.green_coeff),
-        dist_to_boundary=dist_to_boundary
+        green_coeff=0.5,  # Must be 0.5 for shoelace/Green consistency
+        dist_to_boundary=dist_to_boundary,
     )
 
-    from omega_core.omega_math_rolling import calc_topology_area_rolling
-    manifolds = getattr(topo_cfg, "manifolds", ())
-    out_manifolds = {}
-    
-    # We use sequential indices for time_trace proxy since buckets are ordered
-    time_trace_proxy = np.arange(n_rows, dtype=np.float64)
-    
-    trace_sources = {
-        "trace": close_px,
-        "ofi_trace": net_ofi,
-        "vol_trace": trade_vol,
-        "time_trace": time_trace_proxy
-    }
-    
-    for feat in manifolds:
-        feat_name, x_col, y_col, x_scale_attr, y_scale_attr = feat
-        x_scale = float(getattr(topo_cfg, x_scale_attr, topo_cfg.price_scale_floor))
-        y_scale = float(getattr(topo_cfg, y_scale_attr, topo_cfg.ofi_scale_floor))
-        
-        arr_x = trace_sources.get(x_col, np.zeros(n_rows, dtype=np.float64))
-        arr_y = trace_sources.get(y_col, np.zeros(n_rows, dtype=np.float64))
-            
-        out_manifolds[str(feat_name)] = calc_topology_area_rolling(
-            arr_x, arr_y, window=window_len,
-            x_scale_floor=x_scale, y_scale_floor=y_scale, green_coeff=float(topo_cfg.green_coeff),
-            dist_to_boundary=dist_to_boundary
-        )
+    # 2) Ensure Y cannot update before topology becomes valid (Warm-up Mask)
+    srl_is_active = out_is_active.copy()
+    srl_is_active[dist_to_boundary < window_len - 1] = False
 
     base_y = float(srl.y_coeff) if initial_y is None else float(initial_y)
 
     if os.environ.get("OMEGA_KERNEL_VERBOSE") == "1":
         print(f"    Running Recursive Physics on {n_rows} rows...", flush=True)
-    
-    # Unleash GIL-free Numba LLVM Compilation Pass for SRL & Adaptive Y Recursive State
-    from omega_core.omega_math_vectorized import calc_srl_recursion_loop
-    out_srl_resid, out_y, out_spoof = calc_srl_recursion_loop(
+
+    # 3) SRL recursion second
+    from omega_core.omega_math_vectorized import calc_srl_recursion_loop_v63
+    out_srl_resid, out_y, out_spoof = calc_srl_recursion_loop_v63(
         n_rows=n_rows,
         price_change=price_change,
         sigma_eff=sigma_eff,
@@ -226,16 +197,31 @@ def _apply_recursive_physics(
         anchor_w=anchor_w,
         clip_lo=clip_lo,
         clip_hi=clip_hi,
-        out_is_active=out_is_active,
-        out_epi=out_epi,
-        peace_threshold=peace_threshold,
-        min_ofi_for_y=min_ofi_for_y
+        out_is_active=srl_is_active,
+        out_q_topo=out_q_topo,
+        chaos_threshold=peace_threshold, 
+        min_ofi_for_y=min_ofi_for_y,
     )
 
-    # v6.0: Mask Singularity Residuals
-    # Force residuals to 0 where singularity was detected to prevent math explosion
+    # Force residuals to 0 where singularity was detected
     if "has_singularity" in frames.columns:
-        out_srl_resid[has_singularity] = 0.0
+        has_singularity_mask = _safe_bool_col("has_singularity")
+        out_srl_resid[has_singularity_mask] = 0.0
+
+    # 4) Residual MDL third
+    out_epi_raw = calc_residual_epiplexity_rolling(
+        srl_residuals=out_srl_resid,
+        window=window_len,
+        dist_to_boundary=dist_to_boundary,
+    )
+    
+    # Apply global activity mask
+    out_epi = np.where(out_epi_raw > 0, out_epi_raw, float(epi_cfg.fallback_value))
+    out_epi = np.where(out_is_active, out_epi, float(epi_cfg.fallback_value))
+
+    from omega_core.omega_math_rolling import calc_topology_area_rolling
+    manifolds = getattr(topo_cfg, "manifolds", ())
+    out_manifolds = {}
 
     # --- Assembly ---
     # Overwrite topo_area with micro feature if present

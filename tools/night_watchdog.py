@@ -9,7 +9,7 @@ from datetime import datetime
 
 # --- Configuration ---
 POLL_INTERVAL_SEC = 300  # 5 minutes
-GCS_BUCKET = "gs://omega_v52_central"
+GCS_BUCKET = "gs://omega_central"
 YEAR = "2026"
 GIT_HASH = "ed6a760"
 
@@ -27,7 +27,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(me
 
 def get_gcs_parquet_count() -> int:
     """Use gsutil to count the number of parquet files currently in GCS for 2026."""
-    cmd = f"gsutil ls {GCS_BUCKET}/omega/v52/frames/host=*/{YEAR}*_{GIT_HASH}.parquet | wc -l"
+    cmd = f"gsutil ls {GCS_BUCKET}/omega/latest/frames/host=*/{YEAR}*_{GIT_HASH}.parquet | wc -l"
     try:
         result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
         count = int(result.stdout.strip())

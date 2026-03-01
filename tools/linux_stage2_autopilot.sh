@@ -10,8 +10,8 @@ Usage:
 
 Options:
   --repo-root <path>         Repo root. Default: /home/zepher/work/Omega_vNext
-  --input-dir <path>         Stage2 input dir. Default: /omega_pool/parquet_data/v62_base_l1/host=linux1
-  --output-dir <path>        Stage2 output dir. Default: /omega_pool/parquet_data/v62_feature_l2/host=linux1
+  --input-dir <path>         Stage2 input dir. Default: /omega_pool/parquet_data/latest_base_l1/host=linux1
+  --output-dir <path>        Stage2 output dir. Default: /omega_pool/parquet_data/latest_feature_l2/host=linux1
   --timeout-sec <n>          Per-file timeout for targeted runner. Default: 2400
   --poll-sec <n>             Poll interval. Default: 90
   --batch-size <n>           OMEGA_STAGE2_SYMBOL_BATCH_SIZE. Default: 24
@@ -23,8 +23,8 @@ EOF
 }
 
 repo_root="/home/zepher/work/Omega_vNext"
-input_dir="/omega_pool/parquet_data/v62_base_l1/host=linux1"
-output_dir="/omega_pool/parquet_data/v62_feature_l2/host=linux1"
+input_dir="/omega_pool/parquet_data/latest_base_l1/host=linux1"
+output_dir="/omega_pool/parquet_data/latest_feature_l2/host=linux1"
 timeout_sec="2400"
 poll_sec="60"
 batch_size="8"

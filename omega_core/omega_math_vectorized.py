@@ -263,82 +263,75 @@ except ImportError:
             return func
         return decorator
 
-@njit(cache=True, fastmath=True)
-def calc_srl_recursion_loop(
-    n_rows,
-    price_change,
-    sigma_eff,
-    net_ofi,
-    depth_eff,
-    cancel_vol,
-    trade_vol,
-    base_y,
-    is_boundary,
-    # Config Scalars
+@njit(cache=True)
+def calc_srl_recursion_loop_v63(
+    n_rows, price_change, sigma_eff, net_ofi, depth_eff, cancel_vol, trade_vol, base_y, is_boundary,
     depth_floor, sigma_floor, spoof_ratio_eps, spoof_penalty_gamma,
     implied_y_min_impact, implied_y_min_penalty,
     y_min, y_max, y_alpha, anchor_y, anchor_w, clip_lo, clip_hi,
-    out_is_active, out_epi, peace_threshold, min_ofi_for_y
+    out_is_active,
+    out_q_topo,      # V63 injection: topology gate
+    chaos_threshold, # V63 gate: update Y only when Q_topo < chaos_threshold
+    min_ofi_for_y
 ):
     """
-    JIT-compiled scalar recursion loop for Universal SRL + Adaptive Y + Spoofing.
-    Speeds up physics by >50x vs Python loop.
+    V63 SRL recursion.
+    Note: out_is_active is masked for topology warm-up validity by the caller.
     """
     out_srl_resid = np.zeros(n_rows, dtype=np.float64)
     out_y = np.zeros(n_rows, dtype=np.float64)
     out_spoof = np.zeros(n_rows, dtype=np.float64)
-    
+
     current_y = float(base_y)
-    
+
     for i in range(n_rows):
-        # Fast Boundary Detect for Phase Transition
         if is_boundary[i]:
             current_y = float(base_y)
 
-        # 1. Safety Floors
+        # Microstructure spoofing correction
         safe_depth = max(depth_eff[i], depth_floor)
         safe_sigma = max(sigma_eff[i], sigma_floor)
-
-        # 2. Spoofing Penalty
         safe_trade = max(trade_vol[i], spoof_ratio_eps)
-        c_vol = max(cancel_vol[i], 0.0)
-        spoof_ratio = c_vol / safe_trade
 
+        spoof_ratio = max(cancel_vol[i], 0.0) / safe_trade
         penalty = math.exp(-spoof_penalty_gamma * spoof_ratio)
         effective_depth = max(safe_depth * penalty, depth_floor)
 
-        # 3. SRL (Delta=0.5)
+        # Sato-style impact unit: sigma * sqrt(|OFI| / D_eff)
         q_over_d = abs(net_ofi[i]) / effective_depth
-        raw_impact_unit = safe_sigma * math.sqrt(q_over_d) 
-        
-        sign = 1.0 if net_ofi[i] > 0 else (-1.0 if net_ofi[i] < 0 else 0.0)
+        raw_impact_unit = safe_sigma * math.sqrt(q_over_d)
+
+        sign = 1.0 if net_ofi[i] > 0.0 else (-1.0 if net_ofi[i] < 0.0 else 0.0)
         theory_impact = sign * current_y * raw_impact_unit
-        
+
         resid = price_change[i] - theory_impact
-        
-        # 4. Implied Y
-        # Recalculate implied only if impact is significant
+
         implied_y = current_y
         if raw_impact_unit > implied_y_min_impact and penalty > implied_y_min_penalty:
             implied_y = abs(price_change[i]) / (raw_impact_unit + 1e-9)
 
         out_srl_resid[i] = resid
         out_spoof[i] = spoof_ratio
-        
-        # Adaptive Y Update
-        if out_is_active[i] and out_epi[i] > peace_threshold and abs(net_ofi[i]) > min_ofi_for_y:
-            # Clip implied before update
-            if implied_y < y_min: implied_y = y_min
-            elif implied_y > y_max: implied_y = y_max
-            
+
+        # V63 inverted state gate:
+        # update Y only in high-entropy / Brownian baseline states
+        # freeze Y in deterministic / hysteretic states
+        if out_is_active[i] and out_q_topo[i] < chaos_threshold and abs(net_ofi[i]) > min_ofi_for_y:
+            if implied_y < y_min:
+                implied_y = y_min
+            elif implied_y > y_max:
+                implied_y = y_max
+
             current_y = (1.0 - y_alpha) * current_y + y_alpha * implied_y
-            
+
         if anchor_w > 0.0:
             current_y = (1.0 - anchor_w) * current_y + anchor_w * anchor_y
-            
-        if current_y < clip_lo: current_y = clip_lo
-        elif current_y > clip_hi: current_y = clip_hi
-        
+
+        if current_y < clip_lo:
+            current_y = clip_lo
+        elif current_y > clip_hi:
+            current_y = clip_hi
+
         out_y[i] = current_y
-        
+
     return out_srl_resid, out_y, out_spoof

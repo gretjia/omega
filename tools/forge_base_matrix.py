@@ -781,7 +781,7 @@ class LocalManifoldForger:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description="v60 local base-matrix forger (ticker sharding)")
-    ap.add_argument("--input-pattern", default="artifacts/runtime/v52/frames/host=*/*.parquet")
+    ap.add_argument("--input-pattern", default="artifacts/runtime/latest/frames/host=*/*.parquet")
     ap.add_argument("--input-file-list", default="")
     ap.add_argument("--years", default="2023,2024")
     ap.add_argument("--hash", default="")

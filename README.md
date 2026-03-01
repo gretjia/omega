@@ -304,8 +304,8 @@ python tools\stage1_windows_base_etl.py --years 2023,2024,2025,2026 --total-shar
 
 ```bash
 python tools/stage2_physics_compute.py \
-  --input-dir /omega_pool/parquet_data/v62_base_l1 \
-  --output-dir /omega_pool/parquet_data/v62_feature_l2 \
+  --input-dir /omega_pool/parquet_data/latest_base_l1 \
+  --output-dir /omega_pool/parquet_data/latest_feature_l2 \
   --workers 4
 ```
 
@@ -1965,7 +1965,7 @@ ssh windows1-w1 "hostname && whoami"
 - **`audit/stage3_full_supervisor/20260228-omega-stage3-fast/state.json`**
 - **`audit/stage3_full_supervisor/20260228-omega-stage3-reset/state.json`**
 - **`audit/stage3_full_supervisor/20260228-omega-stage3-safe/state.json`**
-- **`audit/stage3_full_unified_local_model/omega_v6_xgb_final.pkl`**
+- **`audit/stage3_full_unified_local_model/omega_xgb_final.pkl`**
 - **`audit/v62.md`**
 - **`audit/v62_comprehensive_report.md`**
 - **`audit/v62_framing_audit.md`**

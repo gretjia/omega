@@ -176,8 +176,8 @@ def main() -> int:
     # 1) Mount and path checks
     omega_pool = Path("/omega_pool")
     raw_root = Path("/omega_pool/raw_7z_archives")
-    base_l1 = Path("/omega_pool/parquet_data/v62_base_l1/host=linux1")
-    feat_l2 = Path("/omega_pool/parquet_data/v62_feature_l2/host=linux1")
+    base_l1 = Path("/omega_pool/parquet_data/latest_base_l1/host=linux1")
+    feat_l2 = Path("/omega_pool/parquet_data/latest_feature_l2/host=linux1")
 
     mounted = os.path.ismount(str(omega_pool))
     checks.append(

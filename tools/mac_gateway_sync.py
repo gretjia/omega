@@ -45,7 +45,7 @@ GCS_CP_CHUNK = 64
 HOSTS = {
     "linux1": {
         "ssh_target": "zepher@192.168.3.113",
-        "source_path": "/omega_pool/parquet_data/v52/frames/host=linux1/",
+        "source_path": "/omega_pool/parquet_data/latest/frames/host=linux1/",
         "dest_subpath": "host=linux1"
     },
     "windows1": {
@@ -148,7 +148,7 @@ def get_gcs_existing_parquet_names(gcs_bucket: str, dest_subpath: str, git_hash:
     """
     Returns parquet filenames already present in GCS for this host/hash.
     """
-    prefix = f"{gcs_bucket.rstrip('/')}/omega/v52/frames/{dest_subpath}"
+    prefix = f"{gcs_bucket.rstrip('/')}/omega/latest/frames/{dest_subpath}"
     pattern = f"{prefix}/*_{git_hash}.parquet"
     cmd = ["gcloud", "storage", "ls", pattern]
     res = subprocess.run(cmd, capture_output=True, text=True)
@@ -254,7 +254,7 @@ def sync_batch(host_key, files_to_sync, gcs_bucket):
 
     print(f"[*] Processing batch of {len(files_to_sync)} files from {host_key}...")
     downloaded: list[str] = []
-    gcs_target = f"{gcs_bucket}/omega/v52/frames/{host_cfg['dest_subpath']}/"
+    gcs_target = f"{gcs_bucket}/omega/latest/frames/{host_cfg['dest_subpath']}/"
 
     try:
         for fname, _ in files_to_sync:
@@ -369,7 +369,7 @@ def run_sync(bucket_name, git_hash, target_host=None, year_filter=None):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="OMEGA v5.2 Mac Gateway Sync")
-    parser.add_argument("--bucket", default="gs://omega_v52_central", help="GCS Bucket Name (default: gs://omega_v52)")
+    parser.add_argument("--bucket", default="gs://omega_central", help="GCS Bucket Name (default: gs://omega_v52)")
     parser.add_argument("--host", help="Specific host to sync (linux1 or windows1)")
     parser.add_argument("--year", help="Filter by year (e.g., 2025)")
     parser.add_argument("--hash", default="", help="Frame git short hash suffix (default: local HEAD short hash)")
