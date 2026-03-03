@@ -10,9 +10,9 @@ This file is the single source of current operational truth for all agents.
 
 ## 1. Snapshot Metadata
 
-- `updated_at_local`: 2026-02-27 08:24:43 +0000 (UTC)
-- `updated_at_utc`: 2026-02-27 08:24:43 +0000 (UTC)
-- `updated_by`: Codex
+- `updated_at_local`: 2026-03-03 09:25:20 +0800
+- `updated_at_utc`: 2026-03-03 01:25:20 +0000 (UTC)
+- `updated_by`: Gemini
 - `controller_repo_head`: `afcb663` (branch: `perf/stage2-speedup-v62`, working tree dirty)
 - `worker_repo_head_linux`: `afcb663` (branch: `perf/stage2-speedup-v62`, runtime audit/preflight artifacts dirty)
 - `worker_repo_head_windows`: `afcb663` (branch: `perf/stage2-speedup-v62`, runtime audit ledgers dirty)
@@ -44,7 +44,7 @@ Detailed board:
   - V62 completed: `LNX_STAGE2_DONE=552 / 552`
   - **V63 (latest) completed**: `LNX_STAGE2_DONE=552 / 552` (`latest_feature_l2/host=linux1/*.done`)
 - Stage3 status:
-  - **BaseMatrix Forging (V63)**: Running via `tools/forge_base_matrix.py` (aggregating both linux1 and windows1 hosts). Output: `audit/v63_basematrix.parquet`.
+  - **BaseMatrix Forging (V63)**: COMPLETED. Generated `audit/v63_basematrix.parquet` (243MB) from 155 shards on `linux1-lx`.
 
 ### 3.2 Windows `windows1-w1` (`100.123.90.25`)
 
@@ -97,6 +97,7 @@ ssh linux1-lx '/home/zepher/work/Omega_vNext/.venv/bin/python -c "import numba, 
 
 ## 7. Latest Related Entries
 
+- `handover/ai-direct/entries/20260303_012520_v63_basematrix_forge_completed.md`
 - `handover/ai-direct/entries/20260227_082443_stage2_dual_host_completion_linux_assist.md`
 - `handover/ai-direct/entries/20260227_031200_turingos_week2_guard_mvp_pushed.md`
 - `handover/ai-direct/entries/20260227_025500_turingos_week1_schema_gate_completed.md`
@@ -111,7 +112,25 @@ ssh linux1-lx '/home/zepher/work/Omega_vNext/.venv/bin/python -c "import numba, 
 - `handover/ai-direct/entries/20260224_041600_omega_vm_windows_connectivity_rca_fix.md`
 
 ## Update 2026-02-27 08:24 +0000 (V62 Stage2 Dual-Host Completion + Linux Assist Cutover)
-## Update 2026-03-01 22:45 +0000 (V63 Stage 2 Completion & Stage 3 Launch)
+## Update 2026-03-03 09:25 +0800 (V63 BaseMatrix Forge Completed)
+
+- **Host**: `linux1-lx`
+- **Progress**: 155/155 batches (100%) completed via `tools/forge_base_matrix.py`.
+- **Final Output**: The consolidated `audit/v63_basematrix.parquet` was successfully built at 09:16. Size: ~243MB.
+- **Health**: Process completed successfully after ~26.5 hours. Log `stage3_v63_forge.log` indicates clean exit (`status=ok`).
+- **Next Action for Next Agent**: Proceed with Stage 3 model full-train/backtest sweep or parity/integrity gates as dictated by the primary LATEST.md next actions.
+- **Details**: `handover/ai-direct/entries/20260303_012520_v63_basematrix_forge_completed.md`
+
+## Update 2026-03-03 00:29 +0800 (V63 BaseMatrix Forge 63% Complete)
+
+- **Host**: `linux1-lx`
+- **Progress**: 98/155 batches (63.2%) completed via `tools/forge_base_matrix.py`.
+- **Health**: Stable. Running at 12 mins/batch on single thread (guarded by memory limits). No OOM.
+- **ETA**: ~11.4 hours remaining. Expected finish around noon on March 3rd.
+- **Next Action for Next Agent**: Verify process on `linux1-lx`, check shard count reaches 155, and confirm final `v63_basematrix.parquet` generation.
+- **Details**: `handover/ai-direct/entries/20260303_002900_v63_basematrix_forge_progress.md`
+
+## Update 2026-03-01 22:45 +0000 (V63 Stage 2 Completion ## Update 2026-03-01 22:45 +0000 (V63 Stage 2 Completion & Stage 3 Launch) Stage 3 Launch)
 
 - **Windows Stage 2 Completion**: Verified the V63 (latest) run finished on March 1st (191 files) despite the Python `.done` marker creation failing silently. Missing markers were manually retrofitted.
 - **Data Sync**: Transferred the Windows V63 data (`host=windows1`) to `linux1-lx` over LAN.

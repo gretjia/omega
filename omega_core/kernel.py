@@ -222,6 +222,30 @@ def _apply_recursive_physics(
     from omega_core.omega_math_rolling import calc_topology_area_rolling
     manifolds = getattr(topo_cfg, "manifolds", ())
     out_manifolds = {}
+    
+    # We use sequential indices for time_trace proxy since buckets are ordered
+    time_trace_proxy = np.arange(n_rows, dtype=np.float64)
+    
+    trace_sources = {
+        "trace": close_px,
+        "ofi_trace": net_ofi,
+        "vol_trace": trade_vol,
+        "time_trace": time_trace_proxy
+    }
+    
+    for feat in manifolds:
+        feat_name, x_col, y_col, x_scale_attr, y_scale_attr = feat
+        x_scale = float(getattr(topo_cfg, x_scale_attr, topo_cfg.price_scale_floor))
+        y_scale = float(getattr(topo_cfg, y_scale_attr, topo_cfg.ofi_scale_floor))
+        
+        arr_x = trace_sources.get(x_col, np.zeros(n_rows, dtype=np.float64))
+        arr_y = trace_sources.get(y_col, np.zeros(n_rows, dtype=np.float64))
+            
+        out_manifolds[str(feat_name)] = calc_topology_area_rolling(
+            arr_x, arr_y, window=window_len,
+            x_scale_floor=x_scale, y_scale_floor=y_scale, green_coeff=0.5,
+            dist_to_boundary=dist_to_boundary
+        )
 
     # --- Assembly ---
     # Overwrite topo_area with micro feature if present
