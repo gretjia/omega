@@ -26,3 +26,10 @@ Because `config.py` demands 3 separate manifold projections (`topo_micro`, `topo
 - **Expected Throughput**: ~30 to 50 minutes per single 4GB `Base_L1` file on a modern high-clock core.
 - **Do not optimize this away.** If you attempt to skip the manifold generation loop to speed up the process (as happened previously), the resulting dataset will lack critical features required by the `FEATURE_COLS` signature, causing catastrophic failure in Vertex AI XGBoost training.
 - Use `tools/launch_stage2_sharded.sh` to safely scale this compute-bound task across available memory without triggering OOM Swap thrashing.
+
+## Windows 1 Execution & Environment Hazards
+When utilizing `windows1-w1` to process its partition of the L1 dataset, agents must observe the following constraints:
+- **Code Synchronization**: Windows cannot natively sync from GitHub due to firewall limitations (GFW). You MUST push to the local IP mirror (`192.168.3.93`) or manually `scp` updated Python scripts (like `kernel.py`) from the Linux controller before running pipelines.
+- **Environment Rot**: The Python virtual environment (`.venv`) on Windows can become corrupted (e.g., losing the `pip` module or missing binaries) when manually tampered with. If processes crash with `RC=2` instantly, rebuild the venv using `python.exe -m venv .venv --clear` and reinstall dependencies.
+- **Process Orphan Tracking (WinError 32)**: Windows enforces strict file locks. If a previous run crashes, it may leave a background Python process holding the lock on a `.tmp` file. Attempting to overwrite it via `unlink()` will throw `PermissionError: [WinError 32]`. Use PowerShell (`Stop-Process -Name python -Force`) to cleanly release locks before restarting the targeted supervisor.
+- **Detached Execution**: Standard backgrounding techniques like `Start-Process` or `& ... &` fail across SSH sessions on Windows. You MUST use Scheduled Tasks (`Register-ScheduledTask`) running as `System` to properly detach a long-running supervisor daemon from the SSH lifecycle.
