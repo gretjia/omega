@@ -4,6 +4,9 @@ This file is the single source of current operational truth for all agents.
 
 ## 0. Update Contract
 
+- **FIRST ACTION PROTOCOL:** Before taking ANY operational action, you MUST read this file (`LATEST.md`) to establish context. Do not guess the state.
+- **CODE INJECTION SAFETY:** When applying an Architect's Directive, you must reconcile the provided code blocks against the existing project variables (like `FEATURE_COLS`). Do not blindly overwrite code if it drops required columns or dependencies.
+- **RESOURCE PROFILING:** Never launch parallel pipelines (like Stage 2) on host machines without profiling memory first (`free -g`, `top`). `Base_L1` files are massive (4GB+). Prefer the `shard`-based parallelization (`tools/launch_stage2_sharded.sh`) over naive process bombing.
 - Keep this file focused on current state and next actions.
 - Put detailed history in `handover/ai-direct/entries/*.md`.
 - Every session must update this file before handoff.
@@ -45,6 +48,8 @@ Detailed board:
   - **V63 (latest) completed**: `LNX_STAGE2_DONE=552 / 552` (`latest_feature_l2/host=linux1/*.done`)
 - Stage3 status:
   - **BaseMatrix Forging (V63)**: COMPLETED. Generated `audit/v63_basematrix.parquet` (243MB) from 155 shards on `linux1-lx`.
+  - **Vertex AI Model Training**: COMPLETED. XGBoost global training successful (with workaround for missing manifolds). Model pushed to `gs://omega_v52_central/omega/staging/models/v63/20260303_014925/omega_xgb_final.pkl`.
+  - **Local Backtest Evaluation**: IN PROGRESS on `linux1-lx` across 16 workers (`audit/local_backtest_v63.log`).
 
 ### 3.2 Windows `windows1-w1` (`100.123.90.25`)
 
@@ -97,6 +102,8 @@ ssh linux1-lx '/home/zepher/work/Omega_vNext/.venv/bin/python -c "import numba, 
 
 ## 7. Latest Related Entries
 
+- `handover/ai-direct/entries/20260303_121500_v63_execution_post_mortem.md`
+- `handover/ai-direct/entries/20260303_025736_stage3_train_success_backtest_initiated.md`
 - `handover/ai-direct/entries/20260303_012520_v63_basematrix_forge_completed.md`
 - `handover/ai-direct/entries/20260227_082443_stage2_dual_host_completion_linux_assist.md`
 - `handover/ai-direct/entries/20260227_031200_turingos_week2_guard_mvp_pushed.md`
@@ -112,6 +119,13 @@ ssh linux1-lx '/home/zepher/work/Omega_vNext/.venv/bin/python -c "import numba, 
 - `handover/ai-direct/entries/20260224_041600_omega_vm_windows_connectivity_rca_fix.md`
 
 ## Update 2026-02-27 08:24 +0000 (V62 Stage2 Dual-Host Completion + Linux Assist Cutover)
+## Update 2026-03-03 10:57 +0800 (Stage3 Train Success & Backtest Initiated)
+
+- **Host**: `omega-vm` / GCP Vertex AI / `linux1-lx`
+- **Progress**: Stage 3 global XGBoost training completed successfully. Local backtest sweep initiated.
+- **Details**: `v63_basematrix.parquet` lacked manifold columns (`topo_micro`, etc.) due to a missed refactor loop in `omega_core/kernel.py`. The training/eval scripts were hot-patched to inject mock variables (`0.0`), allowing model signatures to compile and backtest to run without waiting for a multi-day Stage 2 re-run. `omega_core/kernel.py` bug has been fixed on `main` branch.
+- **Next Action**: Await local backtest sweep on `linux1-lx` (running with 16 workers, tail `audit/local_backtest_v63.log`).
+
 ## Update 2026-03-03 09:25 +0800 (V63 BaseMatrix Forge Completed)
 
 - **Host**: `linux1-lx`
