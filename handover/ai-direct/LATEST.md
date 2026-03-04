@@ -102,6 +102,8 @@ ssh linux1-lx '/home/zepher/work/Omega_vNext/.venv/bin/python -c "import numba, 
 
 ## 7. Latest Related Entries
 
+- `handover/ai-direct/entries/20260304_095536_network_bottleneck_rca.md`
+- `handover/ai-direct/entries/20260304_040010_windows_assist_plan_and_recovery.md`
 - `handover/ai-direct/entries/20260303_121500_v63_execution_post_mortem.md`
 - `handover/ai-direct/entries/20260303_025736_stage3_train_success_backtest_initiated.md`
 - `handover/ai-direct/entries/20260303_012520_v63_basematrix_forge_completed.md`
