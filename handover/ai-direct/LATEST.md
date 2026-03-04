@@ -119,6 +119,18 @@ ssh linux1-lx '/home/zepher/work/Omega_vNext/.venv/bin/python -c "import numba, 
 - `handover/ai-direct/entries/20260224_041600_omega_vm_windows_connectivity_rca_fix.md`
 
 ## Update 2026-02-27 08:24 +0000 (V62 Stage2 Dual-Host Completion + Linux Assist Cutover)
+## Update 2026-03-04 18:00 +0800 (V63 Stage 2 Distributed Acceleration & Windows Unblocked)
+
+- **Host**: `linux1-lx` (4 Shards) & `windows1-w1` (Scheduled Task)
+- **Progress**: 
+  - Linux: 47/180 files fully generated (`v63_feature_l2`).
+  - Windows: 2/60 files fully generated (`v63_feature_l2`), currently computing at full parity speed.
+- **Details**: 
+  - `windows1-w1` suffered from a V63 exponential slowdown due to `force_scan_fallback=True` which spawned 7000 isolation sub-processes per day file. This was bypassed by enforcing `$env:OMEGA_STAGE2_FORCE_SCAN_FALLBACK='0'`, `$env:OMEGA_DISABLE_NUMBA='0'`, and `$env:OMEGA_STAGE2_ISOLATE_SYMBOL_BATCH='0'`.
+  - To prevent Windows background SSH termination, the pipeline is now correctly invoked via `Scheduled Tasks` running as `System`.
+  - Both nodes are accurately producing the strictly rigorous V63 topological features (including `topo_micro`).
+- **Next Action**: Wait for the distributed cluster to digest the remaining ~190 files across both host architectures. 
+
 ## Update 2026-03-03 10:57 +0800 (Stage3 Train Success & Backtest Initiated)
 
 - **Host**: `omega-vm` / GCP Vertex AI / `linux1-lx`

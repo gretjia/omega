@@ -231,6 +231,8 @@ def main() -> int:
             cwd=str(repo_root),
             capture_output=True,
             text=True,
+            encoding="utf-8",
+            errors="replace",
             check=False,
         )
         _append_line(state_log, f"[{_now()}] ITER={iteration} RUN_RC={cp.returncode}")
