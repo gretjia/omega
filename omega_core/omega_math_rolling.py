@@ -98,16 +98,15 @@ def calc_isoperimetric_topology_rolling(
     return out_area, out_energy, out_q
 
 
-@njit(parallel=True, cache=True)
+# [反脆弱底线] 普朗克常数守护物理奇点
+PLANCK_CONSTANT = 1e-12
+
+@njit(parallel=True, cache=True) # 严禁添加 fastmath=True! 捍卫 IEEE-754 极值
 def calc_residual_epiplexity_rolling(
     srl_residuals: np.ndarray,
     window: int,
     dist_to_boundary: np.ndarray
 ) -> np.ndarray:
-    """
-    V63: Kolmogorov-Sato Separation.
-    Computes time-bounded MDL gain strictly on SRL residuals.
-    """
     n = len(srl_residuals)
     out = np.zeros(n, dtype=np.float64)
 
@@ -117,10 +116,7 @@ def calc_residual_epiplexity_rolling(
     T = np.arange(window, dtype=np.float64)
     sum_t = np.sum(T)
     sum_t2 = np.sum(T * T)
-    var_t = sum_t2 - (sum_t * sum_t / window)
-
-    if var_t < 1e-12:
-        return out
+    var_t = max(sum_t2 - (sum_t * sum_t / window), PLANCK_CONSTANT)
 
     for i in prange(window - 1, n):
         if dist_to_boundary[i] < window - 1:
@@ -135,20 +131,25 @@ def calc_residual_epiplexity_rolling(
         cov = sum_ty - (sum_t * sum_y / window)
         var_y = sum_y2 - (sum_y * sum_y / window)
 
-        if var_y < 1e-12:
-            out[i] = 0.0
+        # ==========================================
+        # 🪐 奇点守护：Epiplexity 的终极觉醒
+        # ==========================================
+        if var_y < PLANCK_CONSTANT:
+            # 绝对控盘：残差方差塌缩。
+            # 【压缩即智能】：不可返回 0.0！赋予它极大的 MDL 增益（势能极值）！
+            out[i] = 999.0 
             continue
 
         r2 = (cov * cov) / (var_t * var_y)
-
-        # Numerical guard
-        if r2 < 0.0:
+        
+        # 拔掉 0.9999 的盖子！允许逼近1，仅保留微小底线防范 log(0)
+        if r2 < 0.0: 
             r2 = 0.0
-        elif r2 > 0.9999:
-            r2 = 0.9999
+        elif r2 > 1.0 - PLANCK_CONSTANT: 
+            r2 = 1.0 - PLANCK_CONSTANT
 
-        # delta_k = 3.0: slope + intercept + factored-out physical baseline
         delta_k = 3.0
+        # 当 r2 逼近 1 时，mdl_gain 将呈对数爆炸，真正体现主力的智能碾压！
         mdl_gain = -(window / 2.0) * math.log(1.0 - r2) - (delta_k / 2.0) * math.log(window)
 
         if mdl_gain > 0.0:

@@ -27,6 +27,13 @@ from pathlib import Path
 
 import numpy as np
 import polars as pl
+import os
+
+# [V64 统御指令] 强制收缴所有底层库的并发生成权，防止 128G 节点发生线程踩踏死锁
+# 统一内存架构下，保持线程数等于物理核心数的一半即可喂饱总线带宽
+os.environ["POLARS_MAX_THREADS"] = str(max(1, os.cpu_count() // 2))
+os.environ["NUMBA_NUM_THREADS"] = str(max(1, os.cpu_count() // 2))
+os.environ["OPENBLAS_NUM_THREADS"] = "1" # 禁止底层线性代数库抢占算力
 
 try:
     import pyarrow as pa
@@ -444,11 +451,22 @@ def _process_symbol_batch(task: dict) -> dict:
             f"Batch {batch_id}: forbidden non-Float64 columns detected: {sorted(forbidden_float_cols)}"
         )
 
+    # [V64 极端斯坦守则] 绝对捍卫物理奇点，废除一切对特征 X 的数值上限截断！
+    # 1. 结构性空值吸敛为0，防止暴力 dropna 造成的级联误杀
+    base_df = base_df.with_columns(pl.col("singularity_vector").fill_nan(0.0).fill_null(0.0))
+    
+    # 2. 自适应底噪阈值：只过滤毫无波动的“绝对死水期”，对顶部的巨大极值绝对放行
     filters: list[pl.Expr] = [
         (pl.col("is_physics_valid") == True),
-        (pl.col("epiplexity") > peace_baseline),
+        (pl.col("singularity_vector").abs() > peace_baseline),
     ]
-    base_df = base_df.filter(pl.all_horizontal(filters))
+    
+    # 3. 靶向切除：我们只丢弃没有“未来收益率 (target)”对齐的尾盘数据
+    # 严禁使用 Z-Score 截断 singularity_vector！999.0 的极值必须原封不动送入云端！
+    if "t1_fwd_return" in base_df.columns:
+        base_df = base_df.filter(pl.all_horizontal(filters)).drop_nulls(subset=["t1_fwd_return"])
+    else:
+        base_df = base_df.filter(pl.all_horizontal(filters))
 
     if base_df.height <= 0:
         del base_df
@@ -491,39 +509,23 @@ def _process_symbol_batch(task: dict) -> dict:
 
 
 def _merge_batch_parquets(batch_files: list[Path], out_parquet: Path) -> tuple[int, int]:
-    if pq is None:
-        if not batch_files:
-            return 0, 0
-        # Fallback path for hosts without pyarrow: concatenate shard files in Polars.
-        merged_df = pl.scan_parquet([str(x) for x in sorted(batch_files)]).collect()
-        if merged_df.height <= 0:
-            return 0, 0
-        merged_df.write_parquet(out_parquet, compression="snappy")
-        return int(merged_df.height), int(len(batch_files))
-
-    writer: pq.ParquetWriter | None = None
-    merged_rows = 0
-    merged_files = 0
-    try:
-        for shard in sorted(batch_files):
-            table = pq.read_table(str(shard))
-            if table.num_rows <= 0:
-                continue
-
-            if writer is None:
-                writer = pq.ParquetWriter(str(out_parquet), table.schema, compression="snappy")
-            else:
-                writer_schema_names = list(writer.schema.names)  # type: ignore[attr-defined]
-                table_names = list(table.schema.names)
-                if writer_schema_names != table_names:
-                    table = table.select(writer_schema_names)
-            writer.write_table(table)
-            merged_rows += int(table.num_rows)
-            merged_files += 1
-    finally:
-        if writer is not None:
-            writer.close()
-    return merged_rows, merged_files
+    if not batch_files:
+        return 0, 0
+    
+    print(f"[SYSTEM ARCHITECT] 开启物理张量流式熔铸 (Zero-Copy Streaming)...", flush=True)
+    
+    # [V64 纯流式零拷贝纪元] 废弃 pyarrow/multiprocessing，构建延迟计算的 DAG
+    lazy_df = pl.scan_parquet([str(x) for x in sorted(batch_files)])
+    
+    lazy_df.sink_parquet(
+        str(out_parquet),
+        compression="zstd",
+        row_group_size=1048576,
+        maintain_order=False
+    )
+    
+    merged_rows = _count_parquet_rows(out_parquet)
+    return int(merged_rows), int(len(batch_files))
 
 
 def _count_parquet_rows(path: Path) -> int:
@@ -907,6 +909,7 @@ def main() -> int:
                 "bucket_id",
                 "time_end",
                 "epiplexity",
+                "singularity_vector",
                 "srl_resid",
                 "srl_resid_050",
                 "sigma_eff",

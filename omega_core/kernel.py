@@ -296,54 +296,50 @@ def _apply_recursive_physics(
         (pl.col("srl_resid").sign()).alias("direction"),
     ])
 
-    # === V62 PHASE 5: MDL DYNAMIC ARENA ===
-    # Real-time competition between the 3 structural probes
+    # === V64 EXTREMISTAN ARENA: 三位一体大融合 (The Epistemic Trinity) ===
+    # 彻底贯彻核心洞察：Topology (空间折叠) + Epiplexity (信息压缩) + SRL (动量矢量) 
+    
     if "symbol" in res_df.columns:
         group_expr = pl.col("symbol")
         
-        # 1. Bits Linear (Already computed as Epiplexity)
+        # 1. Epiplexity (线性压缩率：底层奇点已被释放)
         bits_linear = pl.col("epiplexity").forward_fill().over(group_expr)
 
-        # 2. Bits SRL (Time-Bounded R^2 of Residuals vs Price Change)
-        # delta_k = 1.0 (Y parameter)
+        # 2. Bits SRL (非线性压缩率：解除 0.9999 封印，允许逼近 1.0)
         var_srl_resid = pl.col("srl_resid").rolling_var(window_size=window_len).over(group_expr).forward_fill().over(group_expr)
         var_price_change = pl.col("price_change").rolling_var(window_size=window_len).over(group_expr).forward_fill().over(group_expr)
-        r2_srl = (1.0 - (var_srl_resid / (var_price_change + 1e-12))).clip(0.0, 0.9999)
-        bits_srl = (-(window_len / 2.0) * (1.0 - r2_srl).log() - 0.5 * math.log(window_len)).clip(0.0, 999.0)
+        r2_srl = (1.0 - (var_srl_resid / (var_price_change + 1e-12))).clip(0.0, 1.0 - 1e-12)
+        bits_srl = (-(window_len / 2.0) * (1.0 - r2_srl).log() - 0.5 * math.log(window_len)).clip(lower_bound=0.0)
 
-        # 3. Bits Topology (Isoperimetric Structure bits)
-        # Using compactness structural gain
+        # 3. Bits Topology (高维拓扑：被折叠的空间)
         compactness = (4.0 * math.pi * pl.col("topo_area").abs()) / (pl.col("topo_energy")**2 + 1e-12)
-        bits_topo = (compactness * math.log(window_len)).forward_fill().over(group_expr).clip(0.0, 999.0)
+        bits_topo = (compactness * math.log(window_len)).forward_fill().over(group_expr).clip(lower_bound=0.0)
+
+        # 4. SRL Phase (主力算法单的微观破缺方向)
+        srl_phase = pl.col("srl_resid").sign() * pl.col("srl_resid").abs().sqrt()
 
         res_df = res_df.with_columns([
             bits_linear.alias("bits_linear"),
             bits_srl.alias("bits_srl"),
-            bits_topo.alias("bits_topology")
+            bits_topo.alias("bits_topology"),
+            srl_phase.alias("srl_phase")
         ])
-
-        # Argmax Competition: Select Dominant Probe (1=Linear, 2=SRL, 3=Topology)
-        # Perf: scalar when/then avoids allocating a List column per row
-        # (memory fragmentation bomb). Tie-break matches original arg_max
-        # behavior (first-index wins: Linear > SRL > Topology).
-        # Important: keep exact arg_max semantics with nulls.
-        # concat_list(...).list.arg_max() effectively ignores null candidates.
-        # Fill null/NaN to -inf for comparison so tie-break and null behavior match
-        # the old implementation.
-        bits_linear_cmp = pl.col("bits_linear").fill_null(float("-inf")).fill_nan(float("-inf"))
-        bits_srl_cmp = pl.col("bits_srl").fill_null(float("-inf")).fill_nan(float("-inf"))
-        bits_topology_cmp = (
-            pl.col("bits_topology").fill_null(float("-inf")).fill_nan(float("-inf"))
-        )
-
-        dominant_probe = (
-            pl.when((bits_srl_cmp > bits_linear_cmp) & (bits_srl_cmp >= bits_topology_cmp))
-            .then(pl.lit(2))
-            .when((bits_topology_cmp > bits_linear_cmp) & (bits_topology_cmp > bits_srl_cmp))
-            .then(pl.lit(3))
-            .otherwise(pl.lit(1))
-        )
-        res_df = res_df.with_columns(dominant_probe.alias("dominant_probe"))
+        
+        # -------------------------------------------------------------
+        # 🐺 [THE HOLY GRAIL]: 主力奇点向量 (Main Force Singularity Vector)
+        # 这就是你独狼狩猎的终极武器。
+        # 绝对压缩程度 (bits_linear + bits_srl + bits_topo) 赋予它巨大的杠铃“幅度”。
+        # SRL (srl_phase) 赋予它射击的“方向”。
+        # 散户行情下：压缩度趋近0，整个向量归于死寂。
+        # 主力入场时：压缩度呈指数爆发，伴随方向，模型给出必杀一击！
+        # -------------------------------------------------------------
+        main_force_singularity = (pl.col("bits_linear") + pl.col("bits_srl") + pl.col("bits_topology")) * pl.col("srl_phase")
+        
+        res_df = res_df.with_columns([
+            main_force_singularity.alias("singularity_vector"),
+            # 兼容系统后续管线
+            pl.lit(1).alias("dominant_probe") 
+        ])
         
     return res_df
 
