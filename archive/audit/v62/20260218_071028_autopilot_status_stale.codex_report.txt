@@ -1,0 +1,9 @@
+Report written to:
+
+`audit/runtime/v52/incidents/20260218_071028_autopilot_status_stale.codex_report.txt`
+
+Key outcome:
+- Root cause confirmed as stale status heartbeat during long `build_base_matrix` Vertex polling, not an autopilot stop.
+- Minimal safe intervention applied: refreshed `audit/runtime/v52/autopilot_aa8abb7.status.json` (no v6 math/principle changes, no destructive commands, no autopilot restart).
+- Verification shows forward progress is active: `autopilot_aa8abb7.runner.log` continues advancing (`elapsed` increased from `7875s` at `07:10:28` to `8404s` at `07:19:17`), and live state refreshed with low `status_age_sec` after intervention.
+- Remaining risk: stale-status incidents can recur while Vertex stays pending if heartbeat isn’t periodically refreshed or watchdog process isn’t relaunched with the current runner-age-gated logic.

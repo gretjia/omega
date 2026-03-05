@@ -1,0 +1,256 @@
+{
+  "KernelConfig": {
+    "volume_clock": {
+      "volume_per_bar": 50000.0,
+      "min_ticks_per_bar": 5,
+      "max_bars": 2048
+    },
+    "embedding": {
+      "delay": 3,
+      "dimension": 8
+    },
+    "tda": {
+      "eps_min": 0.25,
+      "eps_max": 3.0,
+      "n_eps": 16,
+      "epsilon_base": 1.0,
+      "epsilon_min": 0.25,
+      "epsilon_max": 3.0,
+      "epsilon_shrink_k": 0.75,
+      "standardize_point_cloud": true,
+      "standardize_eps": 1e-12,
+      "triangle_penalty": 0.0,
+      "topo_snr_metric": "beta1_auc",
+      "topo_snr_n_shuffle": 100,
+      "topo_snr_seed": 1337,
+      "topo_snr_std_floor": 1e-12,
+      "topo_snr_min_shuffles": 10
+    },
+    "mdl": {
+      "max_ar_order": 12,
+      "candidate_orders": null,
+      "ridge_alpha": 1e-06,
+      "data_cost_method": "gzip",
+      "model_cost_method": "bic",
+      "residual_scale_method": "std",
+      "residual_scale_floor": 1e-06,
+      "compression": {
+        "codec": "gzip",
+        "level_data": 6,
+        "level_model": 6,
+        "residual_quant_step": 0.0001,
+        "raw_quant_step": 0.0001,
+        "coef_quant_step": 1e-06
+      }
+    },
+    "srl": {
+      "impact_Y": 1.0,
+      "exponent": 0.5,
+      "sigma_floor": 1e-06,
+      "price_floor": 1e-12,
+      "V_floor": 1.0,
+      "impact_mode": "abs_log_return",
+      "ofi_mode": "tick_rule",
+      "min_predicted_impact": 1e-05
+    },
+    "boundary": {
+      "enabled": true,
+      "stall_window_bars": 5,
+      "stall_zero_return_frac": 0.8,
+      "boundary_margin": 0.002,
+      "disable_srl": true,
+      "disable_trading": true
+    },
+    "decision": {
+      "epiplexity_high": 0.25,
+      "epiplexity_low": 0.05,
+      "entropy_high": 0.9,
+      "entropy_low": 0.4,
+      "beta1_high": 1.5,
+      "beta0_low": 1.5,
+      "iceberg_ratio_low": 0.5,
+      "iceberg_ratio_high": 1.5,
+      "min_ofi_abs": 0.0,
+      "use_signed_area_direction": true,
+      "vector_align_window": 8,
+      "vector_align_min": 0.8,
+      "vector_align_norm_floor": 1e-12,
+      "vector_align_nan_fallback": 0.0,
+      "signed_area_min_abs": 1e-09
+    },
+    "risk": {
+      "base_position": 1.0,
+      "max_position": 3.0,
+      "entropy_k": 1.0,
+      "iceberg_k": 0.25
+    },
+    "min_bars": 3
+  },
+  "DataSourceConfig": {
+    "_init_error": "__init__() missing 1 required positional argument: 'root_dir'"
+  },
+  "SplitConfig": {
+    "method": "time",
+    "train_frac": 0.8,
+    "val_frac": 0.1,
+    "test_frac": 0.1,
+    "split_seed": 2026,
+    "train_years": [
+      2023,
+      2024
+    ],
+    "test_years": [
+      2025
+    ],
+    "test_year_months": [
+      202601
+    ],
+    "val_years": []
+  },
+  "WindowSamplingConfig": {
+    "lookback_bars": 128,
+    "stride_bars": 8,
+    "label_horizon_bars": 16,
+    "label_return_threshold": 0.0,
+    "require_min_embedded_points": true
+  },
+  "CalibrationConfig": {
+    "enabled": true,
+    "reservoir_size": 50000,
+    "max_windows_total": 300000,
+    "q_s_low": 0.2,
+    "q_s_high": 0.8,
+    "q_h_low": 0.2,
+    "q_h_high": 0.8
+  },
+  "FeatureConfig": {
+    "include_raw_tda_curve_stats": true,
+    "include_srl": true,
+    "include_ofi": true,
+    "include_sigma_V": true,
+    "standardize_features": true,
+    "nan_fallback": 0.0,
+    "include_diagnostics_in_model": false
+  },
+  "AuditMetricsConfig": {
+    "topo_snr_avg_min": 3.0,
+    "epi_entropy_corr_max": 0.1,
+    "vector_align_avg_min": 0.8,
+    "corr_min_samples": 30,
+    "corr_eps": 1e-12,
+    "kurtosis_min_samples": 30,
+    "kurtosis_eps": 1e-12,
+    "kurtosis_excess": true,
+    "kurtosis_excess_offset": 3.0
+  },
+  "ModelConfig": {
+    "model_type": "sgd_logistic",
+    "loss": "log_loss",
+    "penalty": "l2",
+    "alpha": 0.0001,
+    "l1_ratio": 0.15,
+    "max_iter": 1,
+    "tol": null,
+    "learning_rate": "optimal",
+    "eta0": 0.01,
+    "power_t": 0.5,
+    "average": true,
+    "epochs": 3,
+    "batch_size": 512,
+    "shuffle_within_file": false,
+    "decision_margin": 0.05
+  },
+  "BacktestConfig": {
+    "cost_weight": 1.0,
+    "annualization_factor": 252.0,
+    "pnl_clip": null
+  },
+  "TrainingStageConfig": {
+    "_init_error": "__init__() missing 3 required positional arguments: 'name', 'sources', and 'epochs'"
+  },
+  "TrainerConfig": {
+    "csv": {
+      "simplified_time_unit": "ms",
+      "simplified_time_is_epoch": true,
+      "volume_mode": "auto",
+      "sort_by_time": true,
+      "drop_duplicated_time": true
+    },
+    "split": {
+      "method": "time",
+      "train_frac": 0.8,
+      "val_frac": 0.1,
+      "test_frac": 0.1,
+      "split_seed": 2026,
+      "train_years": [
+        2023,
+        2024
+      ],
+      "test_years": [
+        2025
+      ],
+      "test_year_months": [
+        202601
+      ],
+      "val_years": []
+    },
+    "window": {
+      "lookback_bars": 128,
+      "stride_bars": 8,
+      "label_horizon_bars": 16,
+      "label_return_threshold": 0.0,
+      "require_min_embedded_points": true
+    },
+    "calibration": {
+      "enabled": true,
+      "reservoir_size": 50000,
+      "max_windows_total": 300000,
+      "q_s_low": 0.2,
+      "q_s_high": 0.8,
+      "q_h_low": 0.2,
+      "q_h_high": 0.8
+    },
+    "feature": {
+      "include_raw_tda_curve_stats": true,
+      "include_srl": true,
+      "include_ofi": true,
+      "include_sigma_V": true,
+      "standardize_features": true,
+      "nan_fallback": 0.0,
+      "include_diagnostics_in_model": false
+    },
+    "model": {
+      "model_type": "sgd_logistic",
+      "loss": "log_loss",
+      "penalty": "l2",
+      "alpha": 0.0001,
+      "l1_ratio": 0.15,
+      "max_iter": 1,
+      "tol": null,
+      "learning_rate": "optimal",
+      "eta0": 0.01,
+      "power_t": 0.5,
+      "average": true,
+      "epochs": 3,
+      "batch_size": 512,
+      "shuffle_within_file": false,
+      "decision_margin": 0.05
+    },
+    "backtest": {
+      "cost_weight": 1.0,
+      "annualization_factor": 252.0,
+      "pnl_clip": null
+    },
+    "audit": {
+      "topo_snr_avg_min": 3.0,
+      "epi_entropy_corr_max": 0.1,
+      "vector_align_avg_min": 0.8,
+      "corr_min_samples": 30,
+      "corr_eps": 1e-12,
+      "kurtosis_min_samples": 30,
+      "kurtosis_eps": 1e-12,
+      "kurtosis_excess": true,
+      "kurtosis_excess_offset": 3.0
+    }
+  }
+}

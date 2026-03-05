@@ -1,0 +1,128 @@
+{
+  "started_at": "2026-02-19 10:59:51",
+  "git_hash": "aa8abb7",
+  "bucket": "gs://omega_v52_central/omega",
+  "windows_expected": 263,
+  "linux_expected": 484,
+  "stage": "vertex_train",
+  "frame": {
+    "linux_done": 484,
+    "windows_done": 263,
+    "windows_task_state": "Ready",
+    "probe_linux": 484,
+    "probe_windows": 263,
+    "probe_ok": true,
+    "updated_at": "2026-02-19 10:59:52"
+  },
+  "upload": {
+    "gcs_counts": {
+      "linux1": 484,
+      "windows1": 263,
+      "checked_at": "2026-02-19 11:00:00"
+    }
+  },
+  "optimization": {
+    "base_matrix_uri": "gs://omega_v52_central/omega/staging/base_matrix/v60/resume_aa8abb7/base_matrix.parquet",
+    "base_matrix_meta_uri": "gs://omega_v52_central/omega/staging/base_matrix/v60/resume_aa8abb7/base_matrix.meta.json",
+    "base_matrix_exec_mode": "local_ticker_sharding",
+    "base_matrix_input_pattern": "/Users/zephryj/work/Omega_vNext/artifacts/runtime/v52/frames/host=windows1/*_aa8abb7.parquet",
+    "base_matrix_input_files": 40,
+    "base_matrix_symbols_per_batch": 50,
+    "base_matrix_max_workers": 8,
+    "base_matrix_resume": true,
+    "base_matrix_cache_key": "aa8abb7",
+    "result_uri": "gs://omega_v52_central/omega/staging/optimization/v60/20260219-030000_aa8abb7/swarm_best.json",
+    "completed_at": "2026-02-19 11:21:39",
+    "result": {
+      "status": "completed",
+      "best_params": {
+        "peace_threshold": 0.5253567667772991,
+        "srl_resid_sigma_mult": 1.9773888188507172,
+        "topo_energy_sigma_mult": 5.427559578121958,
+        "max_depth": 5,
+        "learning_rate": 0.006525909043483982,
+        "subsample": 0.9382970275902356,
+        "colsample_bytree": 0.7855991276821759
+      },
+      "best_value": 0.6101452643370191,
+      "n_trials": 50,
+      "n_completed": 20,
+      "base_matrix": "gs://omega_v52_central/omega/staging/base_matrix/v60/resume_aa8abb7/base_matrix.parquet",
+      "feature_cols": [
+        "sigma_eff",
+        "net_ofi",
+        "depth_eff",
+        "epiplexity",
+        "srl_resid",
+        "topo_area",
+        "topo_energy",
+        "topo_micro",
+        "topo_classic",
+        "topo_trend",
+        "price_change",
+        "bar_duration_ms",
+        "adaptive_y",
+        "epi_x_srl_resid",
+        "epi_x_topo_area",
+        "epi_x_net_ofi"
+      ],
+      "seconds": 28.56,
+      "job_id": "8392580415252070400"
+    },
+    "best_params": {
+      "peace_threshold": 0.5253567667772991,
+      "srl_resid_sigma_mult": 1.9773888188507172,
+      "topo_energy_sigma_mult": 5.427559578121958,
+      "max_depth": 5,
+      "learning_rate": 0.006525909043483982,
+      "subsample": 0.9382970275902356,
+      "colsample_bytree": 0.7855991276821759
+    }
+  },
+  "train": {
+    "output_uri": "gs://omega_v52_central/omega/staging/models/v6/20260219-030000_aa8abb7",
+    "data_pattern": "gs://omega_v52_central/omega/omega/v52/frames/host=*/*_aa8abb7.parquet",
+    "overrides": {
+      "peace_threshold": 0.5253567667772991,
+      "srl_resid_sigma_mult": 1.9773888188507172,
+      "topo_energy_sigma_mult": 5.427559578121958,
+      "max_depth": 5,
+      "learning_rate": 0.006525909043483982,
+      "subsample": 0.9382970275902356,
+      "colsample_bytree": 0.7855991276821759
+    }
+  },
+  "backtest": {
+    "machine_candidates": [
+      "n2-standard-80",
+      "n2-standard-64",
+      "n2-standard-48",
+      "n2-standard-32"
+    ],
+    "sync_timeout_sec": 14400,
+    "takeover_log": "audit/runtime/v52/backtest_takeover_aa8abb7.log",
+    "takeover_mode": "pending_train_completion",
+    "worker_policy": {
+      "workers": 0,
+      "workers_min": 2,
+      "workers_max": 0,
+      "workers_start": 0,
+      "workers_cpu_frac": 0.75,
+      "workers_cpu_util_low": 55,
+      "workers_cpu_util_high": 88,
+      "workers_mem_headroom_gb": 24,
+      "workers_est_mem_gb": 3,
+      "workers_adjust_step": 1,
+      "workers_poll_sec": 2
+    }
+  },
+  "run_id": "20260219-030000",
+  "data_pattern": "gs://omega_v52_central/omega/omega/v52/frames/host=*/*_aa8abb7.parquet",
+  "orchestrator": {
+    "mode": "manual_takeover_after_train",
+    "updated_at": "2026-02-19 15:38:50",
+    "reason": "upgrade backtest machine tier + adaptive workers",
+    "watcher_pid": 63228,
+    "watcher_session_id": 31165
+  }
+}

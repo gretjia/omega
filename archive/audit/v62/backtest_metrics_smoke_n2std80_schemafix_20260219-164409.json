@@ -1,0 +1,74 @@
+{
+  "status": "completed",
+  "files_matched": 263,
+  "files_selected": 2,
+  "files_used": 2,
+  "day_span_selected": {
+    "count": 2,
+    "first": "20250103",
+    "last": "20260128"
+  },
+  "day_span_used": {
+    "count": 2,
+    "first": "20250103",
+    "last": "20260128"
+  },
+  "total_proc_rows": 62842,
+  "seconds": 505.95,
+  "model_uri": "gs://omega_v52_central/omega/staging/models/v6/20260219-125410_78e36d9/omega_v6_xgb_final.pkl",
+  "data_pattern": "gs://omega_v52_central/omega/omega/v52/frames/host=*/*_aa8abb7.parquet",
+  "test_years": [
+    "2025",
+    "2026"
+  ],
+  "test_ym": [
+    "2025",
+    "202601"
+  ],
+  "split_guard": {
+    "enforced": true,
+    "test_years": [
+      "2025",
+      "2026"
+    ],
+    "test_ym": [
+      "2025",
+      "202601"
+    ]
+  },
+  "overrides": {
+    "peace_threshold": 0.5253567667772991,
+    "srl_resid_sigma_mult": 1.9773888188507172,
+    "topo_energy_sigma_mult": 5.427559578121958
+  },
+  "worker_plan": {
+    "requested": 1,
+    "min_workers": 1,
+    "max_workers": 80,
+    "start_workers": 80,
+    "adaptive": false,
+    "cpu_total": 80,
+    "mem_total_gb": 314.87,
+    "architecture": "global_causal_materialization"
+  },
+  "summary": {
+    "Topo_SNR": 9.331698797292082,
+    "Orthogonality": -0.03853562495575558,
+    "Phys_Alignment": 0.514307662761667,
+    "Model_Alignment": 0.4644709045515652,
+    "Vector_Alignment": 0.4644709045515652
+  },
+  "per_file_count": 1,
+  "per_file": [
+    {
+      "source_uri": "global_continuum_manifold",
+      "raw_rows": -1,
+      "proc_rows": 62842,
+      "Topo_SNR": 9.331698797292082,
+      "Orthogonality": -0.03853562495575558,
+      "Phys_Alignment": 0.514307662761667,
+      "Model_Alignment": 0.4644709045515652,
+      "Vector_Alignment": 0.4644709045515652
+    }
+  ]
+}

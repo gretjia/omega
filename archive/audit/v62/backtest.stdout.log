@@ -1,0 +1,95 @@
+Running Parallel Backtest on: ['level2_frames_v50_output', 'level2_frames_v50_win']
+[Init] Loading Policy: C:\Omega_vNext\artifacts\checkpoint_rows_15880921.pkl
+[Plan] loading file list (stream mode): C:\Omega_vNext\audit\v51_runtime\windows\full_autopilot\manifests\backtest_files.txt
+[Start] Launching 8 workers...
+[Plan] file-list stream selected first chunk. scanned=16, selected=16
+[Stage] chunk=0, files=16, elapsed=0.5s, copy_workers=4, dir=D:\Omega_backtest_stage_v51_full\chunk_000000
+  Progress: 545,196 rows | Files: 13/16 | PnL: 60.2849 | Trades: 106,188 | Speed: 0.0 f/s
+[Stage] chunk=1, files=16, elapsed=1.4s, copy_workers=4, dir=D:\Omega_backtest_stage_v51_full\chunk_000001
+  Progress: 1,072,443 rows | Files: 25/32 | PnL: 46.8383 | Trades: 207,738 | Speed: 0.0 f/s
+[Stage] chunk=2, files=16, elapsed=1.4s, copy_workers=4, dir=D:\Omega_backtest_stage_v51_full\chunk_000002
+  Progress: 1,602,226 rows | Files: 37/48 | PnL: -14.6726 | Trades: 317,918 | Speed: 0.0 f/s
+[Stage] chunk=3, files=16, elapsed=1.5s, copy_workers=4, dir=D:\Omega_backtest_stage_v51_full\chunk_000003
+  Progress: 2,132,536 rows | Files: 49/64 | PnL: 15.9838 | Trades: 428,322 | Speed: 0.0 f/s
+  Progress: 2,677,284 rows | Files: 62/64 | PnL: 93.5571 | Trades: 541,806 | Speed: 0.0 f/s
+[Stage] chunk=4, files=16, elapsed=1.4s, copy_workers=4, dir=D:\Omega_backtest_stage_v51_full\chunk_000004
+  Progress: 3,179,485 rows | Files: 74/80 | PnL: 103.3691 | Trades: 647,356 | Speed: 0.0 f/s
+[Stage] chunk=5, files=16, elapsed=1.5s, copy_workers=4, dir=D:\Omega_backtest_stage_v51_full\chunk_000005
+  Progress: 3,680,719 rows | Files: 86/96 | PnL: 102.7401 | Trades: 750,026 | Speed: 0.0 f/s
+[Stage] chunk=6, files=16, elapsed=1.4s, copy_workers=4, dir=D:\Omega_backtest_stage_v51_full\chunk_000006
+  Progress: 4,189,480 rows | Files: 98/112 | PnL: 115.1572 | Trades: 859,348 | Speed: 0.0 f/s
+  Progress: 4,699,021 rows | Files: 110/112 | PnL: 149.5217 | Trades: 969,711 | Speed: 0.0 f/s
+[Stage] chunk=7, files=16, elapsed=1.5s, copy_workers=4, dir=D:\Omega_backtest_stage_v51_full\chunk_000007
+  Progress: 5,229,761 rows | Files: 122/128 | PnL: 152.6964 | Trades: 1,083,527 | Speed: 0.0 f/s
+[Stage] chunk=8, files=16, elapsed=1.7s, copy_workers=4, dir=D:\Omega_backtest_stage_v51_full\chunk_000008
+  Progress: 5,761,008 rows | Files: 134/144 | PnL: 122.1156 | Trades: 1,192,508 | Speed: 0.0 f/s
+[Stage] chunk=9, files=16, elapsed=1.8s, copy_workers=4, dir=D:\Omega_backtest_stage_v51_full\chunk_000009
+  Progress: 6,272,441 rows | Files: 145/160 | PnL: 146.1328 | Trades: 1,298,331 | Speed: 0.0 f/s
+  Progress: 6,785,022 rows | Files: 156/160 | PnL: 120.9899 | Trades: 1,400,201 | Speed: 0.0 f/s
+[Stage] chunk=10, files=16, elapsed=1.7s, copy_workers=4, dir=D:\Omega_backtest_stage_v51_full\chunk_000010
+  Progress: 7,310,064 rows | Files: 167/176 | PnL: 108.4018 | Trades: 1,502,702 | Speed: 0.0 f/s
+[Stage] chunk=11, files=16, elapsed=1.5s, copy_workers=4, dir=D:\Omega_backtest_stage_v51_full\chunk_000011
+  Progress: 7,831,685 rows | Files: 178/192 | PnL: 144.8569 | Trades: 1,605,633 | Speed: 0.0 f/s
+[Status Warn] status_json write failed: [Errno 28] No space left on device
+  Progress: 8,355,764 rows | Files: 190/192 | PnL: 191.0880 | Trades: 1,708,787 | Speed: 0.0 f/s
+[Stage] chunk=12, files=16, elapsed=0.8s, copy_workers=4, dir=D:\Omega_backtest_stage_v51_full\chunk_000012
+  [Warn] 20251105.parquet: Traceback (most recent call last):
+  File "C:\Omega_vNext\parallel_trainer\run_parallel_backtest_v31.py", line 159, in process_backtest_file
+    df = trainer_tool._prepare_frames(df, policy_cfg)
+  File "C:\Omega_vNext\omega_core\trainer_v51.py", line 86, in _prepare_frames
+    df = apply_recursive_physics(df, cfg)
+  File "C:\Omega_vNext\omega_core\kernel.py", line 222, in apply_recursive_physics
+    return _apply_recursive_physics(frames, cfg, initial_y=initial_y)
+  File "C:\Omega_vNext\omega_core\kernel.py", line 58, in _apply_recursive_physics
+    rows = frames.to_dicts()
+  File "C:\Users\jiazi\AppData\Roaming\Python\Python314\site-packages\polars\dataframe\frame.py", line 1880, in to_dicts
+    return self.rows(named=True)
+           ~~~~~~~~~^^^^^^^^^^^^
+  File "C:\Users\jiazi\AppData\Roaming\Python\Python314\site-packages\polars\dataframe\frame.py", line 11588, in rows
+    return [dict_(zip_(columns, row)) for row in self._df.row_tuples()]
+            ~~~~~^^^^^^^^^^^^^^^^^^^^
+MemoryError
+
+  [Warn] 20251022.parquet: Traceback (most recent call last):
+  File "C:\Omega_vNext\parallel_trainer\run_parallel_backtest_v31.py", line 159, in process_backtest_file
+    df = trainer_tool._prepare_frames(df, policy_cfg)
+  File "C:\Omega_vNext\omega_core\trainer_v51.py", line 86, in _prepare_frames
+    df = apply_recursive_physics(df, cfg)
+  File "C:\Omega_vNext\omega_core\kernel.py", line 222, in apply_recursive_physics
+    return _apply_recursive_physics(frames, cfg, initial_y=initial_y)
+  File "C:\Omega_vNext\omega_core\kernel.py", line 194, in _apply_recursive_physics
+    results.append(row)
+    ~~~~~~~~~~~~~~^^^^^
+MemoryError
+
+  Progress: 8,884,494 rows | Files: 204/208 | PnL: 198.8066 | Trades: 1,812,819 | Speed: 0.0 f/s
+[Stage] chunk=13, files=16, elapsed=0.8s, copy_workers=4, dir=D:\Omega_backtest_stage_v51_full\chunk_000013
+  Progress: 9,413,664 rows | Files: 216/224 | PnL: 209.1175 | Trades: 1,917,307 | Speed: 0.0 f/s
+[Stage] chunk=14, files=16, elapsed=0.8s, copy_workers=4, dir=D:\Omega_backtest_stage_v51_full\chunk_000014
+  Progress: 9,951,815 rows | Files: 228/240 | PnL: 249.5368 | Trades: 2,024,350 | Speed: 0.0 f/s
+  Progress: 10,491,643 rows | Files: 240/240 | PnL: 231.6906 | Trades: 2,132,718 | Speed: 0.0 f/s
+[Stage] chunk=15, files=16, elapsed=0.8s, copy_workers=4, dir=D:\Omega_backtest_stage_v51_full\chunk_000015
+  Progress: 10,999,166 rows | Files: 251/256 | PnL: 246.6691 | Trades: 2,230,641 | Speed: 0.0 f/s
+[Stage] chunk=16, files=7, elapsed=0.3s, copy_workers=4, dir=D:\Omega_backtest_stage_v51_full\chunk_000016
+  Progress: 11,511,464 rows | Files: 262/263 | PnL: 216.5903 | Trades: 2,335,161 | Speed: 0.0 f/s
+[Plan] file-list mode complete: scanned=263, selected=263
+
+==================================================
+OMEGA v3.1 PARALLEL BACKTEST REPORT
+==================================================
+Data Source Mode: manifest(file-list)
+Manifest Path: C:\Omega_vNext\audit\v51_runtime\windows\full_autopilot\manifests\backtest_files.txt
+Manifest Selected Files: 263
+Configured Data Roots: ['data\\level2_frames_v50_output', 'data\\level2_frames_v50_win']
+Total Rows  : 11,557,977
+Total Trades: 2,344,617
+Total PnL   : 212.748284 (Unit: Return k)
+Ret Clip Abs: None
+--------------------------------------------------
+PHYSICS AUDIT METRICS (DoD)
+Topo SNR         : 9.4581  (Target > 3.0)
+Orthogonality    : -0.0404  (Target < 0.1)
+Vector Alignment : 0.5077 (Target > 0.6)
+--------------------------------------------------
+FINAL AUDIT STATUS: FAILED
+==================================================

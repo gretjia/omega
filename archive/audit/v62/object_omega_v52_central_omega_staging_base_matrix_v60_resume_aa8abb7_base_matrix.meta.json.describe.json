@@ -1,0 +1,47 @@
+{
+  "acl": [
+    {
+      "entity": "project-owners-269018079180",
+      "projectTeam": {
+        "projectNumber": "269018079180",
+        "team": "owners"
+      },
+      "role": "OWNER"
+    },
+    {
+      "entity": "project-editors-269018079180",
+      "projectTeam": {
+        "projectNumber": "269018079180",
+        "team": "editors"
+      },
+      "role": "OWNER"
+    },
+    {
+      "entity": "project-viewers-269018079180",
+      "projectTeam": {
+        "projectNumber": "269018079180",
+        "team": "viewers"
+      },
+      "role": "READER"
+    },
+    {
+      "email": "ziqian.jia@gmail.com",
+      "entity": "user-ziqian.jia@gmail.com",
+      "role": "OWNER"
+    }
+  ],
+  "bucket": "omega_v52_central",
+  "content_type": "application/json",
+  "crc32c_hash": "jvpaqg==",
+  "creation_time": "2026-02-19T03:15:41+0000",
+  "etag": "CIWz2MHL5JIDEAE=",
+  "generation": "1771470941723013",
+  "md5_hash": "sFk3UUn09IIuzwSzQfcBvg==",
+  "metageneration": 1,
+  "name": "omega/staging/base_matrix/v60/resume_aa8abb7/base_matrix.meta.json",
+  "size": 37260,
+  "storage_class": "STANDARD",
+  "storage_class_update_time": "2026-02-19T03:15:41+0000",
+  "storage_url": "gs://omega_v52_central/omega/staging/base_matrix/v60/resume_aa8abb7/base_matrix.meta.json#1771470941723013",
+  "update_time": "2026-02-19T03:15:41+0000"
+}

@@ -1,0 +1,47 @@
+{
+  "acl": [
+    {
+      "entity": "project-owners-269018079180",
+      "projectTeam": {
+        "projectNumber": "269018079180",
+        "team": "owners"
+      },
+      "role": "OWNER"
+    },
+    {
+      "entity": "project-editors-269018079180",
+      "projectTeam": {
+        "projectNumber": "269018079180",
+        "team": "editors"
+      },
+      "role": "OWNER"
+    },
+    {
+      "entity": "project-viewers-269018079180",
+      "projectTeam": {
+        "projectNumber": "269018079180",
+        "team": "viewers"
+      },
+      "role": "READER"
+    },
+    {
+      "email": "service-269018079180@gcp-sa-aiplatform-cc.iam.gserviceaccount.com",
+      "entity": "user-service-269018079180@gcp-sa-aiplatform-cc.iam.gserviceaccount.com",
+      "role": "OWNER"
+    }
+  ],
+  "bucket": "omega_v52_central",
+  "content_type": "application/json",
+  "crc32c_hash": "AvaJoQ==",
+  "creation_time": "2026-02-19T03:21:15+0000",
+  "etag": "CLjn7eDM5JIDEAE=",
+  "generation": "1771471275520952",
+  "md5_hash": "xTeyodrlajYI1MGFgtDtgA==",
+  "metageneration": 1,
+  "name": "omega/staging/optimization/v60/20260219-030000_aa8abb7/swarm_best.json",
+  "size": 900,
+  "storage_class": "STANDARD",
+  "storage_class_update_time": "2026-02-19T03:21:15+0000",
+  "storage_url": "gs://omega_v52_central/omega/staging/optimization/v60/20260219-030000_aa8abb7/swarm_best.json#1771471275520952",
+  "update_time": "2026-02-19T03:21:15+0000"
+}

@@ -1,0 +1,76 @@
+[2026-02-19 10:59:51] Spot plan base=False opt=False train=False backtest=False
+[2026-02-19 10:59:51] Data caps base(symbols_per_batch=50, max_workers=8, sample_symbols=0) train(max_files=0, max_rows_per_file=0) backtest(max_files=0, max_rows_per_file=0)
+[2026-02-19 10:59:51] Base-matrix local input pattern=/Users/zephryj/work/Omega_vNext/artifacts/runtime/v52/frames/host=windows1/*_aa8abb7.parquet files=40
+[2026-02-19 10:59:51] Backtest month guard enabled: 2025,202601
+[2026-02-19 10:59:51] Recursive audit passed at node=bootstrap
+[2026-02-19 10:59:52] Frame progress linux=484/484 windows=263/263 task=Ready probe_ok=True
+[2026-02-19 10:59:52] Frame stage complete.
+[2026-02-19 10:59:52] Recursive audit passed at node=frame_complete
+[2026-02-19 10:59:56] GCS progress linux1=484/484 windows1=263/263
+[2026-02-19 10:59:56] Upload stage complete.
+[2026-02-19 11:00:00] GCS counts linux1=484 windows1=263
+[2026-02-19 11:00:00] Building v60 base matrix on local AMD nodes via ticker sharding...
+[2026-02-19 11:00:00] Recursive audit passed at node=pre_base_matrix
+[2026-02-19 11:00:00] + /Library/Developer/CommandLineTools/usr/bin/python3 tools/v60_build_base_matrix.py --input-pattern=/Users/zephryj/work/Omega_vNext/artifacts/runtime/v52/frames/host=windows1/*_aa8abb7.parquet --years=2023,2024 --hash=aa8abb7 --peace-threshold=0.1 --peace-threshold-baseline=0.1 --srl-resid-sigma-mult=0.5 --symbols-per-batch=50 --max-workers=8 --output-parquet=/Users/zephryj/work/Omega_vNext/artifacts/runtime/v60/base_matrix/aa8abb7/base_matrix.parquet --output-meta=/Users/zephryj/work/Omega_vNext/artifacts/runtime/v60/base_matrix/aa8abb7/base_matrix.parquet.meta.json --shard-dir=/Users/zephryj/work/Omega_vNext/artifacts/runtime/v60/base_matrix/aa8abb7/base_matrix_shards --output-uri=gs://omega_v52_central/omega/staging/base_matrix/v60/resume_aa8abb7/base_matrix.parquet --output-meta-uri=gs://omega_v52_central/omega/staging/base_matrix/v60/resume_aa8abb7/base_matrix.meta.json --seed=42
+[2026-02-19 11:00:01] [INFO] forge scheduling: total_batches=112, pre_resumed=0, pending=112, max_workers=8
+[2026-02-19 11:00:01] [INFO] worker plan: requested=8, effective=8, worker_budget=0, mem_available_gb=None
+[2026-02-19 11:11:48] Copying file:///Users/zephryj/work/Omega_vNext/artifacts/runtime/v60/base_matrix/aa8abb7/base_matrix.parquet to gs://omega_v52_central/omega/staging/base_matrix/v60/resume_aa8abb7/base_matrix.parquet
+[2026-02-19 11:11:48]   
+[2026-02-19 11:15:38] .........................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................
+[2026-02-19 11:15:38] 
+[2026-02-19 11:15:38] Average throughput: 4.1MiB/s
+[2026-02-19 11:15:40] Copying file:///Users/zephryj/work/Omega_vNext/artifacts/runtime/v60/base_matrix/aa8abb7/base_matrix.parquet.meta.json to gs://omega_v52_central/omega/staging/base_matrix/v60/resume_aa8abb7/base_matrix.meta.json
+[2026-02-19 11:15:40]   
+[2026-02-19 11:15:41] ........
+[2026-02-19 11:15:42] {"status": "ok", "mode": "local_ticker_sharding", "output_parquet": "/Users/zephryj/work/Omega_vNext/artifacts/runtime/v60/base_matrix/aa8abb7/base_matrix.parquet", "output_meta": "/Users/zephryj/work/Omega_vNext/artifacts/runtime/v60/base_matrix/aa8abb7/base_matrix.parquet.meta.json", "output_uri": "gs://omega_v52_central/omega/staging/base_matrix/v60/resume_aa8abb7/base_matrix.parquet", "output_meta_uri": "gs://omega_v52_central/omega/staging/base_matrix/v60/resume_aa8abb7/base_matrix.meta.json", "base_rows": 5780139, "input_file_count": 40, "symbols_total": 5576, "batch_count": 112, "worker_count": 8, "seconds": 940.89}
+[2026-02-19 11:15:42] Recursive audit passed at node=post_base_matrix
+[2026-02-19 11:15:42] Submitting v60 swarm optimization job (sync mode)...
+[2026-02-19 11:15:42] + /Library/Developer/CommandLineTools/usr/bin/python3 tools/submit_vertex_sweep.py --script tools/v60_swarm_xgb.py --machine-type e2-highmem-16 --sync --sync-timeout-sec=10800 --force-gcloud-fallback --script-arg=--bootstrap-code --script-arg=--install-deps --script-arg=--base-matrix-uri=gs://omega_v52_central/omega/staging/base_matrix/v60/resume_aa8abb7/base_matrix.parquet --script-arg=--n-trials=50 --script-arg=--min-samples=2000 --script-arg=--seed=42 --script-arg=--output-uri=gs://omega_v52_central/omega/staging/optimization/v60/20260219-030000_aa8abb7/swarm_best.json
+[2026-02-19 11:15:42] /Users/zephryj/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+[2026-02-19 11:15:42]   warnings.warn(
+[2026-02-19 11:15:43] [*] Packaging code from repo root: /Users/zephryj/work/Omega_vNext
+[2026-02-19 11:15:43]     Created archive: /Users/zephryj/work/Omega_vNext/omega_core.zip
+[2026-02-19 11:15:43] [*] Uploading to gs://omega_v52/staging/code/omega_core.zip...
+[2026-02-19 11:15:45] [+] Code bundle uploaded successfully.
+[2026-02-19 11:15:45] [*] Submitting Custom Job: omega-v60-v60_swarm_xgb-20260219-111545
+[2026-02-19 11:15:45] [*] Forcing gcloud fallback submission path.
+[2026-02-19 11:15:49] [+] Fallback submit succeeded: projects/269018079180/locations/us-central1/customJobs/8392580415252070400
+[2026-02-19 11:15:50]     [Fallback] state=JOB_STATE_PENDING elapsed=0s
+[2026-02-19 11:16:22]     [Fallback] state=JOB_STATE_PENDING elapsed=31s
+[2026-02-19 11:16:53]     [Fallback] state=JOB_STATE_PENDING elapsed=63s
+[2026-02-19 11:17:25]     [Fallback] state=JOB_STATE_PENDING elapsed=94s
+[2026-02-19 11:17:57]     [Fallback] state=JOB_STATE_PENDING elapsed=126s
+[2026-02-19 11:18:28]     [Fallback] state=JOB_STATE_PENDING elapsed=157s
+[2026-02-19 11:19:00]     [Fallback] state=JOB_STATE_PENDING elapsed=189s
+[2026-02-19 11:19:31]     [Fallback] state=JOB_STATE_PENDING elapsed=221s
+[2026-02-19 11:20:03]     [Fallback] state=JOB_STATE_RUNNING elapsed=252s
+[2026-02-19 11:20:35]     [Fallback] state=JOB_STATE_RUNNING elapsed=284s
+[2026-02-19 11:21:06]     [Fallback] state=JOB_STATE_RUNNING elapsed=315s
+[2026-02-19 11:21:38]     [Fallback] state=JOB_STATE_SUCCEEDED elapsed=347s
+[2026-02-19 11:21:39] Optimization complete best_params={'peace_threshold': 0.5253567667772991, 'srl_resid_sigma_mult': 1.9773888188507172, 'topo_energy_sigma_mult': 5.427559578121958, 'max_depth': 5, 'learning_rate': 0.006525909043483982, 'subsample': 0.9382970275902356, 'colsample_bytree': 0.7855991276821759}
+[2026-02-19 11:21:39] Recursive audit passed at node=post_optimize
+[2026-02-19 11:21:39] Submitting Vertex train job (sync mode)...
+[2026-02-19 11:21:39] Recursive audit passed at node=pre_train
+[2026-02-19 11:21:39] + /Library/Developer/CommandLineTools/usr/bin/python3 tools/submit_vertex_sweep.py --script tools/run_vertex_xgb_train.py --machine-type n1-standard-32 --sync --sync-timeout-sec=21600 --force-gcloud-fallback --script-arg=--data-pattern=gs://omega_v52_central/omega/omega/v52/frames/host=*/*_aa8abb7.parquet --script-arg=--train-years=2023,2024 --script-arg=--output-uri=gs://omega_v52_central/omega/staging/models/v6/20260219-030000_aa8abb7 --script-arg=--max-files=0 --script-arg=--max-rows-per-file=0 --script-arg=--peace-threshold=0.5253567667772991 --script-arg=--srl-resid-sigma-mult=1.9773888188507172 --script-arg=--topo-energy-sigma-mult=5.427559578121958 --script-arg=--xgb-max-depth=5 --script-arg=--xgb-learning-rate=0.006525909043483982 --script-arg=--xgb-subsample=0.9382970275902356 --script-arg=--xgb-colsample-bytree=0.7855991276821759
+[2026-02-19 11:21:39] /Users/zephryj/Library/Python/3.9/lib/python/site-packages/urllib3/__init__.py:35: NotOpenSSLWarning: urllib3 v2 only supports OpenSSL 1.1.1+, currently the 'ssl' module is compiled with 'LibreSSL 2.8.3'. See: https://github.com/urllib3/urllib3/issues/3020
+[2026-02-19 11:21:39]   warnings.warn(
+[2026-02-19 11:21:40] [*] Packaging code from repo root: /Users/zephryj/work/Omega_vNext
+[2026-02-19 11:21:40]     Created archive: /Users/zephryj/work/Omega_vNext/omega_core.zip
+[2026-02-19 11:21:40] [*] Uploading to gs://omega_v52/staging/code/omega_core.zip...
+[2026-02-19 11:21:42] [+] Code bundle uploaded successfully.
+[2026-02-19 11:21:42] [*] Submitting Custom Job: omega-v60-run_vertex_xgb_train-20260219-112142
+[2026-02-19 11:21:42] [*] Forcing gcloud fallback submission path.
+[2026-02-19 11:21:45] [+] Fallback submit succeeded: projects/269018079180/locations/us-central1/customJobs/4026903526469795840
+[2026-02-19 11:21:47]     [Fallback] state=JOB_STATE_QUEUED elapsed=0s
+[2026-02-19 11:22:18]     [Fallback] state=JOB_STATE_PENDING elapsed=31s
+[2026-02-19 11:22:50]     [Fallback] state=JOB_STATE_PENDING elapsed=62s
+[2026-02-19 11:23:21]     [Fallback] state=JOB_STATE_PENDING elapsed=94s
+[2026-02-19 11:23:53]     [Fallback] state=JOB_STATE_PENDING elapsed=126s
+[2026-02-19 11:24:25]     [Fallback] state=JOB_STATE_PENDING elapsed=157s
+[2026-02-19 11:24:57]     [Fallback] state=JOB_STATE_RUNNING elapsed=189s
+[2026-02-19 11:25:28]     [Fallback] state=JOB_STATE_RUNNING elapsed=221s
+[2026-02-19 11:26:00]     [Fallback] state=JOB_STATE_RUNNING elapsed=253s
+[2026-02-19 11:26:31]     [Fallback] state=JOB_STATE_RUNNING elapsed=284s
+[2026-02-19 11:27:03]     [Fallback] state=JOB_STATE_RUNNING elapsed=316s
+[2026-02-19 11:27:35]     [Fallback] state=JOB_STATE_RUNNING elapsed=347s
+[2026-02-19 11:28:06]     [Fallback] state=JOB_STATE_RUNNING elapsed=379s

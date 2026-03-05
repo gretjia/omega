@@ -1,0 +1,1 @@
+# OMEGA L2 Audit Report (v3)\n\n## Metrics\n| Metric | Value | Threshold |\n| :--- | :--- | :--- |\n| **Topo_SNR** | 0.066829 | > 3.0 |\n| **Orthogonality** | 0.000108 | < 0.1 |\n| **Vector_Alignment** | 0.500330 | > 0.6 |\n| **n_frames** | 61883017 | (report) |\n\n**DoD_pass**: False

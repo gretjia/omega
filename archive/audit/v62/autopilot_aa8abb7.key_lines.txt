@@ -1,0 +1,201 @@
+235:[2026-02-17 12:07:08] Frame progress linux=411/497 windows=250/250 task=Ready probe_ok=True
+236:[2026-02-17 12:10:09] Frame progress linux=413/497 windows=250/250 task=Ready probe_ok=True
+237:[2026-02-17 12:13:10] Frame progress linux=415/497 windows=250/250 task=Ready probe_ok=True
+238:[2026-02-17 12:16:12] Frame progress linux=416/497 windows=250/250 task=Ready probe_ok=True
+239:[2026-02-17 12:19:13] Frame progress linux=418/497 windows=250/250 task=Ready probe_ok=True
+240:[2026-02-17 12:22:14] Frame progress linux=420/497 windows=250/250 task=Ready probe_ok=True
+241:[2026-02-17 12:25:16] Frame progress linux=422/497 windows=250/250 task=Ready probe_ok=True
+242:[2026-02-17 12:28:17] Frame progress linux=423/497 windows=250/250 task=Ready probe_ok=True
+243:[2026-02-17 12:31:18] Frame progress linux=425/497 windows=250/250 task=Ready probe_ok=True
+244:[2026-02-17 12:34:20] Frame progress linux=428/497 windows=250/250 task=Ready probe_ok=True
+245:[2026-02-17 12:37:21] Frame progress linux=429/497 windows=250/250 task=Ready probe_ok=True
+246:[2026-02-17 12:40:22] Frame progress linux=432/497 windows=250/250 task=Ready probe_ok=True
+247:[2026-02-17 12:43:24] Frame progress linux=433/497 windows=250/250 task=Ready probe_ok=True
+248:[2026-02-17 12:46:25] Frame progress linux=435/497 windows=250/250 task=Ready probe_ok=True
+249:[2026-02-17 12:49:26] Frame progress linux=437/497 windows=250/250 task=Ready probe_ok=True
+250:[2026-02-17 12:52:28] Frame progress linux=438/497 windows=250/250 task=Ready probe_ok=True
+251:[2026-02-17 12:55:29] Frame progress linux=440/497 windows=250/250 task=Ready probe_ok=True
+252:[2026-02-17 12:58:30] Frame progress linux=442/497 windows=250/250 task=Ready probe_ok=True
+253:[2026-02-17 13:01:32] Frame progress linux=444/497 windows=250/250 task=Ready probe_ok=True
+254:[2026-02-17 13:04:33] Frame progress linux=445/497 windows=250/250 task=Ready probe_ok=True
+255:[2026-02-17 13:07:34] Frame progress linux=447/497 windows=250/250 task=Ready probe_ok=True
+256:[2026-02-17 13:10:36] Frame progress linux=449/497 windows=250/250 task=Ready probe_ok=True
+257:[2026-02-17 13:13:37] Frame progress linux=450/497 windows=250/250 task=Ready probe_ok=True
+258:[2026-02-17 13:16:38] Frame progress linux=452/497 windows=250/250 task=Ready probe_ok=True
+259:[2026-02-17 13:19:40] Frame progress linux=454/497 windows=250/250 task=Ready probe_ok=True
+260:[2026-02-17 13:22:41] Frame progress linux=456/497 windows=250/250 task=Ready probe_ok=True
+261:[2026-02-17 13:25:43] Frame progress linux=458/497 windows=250/250 task=Ready probe_ok=True
+262:[2026-02-17 13:28:44] Frame progress linux=459/497 windows=250/250 task=Ready probe_ok=True
+263:[2026-02-17 13:31:45] Frame progress linux=461/497 windows=250/250 task=Ready probe_ok=True
+264:[2026-02-17 13:34:47] Frame progress linux=463/497 windows=250/250 task=Ready probe_ok=True
+265:[2026-02-17 13:37:48] Frame progress linux=465/497 windows=250/250 task=Ready probe_ok=True
+266:[2026-02-17 13:40:49] Frame progress linux=467/497 windows=250/250 task=Ready probe_ok=True
+267:[2026-02-17 13:43:51] Frame progress linux=468/497 windows=250/250 task=Ready probe_ok=True
+268:[2026-02-17 13:46:52] Frame progress linux=470/497 windows=250/250 task=Ready probe_ok=True
+269:[2026-02-17 13:50:27] Frame progress linux=472/497 windows=250/250 task=Ready probe_ok=True
+270:[2026-02-17 13:53:28] Frame progress linux=473/497 windows=250/250 task=Ready probe_ok=True
+271:[2026-02-17 13:56:30] Frame progress linux=475/497 windows=250/250 task=Ready probe_ok=True
+272:[2026-02-17 13:59:31] Frame progress linux=476/497 windows=250/250 task=Ready probe_ok=True
+273:[2026-02-17 14:02:32] Frame progress linux=478/497 windows=250/250 task=Ready probe_ok=True
+274:[2026-02-17 14:05:34] Frame progress linux=479/497 windows=250/250 task=Ready probe_ok=True
+275:[2026-02-17 14:08:35] Frame progress linux=481/497 windows=250/250 task=Ready probe_ok=True
+276:[2026-02-17 14:11:37] Frame progress linux=482/497 windows=250/250 task=Ready probe_ok=True
+277:[2026-02-17 14:14:38] Frame progress linux=484/497 windows=250/250 task=Ready probe_ok=True
+278:[2026-02-17 14:17:39] Frame progress linux=484/497 windows=250/250 task=Ready probe_ok=True
+279:[2026-02-17 14:20:41] Frame progress linux=484/497 windows=250/250 task=Ready probe_ok=True
+280:[2026-02-17 14:23:42] Frame progress linux=484/497 windows=250/250 task=Ready probe_ok=True
+281:[2026-02-17 14:26:43] Frame progress linux=484/497 windows=250/250 task=Ready probe_ok=True
+282:[2026-02-17 14:29:45] Frame progress linux=484/497 windows=250/250 task=Ready probe_ok=True
+283:[2026-02-17 14:32:46] Frame progress linux=484/497 windows=250/250 task=Ready probe_ok=True
+284:[2026-02-17 14:35:47] Frame progress linux=484/497 windows=250/250 task=Ready probe_ok=True
+285:[2026-02-17 14:38:49] Frame progress linux=484/497 windows=250/250 task=Ready probe_ok=True
+286:[2026-02-17 14:41:50] Frame progress linux=484/497 windows=250/250 task=Ready probe_ok=True
+287:[2026-02-17 14:41:51] Autopilot started hash=aa8abb7 expected windows=250 linux=497 poll=180s stall=1800s optimization=True
+288:[2026-02-17 14:41:52] Frame progress linux=484/497 windows=250/250 task=Ready probe_ok=True
+289:[2026-02-17 14:44:54] Frame progress linux=484/497 windows=250/250 task=Ready probe_ok=True
+290:[2026-02-17 14:47:55] Frame progress linux=484/497 windows=250/250 task=Ready probe_ok=True
+291:[2026-02-17 14:50:57] Frame progress linux=484/497 windows=250/250 task=Ready probe_ok=True
+292:[2026-02-17 14:53:58] Frame progress linux=484/497 windows=250/250 task=Ready probe_ok=True
+293:[2026-02-17 14:56:59] Frame progress linux=484/497 windows=250/250 task=Ready probe_ok=True
+294:[2026-02-17 15:00:01] Frame progress linux=484/497 windows=250/250 task=Ready probe_ok=True
+295:[2026-02-17 15:03:02] Frame progress linux=484/497 windows=250/250 task=Ready probe_ok=True
+296:[2026-02-17 15:06:04] Frame progress linux=484/497 windows=250/250 task=Ready probe_ok=True
+297:[2026-02-17 15:09:05] Frame progress linux=484/497 windows=250/250 task=Ready probe_ok=True
+298:[2026-02-17 15:12:07] Frame progress linux=484/497 windows=250/250 task=Ready probe_ok=True
+299:[2026-02-17 15:14:37] Autopilot started hash=aa8abb7 expected windows=263 linux=484 poll=180s stall=1800s optimization=True
+300:[2026-02-17 15:14:39] Frame progress linux=484/484 windows=251/263 task=Ready probe_ok=True
+301:[2026-02-17 15:17:40] Frame progress linux=484/484 windows=252/263 task=Ready probe_ok=True
+302:[2026-02-17 15:20:42] Frame progress linux=484/484 windows=254/263 task=Ready probe_ok=True
+303:[2026-02-17 15:23:43] Frame progress linux=484/484 windows=255/263 task=Ready probe_ok=True
+304:[2026-02-17 15:26:45] Frame progress linux=484/484 windows=256/263 task=Ready probe_ok=True
+305:[2026-02-17 15:29:46] Frame progress linux=484/484 windows=258/263 task=Ready probe_ok=True
+306:[2026-02-17 15:32:48] Frame progress linux=484/484 windows=259/263 task=Ready probe_ok=True
+307:[2026-02-17 15:35:50] Frame progress linux=484/484 windows=260/263 task=Ready probe_ok=True
+308:[2026-02-17 15:38:52] Frame progress linux=484/484 windows=261/263 task=Ready probe_ok=True
+309:[2026-02-17 15:41:53] Frame progress linux=484/484 windows=262/263 task=Ready probe_ok=True
+310:[2026-02-17 15:43:05] Autopilot started hash=aa8abb7 expected windows=263 linux=484 poll=180s stall=1800s optimization=True
+312:[2026-02-17 15:43:07] Frame progress linux=484/484 windows=263/263 task=Ready probe_ok=True
+316:[2026-02-17 15:44:54] Frame progress linux=484/484 windows=263/263 task=Ready probe_ok=True
+321:[2026-02-17 15:45:02] Building v60 base matrix with relaxed physics gates...
+332:[2026-02-17 15:46:18] Building v60 base matrix with relaxed physics gates...
+341:[2026-02-17 20:02:37] Autopilot started hash=aa8abb7 expected windows=263 linux=484 poll=180s stall=1800s optimization=True
+346:[2026-02-17 20:02:39] Frame progress linux=484/484 windows=263/263 task=Ready probe_ok=True
+352:[2026-02-17 20:02:45] Building v60 base matrix with relaxed physics gates...
+404:[2026-02-17 20:22:36] Autopilot started hash=aa8abb7 expected windows=263 linux=484 poll=180s stall=1800s optimization=True
+409:[2026-02-17 20:22:37] Frame progress linux=484/484 windows=263/263 task=Ready probe_ok=True
+415:[2026-02-17 20:22:44] Building v60 base matrix with relaxed physics gates...
+455:[2026-02-17 20:34:56] Autopilot started hash=aa8abb7 expected windows=263 linux=484 poll=180s stall=1800s optimization=True
+460:[2026-02-17 20:34:57] Frame progress linux=484/484 windows=263/263 task=Ready probe_ok=True
+466:[2026-02-17 20:35:05] Building v60 base matrix with relaxed physics gates...
+503:[2026-02-17 20:47:39] Autopilot started hash=aa8abb7 expected windows=263 linux=484 poll=180s stall=1800s optimization=True
+508:[2026-02-17 20:47:39] Frame progress linux=-1/484 windows=-1/263 task=unknown probe_ok=False
+509:[2026-02-17 20:48:41] Autopilot started hash=aa8abb7 expected windows=263 linux=484 poll=180s stall=1800s optimization=True
+514:[2026-02-17 20:48:42] Frame progress linux=484/484 windows=263/263 task=Ready probe_ok=True
+520:[2026-02-17 20:48:53] Building v60 base matrix with relaxed physics gates...
+575:[2026-02-17 21:20:14] Autopilot started hash=aa8abb7 expected windows=263 linux=484 poll=180s stall=1800s optimization=True
+580:[2026-02-17 21:20:15] Frame progress linux=484/484 windows=263/263 task=Ready probe_ok=True
+586:[2026-02-17 21:20:23] Building v60 base matrix with relaxed physics gates...
+609:[2026-02-17 21:25:52] Autopilot started hash=aa8abb7 expected windows=263 linux=484 poll=180s stall=1800s optimization=True
+614:[2026-02-17 21:25:53] Frame progress linux=484/484 windows=263/263 task=Ready probe_ok=True
+620:[2026-02-17 21:26:00] Building v60 base matrix with relaxed physics gates...
+670:[2026-02-17 21:47:27] Autopilot started hash=aa8abb7 expected windows=263 linux=484 poll=180s stall=1800s optimization=True
+676:[2026-02-17 21:47:28] Frame progress linux=484/484 windows=263/263 task=Ready probe_ok=True
+682:[2026-02-17 21:47:34] Building v60 base matrix with relaxed physics gates...
+721:[2026-02-17 22:01:34] Autopilot started hash=aa8abb7 expected windows=263 linux=484 poll=180s stall=1800s optimization=True
+727:[2026-02-17 22:01:36] Frame progress linux=484/484 windows=263/263 task=Ready probe_ok=True
+733:[2026-02-17 22:01:42] Building v60 base matrix with relaxed physics gates...
+1458:[2026-02-18 04:07:32] Autopilot started hash=aa8abb7 expected windows=263 linux=484 poll=180s stall=1800s optimization=True
+1464:[2026-02-18 04:07:32] Frame progress linux=-1/484 windows=-1/263 task=unknown probe_ok=False
+1465:[2026-02-18 04:15:47] Autopilot started hash=aa8abb7 expected windows=263 linux=484 poll=180s stall=1800s optimization=True
+1471:[2026-02-18 04:15:49] Frame progress linux=484/484 windows=263/263 task=Ready probe_ok=True
+1477:[2026-02-18 04:15:55] Building v60 base matrix with relaxed physics gates...
+1533:[2026-02-18 04:51:59] Autopilot started hash=aa8abb7 expected windows=263 linux=484 poll=180s stall=1800s optimization=True
+1539:[2026-02-18 04:51:59] Frame progress linux=-1/484 windows=-1/263 task=unknown probe_ok=False
+1540:[2026-02-18 04:58:56] Autopilot started hash=aa8abb7 expected windows=263 linux=484 poll=180s stall=1800s optimization=True
+1546:[2026-02-18 04:58:57] Frame progress linux=484/484 windows=263/263 task=Ready probe_ok=True
+1552:[2026-02-18 04:59:04] Building v60 base matrix with relaxed physics gates...
+1919:[2026-02-18 08:03:10] Autopilot started hash=aa8abb7 expected windows=263 linux=484 poll=180s stall=1800s optimization=True
+1925:[2026-02-18 08:03:12] Frame progress linux=484/484 windows=263/263 task=Ready probe_ok=True
+1931:[2026-02-18 08:03:18] Building v60 base matrix with relaxed physics gates...
+1952:[2026-02-18 08:04:59] Autopilot started hash=aa8abb7 expected windows=263 linux=484 poll=180s stall=1800s optimization=True
+1958:[2026-02-18 08:05:00] Frame progress linux=484/484 windows=263/263 task=Ready probe_ok=True
+1964:[2026-02-18 08:05:07] Building v60 base matrix with relaxed physics gates...
+1970:[2026-02-18 08:05:45] Autopilot started hash=aa8abb7 expected windows=263 linux=484 poll=180s stall=1800s optimization=True
+1976:[2026-02-18 08:05:46] Frame progress linux=484/484 windows=263/263 task=Ready probe_ok=True
+1982:[2026-02-18 08:05:53] Building v60 base matrix with relaxed physics gates...
+1988:[2026-02-18 08:07:59] Autopilot started hash=aa8abb7 expected windows=263 linux=484 poll=180s stall=1800s optimization=True
+1994:[2026-02-18 08:08:00] Frame progress linux=484/484 windows=263/263 task=Ready probe_ok=True
+2000:[2026-02-18 08:08:07] Building v60 base matrix with relaxed physics gates...
+2006:[2026-02-18 08:09:40] Autopilot started hash=aa8abb7 expected windows=263 linux=484 poll=180s stall=1800s optimization=True
+2012:[2026-02-18 08:09:42] Frame progress linux=484/484 windows=263/263 task=Ready probe_ok=True
+2018:[2026-02-18 08:09:48] Building v60 base matrix with relaxed physics gates...
+2053:[2026-02-18 08:11:10] Autopilot started hash=aa8abb7 expected windows=263 linux=484 poll=180s stall=1800s optimization=True
+2059:[2026-02-18 08:11:11] Frame progress linux=484/484 windows=263/263 task=Ready probe_ok=True
+2065:[2026-02-18 08:11:17] Building v60 base matrix with relaxed physics gates...
+2146:[2026-02-18 08:50:05] Autopilot started hash=aa8abb7 expected windows=263 linux=484 poll=180s stall=1800s optimization=True
+2152:[2026-02-18 08:50:06] Frame progress linux=484/484 windows=263/263 task=Ready probe_ok=True
+2158:[2026-02-18 08:50:24] Building v60 base matrix with relaxed physics gates...
+2193:[2026-02-18 08:51:29] Autopilot started hash=aa8abb7 expected windows=263 linux=484 poll=180s stall=1800s optimization=True
+2199:[2026-02-18 08:51:31] Frame progress linux=484/484 windows=263/263 task=Ready probe_ok=True
+2205:[2026-02-18 08:51:37] Building v60 base matrix with relaxed physics gates...
+2233:[2026-02-18 08:59:45] Autopilot started hash=aa8abb7 expected windows=263 linux=484 poll=180s stall=1800s optimization=True
+2239:[2026-02-18 08:59:46] Frame progress linux=484/484 windows=263/263 task=Ready probe_ok=True
+2245:[2026-02-18 09:00:01] Building v60 base matrix with relaxed physics gates...
+2280:[2026-02-18 09:01:41] Autopilot started hash=aa8abb7 expected windows=263 linux=484 poll=180s stall=1800s optimization=True
+2286:[2026-02-18 09:01:42] Frame progress linux=484/484 windows=263/263 task=Ready probe_ok=True
+2292:[2026-02-18 09:01:49] Building v60 base matrix with relaxed physics gates...
+2328:[2026-02-18 09:21:52] Autopilot started hash=aa8abb7 expected windows=263 linux=484 poll=180s stall=1800s optimization=True
+2334:[2026-02-18 09:21:53] Frame progress linux=484/484 windows=263/263 task=Ready probe_ok=True
+2340:[2026-02-18 09:22:00] Building v60 base matrix with relaxed physics gates...
+2375:[2026-02-18 09:23:12] Autopilot started hash=aa8abb7 expected windows=263 linux=484 poll=180s stall=1800s optimization=True
+2381:[2026-02-18 09:23:14] Frame progress linux=484/484 windows=263/263 task=Ready probe_ok=True
+2387:[2026-02-18 09:23:21] Building v60 base matrix with relaxed physics gates...
+2421:[2026-02-18 09:44:45] Autopilot started hash=aa8abb7 expected windows=263 linux=484 poll=180s stall=1800s optimization=True
+2427:[2026-02-18 09:44:47] Frame progress linux=484/484 windows=263/263 task=Ready probe_ok=True
+2433:[2026-02-18 09:44:54] Building v60 base matrix with relaxed physics gates...
+2477:[2026-02-18 10:17:17] Autopilot started hash=aa8abb7 expected windows=263 linux=484 poll=180s stall=1800s optimization=True
+2483:[2026-02-18 10:17:18] Frame progress linux=484/484 windows=263/263 task=Ready probe_ok=True
+2489:[2026-02-18 10:17:25] Building v60 base matrix with relaxed physics gates...
+2525:[2026-02-18 10:31:45] Autopilot started hash=aa8abb7 expected windows=263 linux=484 poll=180s stall=1800s optimization=True
+2531:[2026-02-18 10:31:47] Frame progress linux=484/484 windows=263/263 task=Ready probe_ok=True
+2537:[2026-02-18 10:31:54] Building v60 base matrix with relaxed physics gates...
+2577:[2026-02-18 10:44:06] Autopilot started hash=aa8abb7 expected windows=263 linux=484 poll=180s stall=1800s optimization=True
+2583:[2026-02-18 10:44:07] Frame progress linux=484/484 windows=263/263 task=Ready probe_ok=True
+2589:[2026-02-18 10:44:14] Building v60 base matrix with relaxed physics gates...
+2624:[2026-02-18 10:54:23] Autopilot started hash=aa8abb7 expected windows=263 linux=484 poll=180s stall=1800s optimization=True
+2630:[2026-02-18 10:54:25] Frame progress linux=484/484 windows=263/263 task=Ready probe_ok=True
+2636:[2026-02-18 10:54:31] Building v60 base matrix with relaxed physics gates...
+2674:[2026-02-18 11:06:44] Autopilot started hash=aa8abb7 expected windows=263 linux=484 poll=180s stall=1800s optimization=True
+2680:[2026-02-18 11:06:46] Frame progress linux=484/484 windows=263/263 task=Ready probe_ok=True
+2686:[2026-02-18 11:06:52] Building v60 base matrix with relaxed physics gates...
+2725:[2026-02-18 11:19:05] Autopilot started hash=aa8abb7 expected windows=263 linux=484 poll=180s stall=1800s optimization=True
+2731:[2026-02-18 11:19:06] Frame progress linux=484/484 windows=263/263 task=Ready probe_ok=True
+2737:[2026-02-18 11:19:13] Building v60 base matrix with relaxed physics gates...
+2778:[2026-02-18 11:33:29] Autopilot started hash=aa8abb7 expected windows=263 linux=484 poll=180s stall=1800s optimization=True
+2784:[2026-02-18 11:33:30] Frame progress linux=484/484 windows=263/263 task=Ready probe_ok=True
+2790:[2026-02-18 11:33:37] Building v60 base matrix with relaxed physics gates...
+2825:[2026-02-18 11:43:46] Autopilot started hash=aa8abb7 expected windows=263 linux=484 poll=180s stall=1800s optimization=True
+2831:[2026-02-18 11:43:48] Frame progress linux=484/484 windows=263/263 task=Ready probe_ok=True
+2837:[2026-02-18 11:43:54] Building v60 base matrix with relaxed physics gates...
+2875:[2026-02-18 11:56:07] Autopilot started hash=aa8abb7 expected windows=263 linux=484 poll=180s stall=1800s optimization=True
+2881:[2026-02-18 11:56:09] Frame progress linux=484/484 windows=263/263 task=Ready probe_ok=True
+2887:[2026-02-18 11:56:16] Building v60 base matrix with relaxed physics gates...
+2926:[2026-02-18 12:08:28] Autopilot started hash=aa8abb7 expected windows=263 linux=484 poll=180s stall=1800s optimization=True
+2932:[2026-02-18 12:08:30] Frame progress linux=484/484 windows=263/263 task=Ready probe_ok=True
+2938:[2026-02-18 12:08:36] Building v60 base matrix with relaxed physics gates...
+2953:[2026-02-18 12:10:07] Autopilot started hash=aa8abb7 expected windows=263 linux=484 poll=180s stall=1800s optimization=True
+2959:[2026-02-18 12:10:08] Frame progress linux=484/484 windows=263/263 task=Ready probe_ok=True
+2965:[2026-02-18 12:10:15] Building v60 base matrix with relaxed physics gates...
+3235:[2026-02-18 17:59:23] Autopilot started hash=aa8abb7 expected windows=263 linux=-1 poll=60s stall=1800s optimization=True
+3242:[2026-02-18 18:01:14] Autopilot started hash=aa8abb7 expected windows=263 linux=-1 poll=60s stall=1800s optimization=True
+3249:[2026-02-18 18:01:23] Frame progress linux=-1/-1 windows=263/263 task=Ready probe_ok=False
+3255:[2026-02-18 18:01:34] Building v60 base matrix on local AMD nodes via ticker sharding...
+3258:[2026-02-19 10:59:51] Autopilot started hash=aa8abb7 expected windows=263 linux=484 poll=60s stall=1800s optimization=True
+3265:[2026-02-19 10:59:52] Frame progress linux=484/484 windows=263/263 task=Ready probe_ok=True
+3271:[2026-02-19 11:00:00] Building v60 base matrix on local AMD nodes via ticker sharding...
+3286:[2026-02-19 11:15:42] Submitting v60 swarm optimization job (sync mode)...
+3287:[2026-02-19 11:15:42] + /Library/Developer/CommandLineTools/usr/bin/python3 tools/submit_vertex_sweep.py --script tools/v60_swarm_xgb.py --machine-type e2-highmem-16 --sync --sync-timeout-sec=10800 --force-gcloud-fallback --script-arg=--bootstrap-code --script-arg=--install-deps --script-arg=--base-matrix-uri=gs://omega_v52_central/omega/staging/base_matrix/v60/resume_aa8abb7/base_matrix.parquet --script-arg=--n-trials=50 --script-arg=--min-samples=2000 --script-arg=--seed=42 --script-arg=--output-uri=gs://omega_v52_central/omega/staging/optimization/v60/20260219-030000_aa8abb7/swarm_best.json
+3294:[2026-02-19 11:15:45] [*] Submitting Custom Job: omega-v60-v60_swarm_xgb-20260219-111545
+3313:[2026-02-19 11:21:39] + /Library/Developer/CommandLineTools/usr/bin/python3 tools/submit_vertex_sweep.py --script tools/run_vertex_xgb_train.py --machine-type n1-standard-32 --sync --sync-timeout-sec=21600 --force-gcloud-fallback --script-arg=--data-pattern=gs://omega_v52_central/omega/omega/v52/frames/host=*/*_aa8abb7.parquet --script-arg=--train-years=2023,2024 --script-arg=--output-uri=gs://omega_v52_central/omega/staging/models/v6/20260219-030000_aa8abb7 --script-arg=--max-files=0 --script-arg=--max-rows-per-file=0 --script-arg=--peace-threshold=0.5253567667772991 --script-arg=--srl-resid-sigma-mult=1.9773888188507172 --script-arg=--topo-energy-sigma-mult=5.427559578121958 --script-arg=--xgb-max-depth=5 --script-arg=--xgb-learning-rate=0.006525909043483982 --script-arg=--xgb-subsample=0.9382970275902356 --script-arg=--xgb-colsample-bytree=0.7855991276821759
+3320:[2026-02-19 11:21:42] [*] Submitting Custom Job: omega-v60-run_vertex_xgb_train-20260219-112142
+3645:[2026-02-19 14:11:21] Manual takeover enabled: keep current train job, run upgraded backtest via watcher pid=3137

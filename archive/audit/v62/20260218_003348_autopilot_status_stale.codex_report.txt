@@ -1,0 +1,9 @@
+Incident response is completed and written to:
+
+`audit/runtime/v52/incidents/20260218_003348_autopilot_status_stale.codex_report.txt`
+
+Key outcome:
+- Root cause confirmed as a status-heartbeat gap (`autopilot_aa8abb7.status.json` stale during long Vertex sync polling) while runner progress continued.
+- Forward progress is active: `autopilot_aa8abb7.runner.log` advanced to `2026-02-18 00:44:16` with `JOB_STATE_RUNNING` and increasing elapsed time.
+- Minimal safe fix was prepared in `tools/ai_incident_watchdog.py` so stale incidents require both stale status and stale runner log.
+- Runtime caveat documented: this shell blocks process control (`ps/pgrep/pkill`), so replacing the already-running watchdog process in-place could not be completed here.

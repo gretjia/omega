@@ -1,0 +1,3172 @@
+[
+  {
+    "insertId": "1sy5q6hd7rsr",
+    "labels": {
+      "ml.googleapis.com/endpoint": "",
+      "ml.googleapis.com/job_state": "QUEUED"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/ml.googleapis.com%2F4745526734198145024",
+    "receiveTimestamp": "2026-02-19T13:10:54.498076532Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "gen-lang-client-0250995579",
+        "task_name": "service"
+      },
+      "type": "ml_job"
+    },
+    "severity": "INFO",
+    "textPayload": "Waiting for job to be provisioned.",
+    "timestamp": "2026-02-19T13:10:53.537664753Z"
+  },
+  {
+    "insertId": "1sy5q6hd7rss",
+    "labels": {
+      "ml.googleapis.com/endpoint": ""
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/ml.googleapis.com%2F4745526734198145024",
+    "receiveTimestamp": "2026-02-19T13:10:54.498076532Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "gen-lang-client-0250995579",
+        "task_name": "service"
+      },
+      "type": "ml_job"
+    },
+    "severity": "INFO",
+    "textPayload": "Vertex AI is provisioning job running framework. First time usage might take couple of minutes, and subsequent runs can be much faster.",
+    "timestamp": "2026-02-19T13:10:53.554053597Z"
+  },
+  {
+    "insertId": "1sy5q6hd7rst",
+    "labels": {
+      "ml.googleapis.com/endpoint": ""
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/ml.googleapis.com%2F4745526734198145024",
+    "receiveTimestamp": "2026-02-19T13:10:54.498076532Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "gen-lang-client-0250995579",
+        "task_name": "service"
+      },
+      "type": "ml_job"
+    },
+    "severity": "INFO",
+    "textPayload": "Vertex AI is setting up this job.",
+    "timestamp": "2026-02-19T13:10:53.568772221Z"
+  },
+  {
+    "insertId": "1sy5q6hd7rsu",
+    "labels": {
+      "ml.googleapis.com/endpoint": ""
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/ml.googleapis.com%2F4745526734198145024",
+    "receiveTimestamp": "2026-02-19T13:10:54.498076532Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "gen-lang-client-0250995579",
+        "task_name": "service"
+      },
+      "type": "ml_job"
+    },
+    "severity": "INFO",
+    "textPayload": "Waiting for training program to start.",
+    "timestamp": "2026-02-19T13:10:53.568820054Z"
+  },
+  {
+    "insertId": "1sy5q6hd7rsx",
+    "labels": {
+      "ml.googleapis.com/endpoint": "",
+      "ml.googleapis.com/job_state": "PREPARING"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/ml.googleapis.com%2F4745526734198145024",
+    "receiveTimestamp": "2026-02-19T13:10:55.495685889Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "gen-lang-client-0250995579",
+        "task_name": "service"
+      },
+      "type": "ml_job"
+    },
+    "severity": "INFO",
+    "textPayload": "Job is preparing.",
+    "timestamp": "2026-02-19T13:10:54.168829545Z"
+  },
+  {
+    "insertId": "y4wlc5f9yo93j",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T13:13:31.287552513Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.",
+    "timestamp": "2026-02-19T13:13:30.154514541Z"
+  },
+  {
+    "insertId": "y4wlc5f9yo93k",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T13:13:31.287552513Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "google-cloud-datastore 1.15.5 requires protobuf<4.0.0dev, but you have protobuf 4.25.8 which is incompatible.",
+    "timestamp": "2026-02-19T13:13:30.154532138Z"
+  },
+  {
+    "insertId": "y4wlc5f9yo93l",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T13:13:31.287552513Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.",
+    "timestamp": "2026-02-19T13:13:30.154535893Z"
+  },
+  {
+    "insertId": "y4wlc5f9yo93m",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T13:13:31.287552513Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "+ python3 -",
+    "timestamp": "2026-02-19T13:13:30.354324845Z"
+  },
+  {
+    "insertId": "1r0q8sxfa63skq",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T13:13:36.293205788Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "/opt/conda/lib/python3.10/site-packages/google/api_core/_python_version_support.py:275: FutureWarning: You are using a Python version (3.10.18) which Google will stop supporting in new releases of google.api_core once it reaches its end of life (2026-10-04). Please upgrade to the latest Python version, or at least Python 3.11, to continue receiving updates for google.api_core past that date.",
+    "timestamp": "2026-02-19T13:13:32.154672006Z"
+  },
+  {
+    "insertId": "1r0q8sxfa63skr",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T13:13:36.293205788Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "warnings.warn(message, FutureWarning)",
+    "timestamp": "2026-02-19T13:13:32.154684622Z"
+  },
+  {
+    "insertId": "1r0q8sxfa63sks",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T13:13:36.293205788Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "+ python3 -u payload.py --code-bundle-uri=gs://omega_v52_central/omega/staging/code/omega_core_20260219-125410_78e36d9.zip '--data-pattern=gs://omega_v52_central/omega/omega/v52/frames/host=*/*_aa8abb7.parquet' --test-years=2025,2026 --test-ym=2025,202601 --max-files=0 --max-rows-per-file=0 --workers=1 --workers-min=1 --workers-max=1 --workers-start=1 --workers-mem-headroom-gb=24 --workers-est-mem-gb=6 --model-uri=gs://omega_v52_central/omega/staging/models/v6/20260219-125410_78e36d9/omega_v6_xgb_final.pkl --output-uri=gs://omega_v52_central/omega/staging/backtest/v6/20260219-125410_78e36d9/backtest_metrics_retry_highmem16_w1.json --peace-threshold=0.5253567667772991 --srl-resid-sigma-mult=1.9773888188507172 --topo-energy-sigma-mult=5.427559578121958",
+    "timestamp": "2026-02-19T13:13:33.354581312Z"
+  },
+  {
+    "insertId": "1ghzvknfa3im74",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T13:13:40.000977023Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.",
+    "timestamp": "2026-02-19T13:13:38.554228471Z"
+  },
+  {
+    "insertId": "1ghzvknfa3im75",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T13:13:40.000977023Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Error in sitecustomize; set PYTHONVERBOSE for traceback:",
+    "timestamp": "2026-02-19T13:13:38.754754324Z"
+  },
+  {
+    "insertId": "1ghzvknfa3im76",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T13:13:40.000977023Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "ModuleNotFoundError: No module named 'pythonjsonlogger'",
+    "timestamp": "2026-02-19T13:13:38.754761722Z"
+  },
+  {
+    "insertId": "1ghzvknfa3im77",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T13:13:40.000977023Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Error in sitecustomize; set PYTHONVERBOSE for traceback:",
+    "timestamp": "2026-02-19T13:13:39.954360422Z"
+  },
+  {
+    "insertId": "1ghzvknfa3im78",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T13:13:40.000977023Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "ModuleNotFoundError: No module named 'pythonjsonlogger'",
+    "timestamp": "2026-02-19T13:13:39.954368516Z"
+  },
+  {
+    "insertId": "ivvdr8faj5jhp",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T13:13:45.003991218Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Copying gs://omega_v52_central/omega/staging/code/omega_core_20260219-125410_78e36d9.zip...",
+    "timestamp": "2026-02-19T13:13:41.555022600Z"
+  },
+  {
+    "insertId": "ivvdr8faj5jhs",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T13:13:45.003991218Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "/ [0 files][    0.0 B/203.8 KiB]                                                \r/ [1 files][203.8 KiB/203.8 KiB]",
+    "timestamp": "2026-02-19T13:13:41.555033408Z"
+  },
+  {
+    "insertId": "ivvdr8faj5jhu",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T13:13:45.003991218Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Operation completed over 1 objects/203.8 KiB.",
+    "timestamp": "2026-02-19T13:13:41.555035681Z"
+  },
+  {
+    "insertId": "1sy5q6hd7s45",
+    "labels": {
+      "ml.googleapis.com/endpoint": "",
+      "ml.googleapis.com/job_state": "RUNNING"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/ml.googleapis.com%2F4745526734198145024",
+    "receiveTimestamp": "2026-02-19T13:13:43.516038356Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "gen-lang-client-0250995579",
+        "task_name": "service"
+      },
+      "type": "ml_job"
+    },
+    "severity": "INFO",
+    "textPayload": "Job is running.",
+    "timestamp": "2026-02-19T13:13:42.336551799Z"
+  },
+  {
+    "insertId": "1v63o63fa9ehut",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T13:13:46.808044122Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 13:13:45,932 [INFO] Backtest file scope matched=263 selected=263 max_files=0",
+    "timestamp": "2026-02-19T13:13:45.954290055Z"
+  },
+  {
+    "insertId": "1v63o63fa9ehuu",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T13:13:46.808044122Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Error in sitecustomize; set PYTHONVERBOSE for traceback:",
+    "timestamp": "2026-02-19T13:13:46.154876996Z"
+  },
+  {
+    "insertId": "1v63o63fa9ehuv",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T13:13:46.808044122Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "ModuleNotFoundError: No module named 'pythonjsonlogger'",
+    "timestamp": "2026-02-19T13:13:46.154887327Z"
+  },
+  {
+    "insertId": "1v63o63fa9ehuw",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T13:13:46.808044122Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Error in sitecustomize; set PYTHONVERBOSE for traceback:",
+    "timestamp": "2026-02-19T13:13:46.754046938Z"
+  },
+  {
+    "insertId": "1v63o63fa9ehux",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T13:13:46.808044122Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "ModuleNotFoundError: No module named 'pythonjsonlogger'",
+    "timestamp": "2026-02-19T13:13:46.754055028Z"
+  },
+  {
+    "insertId": "1w1j1pqfaxxxqg",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T13:13:51.801835963Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Copying gs://omega_v52_central/omega/staging/models/v6/20260219-125410_78e36d9/omega_v6_xgb_final.pkl...",
+    "timestamp": "2026-02-19T13:13:47.954888151Z"
+  },
+  {
+    "insertId": "1w1j1pqfaxxxqh",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T13:13:51.801835963Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "/ [0 files][    0.0 B/347.4 KiB]                                                \r/ [1 files][347.4 KiB/347.4 KiB]",
+    "timestamp": "2026-02-19T13:13:47.954901678Z"
+  },
+  {
+    "insertId": "1w1j1pqfaxxxqi",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T13:13:51.801835963Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "Operation completed over 1 objects/347.4 KiB.",
+    "timestamp": "2026-02-19T13:13:47.954903880Z"
+  },
+  {
+    "insertId": "1w1j1pqfaxxxqj",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T13:13:51.801835963Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 13:13:48,221 [INFO] Worker plan requested=1 min=1 max=1 start=1 adaptive=False cpu_total=16 mem_total_gb=125.8",
+    "timestamp": "2026-02-19T13:13:48.354669479Z"
+  },
+  {
+    "insertId": "13zh17eeq367z",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T13:15:21.871105232Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 13:15:17,346 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250103_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T13:15:17.388682040Z"
+  },
+  {
+    "insertId": "10eci5tf9w0lrs",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T13:16:16.825375854Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 13:16:12,786 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250106_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T13:16:12.954267724Z"
+  },
+  {
+    "insertId": "1ghzvknfa3of6f",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T13:17:31.830114775Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 13:17:31,293 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250107_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T13:17:31.354662696Z"
+  },
+  {
+    "insertId": "l4p2lufa81wqf",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T13:18:36.836159852Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 13:18:34,377 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250109_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T13:18:34.554510002Z"
+  },
+  {
+    "insertId": "4h8r01fahjxgl",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T13:19:41.846564557Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 13:19:41,090 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250110_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T13:19:41.154290534Z"
+  },
+  {
+    "insertId": "sb4wu7f5myk8h",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T13:20:36.851620644Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 13:20:35,600 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250113_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T13:20:35.754452968Z"
+  },
+  {
+    "insertId": "l4uxarfauycbj",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T13:21:36.859431982Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 13:21:33,638 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250115_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T13:21:33.754827801Z"
+  },
+  {
+    "insertId": "1kvt9sef9v2xia",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T13:25:51.919546878Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 13:25:51,489 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250116_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T13:25:51.554673020Z"
+  },
+  {
+    "insertId": "1y8joo6faor3jd",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T13:26:56.896096472Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 13:26:56,168 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250121_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T13:26:56.355052576Z"
+  },
+  {
+    "insertId": "1vfpd8ffa13gca",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T13:28:06.899447886Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 13:28:03,015 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250122_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T13:28:03.154064583Z"
+  },
+  {
+    "insertId": "1vfpd8ffa13gcb",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T13:28:06.899447886Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 13:28:03,015 [INFO] Backtest progress files=10/263 used=0 rows=0 inflight=0 target=1 rss_gb=3.95",
+    "timestamp": "2026-02-19T13:28:03.154076125Z"
+  },
+  {
+    "insertId": "1gh1m3jfb4fops",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T13:29:01.908354656Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 13:28:59,789 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250124_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T13:28:59.954914839Z"
+  },
+  {
+    "insertId": "1qfrlpnfa3lc73",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T13:30:06.912875780Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 13:30:03,696 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250127_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T13:30:03.754514700Z"
+  },
+  {
+    "insertId": "uinldf9x1jw3",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T13:31:16.929227265Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 13:31:16,013 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250205_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T13:31:16.154407672Z"
+  },
+  {
+    "insertId": "1c08d6sfbb7tbx",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T13:32:31.936081955Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 13:32:31,464 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250206_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T13:32:31.554819497Z"
+  },
+  {
+    "insertId": "ug7iaf1qe7qg",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T13:33:36.939032453Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 13:33:33,815 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250211_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T13:33:33.954870186Z"
+  },
+  {
+    "insertId": "19ic6l8f98j0yy",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T13:34:46.953235967Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 13:34:42,943 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250212_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T13:34:42.954252584Z"
+  },
+  {
+    "insertId": "4g42z4fanx4n4",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T13:35:46.958234013Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 13:35:42,363 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250214_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T13:35:42.554086718Z"
+  },
+  {
+    "insertId": "x1e4npe65qmg",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T13:36:52.010574623Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 13:36:51,538 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250217_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T13:36:51.553980901Z"
+  },
+  {
+    "insertId": "12vch5weov798",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T13:38:02.074950217Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 13:37:58,541 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250218_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T13:37:58.554815070Z"
+  },
+  {
+    "insertId": "ukysoof9msco6",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T13:39:06.982657012Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 13:39:02,455 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250220_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T13:39:02.554328537Z"
+  },
+  {
+    "insertId": "ukysoof9msco7",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T13:39:06.982657012Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 13:39:02,455 [INFO] Backtest progress files=20/263 used=0 rows=0 inflight=0 target=1 rss_gb=4.87",
+    "timestamp": "2026-02-19T13:39:02.554377313Z"
+  },
+  {
+    "insertId": "199uwqrfbms73s",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T13:40:11.987916654Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 13:40:06,800 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250221_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T13:40:06.954612031Z"
+  },
+  {
+    "insertId": "1eschxzfatqm00",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T13:41:22.006748073Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 13:41:21,490 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250224_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T13:41:21.554240831Z"
+  },
+  {
+    "insertId": "12ku1fff9zryrs",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T13:42:37.012564280Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 13:42:34,174 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250226_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T13:42:34.354905162Z"
+  },
+  {
+    "insertId": "t756b4f9cb376",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T13:43:42.019301509Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 13:43:38,575 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250227_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T13:43:38.754702490Z"
+  },
+  {
+    "insertId": "1os0xkyfbkrn9f",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T13:44:57.029402810Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 13:44:55,187 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250304_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T13:44:55.354554756Z"
+  },
+  {
+    "insertId": "170hcxof88b2pi",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T13:46:07.036246762Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 13:46:06,452 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250305_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T13:46:06.554019246Z"
+  },
+  {
+    "insertId": "1nfrynsf93iwja",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T13:47:07.042899718Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 13:47:03,973 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250307_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T13:47:04.154223510Z"
+  },
+  {
+    "insertId": "cs7ug3fafb7j6",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T13:48:07.055151508Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 13:48:05,803 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250310_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T13:48:05.954835388Z"
+  },
+  {
+    "insertId": "1856900f9lyxq7",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T13:49:12.056755169Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 13:49:11,283 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250311_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T13:49:11.355000617Z"
+  },
+  {
+    "insertId": "17l1325f9s9p5p",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T13:50:32.064733307Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 13:50:26,993 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250313_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T13:50:27.154437020Z"
+  },
+  {
+    "insertId": "17l1325f9s9p5q",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T13:50:32.064733307Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 13:50:26,993 [INFO] Backtest progress files=30/263 used=0 rows=0 inflight=0 target=1 rss_gb=4.96",
+    "timestamp": "2026-02-19T13:50:27.154454170Z"
+  },
+  {
+    "insertId": "1224phbfb0kjk2",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T13:51:52.078829013Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 13:51:51,863 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250314_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T13:51:51.953970016Z"
+  },
+  {
+    "insertId": "xkvmnrf9zy1a4",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T13:53:12.084928158Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 13:53:10,313 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250317_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T13:53:10.354776881Z"
+  },
+  {
+    "insertId": "1xo16wif9tvi2e",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T13:54:12.093394669Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 13:54:09,935 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250319_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T13:54:09.954502403Z"
+  },
+  {
+    "insertId": "12lsgicfae14zu",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T13:55:32.106846299Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 13:55:27,540 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250320_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T13:55:27.554477521Z"
+  },
+  {
+    "insertId": "1681usjeox304",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T13:56:57.120281217Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 13:56:54,545 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250325_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T13:56:54.555000201Z"
+  },
+  {
+    "insertId": "6dro92er6h6h",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T13:58:02.139037810Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 13:58:01,465 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250326_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T13:58:01.554254360Z"
+  },
+  {
+    "insertId": "1pxcw6kfaoeohn",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T13:59:17.140447217Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 13:59:12,028 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250328_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T13:59:12.154623968Z"
+  },
+  {
+    "insertId": "1856900f9mey2u",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T14:00:12.140430081Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 14:00:10,045 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250331_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T14:00:10.154876067Z"
+  },
+  {
+    "insertId": "1vgc31ifa194z1",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T14:01:37.177251214Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 14:01:36,296 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250401_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T14:01:36.354203073Z"
+  },
+  {
+    "insertId": "12ku33gfa9eui4",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T14:02:37.187476862Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 14:02:32,933 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250403_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T14:02:32.954705889Z"
+  },
+  {
+    "insertId": "12ku33gfa9eui5",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T14:02:37.187476862Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 14:02:32,933 [INFO] Backtest progress files=40/263 used=0 rows=0 inflight=0 target=1 rss_gb=5.00",
+    "timestamp": "2026-02-19T14:02:32.954718839Z"
+  },
+  {
+    "insertId": "tpx6ggf9znofm",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T14:03:22.191993257Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 14:03:21,393 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250407_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T14:03:21.554751881Z"
+  },
+  {
+    "insertId": "1hbgiiefb2ovxx",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T14:04:42.198383472Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 14:04:41,925 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250409_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T14:04:41.954259221Z"
+  },
+  {
+    "insertId": "1soa34sfae3gay",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T14:05:52.206619787Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 14:05:49,816 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250410_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T14:05:49.953997544Z"
+  },
+  {
+    "insertId": "dlo0lyfap8hn2",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T14:07:07.212499344Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 14:07:02,418 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250415_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T14:07:02.554324865Z"
+  },
+  {
+    "insertId": "3c5b43fa2600z",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T14:08:37.223565751Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 14:08:33,458 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250416_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T14:08:33.554756457Z"
+  },
+  {
+    "insertId": "id8b3rf9kj0bo",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T14:10:22.235255130Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 14:10:17,567 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250418_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T14:10:17.754450832Z"
+  },
+  {
+    "insertId": "nx4cscfadzruw",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T14:11:47.248739496Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 14:11:47,112 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250421_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T14:11:47.154631265Z"
+  },
+  {
+    "insertId": "6e0o2of863ykg",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T14:13:02.255088484Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 14:12:57,364 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250422_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T14:12:57.554711077Z"
+  },
+  {
+    "insertId": "vn0bjrf5oidmm",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T14:13:57.261878476Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 14:13:54,794 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250424_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T14:13:54.954421480Z"
+  },
+  {
+    "insertId": "1fc4vjif9drpjr",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T14:15:02.267505067Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 14:15:01,363 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250425_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T14:15:01.554917723Z"
+  },
+  {
+    "insertId": "1fc4vjif9drpjs",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T14:15:02.267505067Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 14:15:01,363 [INFO] Backtest progress files=50/263 used=0 rows=0 inflight=0 target=1 rss_gb=5.50",
+    "timestamp": "2026-02-19T14:15:01.554928230Z"
+  },
+  {
+    "insertId": "d36teyfb40r12",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T14:16:07.278265682Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 14:16:06,282 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250428_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T14:16:06.354544797Z"
+  },
+  {
+    "insertId": "1m1nhelf21qxw5",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T14:17:17.288874683Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 14:17:12,728 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250430_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T14:17:12.754274619Z"
+  },
+  {
+    "insertId": "ivg3wof9xmkqk",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T14:18:27.298500412Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 14:18:24,604 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250506_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T14:18:24.754622586Z"
+  },
+  {
+    "insertId": "uk9n47fa3ija0",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T14:19:37.300829674Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 14:19:35,055 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250508_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T14:19:35.154857331Z"
+  },
+  {
+    "insertId": "s2g5sbfacldsn",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T14:20:32.309549242Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 14:20:31,694 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250509_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T14:20:31.754026442Z"
+  },
+  {
+    "insertId": "u0ndtuf8ujum5",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T14:21:42.316915969Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 14:21:41,441 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250512_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T14:21:41.554802222Z"
+  },
+  {
+    "insertId": "wim5c4fb77h1q",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T14:22:57.324989654Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 14:22:52,409 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250514_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T14:22:52.554727369Z"
+  },
+  {
+    "insertId": "t55bqgf9sbp4e",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T14:23:57.333827528Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 14:23:57,030 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250515_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T14:23:57.155022138Z"
+  },
+  {
+    "insertId": "1ja56ipf9dmjwl",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T14:25:02.339857912Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 14:24:57,740 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250520_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T14:24:57.754626090Z"
+  },
+  {
+    "insertId": "bz6feffazhhca",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T14:26:07.344037954Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 14:26:04,096 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250521_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T14:26:04.154310926Z"
+  },
+  {
+    "insertId": "bz6feffazhhcb",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T14:26:07.344037954Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 14:26:04,097 [INFO] Backtest progress files=60/263 used=0 rows=0 inflight=0 target=1 rss_gb=5.51",
+    "timestamp": "2026-02-19T14:26:04.154323046Z"
+  },
+  {
+    "insertId": "au3rq1fb95kdt",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T14:27:22.390135937Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 14:27:19,269 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250523_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T14:27:19.354855322Z"
+  },
+  {
+    "insertId": "1n5e8w4fbobjg3",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T14:28:17.360711404Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 14:28:15,862 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250526_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T14:28:15.954816042Z"
+  },
+  {
+    "insertId": "l3codqfabgk1h",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T14:29:17.365984756Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 14:29:16,732 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250527_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T14:29:16.754551716Z"
+  },
+  {
+    "insertId": "1lfsjfzf55qp67",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T14:30:52.383830386Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 14:30:49,721 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250529_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T14:30:49.754829410Z"
+  },
+  {
+    "insertId": "1dg7suofa0d451",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T14:32:02.382358338Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 14:32:01,172 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250530_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T14:32:01.354968227Z"
+  },
+  {
+    "insertId": "5bgtkgfa19vix",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T14:33:12.390556944Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 14:33:08,775 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250604_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T14:33:08.954269408Z"
+  },
+  {
+    "insertId": "18z916cf8bbgwu",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T14:34:37.405704795Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 14:34:35,605 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250605_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T14:34:35.754675031Z"
+  },
+  {
+    "insertId": "1syc8lsfbiamj7",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T14:35:52.406108652Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 14:35:48,558 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250610_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T14:35:48.754442177Z"
+  },
+  {
+    "insertId": "1c25v8sfbw4hwl",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T14:37:02.419373694Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 14:36:57,638 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250611_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T14:36:57.755065822Z"
+  },
+  {
+    "insertId": "8chm20fa5e2mv",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T14:38:07.421685430Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 14:38:02,814 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250613_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T14:38:02.954757354Z"
+  },
+  {
+    "insertId": "8chm20fa5e2mw",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T14:38:07.421685430Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 14:38:02,814 [INFO] Backtest progress files=70/263 used=0 rows=0 inflight=0 target=1 rss_gb=5.53",
+    "timestamp": "2026-02-19T14:38:02.954768405Z"
+  },
+  {
+    "insertId": "dlnj3mfap3oyv",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T14:39:07.441437649Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 14:39:06,541 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250616_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T14:39:06.554719035Z"
+  },
+  {
+    "insertId": "1k38o6afa258uv",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T14:40:27.440887048Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 14:40:26,967 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250617_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T14:40:27.154360503Z"
+  },
+  {
+    "insertId": "1xog1qkf86h8i3",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T14:41:32.474522579Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 14:41:30,895 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250619_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T14:41:30.954878150Z"
+  },
+  {
+    "insertId": "1nfztzpfbbr6qj",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T14:42:47.480269881Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 14:42:43,938 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250620_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T14:42:43.954309317Z"
+  },
+  {
+    "insertId": "1tid0d8fa53f5f",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T14:43:52.491033672Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 14:43:49,671 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250623_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T14:43:49.754509686Z"
+  },
+  {
+    "insertId": "17b7rblfa6hbeb",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T14:44:57.498732959Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 14:44:55,398 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250625_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T14:44:55.554989805Z"
+  },
+  {
+    "insertId": "1h16vnnfazsgr0",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T14:47:02.505581834Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 14:46:58,556 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250626_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T14:46:58.754479260Z"
+  },
+  {
+    "insertId": "abst2lf45j82r",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T14:48:07.514795587Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 14:48:05,836 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250701_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T14:48:05.954594238Z"
+  },
+  {
+    "insertId": "qx69v4fb0gnn0",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T14:49:12.525861781Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 14:49:09,429 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250703_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T14:49:09.554177075Z"
+  },
+  {
+    "insertId": "1jt2pe1fap9o1p",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T14:50:12.527512963Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 14:50:08,441 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250704_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T14:50:08.554488059Z"
+  },
+  {
+    "insertId": "1jt2pe1fap9o1q",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T14:50:12.527512963Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 14:50:08,441 [INFO] Backtest progress files=80/263 used=0 rows=0 inflight=0 target=1 rss_gb=5.54",
+    "timestamp": "2026-02-19T14:50:08.554499227Z"
+  },
+  {
+    "insertId": "15muddbf9uoxfh",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T14:51:07.538314100Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 14:51:03,728 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250707_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T14:51:03.754819182Z"
+  },
+  {
+    "insertId": "10wzp5mfar516x",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T14:52:17.548913981Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 14:52:16,852 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250709_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T14:52:16.954200124Z"
+  },
+  {
+    "insertId": "hrc770fab5jgg",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T14:53:57.566934188Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 14:53:55,058 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250710_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T14:53:55.154472571Z"
+  },
+  {
+    "insertId": "1ra23zvfb8ke0a",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T14:55:02.571060841Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 14:54:58,636 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250715_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T14:54:58.754725325Z"
+  },
+  {
+    "insertId": "vey4ref9e2n9m",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T14:56:02.577319487Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 14:56:01,231 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250716_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T14:56:01.354741658Z"
+  },
+  {
+    "insertId": "1oj6gstf9a00c6",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T14:57:07.585831639Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 14:57:03,064 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250718_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T14:57:03.154788378Z"
+  },
+  {
+    "insertId": "19a89pnfad2hyr",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T14:58:22.592051776Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 14:58:19,852 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250721_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T14:58:19.954161650Z"
+  },
+  {
+    "insertId": "4zy7gtfax313h",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T14:59:32.603052790Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 14:59:31,568 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250722_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T14:59:31.754645619Z"
+  },
+  {
+    "insertId": "fu2kvrfak72hw",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T15:00:42.614448873Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 15:00:40,877 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250724_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T15:00:40.954502588Z"
+  },
+  {
+    "insertId": "mhas6tf9ot12q",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T15:01:47.625430494Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 15:01:44,037 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250725_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T15:01:44.154051678Z"
+  },
+  {
+    "insertId": "mhas6tf9ot12r",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T15:01:47.625430494Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 15:01:44,037 [INFO] Backtest progress files=90/263 used=0 rows=0 inflight=0 target=1 rss_gb=5.56",
+    "timestamp": "2026-02-19T15:01:44.154060792Z"
+  },
+  {
+    "insertId": "8386h1f9tl0ls",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T15:02:52.632214042Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 15:02:50,824 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250728_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T15:02:50.954161310Z"
+  },
+  {
+    "insertId": "qxbsayfa9gqxx",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T15:04:07.639426203Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 15:04:02,693 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250730_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T15:04:02.754507223Z"
+  },
+  {
+    "insertId": "1npyzq3f8b7qoo",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T15:05:17.652028046Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 15:05:13,972 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250731_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T15:05:14.154691674Z"
+  },
+  {
+    "insertId": "i1ir7gf8eoijj",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T15:06:32.656795054Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 15:06:27,574 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250805_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T15:06:27.754405164Z"
+  },
+  {
+    "insertId": "1xf4cgwfbip8rg",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T15:07:32.666972256Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 15:07:32,347 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250806_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T15:07:32.354375752Z"
+  },
+  {
+    "insertId": "bvkyyfa9zqcl",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T15:08:42.677495797Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 15:08:38,215 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250808_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T15:08:38.354815245Z"
+  },
+  {
+    "insertId": "dxsw82fboynwp",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T15:09:47.684331681Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 15:09:44,193 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250811_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T15:09:44.354354406Z"
+  },
+  {
+    "insertId": "1qpld95f9sq6cs",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T15:11:07.710454178Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 15:11:02,981 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250812_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T15:11:03.154640320Z"
+  },
+  {
+    "insertId": "r8zdluf9v457h",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T15:12:12.706484620Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 15:12:08,198 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250814_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T15:12:08.354714341Z"
+  },
+  {
+    "insertId": "501w3efaayuap",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T15:13:22.715088078Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 15:13:18,848 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250815_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T15:13:18.954985177Z"
+  },
+  {
+    "insertId": "501w3efaayuaq",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T15:13:22.715088078Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 15:13:18,849 [INFO] Backtest progress files=100/263 used=0 rows=0 inflight=0 target=1 rss_gb=5.57",
+    "timestamp": "2026-02-19T15:13:18.955001364Z"
+  },
+  {
+    "insertId": "jhc3asf8qj9ni",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T15:14:37.721798811Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 15:14:32,660 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250818_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T15:14:32.754781046Z"
+  },
+  {
+    "insertId": "1w03mdffa8jpmw",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T15:15:37.733649896Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 15:15:33,398 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250820_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T15:15:33.554948950Z"
+  },
+  {
+    "insertId": "12vb1g8fa9js59",
+    "labels": {
+      "compute.googleapis.com/resource_id": "4503328459094405865",
+      "compute.googleapis.com/resource_name": "gk3-cml-0218-005521-6d73-nap-8tl06aeg-5a9de24d-w2qw",
+      "log.file.name": "0.log",
+      "ml.googleapis.com/job_id": "4745526734198145024",
+      "ml.googleapis.com/task_name": "workerpool0-0"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/workerpool0-0",
+    "receiveTimestamp": "2026-02-19T15:16:42.738389312Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "269018079180",
+        "task_name": "workerpool0-0"
+      },
+      "type": "ml_job"
+    },
+    "textPayload": "2026-02-19 15:16:42,309 [WARNING] Skip gs://omega_v52_central/omega/omega/v52/frames/host=linux1/20250821_aa8abb7.parquet: empty_processed",
+    "timestamp": "2026-02-19T15:16:42.354610204Z"
+  },
+  {
+    "insertId": "1sy5q6hd89ye",
+    "labels": {
+      "ml.googleapis.com/endpoint": ""
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/ml.googleapis.com%2F4745526734198145024",
+    "receiveTimestamp": "2026-02-19T15:18:05.486179225Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "gen-lang-client-0250995579",
+        "task_name": "service"
+      },
+      "type": "ml_job"
+    },
+    "severity": "INFO",
+    "textPayload": "Finished tearing down training program.",
+    "timestamp": "2026-02-19T15:18:04.155593621Z"
+  },
+  {
+    "insertId": "1sy5q6hd89yh",
+    "labels": {
+      "ml.googleapis.com/endpoint": "",
+      "ml.googleapis.com/job_state": "CANCELLED"
+    },
+    "logName": "projects/gen-lang-client-0250995579/logs/ml.googleapis.com%2F4745526734198145024",
+    "receiveTimestamp": "2026-02-19T15:18:05.486179225Z",
+    "resource": {
+      "labels": {
+        "job_id": "4745526734198145024",
+        "project_id": "gen-lang-client-0250995579",
+        "task_name": "service"
+      },
+      "type": "ml_job"
+    },
+    "severity": "INFO",
+    "textPayload": "Job cancelled.",
+    "timestamp": "2026-02-19T15:18:04.909736636Z"
+  }
+]

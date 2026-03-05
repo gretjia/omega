@@ -1,0 +1,215 @@
+{
+  "mapping": {
+    "col_symbol": "万得代码",
+    "col_exchange": "交易所代码",
+    "col_date": "自然日",
+    "col_time": "时间",
+    "col_price": "成交价",
+    "col_volume": "成交量",
+    "col_turnover": "成交额",
+    "col_bs_flag": "BS标志",
+    "ask_price_prefix": "申卖价",
+    "ask_volume_prefix": "申卖量",
+    "bid_price_prefix": "申买价",
+    "bid_volume_prefix": "申买量",
+    "book_levels": 10
+  },
+  "session": {
+    "enable_session_filter": true,
+    "session_1_start": 93000000,
+    "session_1_end": 113000000,
+    "session_2_start": 130000000,
+    "session_2_end": 150000000,
+    "allow_auction": false
+  },
+  "io": {
+    "input_root": "./data/level2",
+    "output_root": "./data/level2_frames",
+    "input_format": "csv",
+    "csv_encoding": "gb18030",
+    "seven_zip_exe": "",
+    "audit_report_path": "./audit/level2_v3_audit_report.md"
+  },
+  "volume_clock": {
+    "bucket_size": 2000.0,
+    "dynamic_bucket_size": true,
+    "daily_volume_proxy_div": 50.0,
+    "min_bucket_size": 1000.0,
+    "min_ticks_per_bucket": 10,
+    "volume_mode": "cumulative",
+    "volume_floor": 0.0
+  },
+  "quality": {
+    "drop_zero_price": true,
+    "drop_zero_volume": true,
+    "min_price": 0.0,
+    "min_volume": 0.0,
+    "require_valid_top_book": true,
+    "min_book_price": 0.0,
+    "min_top_book_depth": 0.0,
+    "drop_nonpositive_frame_price": true,
+    "min_frame_price": 0.0
+  },
+  "microprice": {
+    "depth_level": 1,
+    "depth_floor": 1.0
+  },
+  "ofi": {
+    "ofi_mode": "price_change",
+    "depth_levels": 1,
+    "ofi_weight_decay": 1.0,
+    "ofi_zero_value": 0.0
+  },
+  "srl": {
+    "y_coeff": 0.75,
+    "sigma_floor": 1e-12,
+    "depth_floor": 1.0,
+    "exponent": 0.5,
+    "race_exponents": [
+      0.33,
+      0.5,
+      0.66
+    ],
+    "race_lane_names": [
+      "033",
+      "050",
+      "066"
+    ],
+    "standard_lane_index": 1,
+    "spoof_penalty_gamma": 0.5,
+    "spoof_ratio_eps": 1e-09,
+    "implied_y_min_penalty": 0.5,
+    "implied_y_min_impact": 1e-09,
+    "y_min": 0.1,
+    "y_max": 5.0,
+    "y_ema_alpha": 0.05,
+    "anchor_y": 0.75,
+    "anchor_weight": 0.01,
+    "anchor_clip_min": 0.4,
+    "anchor_clip_max": 1.5
+  },
+  "epiplexity": {
+    "mode": "lz76_linear",
+    "min_trace_len": 10,
+    "sax_scale_mult": 0.5,
+    "scale_eps": 0.01,
+    "compress_level": 6,
+    "min_bytes": 8,
+    "fallback_value": 0.0,
+    "sigma_gate_enabled": true,
+    "sigma_gate": 0.01,
+    "sigma_gate_quantile": 0.1,
+    "prior_sample_files": 50,
+    "prior_min_sigma_points": 1000,
+    "prior_min_y_points": 1000,
+    "prior_random_seed": 42
+  },
+  "topology_race": {
+    "enabled": true,
+    "green_coeff": 0.5,
+    "micro_feature": "topo_micro",
+    "classic_feature": "topo_classic",
+    "trend_feature": "topo_trend",
+    "price_scale_floor": 0.01,
+    "ofi_scale_floor": 1.0,
+    "vol_scale_floor": 1.0,
+    "time_scale_floor": 1.0,
+    "manifolds": [
+      [
+        "topo_micro",
+        "trace",
+        "ofi_trace",
+        "price_scale_floor",
+        "ofi_scale_floor"
+      ],
+      [
+        "topo_classic",
+        "trace",
+        "vol_trace",
+        "price_scale_floor",
+        "vol_scale_floor"
+      ],
+      [
+        "topo_trend",
+        "trace",
+        "time_trace",
+        "price_scale_floor",
+        "time_scale_floor"
+      ]
+    ]
+  },
+  "topo_snr": {
+    "n_shuffle": 100,
+    "seed": 1337,
+    "std_floor": 1e-12,
+    "min_shuffles": 10
+  },
+  "signal": {
+    "epiplexity_min": 0.4,
+    "peace_threshold": 0.35,
+    "srl_resid_sigma_mult": 2.0,
+    "topo_area_min_abs": 1e-09,
+    "topo_energy_sigma_mult": 10.0,
+    "spoofing_ratio_max": 2.5,
+    "min_ofi_for_y_update": 100.0
+  },
+  "validation": {
+    "topo_snr_min": 3.0,
+    "orthogonality_max_abs": 0.1,
+    "vector_alignment_min": 0.6,
+    "forward_return_horizon_buckets": 3,
+    "min_samples": 30,
+    "max_traces": null,
+    "corr_eps": 1e-12,
+    "renorm_ortho_penalty_threshold": 0.3,
+    "renorm_ortho_penalty_factor": 0.5,
+    "backtest_ret_clip_abs": null
+  },
+  "train": {
+    "label_horizon_buckets": 3,
+    "label_sigma_mult": 1.0,
+    "drop_neutral_labels": true,
+    "decision_margin": 0.05,
+    "min_valid_close": 0.0,
+    "use_structural_filter": true,
+    "ofi_abs_quantile": 0.9,
+    "topo_energy_quantile": 0.8,
+    "winsor_q_low": 0.001,
+    "winsor_q_high": 0.999,
+    "log1p_features": [
+      "net_ofi",
+      "depth_eff",
+      "srl_resid",
+      "topo_area",
+      "topo_energy"
+    ],
+    "winsor_features": [
+      "topo_area"
+    ],
+    "sample_weight_topo": true,
+    "scale_spectrum": [
+      20,
+      30,
+      40,
+      50,
+      60,
+      80,
+      100,
+      120
+    ],
+    "renorm_sample_frac": 0.2,
+    "srl_race_features": [
+      "srl_resid_033",
+      "srl_resid_050",
+      "srl_resid_066"
+    ],
+    "topology_race_features": [
+      "topo_micro",
+      "topo_classic",
+      "topo_trend"
+    ]
+  },
+  "stages": [],
+  "output_dir": "./artifacts",
+  "artifact_name": "omega_policy.pkl"
+}

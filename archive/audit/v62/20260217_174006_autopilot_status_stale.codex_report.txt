@@ -1,0 +1,13 @@
+Wrote the incident report to:
+
+`audit/runtime/v52/incidents/20260217_174006_autopilot_status_stale.codex_report.txt`
+
+Key outcome:
+- Root cause is `autopilot_status_stale` false-positive during long/silent `build_base_matrix`, not a dead autopilot.
+- I did not restart/kill anything (minimal safe intervention), because live checks showed active compute:
+  - `lsof audit/runtime/v52/autopilot_aa8abb7.runner.log` -> PID `26005` still writing log.
+  - `lsof -nP -a -p 26930 -i` -> active Google `:443` connections from `v60_build_base_matrix.py`.
+  - 20s psutil sample showed positive CPU deltas on PID `26930`.
+- Current status: pipeline is still in `build_base_matrix` (`handover/ai-direct/live/v60_run_aa8abb7.json` updated at `2026-02-17 17:42:10`), with `autopilot_running=true`, `uplink_running=true`.
+- Resume verdict: pipeline has not crashed and is actively progressing within the current stage, but has not yet advanced to `vertex_optimize`.
+- Remaining risks and next checks are documented in the report, including stage-transition checks and conditions for a controlled relaunch if compute exits with no artifact/stage movement.

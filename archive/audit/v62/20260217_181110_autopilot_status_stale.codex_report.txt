@@ -1,0 +1,11 @@
+Incident report is written at:
+
+`audit/runtime/v52/incidents/20260217_181110_autopilot_status_stale.codex_report.txt`
+
+Key outcome:
+- Root cause is stale telemetry during long synchronous `build_base_matrix` (status heartbeat gap), not an autopilot crash.
+- I applied no restart/kill (smallest safe intervention), because liveness checks showed active compute:
+  - parent PID `26005` still attached to `autopilot_aa8abb7.runner.log`
+  - child PID `26930` has active Google `:443` connections and positive CPU deltas in two psutil samples.
+- Current status: pipeline is still running in `build_base_matrix` (`autopilot_running=true`, `uplink_running=true`) and has not yet transitioned to `vertex_optimize`.
+- Next checks and remaining risks are documented in the report, including artifact/stage transition checks and fallback criteria for a controlled single relaunch only if compute exits without output.

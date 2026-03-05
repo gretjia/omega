@@ -1,0 +1,65 @@
+{
+  "hash": "aa8abb7",
+  "updated_at_utc": "2026-02-22T03:58:03Z",
+  "agents": {
+    "windows-monitor": {
+      "last_tick_utc": "2026-02-22T03:58:03Z",
+      "status": "ok",
+      "task_state": "Ready",
+      "guard_state": "Running",
+      "base_done": true,
+      "shard_parquet": 303,
+      "shard_meta": 303,
+      "py_count": 0,
+      "mem_free_gb": 87.59,
+      "mem_total_gb": 95.78,
+      "last_progress_epoch": 1771533002.686053,
+      "stall_age_sec": 199680,
+      "last_action": "none"
+    },
+    "linux-bootstrap": {
+      "last_tick_utc": "2026-02-18T22:57:52Z",
+      "status": "ok",
+      "git_pull_ok": true,
+      "frame_count": 0,
+      "gcs_count": 484,
+      "missing_count": 484,
+      "copied_this_tick": 0,
+      "copy_fail_this_tick": 0,
+      "base_done": false,
+      "proc_count": 0,
+      "last_action": "none",
+      "git_sync_mode": "none"
+    },
+    "linux-monitor": {
+      "last_tick_utc": "2026-02-18T23:01:52Z",
+      "status": "warn",
+      "proc_count": 0,
+      "shard_parquet": 0,
+      "shard_meta": 0,
+      "frame_count": 0,
+      "base_done": false,
+      "stall_age_sec": 5028,
+      "last_progress_epoch": 1771450683.837655,
+      "last_action": "none",
+      "log_tail": ""
+    },
+    "autopilot-gate": {
+      "last_tick_utc": "2026-02-22T03:55:01Z",
+      "status": "ok",
+      "windows_done": true,
+      "linux_done": false,
+      "guard_issues": [],
+      "ready": false,
+      "launched": false,
+      "last_action": "none"
+    }
+  },
+  "debug_agent": {
+    "pid": 48611,
+    "started_at_utc": "2026-02-19T20:28:01Z",
+    "role": "windows-monitor",
+    "reason": "stalled",
+    "report": "/Users/zephryj/work/Omega_vNext/audit/runtime/v60/incidents/20260220_042801_windows-monitor_stalled.gemini.txt"
+  }
+}

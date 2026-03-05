@@ -1,0 +1,13 @@
+﻿{
+    "now":  "2026-02-13 21:16:18",
+    "task_mode":  "UNKNOWN",
+    "log_ready":  true,
+    "total_archives":  null,
+    "done_count":  25,
+    "skip_count":  399,
+    "processed_count":  424,
+    "entries_per_hour":  424000,
+    "eta_minutes":  null,
+    "eta_at":  null,
+    "exit_code":  null
+}

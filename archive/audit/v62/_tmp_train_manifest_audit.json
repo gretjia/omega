@@ -1,0 +1,65 @@
+{
+  "manifest_path": "C:\\Omega_vNext\\audit\\v5_runtime\\windows\\manifests\\train_files.txt",
+  "total_entries": 456,
+  "unique_entries": 456,
+  "duplicate_entry_count": 0,
+  "duplicates": [],
+  "missing_count": 0,
+  "missing_examples": [],
+  "read_error_count": 0,
+  "read_error_examples": [],
+  "total_rows_from_parquet": 75689392,
+  "rows_stats": {
+    "count": 456,
+    "min": 81922,
+    "max": 263942,
+    "mean": 165985.50877192983,
+    "median": 164378.5
+  },
+  "top_5_largest_files": [
+    {
+      "path": "D:\\Omega_frames\\v50\\output\\20241018.parquet",
+      "rows": 263942
+    },
+    {
+      "path": "D:\\Omega_frames\\v50\\output\\20240202.parquet",
+      "rows": 236860
+    },
+    {
+      "path": "D:\\Omega_frames\\v50\\output\\20240926.parquet",
+      "rows": 231094
+    },
+    {
+      "path": "D:\\Omega_frames\\v50\\output\\20240122.parquet",
+      "rows": 226864
+    },
+    {
+      "path": "D:\\Omega_frames\\v50\\output\\20230216.parquet",
+      "rows": 213879
+    }
+  ],
+  "year_breakdown": {
+    "2023": {
+      "files": 242,
+      "rows": 38495469
+    },
+    "2024": {
+      "files": 214,
+      "rows": 37193923
+    }
+  },
+  "root_breakdown": {
+    "D:/Omega_frames/v50/output": {
+      "files": 456,
+      "rows": 75689392
+    }
+  },
+  "status_compare": {
+    "status_total_rows": 55834246,
+    "status_files_selected_or_tasks": 456,
+    "manifest_total_rows": 75689392,
+    "manifest_unique_files": 456,
+    "rows_match": false,
+    "files_match": true
+  }
+}
