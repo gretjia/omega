@@ -152,3 +152,10 @@ Read skill details: `.agent/skills/{name}/SKILL.md`
 
 *Last updated: 2026-02-26 by Antigravity Agent*
 *This file replaces the legacy ENTRYPOINT.md as the primary onboarding doc.*
+
+## Google Docs CLI Tool
+A global CLI tool `gdocs` is available to access and read Google Docs (authenticated via the user's ziqian.jia@gmail.com account).
+- `gdocs list` - Lists recent documents with their IDs.
+- `gdocs read <ID>` - Outputs the plain text content of a Google Doc.
+
+AI agents can use this tool to fetch requirements, architectures, or context from the user's personal Google Drive.

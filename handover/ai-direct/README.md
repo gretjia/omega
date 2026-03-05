@@ -43,3 +43,12 @@ Example:
 - `summary`
 - `next_actions`
 
+## 6. 今日交接快速入口（审计链）
+
+- `handover/ai-direct/entries/20260305_142336_v63_training_backtest_alignment_audit.md`（本轮总结，含原始字段证据与风险）
+- `audit/v63.md`（v63 架构与约束映射）
+- `/home/zepher/work/Omega_vNext/audit/v63_2025_q1q9_basematrix.meta.json`（训练输入与行数）
+- `/home/zepher/work/Omega_vNext/artifacts/v63_q1q9_train_metrics.json`（训练 metrics）
+- `/home/zepher/work/Omega_vNext/audit/v63_backtest_q4_status.json`（回测状态）
+- `/home/zepher/work/Omega_vNext/audit/v63_backtest_q4_result.json`（回测结果）
+- `handover/ai-direct/entries/20260305_094830_v63_vertex_train_success.md`（训练完成记录）

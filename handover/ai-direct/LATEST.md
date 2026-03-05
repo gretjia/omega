@@ -13,10 +13,10 @@ This file is the single source of current operational truth for all agents.
 
 ## 1. Snapshot Metadata
 
-- `updated_at_local`: 2026-03-03 09:25:20 +0800
-- `updated_at_utc`: 2026-03-03 01:25:20 +0000 (UTC)
-- `updated_by`: Gemini
-- `controller_repo_head`: `afcb663` (branch: `perf/stage2-speedup-v62`, working tree dirty)
+- `updated_at_local`: 2026-03-05 10:46:00 +0000
+- `updated_at_utc`: 2026-03-05 10:46:00 +0000 (UTC)
+- `updated_by`: Codex
+- `controller_repo_head`: `43f03cf` (branch: `main`, working tree dirty)
 - `worker_repo_head_linux`: `afcb663` (branch: `perf/stage2-speedup-v62`, runtime audit/preflight artifacts dirty)
 - `worker_repo_head_windows`: `afcb663` (branch: `perf/stage2-speedup-v62`, runtime audit ledgers dirty)
 
@@ -28,6 +28,8 @@ This file is the single source of current operational truth for all agents.
 | V62-STAGE2-WINDOWS | Stage2 Physics from `v62_base_l1` to `v62_feature_l2` | COMPLETED (Linux assist backfill + cleanup finished) | 2026-02-27 15:52 +0800 | `windows1-w1` |
 | V62-STAGE2-LINUX | Stage2 Physics for `host=linux1` | COMPLETED (queue drained) | 2026-02-27 15:48 +0800 | `linux1-lx` |
 | V62-STAGE2-SPEEDUP | Output-preserving perf refactor (branch `perf/stage2-speedup-v62`) | IN_PROGRESS (deployed+validated; pending merge policy) | 2026-02-27 15:52 +0800 | `controller` |
+| V63-STAGE2-LIVE | V63 Stage2 distributed compute: assist/shadow dual-host handoff | READY_FOR_MERGE_GATE (windows done, linux/windows outputs aligned, assist return+merge complete) | 2026-03-05 07:39 +0000 | `linux1-lx`, `windows1-w1` |
+| V63-STAGE3-BASEMATRIX | V63 Stage3 basematrix (2025-01~2025-09训练区间) | BASEMATRIX DONE, Vertex TRAIN SUCCEEDED | 2026-03-05 09:48 +0000 | `linux1-lx`, `omega-vm` |
 | HANDOVER-MAINTENANCE | keep handover as entrypoint + run-state truth | IN_PROGRESS | 2026-02-26 12:51 +0800 | `controller` |
 
 Detailed board:
@@ -44,12 +46,47 @@ Detailed board:
   - final metrics: `ASSIGNED=555`, `COMPLETED=10`, `SKIPPED=545`, `ERROR=0`, `FRAMING_COMPLETE=1`
   - `STAGE1_DONE=552` (`/omega_pool/parquet_data/v62_base_l1/host=linux1/*.parquet.done`)
 - Stage2 status:
-  - V62 completed: `LNX_STAGE2_DONE=552 / 552`
-  - **V63 (latest) completed**: `LNX_STAGE2_DONE=552 / 552` (`latest_feature_l2/host=linux1/*.done`)
-- Stage3 status:
-  - **BaseMatrix Forging (V63)**: COMPLETED. Generated `audit/v63_basematrix.parquet` (243MB) from 155 shards on `linux1-lx`.
-  - **Vertex AI Model Training**: COMPLETED. XGBoost global training successful (with workaround for missing manifolds). Model pushed to `gs://omega_v52_central/omega/staging/models/v63/20260303_014925/omega_xgb_final.pkl`.
-  - **Local Backtest Evaluation**: IN PROGRESS on `linux1-lx` across 16 workers (`audit/local_backtest_v63.log`).
+- V62 completed: `LNX_STAGE2_DONE=552 / 552`
+- V63 Stage2 status (current): running background keepalive; windows shadow/assist outputs complete and aligned, merge-gate check passed
+  - Active processes:
+    - `tools/stage2_targeted_supervisor.py`: 0
+    - `tools/stage2_targeted_resume.py`: 0
+    - `tools/stage2_physics_compute.py`: 0
+  - Source/Input state:
+    - `v63_subset_l1_assist_w1/host=windows1`: 28 files
+    - `v63_subset_l1_shadow_w1/host=windows1`: 61 files
+  - Linux output currently:
+    - `v63_feature_l2_assist_w1/host=linux1`: 28 files, 28 done
+    - `v63_feature_l2_shadow_w1/host=linux1`: 61 files, 61 done
+  - parity（本轮复检）:
+    - assist `28/28`, shadow `61/61`（name+size 全量一致）
+    - Per-shard output done:
+    - `shard1`: `32 / 32`
+    - `shard2`: `33 / 33`
+    - `shard3`: `32 / 32`
+    - `shard4`: `31 / 31`
+  - Data mapping: `/omega_pool/parquet_data/windows_assist_mapping.json` exists and is used for merge.
+Stage3 status:
+  - **BaseMatrix Forging (V63, Jan-Sep 2025 Train Scope)**: COMPLETED on `linux1-lx`.
+    - `audit/v63_2025_q1q9_basematrix.parquet`
+    - `audit/v63_2025_q1q9_basematrix.meta.json`
+    - `audit/v63_2025_q1q9_basematrix_shards/`
+    - Batch summary: `base_rows=561281`, `batch_count=39`, `input_file_count=141`
+  - **Vertex AI Model Training**: SUCCEEDED.
+    - Completed submit: `projects/269018079180/locations/us-central1/customJobs/306719677785047040`
+    - `displayName: omega-v63-train-q1q9-20260305-0944`
+    - Runtime: `2026-03-05T09:44:23Z` -> `2026-03-05T09:44:54Z` (~31s)
+    - Outputs:
+      - `gs://omega_v52_central/omega/staging/base_matrix/v63/q1q9_2025/model/omega_xgb_final.pkl`
+      - `gs://omega_v52_central/omega/staging/base_matrix/v63/q1q9_2025/model/train_metrics.json`
+    - Metrics:
+      - `mask_rows=603`
+      - `total_training_rows=586`
+      - `seconds=0.24`
+  - **Local Backtest Evaluation**: COMPLETED (result files written).
+    - `v63_backtest_q4_status.json`（`status=completed`, `processed_files_total=1`, `total_rows=9940792`, `total_trades=9618642`, `total_pnl=2590.1997923344275`）
+    - `v63_backtest_q4_result.json`（`summary.files=1`, `summary.processed=1`, `summary.errors=0`）
+  - **Local Backtest Gate**: quality_gate_in_review（见 `handover/ai-direct/entries/20260305_142336_v63_training_backtest_alignment_audit.md`）
 
 ### 3.2 Windows `windows1-w1` (`100.123.90.25`)
 
@@ -57,9 +94,16 @@ Detailed board:
   - completed (`STAGE1_DONE=191`)
 - Stage2 status:
   - V62 completed: `WIN_STAGE2_DONE=191 / 191` (`missing=0`)
-  - **V63 (latest) completed**: `WIN_STAGE2_DONE=191 / 191` (`latest_feature_l2/host=windows1/*.parquet`). Note: `.done` markers were manually created due to a Python `touch()` failure on Windows. Data was subsequently synced to `linux1-lx` for Stage 3 BaseMatrix.
-  - process state: no active Stage2 python process chain
-  - temp cleanup: removed `omega_stage2_iso_*` scratch dirs (`25` removed)
+- V63 live status:
+    - `Omega_v63_Windows_Assist`: Ready
+    - `Omega_v63_Windows_Shadow`: Ready
+    - `Omega_V63_Stage2_Supervisor`: Ready
+    - Assist output complete: `WIN_FEATURE_L2_ASSIST=28 / 28` (`done=28`)
+    - Shadow output complete: `WIN_FEATURE_L2_SHADOW=61 / 61` (`done=61`)
+    - Windows Python compute processes: 0
+    - `v63_feature_l2_assist_w1/host=windows1`: `28` files, `28` done
+    - `v63_feature_l2_shadow_w1/host=windows1`: `61` files, `61` done
+- Holdback policy: reverse copy completed after parity gate. Linux and Windows outputs are aligned; merge orchestration can proceed.
 
 ### 3.3 Data Recovery Note
 
@@ -80,11 +124,11 @@ Historical broken files are kept as backups:
 
 ## 5. Immediate Next Actions (User-Directed Sequence)
 
-1. Stage3: run full-train/backtest sweep on finalized V62 L2 outputs (both hosts now complete).
-2. Run parity/integrity gates against `audit/v62.md` and `audit/v62_framing_rebuild.md` on final dual-host outputs.
-3. Normalize worker runtime dirty ledgers intentionally (commit/archive/clean policy), keeping code heads fixed at `afcb663`.
-4. Update `handover/ops/ACTIVE_PROJECTS.md` and `handover/BOARD.md` with final Stage2 completion snapshot.
-5. Preserve assist run evidence logs for RCA/audit, then rotate large transient logs if needed.
+1. Windows holdback remains clear; V63 assist/shadow parity and output counts are still aligned.
+2. 继续监控 `forge_base_matrix.py` 进度（当前 2025-01~2025-09、39 batches），完成后校验 `meta + rows`。
+3. 训练已成功：`JOB_STATE_SUCCEEDED`。回测产物已完成写入，当前处于 `quality_gate_in_review`。
+4. 补齐可机读审计证据（topology 门控路径、train mask 生效解释、v31 脚本治理）后再评估是否放行。
+5. latest验证记录：`20260305_142336_v63_training_backtest_alignment_audit.md`（本轮审计结论与风险）。
 
 ## 6. Quick Verification Commands
 
@@ -102,6 +146,19 @@ ssh linux1-lx '/home/zepher/work/Omega_vNext/.venv/bin/python -c "import numba, 
 
 ## 7. Latest Related Entries
 
+- `handover/ai-direct/entries/20260305_142336_v63_training_backtest_alignment_audit.md`
+- `handover/ai-direct/entries/20260305_094450_v63_vertex_train_submit_retry.md`
+- `handover/ai-direct/entries/20260305_094830_v63_vertex_train_success.md`
+- `handover/ai-direct/entries/20260305_094450_v63_vertex_train_submit_retry.md`
+- `handover/ai-direct/entries/20260305_075850_v63_basematrix_q1q9_relaunch.md`
+- `handover/ai-direct/entries/20260304_234100_v63_final_health_recheck.md`
+- `handover/ai-direct/entries/20260304_232730_v63_recheck_idle_and_parity.md`
+- `handover/ai-direct/entries/20260304_233456_v63_health_recheck_and_parity.md`
+- `handover/ai-direct/entries/20260305_073100_v63_holdback_final_health.md`
+- `handover/ai-direct/entries/20260304_161757_v63_shadow_health_and_merge_ready.md`
+- `handover/ai-direct/entries/20260304_161327_v63_shadow_return_parity_verified.md`
+- `handover/ai-direct/entries/20260304_162029_v63_shadow_aligned_and_merge_gate_ready.md`
+- `handover/ai-direct/entries/20260304_210102_v63_shadow_compute_holdback.md`
 - `handover/ai-direct/entries/20260304_095536_network_bottleneck_rca.md`
 - `handover/ai-direct/entries/20260304_040010_windows_assist_plan_and_recovery.md`
 - `handover/ai-direct/entries/20260303_121500_v63_execution_post_mortem.md`
@@ -119,6 +176,39 @@ ssh linux1-lx '/home/zepher/work/Omega_vNext/.venv/bin/python -c "import numba, 
 - `handover/ai-direct/entries/20260226_154217_windows_stage2_pathological_symbol_debug_fix.md`
 - `handover/ai-direct/entries/20260224_165312_linux_stage1_repair_and_stage2_gate.md`
 - `handover/ai-direct/entries/20260224_041600_omega_vm_windows_connectivity_rca_fix.md`
+
+## Update 2026-03-04 16:20 +0000 (V63 Windows shadow/assist complete, merge gate refreshed)
+
+- Confirmed again that Windows feature outputs are complete and stable:
+  - Assist: `28/28`
+  - Shadow: `61/61`
+  - No active Windows Python compute processes.
+- Re-verified Linux outputs still complete and aligned:
+  - `v63_feature_l2_shadow_w1/host=linux1`: `61 done`, shards `32+33+32+31`
+  - name+size parity (`linux` vs `windows` shadow): `source=61 dest=61 missing=0 partial=0 extra=0`
+- Linux keepalive remains: supervisors/resume active, physics workers are not active.
+- Merge-gate status: ready pending approval.
+
+## Update 2026-03-04 16:13 +0000 (V63 Windows Shadow completed, parity verified, reverse pull complete)
+
+- Windows side `v63_feature_l2_shadow_w1` completed: `61 / 61` done.
+- Windows scheduled tasks all `Ready` for Assist/Shadow/Supervisor.
+- Reverse copy from Windows to Linux completed: `/tmp/pull_v63_shadow_to_linux.log` reports `pushed=61 total=61`.
+- Linux target parity check pass: shadow output filenames and sizes match exactly (61/61).
+- Linux stage2 continuity still running in background (`stage2_targeted_supervisor`: 5, `stage2_targeted_resume`: 4).
+
+## Update 2026-03-04 13:01 +0000 (V63 Windows Shadow Holdback, Linux Keep-Alive)
+
+- **Decision**: hold back all Windows-generated `v63_feature_l2_shadow_w1` outputs from returning to Linux until Windows run completes and parity check passes.
+- **Reason**: avoid contaminating Linux merge with partial/size-mismatched files; enforce strict integrity before merge.
+- **Current state**:
+  - Linux `linux1-lx`: Stage2 target supervisors still active; assist/shadow pipeline continues in background.
+  - Windows `windows1-w1`: `Omega_v63_Windows_Shadow` remains Running.
+  - Current window feature state: `v63_feature_l2_shadow_w1/host=windows1` `5 / 61` done.
+- **Gate to proceed**:
+  - `v63_feature_l2_shadow_w1/host=windows1` must reach `61 / 61`.
+  - Windows↔Linux file name + byte-size parity check must pass before reverse copy.
+- **Next action**: run controlled reverse-sync only after gates pass.
 
 ## Update 2026-02-27 08:24 +0000 (V62 Stage2 Dual-Host Completion + Linux Assist Cutover)
 ## Update 2026-03-04 18:00 +0800 (V63 Stage 2 Distributed Acceleration & Windows Unblocked)

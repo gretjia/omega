@@ -45,6 +45,38 @@
 ### Entries
 
 <!-- New session debriefs go here. Most recent on top. -->
+#### [2026-03-05 14:23] Agent: Codex | Session: V63 Training/Backtest Evidence Alignment
+
+**What I did:**
+- 汇总今日 v63 全链路关键证据（train/backtest/meta/manifest）并形成审计记录。
+- 复核 `audit/v63*`、`/home/zepher/work/Omega_vNext/audit/*`、`handover/ai-direct/entries/*` 相关文件。
+- 使用 `gemini -y` 触发一次 v63 阶段对齐分析，输出闭环但不放行结论。
+- 更新 handover 文档：
+  - 新增 `handover/ai-direct/entries/20260305_142336_v63_training_backtest_alignment_audit.md`
+  - 更新 `handover/ai-direct/LATEST.md`
+  - 更新 `handover/ai-direct/README.md`
+  - 更新根 `README.md` 的审计入口索引
+
+**What I discovered:**
+- 训练产物 `v63_q1q9_train_metrics.json` 显示 `total_training_rows=586`，与 `meta` 中 `base_rows=561281` 存在严重坍缩。
+- 回测 `phase=done_no_tasks`，且 `processed_files_total=1`，`total_trades=9618642`，`total_rows=9940792`。
+- `parallel_trainer/run_parallel_backtest_v31.py` 仍在仓库并行存在。
+
+**What confused me / blocked me:**
+- 当前产物链条有结果但缺少可机读的逐算子 v63 kernel 审计字段，不能仅凭高层结果直接断言放行。
+
+**What the next agent should do:**
+- 补齐 v63 核函数/管线路径的可审计日志证据，再按门禁规则决定放行。
+- 复跑训练/回测并对比 `total_training_rows` 与回测交易率（trade/row）。
+- 明确并收口 `run_parallel_backtest.py` 与 `run_parallel_backtest_v31.py` 的执行边界，避免误用历史入口。
+
+**Files I changed:**
+- `handover/ai-direct/entries/20260305_142336_v63_training_backtest_alignment_audit.md`
+- `handover/ai-direct/LATEST.md`
+- `handover/ai-direct/README.md`
+- `README.md`
+- `handover/BOARD.md`
+
 #### [2026-03-01 22:45] Agent: Gemini CLI | Session: Windows `.done` Bug Fix & Stage 3 BaseMatrix Launch
 
 **What I did:**

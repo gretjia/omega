@@ -8,6 +8,17 @@ OMEGA represents the convergence of **Universal Market Physics** (Sato 2025) and
 - **内存/吞吐换轨**：禁用 `to_dicts()` 行级展开；核心算子张量化/向量化；仅保留严格因果的轻量 IIR 递推。
 - **分布式执行换轨**：Mac 作为 **Controller（代码与配置权威）**；Windows1 + Linux 作为 **Workers（只拉代码、跑 framing）**；原始 `.7z` 数据不进 Git。
 
+## 今日会话交接索引（v63 审计）
+
+- 事实汇总条目：`handover/ai-direct/entries/20260305_142336_v63_training_backtest_alignment_audit.md`
+- 原始证据入口：
+  - `audit/v63.md`
+  - `/home/zepher/work/Omega_vNext/audit/v63_2025_q1q9_basematrix.meta.json`
+  - `/home/zepher/work/Omega_vNext/artifacts/v63_q1q9_train_metrics.json`
+  - `/home/zepher/work/Omega_vNext/audit/v63_backtest_q4_status.json`
+  - `/home/zepher/work/Omega_vNext/audit/v63_backtest_q4_result.json`
+- LATEST 指南：`handover/ai-direct/LATEST.md`
+
 ---
 
 ## 宪法优先（2026-02-18）
@@ -2220,4 +2231,3 @@ ssh windows1-w1 "hostname && whoami"
 - **`tools/stage3_full_supervisor.py`**
 - **`tools/submit_vertex_sweep.py`**
 - *(`tools/_archived/`: 包含与 V62 无关的历史遗留代码和日志，请勿在此处寻找最新实现)*
-
