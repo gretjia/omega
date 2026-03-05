@@ -119,8 +119,8 @@ def main():
     print("\n=== V64 EXTREMISTAN END-TO-END SMOKE TEST PASSED ===")
     
     # Cleanup
-    for d in [SMOKE_L1_DIR, SMOKE_L2_DIR, SMOKE_L3_DIR, SMOKE_MODEL_DIR]:
-        shutil.rmtree(d)
+    # for d in [SMOKE_L1_DIR, SMOKE_L2_DIR, SMOKE_L3_DIR, SMOKE_MODEL_DIR]:
+    #     shutil.rmtree(d)
 
 if __name__ == "__main__":
     main()
