@@ -159,3 +159,6 @@ A global CLI tool `gdocs` is available to access and read Google Docs (authentic
 - `gdocs read <ID>` - Outputs the plain text content of a Google Doc.
 
 AI agents can use this tool to fetch requirements, architectures, or context from the user's personal Google Drive.
+
+- **`archive/`** - Archived tools, scripts, and audit reports from legacy versions (e.g., v62). Check here for historical rollbacks or context on deprecated pipelines.
+
