@@ -108,6 +108,7 @@ def run_global_training(args: argparse.Namespace) -> None:
 
     required_cols = {
         "epiplexity",
+        "singularity_vector",
         "srl_resid_050",
         "sigma_eff",
         "topo_area",
@@ -139,31 +140,27 @@ def run_global_training(args: argparse.Namespace) -> None:
         (pl.col("t1_fwd_return") - pl.col("t1_fwd_return").mean().over(["date", time_key])).alias("t1_excess_return")
     ])
 
-    epi = df.get_column("epiplexity").to_numpy()
-    srl = df.get_column("srl_resid_050").to_numpy()
-    sigma = df.get_column("sigma_eff").to_numpy()
-    topo_area = df.get_column("topo_area").to_numpy()
-    topo_energy = df.get_column("topo_energy").to_numpy()
+    singularity = df.get_column("singularity_vector").fill_nan(0.0).fill_null(0.0).to_numpy()
     X_all = df.select(list(FEATURE_COLS)).to_numpy()
     
     # Use Excess Return for label
     y_all = (df.get_column("t1_excess_return").to_numpy() > 0).astype(int)
 
     print(
-        "[*] Applying physics gates "
-        f"(peace={args.peace_threshold}, srl_mult={args.srl_resid_sigma_mult}, topo_mult={args.topo_energy_sigma_mult})...",
+        "[*] Applying V64 physics gates "
+        f"(peace={args.peace_threshold})...",
         flush=True,
     )
     physics_mask = (
-        (epi > float(args.peace_threshold))
-        & (np.abs(srl) > float(args.srl_resid_sigma_mult) * sigma)
-        & (topo_energy > float(args.topo_energy_sigma_mult) * sigma)
+        (np.abs(singularity) > float(args.peace_threshold))
     )
 
     mask_rows = int(np.sum(physics_mask))
     X_clean = X_all[physics_mask]
     y_clean = y_all[physics_mask]
-    weights_clean = (epi * np.log1p(np.abs(topo_area)))[physics_mask]
+    
+    # V64: The weight of the sample IS the amplitude of the singularity
+    weights_clean = np.abs(singularity)[physics_mask]
 
     finite = np.isfinite(weights_clean) & (weights_clean > 1e-8)
     X_clean = X_clean[finite]
@@ -176,7 +173,7 @@ def run_global_training(args: argparse.Namespace) -> None:
     if train_rows <= 0:
         raise RuntimeError("Physics gates removed all rows; cannot train.")
 
-    del df, epi, srl, sigma, topo_area, topo_energy, X_all, y_all, physics_mask, finite
+    del df, singularity, X_all, y_all, physics_mask, finite
     gc.collect()
 
     dtrain = xgb.DMatrix(
