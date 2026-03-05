@@ -1,9 +1,0 @@
-Incident report has been written to `audit/runtime/v52/incidents/20260217_170902_autopilot_status_stale.codex_report.txt`.
-
-Summary of outcome:
-- Root cause: stale-status false positive during long/silent `build_base_matrix` execution, not a crashed autopilot.
-- Action taken: no restart/kill (minimal safe intervention), because live liveness checks showed active parent (`PID 26005`) and child base-matrix worker (`PID 26930`) plus healthy uplink cycles.
-- Current status: pipeline is still running in `build_base_matrix` as of `2026-02-17 17:15:05 CST`; it has not yet advanced to `vertex_optimize`.
-- Remaining risk: watchdog stale/upload-stall heuristics are not stage-aware here, so repeated stale incidents may continue until the stage transitions.
-
-I could not directly verify GCS object presence from this sandbox because `gcloud` credential writes to `~/.config/gcloud` are blocked; report uses local process/log/watchdog evidence for verification.

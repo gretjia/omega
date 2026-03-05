@@ -1,9 +1,0 @@
-Incident report is written to:
-
-`audit/runtime/v52/incidents/20260218_000255_autopilot_status_stale.codex_report.txt`
-
-Key outcome:
-- Root cause: `autopilot_status_stale` was primarily a status-heartbeat gap (`autopilot_aa8abb7.status.json` stuck at `2026-02-17 22:01:42`) while base-matrix Vertex polling continued.
-- I applied minimal operational intervention (watchdog relaunch/tuning path) without touching v6 math logic.
-- Verification shows forward progress is active: `autopilot_aa8abb7.runner.log` advanced through `2026-02-18 00:13:06` with continuous `JOB_STATE_RUNNING` elapsed growth, and uplink cycles are still running (`2026-02-18 00:13:11`).
-- Remaining risk (documented in report): watchdog process-detection in this sandbox can produce false `autopilot_running` negatives, so runner-log monotonic progress is the reliable source of truth right now.

@@ -1977,15 +1977,15 @@ ssh windows1-w1 "hostname && whoami"
 - **`audit/stage3_full_supervisor/20260228-omega-stage3-reset/state.json`**
 - **`audit/stage3_full_supervisor/20260228-omega-stage3-safe/state.json`**
 - **`audit/stage3_full_unified_local_model/omega_xgb_final.pkl`**
-- **`audit/v62.md`**
-- **`audit/v62_comprehensive_report.md`**
-- **`audit/v62_framing_audit.md`**
-- **`audit/v62_framing_rebuild.md`**
-- **`audit/v62_phase1_execution_audit.md`**
-- **`audit/v62_pre_execution_audit_report.md`**
-- **`audit/v62_topology.md`**
-- **`audit/v62_upgrade_plan.md`**
-- *(`audit/_archived/`: 包含与 V62 无关的历史遗留代码和日志，请勿在此处寻找最新实现)*
+- **`archive/audit/v62.md`**
+- **`archive/audit/v62_comprehensive_report.md`**
+- **`archive/audit/v62_framing_audit.md`**
+- **`archive/audit/v62_framing_rebuild.md`**
+- **`archive/audit/v62_phase1_execution_audit.md`**
+- **`archive/audit/v62_pre_execution_audit_report.md`**
+- **`archive/audit/v62_topology.md`**
+- **`archive/audit/v62_upgrade_plan.md`**
+- *(`archive/audit/v62/`: 包含与 V62 无关的历史遗留代码和日志，请勿在此处寻找最新实现)*
 
 ### `base_matrix_shards/` 目录
 - **`base_matrix_shards/_resume_context.json`**
@@ -2230,4 +2230,4 @@ ssh windows1-w1 "hostname && whoami"
 - **`tools/stage2_targeted_supervisor.py`**
 - **`tools/stage3_full_supervisor.py`**
 - **`tools/submit_vertex_sweep.py`**
-- *(`tools/_archived/`: 包含与 V62 无关的历史遗留代码和日志，请勿在此处寻找最新实现)*
+- *(`archive/tools/`: 包含与 V62 无关的历史遗留代码和日志，请勿在此处寻找最新实现)*

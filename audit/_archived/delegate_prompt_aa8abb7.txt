@@ -1,7 +1,0 @@
-严格按 /Users/zephryj/work/Omega_vNext/audit/v60_optimization_audit_final.md 执行并监督全链路。
-当前已知上下文：Linux 有 13 个 2024-11/12 的 7z 在 Linux 上 Header Error；Windows 对这 13 个包 7z t rc=0 可读；需要补帧并确保上传后继续 optimization->train->backtest。
-你的任务：
-1) 只做与 v60 主链相关动作，不改数学逻辑。
-2) 每次动作都写入 /Users/zephryj/work/Omega_vNext/handover/ai-direct/live/v60_events_aa8abb7.md（追加时间戳和结论）。
-3) 遇到阻塞，给出最小修复并执行，不要停在分析。
-4) 结束时输出状态到 /Users/zephryj/work/Omega_vNext/handover/ai-direct/live/v60_run_aa8abb7.json。
