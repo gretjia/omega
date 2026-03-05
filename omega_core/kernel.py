@@ -333,7 +333,11 @@ def _apply_recursive_physics(
         # 散户行情下：压缩度趋近0，整个向量归于死寂。
         # 主力入场时：压缩度呈指数爆发，伴随方向，模型给出必杀一击！
         # -------------------------------------------------------------
-        main_force_singularity = (pl.col("bits_linear") + pl.col("bits_srl") + pl.col("bits_topology")) * pl.col("srl_phase")
+        main_force_singularity = (
+            pl.col("bits_linear").fill_null(0.0) + 
+            pl.col("bits_srl").fill_null(0.0) + 
+            pl.col("bits_topology").fill_null(0.0)
+        ) * pl.col("srl_phase")
         
         res_df = res_df.with_columns([
             main_force_singularity.alias("singularity_vector"),

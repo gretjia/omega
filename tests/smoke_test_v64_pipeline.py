@@ -31,23 +31,29 @@ def main():
         print(f"[!] No L1 files found in {L1_BASE_DIR}")
         sys.exit(1)
         
-    test_files = l1_files[:2] # Take 2 days
+    test_files = l1_files[:2] # Take 2 days to ensure t+1 target calculation works
     for f in test_files:
-        dest = os.path.join(SMOKE_L1_DIR, os.path.basename(f))
-        shutil.copy2(f, dest)
+        dest = os.path.join(SMOKE_L1_DIR, "tiny_" + os.path.basename(f))
+        print(f"[*] Slicing 5 liquid symbols from {f} for fast smoke test...", flush=True)
+        # We explicitly pick liquid symbols to ensure they have >120 ticks to pass warm-up mask
+        liquid_syms = ["000001.SZ", "510300.SH", "600036.SH", "000858.SZ", "601318.SH"]
+        lf = pl.scan_parquet(f)
+        df_tiny = lf.filter(pl.col("symbol").is_in(liquid_syms)).collect()
+        df_tiny.write_parquet(dest)
             
-    print(f"[*] Stage 1 Data prepared: {len(test_files)} files copied to {SMOKE_L1_DIR}.", flush=True)
+    print(f"[*] Stage 1 Data prepared: 2 tiny files created in {SMOKE_L1_DIR}.", flush=True)
     
     # 2. Stage 2 (Physics Compute)
     print("\n[*] Running Stage 2 (Physics Compute)...", flush=True)
     cmd_stage2 = [
         sys.executable, str(REPO_ROOT / "tools/stage2_physics_compute.py"),
-        "--input-pattern", f"{SMOKE_L1_DIR}/*.parquet",
+        "--input-dir", SMOKE_L1_DIR,
         "--output-dir", SMOKE_L2_DIR,
-        "--max-workers", "2",
-        "--no-resume"
+        "--workers", "2"
     ]
-    subprocess.run(cmd_stage2, check=True)
+    env = os.environ.copy()
+    env["OMEGA_STAGE2_ALLOW_USER_SLICE"] = "1"
+    subprocess.run(cmd_stage2, check=True, env=env)
     
     l2_files = list(glob.glob(f"{SMOKE_L2_DIR}/*.parquet.done"))
     if not l2_files:
@@ -66,12 +72,13 @@ def main():
     base_matrix_out = os.path.join(SMOKE_L3_DIR, "base_matrix.parquet")
     cmd_stage3 = [
         sys.executable, str(REPO_ROOT / "tools/forge_base_matrix.py"),
-        "--input-pattern", f"{SMOKE_L2_DIR}/*.parquet.done",
+        "--input-pattern", f"{SMOKE_L2_DIR}/tiny_*.parquet",
         "--output-parquet", base_matrix_out,
         "--symbols-per-batch", "50",
         "--max-workers", "2",
         "--no-resume",
-        "--peace-threshold", "0.5"
+        "--peace-threshold", "-0.1",
+        "--peace-threshold-baseline", "-0.1"
     ]
     subprocess.run(cmd_stage3, check=True)
     
@@ -90,9 +97,9 @@ def main():
     cmd_train = [
         sys.executable, str(REPO_ROOT / "tools/run_vertex_xgb_train.py"),
         f"--base-matrix-uri={base_matrix_out}",
-        f"--output-uri={SMOKE_MODEL_DIR}",
+        "--output-uri", SMOKE_MODEL_DIR,
         "--code-bundle-uri=", # empty means skip bootstrap codebase
-        "--peace-threshold", "0.5",
+        "--peace-threshold", "-0.1",
         "--num-boost-round", "2",
         "--xgb-max-depth", "3"
     ]

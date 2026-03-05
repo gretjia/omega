@@ -62,6 +62,13 @@ def _download_file(gcs_uri: str, local_path: Path) -> None:
 
 
 def _upload_file(local_path: Path, gcs_uri: str) -> None:
+    if not gcs_uri.startswith("gs://"):
+        dest_path = Path(gcs_uri)
+        dest_path.parent.mkdir(parents=True, exist_ok=True)
+        if dest_path.resolve() != local_path.resolve():
+            shutil.copyfile(local_path, dest_path)
+        return
+        
     from google.cloud import storage
 
     bucket_name, blob_name = _parse_gcs_uri(gcs_uri)
@@ -78,6 +85,10 @@ def _bootstrap_codebase(code_bundle_uri: str) -> None:
 
 
 def run_global_training(args: argparse.Namespace) -> None:
+    repo_root = str(Path(__file__).resolve().parent.parent)
+    if repo_root not in sys.path:
+        sys.path.append(repo_root)
+        
     import numpy as np
     import polars as pl
     import xgboost as xgb
