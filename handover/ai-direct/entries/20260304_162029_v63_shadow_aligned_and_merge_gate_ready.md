@@ -1,0 +1,33 @@
+# Update 2026-03-04 16:20 +0000 (V63 Windows Shadow + Linux alignment gate refresh)
+
+- Snapshot time: `2026-03-04 16:20:29 UTC`
+- Scope: V63 shadow/assist latest run handoff health check and merge-gate readiness
+- Linux `linux1-lx` status:
+  - `tools/stage2_targeted_supervisor.py`: 5
+  - `tools/stage2_targeted_resume.py`: 5
+  - `tools/stage2_physics_compute.py`: 0
+  - `v63_feature_l2_shadow_w1/host=linux1`: `61 / 61 done`
+  - shard outputs:
+    - `shard1`: `32 / 32`
+    - `shard2`: `33 / 33`
+    - `shard3`: `32 / 32`
+    - `shard4`: `31 / 31`
+- Linux input shadow/assist queues:
+  - `v63_subset_l1_assist_w1/host=windows1`: `28`
+  - `v63_subset_l1_shadow_w1/host=windows1`: `61`
+- Windows `windows1-w1` status:
+  - Scheduled tasks: `Omega_v63_Windows_Assist` Ready, `Omega_v63_Windows_Shadow` Ready, `Omega_V63_Stage2_Supervisor` Ready
+  - `D:/Omega_frames/v63_subset_l1_assist_w1/host=windows1`: `28 / done 0`
+  - `D:/Omega_frames/v63_subset_l1_shadow_w1/host=windows1`: `61 / done 0`
+  - `D:/Omega_frames/v63_feature_l2_assist_w1/host=windows1`: `28 / done 28`
+  - `D:/Omega_frames/v63_feature_l2_shadow_w1/host=windows1`: `61 / done 61`
+  - Python compute processes: `0`
+- Integrity check (name+size parity):
+  - `source=61 dest=61 missing=0 partial=0 extra=0`
+- Decision:
+  - Windows side output is fully completed and aligned; reverse-transfer can proceed/does not need restart.
+  - Merge gate can advance once your workflow permits.
+- ETA:
+  - Windows completion: effectively complete
+  - Linux wait/align risk: low
+  - Remaining expected time before merge-gate handoff: immediate once approved

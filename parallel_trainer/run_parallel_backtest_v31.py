@@ -146,16 +146,20 @@ def process_backtest_file(args) -> Dict:
             return {"file": str(logical_name), "empty": True, "rows": 0, "trades": 0, "pnl": 0.0}
 
         # 2. Apply Physics & Labeling
-        # Check if we need to re-run physics or labeling (ret_k)
+        # If any downstream feature or ret_k label is missing, recompute the full
+        # physics/label pipeline to make file format self-consistent.
         has_ret_k = "ret_k" in df.columns
         missing_features = [c for c in feature_cols if c not in df.columns]
-        
+
         if missing_features or not has_ret_k:
-            if "trace" in df.columns and "ofi_list" in df.columns:
+            try:
                 trainer_tool = OmegaTrainerV3(policy_cfg)
                 df = trainer_tool._prepare_frames(df, policy_cfg)
-            else:
-                return {"error": "Missing trace/ofi for physics/labeling", "file": str(logical_name)}
+            except Exception as exc:
+                return {
+                    "error": f"Physics/label prep failed: {exc}",
+                    "file": str(logical_name),
+                }
         
         if df.height == 0:
             return {"file": str(logical_name), "empty": True, "rows": 0, "trades": 0, "pnl": 0.0}
@@ -588,7 +592,7 @@ class ParallelBacktester:
                     (logical_name, read_path, self.policy_path, self.ret_clip_abs)
                     for logical_name, read_path in staged
                 ]
-                for res in pool.imap_unordered(process_backtest_file, tasks, chunksize=5):
+                for res in pool.map(process_backtest_file, tasks):
                     files_processed += 1
                     self.files_processed_in_run += 1
                     _memory_guard(self.memory_threshold)
@@ -831,4 +835,3 @@ if __name__ == "__main__":
         except Exception:
             pass
         raise
-
