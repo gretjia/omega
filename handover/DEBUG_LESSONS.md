@@ -17,6 +17,16 @@ Write only reproducible, technical lessons.
 - guardrail: TODO
 - refs: TODO
 
+## 2026-03-06T02:30:00Z | Windows Node Stage 2 Polars Fallback 100x Degradation
+- task_id: TASK-V64-PERFORMANCE-FIX
+- git_hash: 960f9e2
+- role: debug_scribe
+- model_profile: gemini_3.1_pro
+- symptom: `windows1-w1` was extremely slow (taking ~2 hours per single daily 2.5GB parquet file) during `stage2_physics_compute.py` while processing the V64 "Epistemic Trinity" pipeline. Logs repeatedly indicated: `[WARN] Using scan/filter fallback path (platform/override).`
+- root_cause: The environment default for Windows in Stage 2 triggered a resilient but highly inefficient row-by-row symbol scanning fallback path meant to circumvent pyarrow schema panics in earlier versions. This bypassed the fast parallel memory-mapped ingestion engine and completely negated the 4-worker thread pool advantage.
+- fix: We explicitly overrode the environment variable in PowerShell before launching the command: `$env:OMEGA_STAGE2_FORCE_SCAN_FALLBACK="0"`. After killing the old slow processes and restarting, processing time dropped from ~7500s to ~80s per file (nearly a 100x speedup), bringing it to parity with Linux.
+- guardrail: ALWAYS ensure `OMEGA_STAGE2_FORCE_SCAN_FALLBACK` is explicitly set to `0` when launching Stage 2 on Windows unless a hard `pyo3` panic is actively occurring and halting all progress.
+
 ## 2026-02-18T09:50:00Z | Vertex AI Quota "Partially Approved" Trap
 - task_id: base_matrix_stall
 - git_hash: aa8abb7
