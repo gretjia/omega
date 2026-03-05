@@ -1,2 +1,0 @@
-gs://omega_v52_central/omega/staging/models/v6/20260219-125410_78e36d9/omega_v6_xgb_final.pkl
-gs://omega_v52_central/omega/staging/models/v6/20260219-125410_78e36d9/train_metrics.json
