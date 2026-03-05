@@ -426,7 +426,8 @@ def _vector_alignment(
     min_samples: int,
     model=None,
     scaler=None,
-    feature_cols=None
+    feature_cols=None,
+    peace_threshold: float = 0.0
 ) -> tuple[float, float]:
     if frames.height == 0 or "direction" not in frames.columns:
         return float("nan"), float("nan")
@@ -436,8 +437,6 @@ def _vector_alignment(
             return expr.over("symbol")
         return expr
 
-    # Explicitly sort by causal time order before applying shift
-    # to avoid data bleeding between concatenated files/symbols.
     sort_cols = ["time_end"]
     if "symbol" in frames.columns:
         sort_cols = ["symbol", "time_end"]
@@ -447,27 +446,27 @@ def _vector_alignment(
     )
 
     dir_sign = np.sign(np.asarray(merged.get_column("direction").to_numpy(), dtype=float))
-    # ACTION 1: Safe single-column extraction (never cast full DataFrame to numpy)
     fwd_sign = np.sign(np.asarray(merged.get_column("fwd_return").to_numpy(), dtype=float))
     
-    epi = np.asarray(merged.get_column("epiplexity").to_numpy(), dtype=float)
-    if epi.size == 0 or not np.any(np.isfinite(epi)):
+    # V64: Epiplexity is replaced by singularity_vector as the main filter
+    if "singularity_vector" not in merged.columns:
         return float("nan"), float("nan")
         
-    epi_q = float(np.nanquantile(epi, 0.8))
+    singularity = np.asarray(merged.get_column("singularity_vector").fill_nan(0.0).fill_null(0.0).to_numpy(), dtype=float)
+    if singularity.size == 0 or not np.any(np.isfinite(singularity)):
+        return float("nan"), float("nan")
 
-    # ACTION 4: Seal singularity leakage — exclude limit-up/down rows where
-    # depth=0 causes physics explosion. Training filters these; eval must too.
     if "is_physics_valid" in merged.columns:
         is_valid_arr = np.asarray(merged.get_column("is_physics_valid").to_numpy(), dtype=bool)
     else:
-        is_valid_arr = np.ones_like(epi, dtype=bool)
+        is_valid_arr = np.ones_like(singularity, dtype=bool)
 
+    # V64 Filter: Abs singularity vector > peace_threshold
     mask = (
         np.isfinite(dir_sign) & np.isfinite(fwd_sign)
         & (dir_sign != 0.0) & (fwd_sign != 0.0)
-        & (epi >= epi_q)
-        & is_valid_arr  # Physics Singularity Immunity
+        & (np.abs(singularity) > peace_threshold)
+        & is_valid_arr
     )
     
     phys_align = float("nan")
@@ -476,21 +475,15 @@ def _vector_alignment(
 
     model_align = float("nan")
     if model is not None and feature_cols is not None:
-        if "epi_x_srl_resid" not in merged.columns:
-            merged = merged.with_columns([
-                (pl.col("epiplexity") * pl.col("srl_resid")).alias("epi_x_srl_resid"),
-                (pl.col("epiplexity") * pl.col("topo_area")).alias("epi_x_topo_area"),
-                (pl.col("epiplexity") * pl.col("net_ofi")).alias("epi_x_net_ofi"),
-            ])
-            
         missing = [c for c in feature_cols if c not in merged.columns]
         if not missing:
             X_all = merged.select(feature_cols).to_numpy()
             X_valid = X_all[mask]
             if X_valid.shape[0] >= min_samples:
                 X_eval = X_valid
-                if scaler is not None and (xgb is None or not isinstance(model, xgb.Booster)):
-                    X_eval = scaler.transform(X_eval)
+                # V64: NO SCALING for extreme trees!
+                # if scaler is not None and (xgb is None or not isinstance(model, xgb.Booster)):
+                #     X_eval = scaler.transform(X_eval)
 
                 if xgb is not None and isinstance(model, xgb.Booster):
                     dtest = xgb.DMatrix(X_eval, feature_names=feature_cols)
@@ -530,16 +523,18 @@ def evaluate_frames(
     cfg: L2PipelineConfig,
     model=None,
     scaler=None,
-    feature_cols=None
+    feature_cols=None,
+    peace_threshold: float = 0.0
 ) -> Dict[str, float]:
     vcfg = cfg.validation
     traces = _collect_traces(frames, vcfg.max_traces)
     topo_snr = topo_snr_from_traces(traces, cfg.topo_snr, cfg.epiplexity)
 
     orth = float("nan")
-    if "epiplexity" in frames.columns and "srl_resid" in frames.columns:
+    # V64: Check singularity vector instead of epiplexity for orthogonality
+    if "singularity_vector" in frames.columns and "srl_resid" in frames.columns:
         orth = _safe_corr(
-            np.asarray(frames["epiplexity"].to_numpy(), dtype=float),
+            np.asarray(frames["singularity_vector"].fill_nan(0.0).fill_null(0.0).to_numpy(), dtype=float),
             np.abs(np.asarray(frames["srl_resid"].to_numpy(), dtype=float)),
             eps=float(vcfg.corr_eps),
             min_samples=int(vcfg.min_samples),
@@ -547,7 +542,7 @@ def evaluate_frames(
 
     phys_align, model_align = _vector_alignment(
         frames, int(vcfg.forward_return_horizon_buckets), int(vcfg.min_samples),
-        model=model, scaler=scaler, feature_cols=feature_cols
+        model=model, scaler=scaler, feature_cols=feature_cols, peace_threshold=peace_threshold
     )
 
     final_align = model_align if not math.isnan(model_align) else phys_align
