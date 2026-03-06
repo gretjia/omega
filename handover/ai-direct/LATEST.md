@@ -59,3 +59,7 @@ We are transitioning from mathematical prototyping into full-scale production. T
 - `20260305_201500_v64_preflight_smoke_tests` - End-to-end smoke test completed successfully; pipeline updated for `singularity_vector`.
 - `20260305_142336_v63_training_backtest_alignment_audit` - Legacy post-mortem on sample collapse and threshold hyper-sensitivity.
 - `20260227_104435_stage2_v62_alignment_audit` - Past audit confirming rolling operations compliance.
+
+## Update: 2026-03-06 03:00 UTC
+- **V64.1 Hotfix Deployed:** The Bourbaki Synthesis updates (absolute geometric closure, dimension matching, and decoupling of `peace_threshold`) have been propagated downstream to `run_vertex_xgb_train.py` and `trainer.py` (which powers `run_local_backtest.py`). 
+- **Methodology:** We compute the new, strict `is_signal_v641` purely in-memory at load time. This ensures total mathematical continuity across the pipeline without stalling or restarting the ongoing, multi-hour Stage 2 runs on Windows and Linux.
