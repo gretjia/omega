@@ -16,6 +16,8 @@ import sys
 import time
 from pathlib import Path
 
+from importlib.metadata import version as pkg_version
+
 
 def _install_dependencies() -> None:
     subprocess.check_call(
@@ -36,6 +38,13 @@ def _install_dependencies() -> None:
             "psutil",
         ]
     )
+
+
+def _resolved_version(name: str) -> str:
+    try:
+        return pkg_version(name)
+    except Exception:
+        return "unknown"
 
 
 def _parse_gcs_uri(uri: str) -> tuple[str, str]:
@@ -117,18 +126,27 @@ def run_global_training(args: argparse.Namespace) -> None:
         lf = lf.drop(drop_cols)
     df = lf.collect()
 
+    if "srl_resid" not in df.columns and "srl_resid_050" in df.columns:
+        df = df.with_columns(pl.col("srl_resid_050").alias("srl_resid"))
+
     required_cols = {
+        "date",
         "epiplexity",
-        "singularity_vector",
-        "srl_resid_050",
+        "is_energy_active",
         "sigma_eff",
+        "singularity_vector",
+        "spoof_ratio",
+        "srl_resid",
+        "t1_fwd_return",
         "topo_area",
         "topo_energy",
-        "t1_fwd_return",
-        "date",
         *list(FEATURE_COLS),
     }
-    
+
+    missing = sorted([c for c in required_cols if c not in df.columns])
+    if missing:
+        raise RuntimeError(f"base_matrix missing columns: {missing}")
+
     # [HOTFIX V64.1] Dynamically reconstruct the true `is_signal` based on V64.1 math closure.
     # The L2 parquets on disk have the old V64.0 `is_signal` which compared topo_energy with sigma_eff.
     # We fix it here in-memory before training.
@@ -148,10 +166,6 @@ def run_global_training(args: argparse.Namespace) -> None:
             & (pl.col("spoof_ratio") < spoofing_ratio_max)
         ).alias("is_signal")
     ])
-
-    missing = sorted([c for c in required_cols if c not in df.columns])
-    if missing:
-        raise RuntimeError(f"base_matrix missing columns: {missing}")
 
     # V62 Handover Defense: 3. Dynamic Schema Preflight for Time Key
     time_key = "time"
@@ -253,6 +267,13 @@ def run_global_training(args: argparse.Namespace) -> None:
         "seconds": seconds,
         "job_id": os.environ.get("CLOUD_ML_JOB_ID", "unknown"),
         "model_uri": model_uri,
+        "runtime_versions": {
+            "python": sys.version.split()[0],
+            "numpy": _resolved_version("numpy"),
+            "polars": _resolved_version("polars"),
+            "xgboost": _resolved_version("xgboost"),
+            "scikit-learn": _resolved_version("scikit-learn"),
+        },
         "overrides": {
             "signal_epi_threshold": float(args.signal_epi_threshold),
             "singularity_threshold": float(args.singularity_threshold),
@@ -264,10 +285,7 @@ def run_global_training(args: argparse.Namespace) -> None:
             "xgb_colsample_bytree": float(args.xgb_colsample_bytree),
             "num_boost_round": rounds,
             "seed": int(args.seed),
-            "legacy_compat": {
-                "peace_threshold": float(args.singularity_threshold),
-                "topo_energy_sigma_mult": float(args.topo_energy_min),
-            },
+            "stage3_param_contract": "canonical_v64_1",
         },
     }
     metrics_path = Path("train_metrics.json")

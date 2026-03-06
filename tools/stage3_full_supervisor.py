@@ -21,9 +21,21 @@ import sys
 import time
 from typing import Any, Dict
 
+from configs.node_paths import get_node_config
+
 
 def _now_utc() -> str:
     return dt.datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
+
+
+def _parse_year_set(value: str) -> set[int]:
+    years: set[int] = set()
+    for token in str(value or "").split(","):
+        token = token.strip()
+        if not token:
+            continue
+        years.add(int(token))
+    return years
 
 
 def _log_line(log_file: pathlib.Path, message: str) -> None:
@@ -413,7 +425,7 @@ def _remote_start_forge(args: argparse.Namespace, remote_log: str, remote_pid: s
         "mkdir -p audit/stage3_full || exit 1; "
         f"nohup python3 tools/forge_base_matrix.py "
         f"--input-pattern '{args.input_pattern}' "
-        f"--years '{args.years}' "
+        f"--years '{args.train_years}' "
         f"--symbols-per-batch {args.symbols_per_batch} "
         f"--max-workers {args.forge_workers} "
         f"--reserve-mem-gb {args.reserve_mem_gb} "
@@ -656,6 +668,7 @@ def _remote_start_backtest(args: argparse.Namespace, local_log: pathlib.Path, mo
         f"nohup python3 tools/run_local_backtest.py "
         f"--model-path '{model_remote_path}' "
         f"--frames-dir '{args.backtest_frames_dir}' "
+        f"--years '{args.backtest_years}' "
         f"--output '{bt_out}' "
         f"--workers {workers} "
         f"--symbols-per-batch {args.backtest_symbols_per_batch} "
@@ -779,14 +792,44 @@ def _wait_backtest(args: argparse.Namespace, state: Dict[str, Any], state_path: 
 
 
 def parse_args() -> argparse.Namespace:
+    linux_cfg = get_node_config(node="linux1")
+    default_stage2_output = str(getattr(linux_cfg, "stage2_output", "") or "").rstrip("/\\")
+    default_remote_repo = str(linux_cfg.repo_root)
+    default_input_pattern = (
+        f"{default_stage2_output}/*.parquet"
+        if default_stage2_output
+        else "/omega_pool/parquet_data/latest_feature_l2/host=linux1/*.parquet"
+    )
+    default_backtest_frames_dir = (
+        default_stage2_output
+        if default_stage2_output
+        else "/omega_pool/parquet_data/latest_feature_l2/host=linux1"
+    )
+
     ap = argparse.ArgumentParser(description="Stage3 full chain supervisor")
     ap.add_argument("--run-id", default=dt.datetime.utcnow().strftime("%Y%m%d-%H%M%S"))
     ap.add_argument("--remote-host", default="linux1-lx")
-    ap.add_argument("--remote-repo", default="/home/zepher/work/Omega_vNext")
-    ap.add_argument("--input-pattern", default="/omega_pool/parquet_data/latest_feature_l2/host=linux1/*.parquet")
-    ap.add_argument("--years", default="2023,2024,2025,2026")
+    ap.add_argument("--remote-repo", default=default_remote_repo)
+    ap.add_argument("--input-pattern", default=default_input_pattern)
+    ap.add_argument(
+        "--train-years",
+        "--years",
+        dest="train_years",
+        default="2023,2024,2025",
+        help="Training years for forge/base-matrix generation. Legacy alias: --years",
+    )
+    ap.add_argument(
+        "--backtest-years",
+        default="2026",
+        help="Backtest holdout years. Must remain disjoint from --train-years.",
+    )
     ap.add_argument("--symbols-per-batch", type=int, default=200)
-    ap.add_argument("--forge-workers", type=int, default=2)
+    ap.add_argument(
+        "--forge-workers",
+        type=int,
+        default=2,
+        help="Default is 2. Use values above 2 only after confirming RAM budget on the target node.",
+    )
     ap.add_argument("--reserve-mem-gb", type=float, default=40.0)
     ap.add_argument("--worker-mem-gb", type=float, default=10.0)
     ap.add_argument("--poll-sec", type=int, default=60)
@@ -834,9 +877,17 @@ def parse_args() -> argparse.Namespace:
 
     ap.add_argument("--backtest-workers", type=int, default=2)
     ap.add_argument("--backtest-symbols-per-batch", type=int, default=50)
-    ap.add_argument("--backtest-frames-dir", default="/omega_pool/parquet_data/latest_feature_l2/host=linux1")
+    ap.add_argument("--backtest-frames-dir", default=default_backtest_frames_dir)
 
     args = ap.parse_args()
+    train_years = _parse_year_set(args.train_years)
+    backtest_years = _parse_year_set(args.backtest_years)
+    overlap = sorted(train_years & backtest_years)
+    if overlap:
+        overlap_str = ",".join(str(year) for year in overlap)
+        raise SystemExit(
+            f"Stage 3 dataset isolation violation: --train-years and --backtest-years overlap ({overlap_str})."
+        )
 
     args.base_matrix_uri = (
         f"gs://omega_central/omega/staging/base_matrix/latest/{args.run_id}/base_matrix.parquet"
@@ -869,6 +920,8 @@ def main() -> int:
         "run_id": args.run_id,
         "started_at": _now_utc(),
         "status": "running",
+        "train_years": args.train_years,
+        "backtest_years": args.backtest_years,
         "base_matrix_uri": args.base_matrix_uri,
         "base_matrix_meta_uri": args.base_matrix_meta_uri,
         "model_output_prefix": args.model_output_prefix,

@@ -155,6 +155,34 @@ class OmegaTrainerV3:
         else:
             df = apply_recursive_physics(df, cfg)
 
+        if {
+            "epiplexity",
+            "is_energy_active",
+            "sigma_eff",
+            "spoof_ratio",
+            "srl_resid",
+            "topo_area",
+            "topo_energy",
+        }.issubset(set(df.columns)):
+            sig_cfg = cfg.signal
+            signal_epi_threshold = float(getattr(sig_cfg, "signal_epi_threshold", 0.5))
+            topo_energy_min = float(getattr(sig_cfg, "topo_energy_min", 2.0))
+            spoofing_ratio_max = float(getattr(sig_cfg, "spoofing_ratio_max", 2.5))
+            srl_resid_sigma_mult = float(getattr(sig_cfg, "srl_resid_sigma_mult", 0.5))
+            topo_area_min_abs = float(getattr(sig_cfg, "topo_area_min_abs", 0.0))
+            df = df.with_columns(
+                [
+                    (
+                        (pl.col("is_energy_active") == True)
+                        & (pl.col("epiplexity") > signal_epi_threshold)
+                        & (pl.col("srl_resid").abs() > srl_resid_sigma_mult * pl.col("sigma_eff"))
+                        & (pl.col("topo_area").abs() > topo_area_min_abs)
+                        & (pl.col("topo_energy") > topo_energy_min)
+                        & (pl.col("spoof_ratio") < spoofing_ratio_max)
+                    ).alias("is_signal")
+                ]
+            )
+
         df = df.with_columns(
             [
                 (pl.col("epiplexity") * pl.col("srl_resid")).alias("epi_x_srl_resid"),
@@ -479,8 +507,18 @@ def _vector_alignment(
 
     if "is_physics_valid" in merged.columns:
         # V64.1 absolute closure requires we also respect the updated is_signal logic
-        if "is_signal" in merged.columns:
-            is_valid_arr = np.asarray(merged.get_column("is_physics_valid").to_numpy() & merged.get_column("is_signal").to_numpy(), dtype=bool)
+        if "is_signal_v641" in merged.columns:
+            is_valid_arr = np.asarray(
+                merged.get_column("is_physics_valid").to_numpy()
+                & merged.get_column("is_signal_v641").to_numpy(),
+                dtype=bool,
+            )
+        elif "is_signal" in merged.columns:
+            is_valid_arr = np.asarray(
+                merged.get_column("is_physics_valid").to_numpy()
+                & merged.get_column("is_signal").to_numpy(),
+                dtype=bool,
+            )
         else:
             is_valid_arr = np.asarray(merged.get_column("is_physics_valid").to_numpy(), dtype=bool)
     else:
@@ -554,6 +592,32 @@ def evaluate_frames(
     peace_threshold: float | None = None,
 ) -> Dict[str, float]:
     vcfg = cfg.validation
+    sig_cfg = cfg.signal
+    if {
+        "epiplexity",
+        "is_energy_active",
+        "sigma_eff",
+        "spoof_ratio",
+        "srl_resid",
+        "topo_area",
+        "topo_energy",
+    }.issubset(set(frames.columns)):
+        signal_epi_threshold = float(getattr(sig_cfg, "signal_epi_threshold", 0.5))
+        topo_energy_min = float(getattr(sig_cfg, "topo_energy_min", 2.0))
+        spoofing_ratio_max = float(getattr(sig_cfg, "spoofing_ratio_max", 2.5))
+        srl_resid_sigma_mult = float(getattr(sig_cfg, "srl_resid_sigma_mult", 0.5))
+        topo_area_min_abs = float(getattr(sig_cfg, "topo_area_min_abs", 0.0))
+        frames = frames.with_columns([
+            (
+                (pl.col("is_energy_active") == True)
+                & (pl.col("epiplexity") > signal_epi_threshold)
+                & (pl.col("srl_resid").abs() > srl_resid_sigma_mult * pl.col("sigma_eff"))
+                & (pl.col("topo_area").abs() > topo_area_min_abs)
+                & (pl.col("topo_energy") > topo_energy_min)
+                & (pl.col("spoof_ratio") < spoofing_ratio_max)
+            ).alias("is_signal_v641")
+        ])
+
     traces = _collect_traces(frames, vcfg.max_traces)
     topo_snr = topo_snr_from_traces(traces, cfg.topo_snr, cfg.epiplexity)
 
@@ -613,7 +677,7 @@ def evaluate_dod(metrics: Dict[str, float], cfg: L2PipelineConfig) -> bool:
 def get_latest_model(out_dir: str = "./artifacts") -> dict | None:
     paths = list(Path(out_dir).glob("checkpoint_rows_*.pkl"))
     if not paths:
-        for final_name in ("omega_v6_xgb_final.pkl", "omega_v5_model_final.pkl"):
+        for final_name in ("omega_xgb_final.pkl", "omega_v6_xgb_final.pkl", "omega_v5_model_final.pkl"):
             final_p = Path(out_dir) / final_name
             if final_p.exists():
                 with open(final_p, "rb") as f:

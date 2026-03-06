@@ -1,17 +1,26 @@
-# OMEGA Project — AI Agent Manual
+# OMEGA Unified Agent Entry and Handover Manual
 
-> **Read time:** ~60 seconds. This file is the single onboarding document for any AI agent.
-> After reading this, you will know where everything is and what rules to follow.
+> **This is the unified entrypoint under `/handover` for all OMEGA agent work.**
+> It consolidates onboarding, governance routing, runtime state, and handover discipline.
+> `handover/ENTRYPOINT.md` now exists only as a compatibility shim.
 
-## 1. Reading Order (3 files, then start)
+## 1. Reading Order (unified)
 
 ```
-1. This file           → project map + rules summary
-2. OMEGA_CONSTITUTION.md  → physics-first principles (the "Bible")
-3. handover/ai-direct/LATEST.md → live runtime state
+1. This file                                   → unified entrypoint
+2. OMEGA_CONSTITUTION.md                       → long-lived project invariants
+3. handover/ai-direct/LATEST.md                → live runtime state
+4. handover/ops/MULTI_AGENT_OPERATING_SYSTEM.md → permanent multi-agent governance
+5. Active mission charter (if present)         → task-level canonical spec
 ```
 
-Do NOT read anything else before starting. Expand context only as needed.
+This reading order is equivalent to the repo-level order in `AGENTS.md` and the permanent governance order in `handover/ops/MULTI_AGENT_OPERATING_SYSTEM.md`.
+
+If no mission charter exists for substantial work, instantiate one from:
+
+- `handover/ops/MISSION_CHARTER_TEMPLATE.md`
+
+Do not expand further until the task-level canonical spec is identified.
 
 ## 2. Project Identity
 
@@ -23,13 +32,53 @@ Do NOT read anything else before starting. Expand context only as needed.
 | Language | Python 3.9+ (Polars, NumPy, Numba, XGBoost) |
 | Architecture | 3-node cluster (Mac controller + Linux worker + Windows worker) |
 
-## 3. File Map (find anything in <5s)
+## 3. Governance Layers
+
+OMEGA now separates permanent governance from task-specific execution.
+
+### Layer 0: Constitution
+
+- `OMEGA_CONSTITUTION.md`
+- Long-lived project invariants
+
+### Layer 1: Multi-Agent Operating System
+
+- `handover/ops/MULTI_AGENT_OPERATING_SYSTEM.md`
+- Permanent team structure, authority, gates, runtime discipline
+
+### Layer 2: Mission Charter
+
+- Active task-level canonical spec
+- Instantiate from `handover/ops/MISSION_CHARTER_TEMPLATE.md`
+
+### Layer 3: Run Manifest and Handover
+
+- `handover/ai-direct/LATEST.md`
+- `handover/BOARD.md`
+- `handover/ai-direct/entries/`
+
+## 4. What `/handover` now owns
+
+`/handover` is the unified home for:
+
+- agent entry
+- multi-agent governance
+- runtime truth
+- handoff state
+- debug memory
+- costly lessons
+- task charters
+
+## 5. File Map (find anything in <5s)
 
 ### Agent Governance
 
 | What | Where |
 |---|---|
 | Agent rules (ALL agents) | `AGENTS.md` |
+| Unified handover entrypoint | `handover/README.md` |
+| Multi-agent operating system | `handover/ops/MULTI_AGENT_OPERATING_SYSTEM.md` |
+| Mission charter template | `handover/ops/MISSION_CHARTER_TEMPLATE.md` |
 | Physics constitution | `OMEGA_CONSTITUTION.md` |
 | Machine-readable principles | `.agent/principles.yaml` |
 | Skills (8 active) | `.agent/skills/{name}/SKILL.md` |
@@ -60,6 +109,9 @@ Do NOT read anything else before starting. Expand context only as needed.
 | What | Where |
 |---|---|
 | **🤖 Agent Board (READ+WRITE)** | **`handover/BOARD.md`** |
+| Unified `/handover` entrypoint | `handover/README.md` |
+| Permanent agent governance | `handover/ops/MULTI_AGENT_OPERATING_SYSTEM.md` |
+| Mission charter template | `handover/ops/MISSION_CHARTER_TEMPLATE.md` |
 | Live runtime state | `handover/ai-direct/LATEST.md` |
 | Session history (40+ entries) | `handover/ai-direct/entries/` |
 | Debug lessons (searchable) | `handover/DEBUG_LESSONS.md` |
@@ -88,13 +140,13 @@ Do NOT read anything else before starting. Expand context only as needed.
 | All tests | `python3 -m pytest tests/ -q` |
 | Environment check | `python3 tools/env_verify.py --strict` |
 
-## 4. Cluster Topology
+## 6. Cluster Topology
 
 ```
 Mac (M4 Max, Controller)
 ├── Git origin, orchestration, backtesting
-├── SSH → linux1-lx  (192.168.3.113, LAN)
-└── SSH → windows1-w1 (192.168.3.112, SMB mount)
+├── SSH → linux1-lx  (alias first; 192.168.3.113 informational only)
+└── SSH → windows1-w1 (alias first; 192.168.3.112 informational only; source of truth: `handover/ops/HOSTS_REGISTRY.yaml`)
 
 Linux (Ryzen, 128G RAM)
 ├── Stage 1 ETL + Stage 2 Physics
@@ -107,7 +159,7 @@ Windows (Ryzen, 64G RAM)
 
 Workers are on **isolated LANs** — no internet, no GitHub access.
 
-## 5. Hard Rules (Violations = Blocked)
+## 7. Hard Rules (Violations = Blocked)
 
 1. **ECONOPHYSICS > SWE** — standard engineering heuristics yield to physics
 2. **δ = 0.5 is a constant** — never optimize, never race exponents
@@ -118,13 +170,17 @@ Workers are on **isolated LANs** — no internet, no GitHub access.
 7. **Commit before deploy** — no dirty-tree deployments
 8. **Tests before merge** — `pytest tests/ -q` must pass
 
-## 6. Session Protocol
+## 8. Session Protocol
 
 ### Starting a session
 
-1. Read this file + `LATEST.md`
-2. Run `python3 tools/cluster_health.py --quick`
-3. Check `git log --oneline -5 && git status`
+1. Read this file
+2. Read `OMEGA_CONSTITUTION.md`
+3. Read `handover/ai-direct/LATEST.md`
+4. For multi-agent or substantial work, read `handover/ops/MULTI_AGENT_OPERATING_SYSTEM.md`
+5. Identify the active mission charter, or create one from `handover/ops/MISSION_CHARTER_TEMPLATE.md`
+6. Run `python3 tools/cluster_health.py --quick`
+7. Check `git log --oneline -5 && git status`
 
 ### Ending a session
 
@@ -133,7 +189,7 @@ Workers are on **isolated LANs** — no internet, no GitHub access.
 3. Update `handover/ai-direct/LATEST.md`
 4. Commit changes
 
-## 7. Skill Index
+## 9. Skill Index
 
 | Skill | Trigger |
 |---|---|
@@ -150,8 +206,8 @@ Read skill details: `.agent/skills/{name}/SKILL.md`
 
 ---
 
-*Last updated: 2026-02-26 by Antigravity Agent*
-*This file replaces the legacy ENTRYPOINT.md as the primary onboarding doc.*
+*Last updated: 2026-03-06*
+*This file is the unified `/handover` entrypoint. `handover/ENTRYPOINT.md` remains only as a compatibility shim.*
 
 ## Google Docs CLI Tool
 A global CLI tool `gdocs` is available to access and read Google Docs (authenticated via the user's ziqian.jia@gmail.com account).
@@ -161,4 +217,3 @@ A global CLI tool `gdocs` is available to access and read Google Docs (authentic
 AI agents can use this tool to fetch requirements, architectures, or context from the user's personal Google Drive.
 
 - **`archive/`** - Archived tools, scripts, and audit reports from legacy versions (e.g., v62). Check here for historical rollbacks or context on deprecated pipelines.
-

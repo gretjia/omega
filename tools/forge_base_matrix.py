@@ -29,6 +29,8 @@ import numpy as np
 import polars as pl
 import os
 
+from configs.node_paths import get_node_config
+
 # [V64 统御指令] 强制收缴所有底层库的并发生成权，防止 128G 节点发生线程踩踏死锁
 # 统一内存架构下，保持线程数等于物理核心数的一半即可喂饱总线带宽
 os.environ["POLARS_MAX_THREADS"] = str(max(1, os.cpu_count() // 2))
@@ -647,7 +649,7 @@ class LocalManifoldForger:
         self,
         *,
         symbols_per_batch: int = 50,
-        max_workers: int = 12,
+        max_workers: int = 2,
         reserve_mem_gb: float = 40.0,
         worker_mem_gb: float = 10.0,
         dynamic_worker_cap: bool = True,
@@ -803,8 +805,16 @@ class LocalManifoldForger:
 
 
 def main() -> int:
+    node_cfg = get_node_config()
+    default_stage2_output = str(getattr(node_cfg, "stage2_output", "") or "").rstrip("/\\")
+    default_input_pattern = (
+        f"{default_stage2_output}/*.parquet"
+        if default_stage2_output
+        else "artifacts/runtime/latest/frames/host=*/*.parquet"
+    )
+
     ap = argparse.ArgumentParser(description="v60 local base-matrix forger (ticker sharding)")
-    ap.add_argument("--input-pattern", default="artifacts/runtime/latest/frames/host=*/*.parquet")
+    ap.add_argument("--input-pattern", default=default_input_pattern)
     ap.add_argument("--input-file-list", default="")
     ap.add_argument("--years", default="2023,2024")
     ap.add_argument("--hash", default="")
@@ -812,7 +822,12 @@ def main() -> int:
     ap.add_argument("--sample-symbols", type=int, default=0)
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--symbols-per-batch", type=int, default=50)
-    ap.add_argument("--max-workers", type=int, default=12)
+    ap.add_argument(
+        "--max-workers",
+        type=int,
+        default=2,
+        help="Dynamic caps remain active. Use values above 2 only after confirming RAM budget on the local node.",
+    )
     ap.add_argument("--reserve-mem-gb", type=float, default=40.0)
     ap.add_argument("--worker-mem-gb", type=float, default=10.0)
     ap.add_argument("--no-dynamic-worker-cap", action="store_true")
@@ -955,6 +970,8 @@ def main() -> int:
                 "srl_resid",
                 "srl_resid_050",
                 "sigma_eff",
+                "is_energy_active",
+                "spoof_ratio",
                 "topo_area",
                 "topo_energy",
                 "is_signal",
@@ -1102,15 +1119,7 @@ def main() -> int:
                 if args.topo_energy_min is None
                 else args.topo_energy_min
             ),
-            "legacy_compat": {
-                "peace_threshold": float(args.signal_epi_threshold),
-                "peace_threshold_baseline": float(args.singularity_threshold),
-                "topo_energy_sigma_mult": float(
-                    load_l2_pipeline_config().signal.topo_energy_min
-                    if args.topo_energy_min is None
-                    else args.topo_energy_min
-                ),
-            },
+            "stage3_param_contract": "canonical_v64_1",
         },
         "dtype_invariants": {
             "strict_float64_required": True,

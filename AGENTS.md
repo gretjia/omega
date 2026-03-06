@@ -2,14 +2,19 @@
 
 > **This is the ONE file all AI agents must read first, regardless of IDE or CLI.**
 > It is IDE-agnostic — the same rules apply to Gemini, Claude, Codex, Cursor, or any future agent.
-> For the full project manual, see `handover/README.md`.
+> After this file, the authoritative unified entrypoint is `handover/README.md`.
+> Repo entrypoint: `AGENTS.md`. Handover entrypoint: `handover/README.md`.
 
 ## Quick Start
 
+Quick Start is equivalent to the canonical reading order in `handover/README.md` and `handover/ops/MULTI_AGENT_OPERATING_SYSTEM.md`.
+
+
 1. Read this file
-2. Read `handover/README.md` for project map and file locations
-3. Read `handover/ai-direct/LATEST.md` for live runtime state
-4. Read `OMEGA_CONSTITUTION.md` before any physics-related work
+2. Read `handover/README.md` for unified onboarding, governance, and handover routing
+3. Read `OMEGA_CONSTITUTION.md` before any task
+4. Read `handover/ai-direct/LATEST.md` for live runtime state
+5. For substantial work, identify the active mission charter under `handover/ops/` or instantiate one from `handover/ops/MISSION_CHARTER_TEMPLATE.md`
 
 ## Scope
 
@@ -50,6 +55,7 @@ Built on the Mathematical Trinity: TDA, SRL (δ=0.5), Epiplexity (MDL).
 - **Commit before deploy.** No dirty-tree deployments.
 - **No SCP.** Deploy via `git push` only (`python3 tools/deploy.py`).
 - **Workers are read-only.** They receive code via `git push`, never `git pull`.
+- **Atomic writes only.** Use `.tmp` + `rename()` semantics where applicable; see `handover/README.md` for the handover-level rule.
 - **Branch naming:** `feature/<name>`, `fix/<name>`, `perf/<name>`.
 
 ## Deployment Protocol
@@ -92,7 +98,9 @@ python3 tools/cluster_health.py --quick                # Cluster
 
 ## Handover
 
-- `handover/README.md` — full project manual (READ THIS)
+- `handover/README.md` — unified `/handover` entrypoint (READ THIS)
+- `handover/ops/MULTI_AGENT_OPERATING_SYSTEM.md` — permanent OMEGA multi-agent governance layer
+- `handover/ops/MISSION_CHARTER_TEMPLATE.md` — task-level execution charter template
 - `handover/ai-direct/LATEST.md` — live runtime state
 - `handover/DEBUG_LESSONS.md` — searchable debug database
 - `handover/COSTLY_LESSONS.md` — expensive mistakes ledger

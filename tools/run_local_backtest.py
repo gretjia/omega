@@ -41,6 +41,10 @@ from config_v6 import FEATURE_COLS
 from omega_core.trainer import OmegaTrainerV3, evaluate_frames
 
 
+def _parse_years(raw: str) -> tuple[str, ...]:
+    return tuple(sorted({x.strip() for x in str(raw).split(",") if x.strip()}))
+
+
 def _scan_local_frames(input_pattern: str) -> List[str]:
     """Scan local directory for parquet files."""
     import glob
@@ -94,6 +98,7 @@ def _process_backtest_batch(task: dict) -> dict:
     input_files = task["input_files"]
     model_path = task["model_path"]
     cfg_dump = task["cfg_dump"]
+    years = tuple(task.get("years", ()))
     
     # Load Config & Model inside worker to ensure isolation
     cfg = pickle.loads(cfg_dump)
@@ -117,6 +122,17 @@ def _process_backtest_batch(task: dict) -> dict:
                 # V62 Defensive Engineering: Lazy drop heavy trace lists before eval and collect
                 heavy_cols = ["ofi_list", "ofi_trace", "vol_list", "vol_trace", "time_trace", "trace"]
                 schema_names = lf_one.collect_schema().names()
+                if years:
+                    if "date" not in schema_names:
+                        raise RuntimeError(
+                            "Backtest year isolation requires a `date` column in frame data."
+                        )
+                    lf_one = lf_one.filter(
+                        pl.col("date")
+                        .cast(pl.Utf8, strict=False)
+                        .str.slice(0, 4)
+                        .is_in(list(years))
+                    )
                 drop_cols = [c for c in heavy_cols if c in schema_names]
                 if drop_cols:
                     lf_one = lf_one.drop(drop_cols)
@@ -198,6 +214,7 @@ def main() -> int:
     ap = argparse.ArgumentParser(description="v61 Local Edge Backtest (Boomerang Topology)")
     ap.add_argument("--model-path", required=True, help="Path to downloaded .pkl model")
     ap.add_argument("--frames-dir", required=True, help="Local directory containing raw frames (126GB)")
+    ap.add_argument("--years", default="", help="Comma-separated holdout years for backtest isolation")
     ap.add_argument("--output", default="backtest_metrics.json", help="Path to save result")
     ap.add_argument("--workers", type=int, default=8, help="Number of parallel workers")
     ap.add_argument("--symbols-per-batch", type=int, default=50, help="Symbols per memory batch")
@@ -214,6 +231,7 @@ def main() -> int:
     os.environ["OMEGA_REUSE_PRECOMPUTED_PHYSICS"] = "1"
     cfg = load_l2_pipeline_config()
     cfg_dump = pickle.dumps(cfg)
+    backtest_years = _parse_years(args.years)
     
     # 3. Discovery
     input_files = _scan_local_frames(os.path.join(args.frames_dir, "**/*.parquet"))
@@ -237,7 +255,8 @@ def main() -> int:
             "symbols": syms,
             "input_files": input_files,
             "model_path": args.model_path,
-            "cfg_dump": cfg_dump
+            "cfg_dump": cfg_dump,
+            "years": backtest_years,
         })
 
     # 5. Execution (Multiprocessing)

@@ -2,13 +2,17 @@
 
 This folder is the runtime handoff surface for agent-to-agent continuation.
 
+If you land here directly, still follow `handover/README.md` as the unified entrypoint and read `OMEGA_CONSTITUTION.md` before proceeding.
+
 ## 1. Read Order
 
-1. `handover/ENTRYPOINT.md`
+1. `handover/README.md`
 2. `handover/ai-direct/LATEST.md`
 3. newest file in `handover/ai-direct/entries/`
 4. `handover/ai-direct/live/00_Lesson_Recall.md`
 5. `handover/ai-direct/live/01..05_*.md` (only for multi-agent gate flow)
+
+`handover/ENTRYPOINT.md` is now a compatibility shim only.
 
 ## 2. File Roles
 
@@ -24,6 +28,12 @@ This folder is the runtime handoff surface for agent-to-agent continuation.
   - create one new `entries/*.md` file from template
   - update `LATEST.md`
 - Keep `LATEST.md` short and current. Move detailed history to `entries/`.
+
+The authoritative governance and routing live in:
+
+- `handover/README.md`
+- `handover/ops/MULTI_AGENT_OPERATING_SYSTEM.md`
+- active mission charter under `handover/ops/`
 
 ## 4. Naming Rule for Entries
 
@@ -43,12 +53,11 @@ Example:
 - `summary`
 - `next_actions`
 
-## 6. 今日交接快速入口（审计链）
+## 5. Current Mission Quick Entry
 
-- `handover/ai-direct/entries/20260305_142336_v63_training_backtest_alignment_audit.md`（本轮总结，含原始字段证据与风险）
-- `audit/v63.md`（v63 架构与约束映射）
-- `/home/zepher/work/Omega_vNext/audit/v63_2025_q1q9_basematrix.meta.json`（训练输入与行数）
-- `/home/zepher/work/Omega_vNext/artifacts/v63_q1q9_train_metrics.json`（训练 metrics）
-- `/home/zepher/work/Omega_vNext/audit/v63_backtest_q4_status.json`（回测状态）
-- `/home/zepher/work/Omega_vNext/audit/v63_backtest_q4_result.json`（回测结果）
-- `handover/ai-direct/entries/20260305_094830_v63_vertex_train_success.md`（训练完成记录）
+Use the current mission and runtime truth, not historical v63 artifacts:
+
+- `handover/ops/ACTIVE_MISSION_CHARTER.md`
+- `handover/ai-direct/LATEST.md`
+- newest file in `handover/ai-direct/entries/`
+

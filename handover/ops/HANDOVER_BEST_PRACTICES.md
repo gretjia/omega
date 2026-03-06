@@ -36,14 +36,23 @@ This note captures the external standards used to design the handover folder as 
 
 5. Incident/run supervision needs explicit checklists and escalation conditions.
    - Applied as:
-     - `handover/ENTRYPOINT.md` startup checklist
+     - `handover/README.md` unified startup checklist
      - `handover/ops/PIPELINE_LOGS.md` monitoring checklist
      - `handover/ops/ACTIVE_PROJECTS.md` status + risk + next check
    - Why: incident operations frameworks emphasize role clarity, checklists, and operational readiness.
 
+6. Multi-agent systems need stable permanent governance separated from task-specific execution.
+   - Applied as:
+     - permanent governance: `handover/ops/MULTI_AGENT_OPERATING_SYSTEM.md`
+     - task-specific governance: active charter under `handover/ops/`
+   - Why: permanent team rules and one-off mission specs should not contaminate each other.
+
 ## 3. Resulting Folder Contract
 
-- Entry: `handover/ENTRYPOINT.md`
+- Unified entry: `handover/README.md`
+- Compatibility shim: `handover/ENTRYPOINT.md`
+- Permanent multi-agent governance: `handover/ops/MULTI_AGENT_OPERATING_SYSTEM.md`
+- Active mission charter: `handover/ops/ACTIVE_MISSION_CHARTER.md`
 - Current state: `handover/ai-direct/LATEST.md`
 - Session records: `handover/ai-direct/entries/*.md`
 - Runtime contract bus: `handover/ai-direct/live/01..05_*.md`
@@ -57,4 +66,3 @@ After every material operation session:
 2. update `LATEST.md`,
 3. update `ACTIVE_PROJECTS.md` if status changed,
 4. update ops docs if paths/tools/credentials changed.
-

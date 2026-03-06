@@ -1,9 +1,10 @@
 # LATEST (Authoritative Multi-Agent Snapshot)
 
 > 🚨 **[CRITICAL SYSTEM OVERRIDE - AGENT WAKE-UP DIRECTIVE]** 🚨
-> **V64.1 "Bourbaki Synthesis" Hotfix is LIVE in the codebase!** 
-> If you are a new AI agent waking up to execute Stage 3 (Base Matrix), Training, or Backtesting, your **IMMEDIATE FIRST ACTION MUST BE `git pull origin main`** on the target execution node (`linux1-lx` or `windows1-w1`). 
-> The physical L2 parquet files on disk contain the V64.0 (flawed) `is_signal` column. The Python code in `main` contains a hotfix that dynamically patches this column in-memory using absolute mathematical closure. **DO NOT run downstream stages without pulling this code first.**
+> **V64.1 "Bourbaki Synthesis" Hotfix is LIVE in the codebase!**
+> If you are a new AI agent waking up to execute Stage 3 (Base Matrix), Training, or Backtesting, your **IMMEDIATE FIRST ACTION MUST BE to verify code freshness through the controller-managed deploy path**. Use `tools/deploy.py` from the controller, then verify the target worker state through the deploy workflow. **Workers never run `git pull`.**
+> The physical L2 parquet files on disk contain the V64.0 (flawed) `is_signal` column. The Python code in `main` contains a hotfix that dynamically patches this column in-memory using absolute mathematical closure. **DO NOT run downstream stages until the deployed code state is confirmed on the target node.**
+> If you invoke Stage 3 outside the supervisor, you must preserve the V64.1 in-memory hotfix gates exactly (`signal_epi_threshold`, `srl_resid_sigma_mult`, `topo_area_min_abs`, `topo_energy_min`) or call the canonical forge/training entrypoints as scripted.
 
 This file is the single source of current operational truth for all agents.
 
@@ -53,8 +54,8 @@ We are transitioning from mathematical prototyping into full-scale production. T
 
 ## 4. Operational Guardrails
 
-- **V64 Singularity Rule:** We absolutely DO NOT apply Z-Score clipping, normalization, or smooth `NaN` boundaries on the upper bounds. `999.0` represents an epistemic physical singularity.
-- **Multi-Threading Constraints:** Always use `os.environ["POLARS_MAX_THREADS"] = str(max(1, os.cpu_count() // 2))` on 128G UMA machines to prevent ZFS ARC IO-thrashing. Linux must run under `heavy-workload.slice`.
+- **V64.1 Closure Rule:** Downstream stages must preserve the Bourbaki Closure semantics now live in code: MDL gain is based on `Var(ΔP) / Var(R)`, `Zero-variance -> zero signal`, and the old `999.0` pseudo-singularity must not be reintroduced into Stage 3 or later paths.
+- **Multi-Threading Constraints:** Always use `os.environ["POLARS_MAX_THREADS"] = str(max(1, os.cpu_count() // 2))` on 128G UMA machines to prevent ZFS ARC IO-thrashing. Linux must run under `heavy-workload.slice`. The same bounded-thread guidance applies to Stage 3 local backtest on `linux1-lx`.
 
 ---
 
@@ -75,3 +76,13 @@ We are transitioning from mathematical prototyping into full-scale production. T
 - **Legacy names survive only as compatibility surfaces:** CLI aliases, resume-context normalization, and explicit `legacy_compat` metadata blocks.
 - **Validation:** `py_compile` passed on changed Python files; `uv run --python /usr/bin/python3.11 --with pytest --with numpy==1.26.4 --with numba==0.60.0 pytest tests/test_v64_absolute_closure.py tests/test_omega_math_core.py -q` passed with `32 passed`; external Gemini audit verdict: `PASS`.
 - **Operational note:** Stage 2 remains the active runtime track. When Stage 3 starts, use canonical parameter names first and treat old `peace_threshold` / `topo_energy_sigma_mult` names as compatibility aliases only.
+
+## Update: 2026-03-06 05:20 UTC
+- **Dual Audit: PASS** Final Bourbaki Closure repo alignment passed both math and engineering audit.
+- **Math audit verdict:** `PASS` via `gemini -y`, including downstream verification that `trainer._prepare_frames`, `forge_base_matrix.py`, `run_vertex_xgb_train.py`, and `LATEST.md` remain aligned to the final `Bourbaki Closure`.
+- **Engineering audit verdict:** `PASS` on the Stage 2 onward release path after closing the last blockers:
+  - `configs/node_paths.py` now points Stage 3 defaults at `latest_feature_l2`
+  - `forge_base_matrix.py` preserves `is_energy_active` and `spoof_ratio` for downstream V64.1 reconstruction
+  - `trainer._prepare_frames` rebuilds V64.1 `is_signal` before structural filtering, preventing stale on-disk V64.0 gate leakage into backtest/training prep
+  - `stage3_full_supervisor.py` keeps explicit `train_years` / `backtest_years` separation with overlap fail-fast
+- **Operational release note:** Do not interrupt running Stage 2 jobs. Use controller-side `tools/deploy.py` to propagate this repo state before any Stage 3 / training / backtest action.
