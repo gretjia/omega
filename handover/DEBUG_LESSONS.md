@@ -240,3 +240,13 @@ Write only reproducible, technical lessons.
 - fix: Patch applied and validated under current multi-agent flow.
 - guardrail: Mandatory next gates before declaring run healthy:
 - refs: `handover/ai-direct/live/05_Final_Audit_Decision.md`, `handover/ai-direct/live/04A_Gemini_Recursive_Audit.md`, `handover/ai-direct/live/04B_Codex_Recursive_Audit.md`, `handover/ai-direct/live/03_Mechanic_Patch.md`, `handover/ai-direct/live/02_Oracle_Insight.md`, `handover/ai-direct/live/01_Raw_Context.md`
+## 2026-03-06T04:10:00Z | 2.5G LAN Multi-TB File Transfer Speed Degradation
+- task_id: TASK-L1-SYNC-2.5G
+- git_hash: 2f513ec
+- role: debug_scribe
+- model_profile: gemini_3.1_pro
+- symptom: Transferring 1.5 TB of Stage1 L1 Parquet files (~2.5GB each) between the Linux and Windows node over the local 2.5G network was extremely slow and repeatedly failed with HTTP 10061 (Connection Refused/Timeout).
+- root_cause: Using Python's `http.server` combined with PowerShell/Aria2c concurrent downloads maxed out the single-threaded Python I/O handler, causing connection drops. Additionally, transferring via the Tailscale virtual IP (`100.x.x.x`) added WireGuard encryption overhead which bottlenecked the transfer and prevented utilizing the full 2.5 Gbps physical hardware bandwidth.
+- fix: Fall back to native, kernel-space OS protocols on the pure physical LAN IP (`192.168.3.x`). Created a Windows SMB Share for the `D:\` drive and mounted it on Linux via `cifs-utils` to `/mnt/windows_d`. Then utilized `rsync -av --inplace` to perform a direct block-level copy.
+- guardrail: NEVER use `python -m http.server` for transferring production Parquet databases across nodes. Always use `rsync` over natively mounted SMB (`cifs`) or NFS shares over the physical `192.168.x.x` LAN IPs to saturate the 2.5G bandwidth. See `tools/sync_l1_smb.sh` for the codified standard.
+
