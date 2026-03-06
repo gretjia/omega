@@ -273,30 +273,35 @@ def main() -> int:
     
     processed_batches = 0
     
-    # ACTION 4: Anti-Fragile Memory Release — force worker death after each batch
-    # Rust/C++ jemalloc inside Polars does NOT reliably return freed pages to OS.
-    # maxtasksperchild=1 forces process restart → OS Ring-0 reclaims all memory.
-    with mp.Pool(args.workers, maxtasksperchild=1) as pool:
-        for res in pool.imap_unordered(_process_backtest_batch, tasks):
-            if "error" in res:
-                print(f"    [!] Batch {res['batch_id']} error: {res['error']}")
-                continue
-                
-            n = res["rows"]
-            if n > 0:
-                global_stats["n_frames"] += n
-                for k, v in res["weighted_metrics"].items():
-                    # V61 Fix: Prevent metric pollution. 
-                    # Do not sum "n_frames" from weighted_metrics (which is n*n), as we handled it above.
-                    if k in global_stats and k != "n_frames":
-                        # Handle NaNs in partials? evaluate_frames returns NaNs if undefined.
-                        # Assuming 0 contribution if NaN for sum
-                        if np.isfinite(v):
-                            global_stats[k] += v
-            
-            processed_batches += 1
-            if processed_batches % 10 == 0:
-                print(f"    Progress: {processed_batches}/{len(batches)} batches...", flush=True)
+    def _accumulate_result(res: dict) -> None:
+        nonlocal processed_batches
+        if "error" in res:
+            print(f"    [!] Batch {res['batch_id']} error: {res['error']}")
+            return
+
+        n = res["rows"]
+        if n > 0:
+            global_stats["n_frames"] += n
+            for k, v in res["weighted_metrics"].items():
+                if k in global_stats and k != "n_frames":
+                    if np.isfinite(v):
+                        global_stats[k] += v
+
+        processed_batches += 1
+        if processed_batches % 10 == 0:
+            print(f"    Progress: {processed_batches}/{len(batches)} batches...", flush=True)
+
+    if int(args.workers) <= 1 or len(tasks) <= 1:
+        print("[*] Using sequential backtest execution path.", flush=True)
+        for task in tasks:
+            _accumulate_result(_process_backtest_batch(task))
+    else:
+        # ACTION 4: Anti-Fragile Memory Release — force worker death after each batch
+        # Rust/C++ jemalloc inside Polars does NOT reliably return freed pages to OS.
+        # maxtasksperchild=1 forces process restart → OS Ring-0 reclaims all memory.
+        with mp.Pool(args.workers, maxtasksperchild=1) as pool:
+            for res in pool.imap_unordered(_process_backtest_batch, tasks):
+                _accumulate_result(res)
 
     # 6. Aggregation
     total_n = global_stats["n_frames"]
