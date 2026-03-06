@@ -40,7 +40,9 @@ def _apply_recursive_physics(
     epi_cfg = cfg.epiplexity
     topo_cfg = cfg.topology_race
 
-    peace_threshold = float(getattr(sig, "peace_threshold", getattr(sig, "epiplexity_min", 0.5)))
+    signal_epi_threshold = float(getattr(sig, "epiplexity_min", 0.5))
+    brownian_q_threshold = float(getattr(srl, "brownian_q_threshold", 0.5))
+    topo_energy_min_dimensionless = float(getattr(sig, "topo_energy_min", 2.0))
     spoofing_ratio_max = float(getattr(sig, "spoofing_ratio_max", 2.5))
     min_ofi_for_y = float(getattr(sig, "min_ofi_for_y_update", 100.0))
     topo_energy_sigma_mult = float(getattr(sig, "topo_energy_sigma_mult", 10.0))
@@ -199,7 +201,7 @@ def _apply_recursive_physics(
         clip_hi=clip_hi,
         out_is_active=srl_is_active,
         out_q_topo=out_q_topo,
-        chaos_threshold=peace_threshold, 
+        chaos_threshold=brownian_q_threshold, 
         min_ofi_for_y=min_ofi_for_y,
     )
 
@@ -248,9 +250,7 @@ def _apply_recursive_physics(
         )
 
     # --- Assembly ---
-    # Overwrite topo_area with micro feature if present
-    if str(topo_cfg.micro_feature) in out_manifolds:
-        out_topo_area = out_manifolds[str(topo_cfg.micro_feature)]
+    # Removed topo_area micro feature overwrite (V64.1 Absolute Closure)
 
     columns_to_add = [
         pl.Series("price_change", price_change),
@@ -287,10 +287,10 @@ def _apply_recursive_physics(
     res_df = res_df.with_columns([
         (
             (pl.col("is_energy_active") == True)
-            & (pl.col("epiplexity") > peace_threshold) 
+            & (pl.col("epiplexity") > signal_epi_threshold) 
             & (pl.col("srl_resid").abs() > float(sig.srl_resid_sigma_mult) * pl.col("sigma_eff"))
             & (pl.col("topo_area").abs() > float(sig.topo_area_min_abs))
-            & (pl.col("topo_energy") > pl.col("sigma_eff") * topo_energy_sigma_mult)
+            & (pl.col("topo_energy") > topo_energy_min_dimensionless)
             & (pl.col("spoof_ratio") < spoofing_ratio_max)
         ).alias("is_signal"),
         (pl.col("srl_resid").sign()).alias("direction"),
