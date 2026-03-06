@@ -1,6 +1,6 @@
 # OMEGA Active Mission Charter
 
-Status: Ready for Release
+Status: Completed
 Task Name: V64.3 Backtest Stall Remediation and Smoke Completion
 Owner: Human Owner
 Commander: Codex
@@ -10,7 +10,8 @@ Current checkpoint:
 
 - backtest remediation implemented
 - isolated V64.3 smoke is green again end-to-end
-- next gate is `commit + push`, then post-push auditor review
+- `commit + push` completed as `72f7fe9`
+- post-push auditor review passed
 
 ## 1. Objective
 

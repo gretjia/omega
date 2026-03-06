@@ -158,3 +158,9 @@ The repo-alignment mission is complete. The isolated V64.3 smoke is now green ag
   - `seconds = 94.19`
   - output: `.tmp/smoke_v64_v643/model/local_backtest.json`
 - **Mission state:** the isolated V64.3 smoke is now fully green. Next gate is `commit + push`, then post-push auditor review.
+
+## Update: 2026-03-06 14:00 UTC
+- **Commit pushed:** `72f7fe9` `fix(v64.3): resolve backtest stall and unify config entry`
+- **Post-push runtime review:** `PASS`
+- **Post-push Gemini review:** `PASS`
+- **Release state:** V64.3 smoke, audits, push, and post-push review are all complete. The repo is no longer blocked by the local backtest stall.
