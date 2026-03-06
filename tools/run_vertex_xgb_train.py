@@ -132,11 +132,11 @@ def run_global_training(args: argparse.Namespace) -> None:
     # [HOTFIX V64.1] Dynamically reconstruct the true `is_signal` based on V64.1 math closure.
     # The L2 parquets on disk have the old V64.0 `is_signal` which compared topo_energy with sigma_eff.
     # We fix it here in-memory before training.
-    signal_epi_threshold = 0.5
-    topo_energy_min_dimensionless = 2.0
+    signal_epi_threshold = float(args.signal_epi_threshold)
+    topo_energy_min = float(args.topo_energy_min)
     spoofing_ratio_max = 2.5
-    srl_resid_sigma_mult = 0.5
-    topo_area_min_abs = 0.0
+    srl_resid_sigma_mult = float(args.srl_resid_sigma_mult)
+    topo_area_min_abs = 1e-9
     
     df = df.with_columns([
         (
@@ -144,7 +144,7 @@ def run_global_training(args: argparse.Namespace) -> None:
             & (pl.col("epiplexity") > signal_epi_threshold) 
             & (pl.col("srl_resid").abs() > srl_resid_sigma_mult * pl.col("sigma_eff"))
             & (pl.col("topo_area").abs() > topo_area_min_abs)
-            & (pl.col("topo_energy") > topo_energy_min_dimensionless) # 纯几何无量纲门控比较 (HOTFIX)
+            & (pl.col("topo_energy") > topo_energy_min) # 纯几何无量纲门控比较 (HOTFIX)
             & (pl.col("spoof_ratio") < spoofing_ratio_max)
         ).alias("is_signal")
     ])
@@ -180,11 +180,11 @@ def run_global_training(args: argparse.Namespace) -> None:
 
     print(
         "[*] Applying V64 physics gates "
-        f"(peace={args.peace_threshold})...",
+        f"(singularity_threshold={args.singularity_threshold})...",
         flush=True,
     )
     physics_mask = (
-        (np.abs(singularity) > float(args.peace_threshold))
+        (np.abs(singularity) > float(args.singularity_threshold))
     )
 
     mask_rows = int(np.sum(physics_mask))
@@ -254,15 +254,20 @@ def run_global_training(args: argparse.Namespace) -> None:
         "job_id": os.environ.get("CLOUD_ML_JOB_ID", "unknown"),
         "model_uri": model_uri,
         "overrides": {
-            "peace_threshold": float(args.peace_threshold),
+            "signal_epi_threshold": float(args.signal_epi_threshold),
+            "singularity_threshold": float(args.singularity_threshold),
             "srl_resid_sigma_mult": float(args.srl_resid_sigma_mult),
-            "topo_energy_sigma_mult": float(args.topo_energy_sigma_mult),
+            "topo_energy_min": float(args.topo_energy_min),
             "xgb_max_depth": int(args.xgb_max_depth),
             "xgb_learning_rate": float(args.xgb_learning_rate),
             "xgb_subsample": float(args.xgb_subsample),
             "xgb_colsample_bytree": float(args.xgb_colsample_bytree),
             "num_boost_round": rounds,
             "seed": int(args.seed),
+            "legacy_compat": {
+                "peace_threshold": float(args.singularity_threshold),
+                "topo_energy_sigma_mult": float(args.topo_energy_min),
+            },
         },
     }
     metrics_path = Path("train_metrics.json")
@@ -276,9 +281,30 @@ def main() -> None:
     ap.add_argument("--base-matrix-uri", required=True, help="GCS URI for base_matrix.parquet")
     ap.add_argument("--output-uri", required=True, help="GCS prefix for model output")
 
-    ap.add_argument("--peace-threshold", type=float, default=0.10)
-    ap.add_argument("--srl-resid-sigma-mult", type=float, default=0.5)
-    ap.add_argument("--topo-energy-sigma-mult", type=float, default=2.0)
+    ap.add_argument(
+        "--singularity-threshold",
+        "--peace-threshold",
+        dest="singularity_threshold",
+        type=float,
+        default=0.10,
+        help="Canonical singularity_vector amplitude gate. Legacy alias: --peace-threshold",
+    )
+    ap.add_argument(
+        "--signal-epi-threshold",
+        dest="signal_epi_threshold",
+        type=float,
+        default=0.5,
+        help="Canonical V64.1 MDL signal gate used when reconstructing is_signal in-memory.",
+    )
+    ap.add_argument("--srl-resid-sigma-mult", type=float, default=2.0)
+    ap.add_argument(
+        "--topo-energy-min",
+        "--topo-energy-sigma-mult",
+        dest="topo_energy_min",
+        type=float,
+        default=2.0,
+        help="Canonical dimensionless topology gate. Legacy alias: --topo-energy-sigma-mult",
+    )
     ap.add_argument("--xgb-max-depth", type=int, default=5)
     ap.add_argument("--xgb-learning-rate", type=float, default=0.03)
     ap.add_argument("--xgb-subsample", type=float, default=0.9)

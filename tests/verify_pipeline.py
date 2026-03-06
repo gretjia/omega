@@ -123,10 +123,10 @@ def verify_forge_logic(frames_path, output_dir):
         "input_files": [temp_frames_path],
         "shard_dir": output_dir,
         "keep_cols": ["srl_resid", "direction", "t1_excess_return"], # Columns to verify
-        "peace_threshold": -1.0, # Disable filter (allow any value)
-        "peace_threshold_baseline": -1.0,
+        "signal_epi_threshold": -1.0, # Disable MDL gate (allow any value)
+        "singularity_threshold": -1.0, # Disable singularity amplitude filter
         "srl_resid_sigma_mult": 0.0,
-        "topo_energy_sigma_mult": 0.0
+        "topo_energy_min": 0.0
     }
     
     # 4. Run Forge Batch
@@ -149,9 +149,9 @@ def verify_forge_logic(frames_path, output_dir):
         from tools.forge_base_matrix import _build_relaxed_cfg
         
         cfg = _build_relaxed_cfg(
-            peace_threshold=-1.0,
+            signal_epi_threshold=-1.0,
             srl_mult=0.0,
-            topo_mult=0.0
+            topo_energy_min=0.0
         )
         trainer = OmegaTrainerV3(cfg)
         raw_df = pl.read_parquet(temp_frames_path)

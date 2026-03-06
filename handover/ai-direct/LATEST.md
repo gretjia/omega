@@ -68,3 +68,10 @@ We are transitioning from mathematical prototyping into full-scale production. T
 ## Update: 2026-03-06 03:00 UTC
 - **V64.1 Hotfix Deployed:** The Bourbaki Synthesis updates (absolute geometric closure, dimension matching, and decoupling of `peace_threshold`) have been propagated downstream to `run_vertex_xgb_train.py` and `trainer.py` (which powers `run_local_backtest.py`). 
 - **Methodology:** We compute the new, strict `is_signal_v641` purely in-memory at load time. This ensures total mathematical continuity across the pipeline without stalling or restarting the ongoing, multi-hour Stage 2 runs on Windows and Linux.
+
+## Update: 2026-03-06 03:27 UTC
+- **Bourbaki Closure Repo Alignment: PASS** The repository is now aligned to the final `Bourbaki Closure` override in `audit/v64.md`.
+- **Canonical runtime semantics are primary:** `signal_epi_threshold`, `brownian_q_threshold`, `topo_energy_min`, `singularity_threshold`.
+- **Legacy names survive only as compatibility surfaces:** CLI aliases, resume-context normalization, and explicit `legacy_compat` metadata blocks.
+- **Validation:** `py_compile` passed on changed Python files; `uv run --python /usr/bin/python3.11 --with pytest --with numpy==1.26.4 --with numba==0.60.0 pytest tests/test_v64_absolute_closure.py tests/test_omega_math_core.py -q` passed with `32 passed`; external Gemini audit verdict: `PASS`.
+- **Operational note:** Stage 2 remains the active runtime track. When Stage 3 starts, use canonical parameter names first and treat old `peace_threshold` / `topo_energy_sigma_mult` names as compatibility aliases only.

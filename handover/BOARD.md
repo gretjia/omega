@@ -45,6 +45,42 @@
 ### Entries
 
 <!-- New session debriefs go here. Most recent on top. -->
+#### [2026-03-06 03:27] Agent: Codex | Session: V64 Bourbaki Closure Repo Alignment
+
+**What I did:**
+- 将仓库实现收口到 `audit/v64.md` 最后一个 `Bourbaki Closure` override。
+- 对齐核心语义：`signal_epi_threshold`、`brownian_q_threshold`、`topo_energy_min`、`singularity_threshold`。
+- 更新 Stage 3 / train 运行链路与 CLI 别名：`tools/forge_base_matrix.py`、`tools/run_vertex_xgb_train.py`、`tools/stage3_full_supervisor.py`、`tools/run_v64_smoke_backtest.py`。
+- 新增 `tests/test_v64_absolute_closure.py`，并更新 `README.md`、`tests/verify_pipeline.py`。
+- 运行 `py_compile` 与 `uv + pytest` 关键门禁，并完成一轮 `gemini` 外审。
+
+**What I discovered:**
+- `forge_base_matrix.py` 里的旧 `peace_threshold` 历史上同时承载过 `signal_epi_threshold` 与 `singularity_threshold` 的不同语义，是本轮最危险的语义漂移点。
+- `stage3_full_supervisor.py` 已经切到 canonical 名称，但默认值仍停留在旧口径，必须一起收口。
+- `tools/apply_v641_hotfix.py` 不是权威实现入口，保留它只能作为兼容性 breadcrumb。
+
+**What confused me / blocked me:**
+- 当前系统 `python3` 环境没有 `pytest`；改用 `uv run --python /usr/bin/python3.11 --with pytest --with numpy==1.26.4 --with numba==0.60.0 ...` 才完成测试。
+
+**What the next agent should do:**
+- 按 `handover/ai-direct/LATEST.md` 继续运行态接力即可；代码层 Bourbaki Closure 已通过本地与外部审计。
+- 若后续启动 Stage 3，优先使用 canonical 参数名，旧名只作为兼容别名。
+
+**Files I changed:**
+- `config.py`
+- `omega_core/kernel.py`
+- `omega_core/trainer.py`
+- `README.md`
+- `tests/test_v64_absolute_closure.py`
+- `tests/verify_pipeline.py`
+- `tools/forge_base_matrix.py`
+- `tools/run_vertex_xgb_train.py`
+- `tools/stage3_full_supervisor.py`
+- `tools/run_v64_smoke_backtest.py`
+- `tools/apply_v641_hotfix.py`
+- `handover/BOARD.md`
+- `handover/ai-direct/LATEST.md`
+- `handover/ai-direct/entries/20260306_032720_v64_bourbaki_closure_repo_alignment.md`
 #### [2026-03-05 14:23] Agent: Codex | Session: V63 Training/Backtest Evidence Alignment
 
 **What I did:**

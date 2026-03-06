@@ -678,7 +678,6 @@ class L2SignalConfig:
     """
     Signal synthesis thresholds.
     """
-    epiplexity_min: float = 0.4
     signal_epi_threshold: float = 0.5  # [V64.1] MDL singularity trigger
     srl_resid_sigma_mult: float = 2.0
     topo_area_min_abs: float = 1e-9

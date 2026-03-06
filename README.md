@@ -2231,3 +2231,35 @@ ssh windows1-w1 "hostname && whoami"
 - **`tools/stage3_full_supervisor.py`**
 - **`tools/submit_vertex_sweep.py`**
 - *(`archive/tools/`: 包含与 V62 无关的历史遗留代码和日志，请勿在此处寻找最新实现)*
+
+## V64.1 Bourbaki Closure (Authoritative)
+
+Only the final `"[ SYSTEM ARCHITECT ABSOLUTE OVERRIDE: THE BOURBAKI CLOSURE ]"` section in `audit/v64.md` is binding. Earlier sections remain useful as context and motivation, but they are not the implementation source of truth.
+
+### Closure Rules
+
+1. `calc_srl_compression_gain_rolling` is defined by relative compression gain between the null model and SRL residuals:
+   - Null model: `Var(Delta P)`
+   - Alternative model: `Var(R)`
+   - Gain: positive MDL bits only when `Var(Delta P) / Var(R) > 1`
+2. `Zero-variance -> zero signal`.
+   - If the original price-change variance collapses, there is no compressible intelligence and the gain must remain `0.0`.
+   - No fake `999.0` singularity is permitted.
+3. Holographic damper semantics are strictly decoupled:
+   - `brownian_q_threshold`: update the adaptive `Y` baseline only in the high-entropy Brownian regime.
+   - `signal_epi_threshold`: trigger the final `is_signal` gate only when MDL compression emerges.
+4. Topology remains dimensionless:
+   - `topo_energy_min` is the canonical lower bound.
+   - Legacy `topo_energy_sigma_mult` is compatibility-only vocabulary and must not re-enter canonical config semantics.
+5. The Bourbaki closure uses `delta_k = 2.0` in the rolling MDL gain path to stay aligned with the scalar formulation.
+
+### Legacy Name -> Canonical Semantics
+
+| Legacy name | Canonical meaning |
+| --- | --- |
+| `peace_threshold` in `forge_base_matrix.py` | `signal_epi_threshold` |
+| `peace_threshold_baseline` in `forge_base_matrix.py` | `singularity_threshold` |
+| `peace_threshold` in training/backtest filters | `singularity_threshold` |
+| `topo_energy_sigma_mult` | `topo_energy_min` |
+
+When keeping legacy flags for compatibility, the code should treat them as aliases only and emit canonical fields in runtime metadata and audit artifacts.

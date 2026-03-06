@@ -418,6 +418,10 @@ def _remote_start_forge(args: argparse.Namespace, remote_log: str, remote_pid: s
         f"--max-workers {args.forge_workers} "
         f"--reserve-mem-gb {args.reserve_mem_gb} "
         f"--worker-mem-gb {args.worker_mem_gb} "
+        f"--signal-epi-threshold {args.signal_epi_threshold} "
+        f"--singularity-threshold {args.singularity_threshold} "
+        f"--srl-resid-sigma-mult {args.srl_resid_sigma_mult} "
+        f"--topo-energy-min {args.topo_energy_min} "
         f"--output-parquet '{args.remote_output_parquet}' "
         f"--output-meta '{args.remote_output_meta}' "
         f"--shard-dir '{args.remote_shard_dir}' "
@@ -600,11 +604,13 @@ def _submit_training(args: argparse.Namespace, repo_root: pathlib.Path, state: D
         "--script-arg",
         f"--output-uri={args.model_output_prefix}",
         "--script-arg",
-        f"--peace-threshold={args.peace_threshold}",
+        f"--singularity-threshold={args.singularity_threshold}",
+        "--script-arg",
+        f"--signal-epi-threshold={args.signal_epi_threshold}",
         "--script-arg",
         f"--srl-resid-sigma-mult={args.srl_resid_sigma_mult}",
         "--script-arg",
-        f"--topo-energy-sigma-mult={args.topo_energy_sigma_mult}",
+        f"--topo-energy-min={args.topo_energy_min}",
         "--script-arg",
         f"--xgb-max-depth={args.xgb_max_depth}",
         "--script-arg",
@@ -798,9 +804,29 @@ def parse_args() -> argparse.Namespace:
     ap.add_argument("--vertex-machine-type", default="n1-standard-32")
     ap.add_argument("--train-timeout-sec", type=int, default=21600)
 
-    ap.add_argument("--peace-threshold", type=float, default=0.5253567667772991)
-    ap.add_argument("--srl-resid-sigma-mult", type=float, default=1.9773888188507172)
-    ap.add_argument("--topo-energy-sigma-mult", type=float, default=5.427559578121958)
+    ap.add_argument(
+        "--singularity-threshold",
+        "--peace-threshold",
+        dest="singularity_threshold",
+        type=float,
+        default=0.10,
+        help="Canonical singularity_vector amplitude gate for Stage 3 training. Legacy alias: --peace-threshold",
+    )
+    ap.add_argument(
+        "--signal-epi-threshold",
+        type=float,
+        default=0.5,
+        help="Canonical V64.1 MDL signal gate used during in-memory is_signal reconstruction.",
+    )
+    ap.add_argument("--srl-resid-sigma-mult", type=float, default=2.0)
+    ap.add_argument(
+        "--topo-energy-min",
+        "--topo-energy-sigma-mult",
+        dest="topo_energy_min",
+        type=float,
+        default=2.0,
+        help="Canonical dimensionless topology gate. Legacy alias: --topo-energy-sigma-mult",
+    )
     ap.add_argument("--xgb-max-depth", type=int, default=5)
     ap.add_argument("--xgb-learning-rate", type=float, default=0.006525909043483982)
     ap.add_argument("--xgb-subsample", type=float, default=0.9382970275902356)

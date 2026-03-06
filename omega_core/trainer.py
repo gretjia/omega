@@ -262,18 +262,19 @@ class OmegaTrainerV3:
         
 
         # [HOTFIX V64.1] Recompute is_signal on the fly if needed
-        signal_epi_threshold = 0.5
-        topo_energy_min_dimensionless = 2.0
-        spoofing_ratio_max = 2.5
-        srl_resid_sigma_mult = 0.5
-        topo_area_min_abs = 0.0
+        sig_cfg = self.cfg.signal
+        signal_epi_threshold = float(getattr(sig_cfg, "signal_epi_threshold", 0.5))
+        topo_energy_min = float(getattr(sig_cfg, "topo_energy_min", 2.0))
+        spoofing_ratio_max = float(getattr(sig_cfg, "spoofing_ratio_max", 2.5))
+        srl_resid_sigma_mult = float(getattr(sig_cfg, "srl_resid_sigma_mult", 0.5))
+        topo_area_min_abs = float(getattr(sig_cfg, "topo_area_min_abs", 0.0))
         df = df.with_columns([
             (
                 (pl.col("is_energy_active") == True)
                 & (pl.col("epiplexity") > signal_epi_threshold) 
                 & (pl.col("srl_resid").abs() > srl_resid_sigma_mult * pl.col("sigma_eff"))
                 & (pl.col("topo_area").abs() > topo_area_min_abs)
-                & (pl.col("topo_energy") > topo_energy_min_dimensionless)
+                & (pl.col("topo_energy") > topo_energy_min)
                 & (pl.col("spoof_ratio") < spoofing_ratio_max)
             ).alias("is_signal_v641")
         ])
@@ -443,10 +444,14 @@ def _vector_alignment(
     model=None,
     scaler=None,
     feature_cols=None,
-    peace_threshold: float = 0.0
+    singularity_threshold: float = 0.0,
+    peace_threshold: float | None = None,
 ) -> tuple[float, float]:
     if frames.height == 0 or "direction" not in frames.columns:
         return float("nan"), float("nan")
+
+    if peace_threshold is not None:
+        singularity_threshold = float(peace_threshold)
 
     def _over_symbol(expr: pl.Expr) -> pl.Expr:
         if "symbol" in frames.columns:
@@ -481,11 +486,12 @@ def _vector_alignment(
     else:
         is_valid_arr = np.ones_like(singularity, dtype=bool)
 
-    # V64 Filter: Abs singularity vector > peace_threshold
+    # V64 Filter: Abs singularity vector > singularity_threshold.
+    # `peace_threshold` is kept only as a legacy keyword alias for old callers.
     mask = (
         np.isfinite(dir_sign) & np.isfinite(fwd_sign)
         & (dir_sign != 0.0) & (fwd_sign != 0.0)
-        & (np.abs(singularity) > peace_threshold)
+        & (np.abs(singularity) > singularity_threshold)
         & is_valid_arr
     )
     
@@ -544,11 +550,15 @@ def evaluate_frames(
     model=None,
     scaler=None,
     feature_cols=None,
-    peace_threshold: float = 0.0
+    singularity_threshold: float = 0.0,
+    peace_threshold: float | None = None,
 ) -> Dict[str, float]:
     vcfg = cfg.validation
     traces = _collect_traces(frames, vcfg.max_traces)
     topo_snr = topo_snr_from_traces(traces, cfg.topo_snr, cfg.epiplexity)
+
+    if peace_threshold is not None:
+        singularity_threshold = float(peace_threshold)
 
     orth = float("nan")
     # V64: Check singularity vector instead of epiplexity for orthogonality
@@ -562,7 +572,10 @@ def evaluate_frames(
 
     phys_align, model_align = _vector_alignment(
         frames, int(vcfg.forward_return_horizon_buckets), int(vcfg.min_samples),
-        model=model, scaler=scaler, feature_cols=feature_cols, peace_threshold=peace_threshold
+        model=model,
+        scaler=scaler,
+        feature_cols=feature_cols,
+        singularity_threshold=singularity_threshold,
     )
 
     final_align = model_align if not math.isnan(model_align) else phys_align

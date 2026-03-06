@@ -29,12 +29,13 @@ def main():
     cfg = load_l2_pipeline_config()
     
     # Needs a dummy target for evaluation if not present in basic L2. Let's rely on direction.
+    singularity_threshold = -0.1
     metrics = evaluate_frames(
         df, cfg, 
         model=model, 
         scaler=None, # V64 removes scaling
         feature_cols=feature_cols,
-        peace_threshold=-0.1
+        peace_threshold=singularity_threshold, # legacy evaluate_frames keyword; semantic gate is singularity_vector amplitude
     )
     
     print("\nBacktest Metrics:")

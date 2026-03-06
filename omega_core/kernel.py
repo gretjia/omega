@@ -40,12 +40,11 @@ def _apply_recursive_physics(
     epi_cfg = cfg.epiplexity
     topo_cfg = cfg.topology_race
 
-    signal_epi_threshold = float(getattr(sig, "epiplexity_min", 0.5))
+    signal_epi_threshold = float(getattr(sig, "signal_epi_threshold", 0.5))
     brownian_q_threshold = float(getattr(srl, "brownian_q_threshold", 0.5))
-    topo_energy_min_dimensionless = float(getattr(sig, "topo_energy_min", 2.0))
+    topo_energy_min = float(getattr(sig, "topo_energy_min", 2.0))
     spoofing_ratio_max = float(getattr(sig, "spoofing_ratio_max", 2.5))
     min_ofi_for_y = float(getattr(sig, "min_ofi_for_y_update", 100.0))
-    topo_energy_sigma_mult = float(getattr(sig, "topo_energy_sigma_mult", 10.0))
 
     y_min = float(getattr(srl, "y_min", 0.1))
     y_max = float(getattr(srl, "y_max", 5.0))
@@ -154,7 +153,7 @@ def _apply_recursive_physics(
     window_len = int(epi_cfg.min_trace_len)
 
     # 1) Topology first
-    from omega_core.omega_math_rolling import calc_isoperimetric_topology_rolling, calc_residual_epiplexity_rolling
+    from omega_core.omega_math_rolling import calc_isoperimetric_topology_rolling
     out_topo_area, out_topo_energy, out_q_topo = calc_isoperimetric_topology_rolling(
         prices=close_px,
         ofis=net_ofi,
@@ -220,9 +219,8 @@ def _apply_recursive_physics(
         delta_k=2.0                            # [闭环] 统一常数
     )
     
-    # Apply global activity mask
-    out_epi = np.where(out_epi_raw > 0, out_epi_raw, float(epi_cfg.fallback_value))
-    out_epi = np.where(out_is_active, out_epi, float(epi_cfg.fallback_value))
+    # Apply the activity mask without reintroducing any secondary threshold semantics.
+    out_epi = np.where(out_is_active, out_epi_raw, float(epi_cfg.fallback_value))
 
     from omega_core.omega_math_rolling import calc_topology_area_rolling
     manifolds = getattr(topo_cfg, "manifolds", ())
@@ -293,7 +291,7 @@ def _apply_recursive_physics(
             & (pl.col("epiplexity") > signal_epi_threshold) 
             & (pl.col("srl_resid").abs() > float(sig.srl_resid_sigma_mult) * pl.col("sigma_eff"))
             & (pl.col("topo_area").abs() > float(sig.topo_area_min_abs))
-            & (pl.col("topo_energy") > topo_energy_min_dimensionless)
+            & (pl.col("topo_energy") > topo_energy_min)
             & (pl.col("spoof_ratio") < spoofing_ratio_max)
         ).alias("is_signal"),
         (pl.col("srl_resid").sign()).alias("direction"),

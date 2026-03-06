@@ -197,7 +197,7 @@ def _list_files(pattern: str, years: list[str], run_hash: str) -> list[str]:
     return sorted(set(out))
 
 
-def _build_relaxed_cfg(peace_threshold: float, srl_mult: float, topo_mult: float | None):
+def _build_relaxed_cfg(signal_epi_threshold: float, srl_mult: float, topo_energy_min: float | None):
     cfg = load_l2_pipeline_config()
     sig = cfg.signal
     trn = cfg.train
@@ -205,9 +205,9 @@ def _build_relaxed_cfg(peace_threshold: float, srl_mult: float, topo_mult: float
 
     sig = replace(
         sig,
-        peace_threshold=float(peace_threshold),
+        signal_epi_threshold=float(signal_epi_threshold),
         srl_resid_sigma_mult=float(srl_mult),
-        topo_energy_sigma_mult=float(sig.topo_energy_sigma_mult if topo_mult is None else topo_mult),
+        topo_energy_min=float(sig.topo_energy_min if topo_energy_min is None else topo_energy_min),
     )
     trn = replace(
         trn,
@@ -250,14 +250,14 @@ def _process_symbol_batch(task: dict) -> dict:
     input_files = [str(x) for x in task["input_files"]]
     shard_dir = Path(task["shard_dir"])
     keep_cols = [str(x) for x in task["keep_cols"]]
-    peace_baseline = float(task["peace_threshold_baseline"])
+    singularity_threshold = float(task["singularity_threshold"])
     batch_symbol_set = {str(x) for x in batch_symbols}
     batch_symbols_sorted = sorted(batch_symbol_set)
 
     cfg = _build_relaxed_cfg(
-        peace_threshold=float(task["peace_threshold"]),
+        signal_epi_threshold=float(task["signal_epi_threshold"]),
         srl_mult=float(task["srl_resid_sigma_mult"]),
-        topo_mult=task.get("topo_energy_sigma_mult"),
+        topo_energy_min=task.get("topo_energy_min"),
     )
     trainer = OmegaTrainerV3(cfg)
 
@@ -458,11 +458,12 @@ def _process_symbol_batch(task: dict) -> dict:
     # [HOTFIX V64.1] Dynamically reconstruct the true `is_signal` based on V64.1 math closure.
     # The L2 parquets on disk have the old V64.0 `is_signal` which compared topo_energy with sigma_eff.
     # We fix it here in-memory before forging the matrix to avoid rerunning Stage 2.
-    signal_epi_threshold = 0.5
-    topo_energy_min_dimensionless = 2.0
-    spoofing_ratio_max = 2.5
-    srl_resid_sigma_mult = 0.5
-    topo_area_min_abs = 0.0
+    sig_cfg = cfg.signal
+    signal_epi_threshold = float(getattr(sig_cfg, "signal_epi_threshold", 0.5))
+    topo_energy_min = float(getattr(sig_cfg, "topo_energy_min", 2.0))
+    spoofing_ratio_max = float(getattr(sig_cfg, "spoofing_ratio_max", 2.5))
+    srl_resid_sigma_mult = float(getattr(sig_cfg, "srl_resid_sigma_mult", 2.0))
+    topo_area_min_abs = float(getattr(sig_cfg, "topo_area_min_abs", 1e-9))
     
     base_df = base_df.with_columns([
         (
@@ -470,7 +471,7 @@ def _process_symbol_batch(task: dict) -> dict:
             & (pl.col("epiplexity") > signal_epi_threshold) 
             & (pl.col("srl_resid").abs() > srl_resid_sigma_mult * pl.col("sigma_eff"))
             & (pl.col("topo_area").abs() > topo_area_min_abs)
-            & (pl.col("topo_energy") > topo_energy_min_dimensionless) # 纯几何无量纲门控比较 (HOTFIX)
+            & (pl.col("topo_energy") > topo_energy_min) # 纯几何无量纲门控比较 (HOTFIX)
             & (pl.col("spoof_ratio") < spoofing_ratio_max)
         ).alias("is_signal")
     ])
@@ -478,7 +479,7 @@ def _process_symbol_batch(task: dict) -> dict:
     # 2. 自适应底噪阈值：只过滤毫无波动的“绝对死水期”，对顶部的巨大极值绝对放行
     filters: list[pl.Expr] = [
         (pl.col("is_physics_valid") == True),
-        (pl.col("singularity_vector").abs() > peace_baseline),
+        (pl.col("singularity_vector").abs() > singularity_threshold),
     ]
     
     # 3. 靶向切除：我们只丢弃没有“未来收益率 (target)”对齐的尾盘数据
@@ -599,18 +600,18 @@ class LocalManifoldForger:
         *,
         input_files: list[str],
         shard_dir: Path,
-        peace_threshold: float,
+        signal_epi_threshold: float,
         srl_resid_sigma_mult: float,
-        topo_energy_sigma_mult: float | None,
-        peace_threshold_baseline: float,
+        topo_energy_min: float | None,
+        singularity_threshold: float,
         keep_cols: list[str],
     ):
         self.input_files = sorted(set(str(x) for x in input_files))
         self.shard_dir = shard_dir
-        self.peace_threshold = float(peace_threshold)
+        self.signal_epi_threshold = float(signal_epi_threshold)
         self.srl_resid_sigma_mult = float(srl_resid_sigma_mult)
-        self.topo_energy_sigma_mult = topo_energy_sigma_mult
-        self.peace_threshold_baseline = float(peace_threshold_baseline)
+        self.topo_energy_min = topo_energy_min
+        self.singularity_threshold = float(singularity_threshold)
         self.keep_cols = list(dict.fromkeys(keep_cols))
 
     def _all_symbols(self, sample_symbols: int, seed: int) -> list[str]:
@@ -708,10 +709,10 @@ class LocalManifoldForger:
                     "input_files": self.input_files,
                     "shard_dir": str(self.shard_dir),
                     "keep_cols": self.keep_cols,
-                    "peace_threshold": self.peace_threshold,
+                    "signal_epi_threshold": self.signal_epi_threshold,
                     "srl_resid_sigma_mult": self.srl_resid_sigma_mult,
-                    "topo_energy_sigma_mult": self.topo_energy_sigma_mult,
-                    "peace_threshold_baseline": self.peace_threshold_baseline,
+                    "topo_energy_min": self.topo_energy_min,
+                    "singularity_threshold": self.singularity_threshold,
                 }
             )
 
@@ -816,10 +817,31 @@ def main() -> int:
     ap.add_argument("--worker-mem-gb", type=float, default=10.0)
     ap.add_argument("--no-dynamic-worker-cap", action="store_true")
     ap.add_argument("--max-rows-per-file", type=int, default=0)
-    ap.add_argument("--peace-threshold", type=float, default=0.10)
-    ap.add_argument("--peace-threshold-baseline", type=float, default=0.10)
-    ap.add_argument("--srl-resid-sigma-mult", type=float, default=0.5)
-    ap.add_argument("--topo-energy-sigma-mult", type=float, default=None)
+    ap.add_argument(
+        "--signal-epi-threshold",
+        "--peace-threshold",
+        dest="signal_epi_threshold",
+        type=float,
+        default=0.5,
+        help="Canonical V64.1 MDL signal gate. Legacy alias: --peace-threshold",
+    )
+    ap.add_argument(
+        "--singularity-threshold",
+        "--peace-threshold-baseline",
+        dest="singularity_threshold",
+        type=float,
+        default=0.10,
+        help="Canonical singularity_vector amplitude gate. Legacy alias: --peace-threshold-baseline",
+    )
+    ap.add_argument("--srl-resid-sigma-mult", type=float, default=2.0)
+    ap.add_argument(
+        "--topo-energy-min",
+        "--topo-energy-sigma-mult",
+        dest="topo_energy_min",
+        type=float,
+        default=None,
+        help="Canonical dimensionless topology gate. Legacy alias: --topo-energy-sigma-mult",
+    )
     ap.add_argument("--output-parquet", required=True)
     ap.add_argument("--output-meta", default="")
     ap.add_argument("--output-uri", default="")
@@ -953,21 +975,36 @@ def main() -> int:
         "symbols_per_batch": int(args.symbols_per_batch),
         "sample_symbols": int(args.sample_symbols),
         "seed": int(args.seed),
-        "peace_threshold": float(args.peace_threshold),
-        "peace_threshold_baseline": float(args.peace_threshold_baseline),
+        "signal_epi_threshold": float(args.signal_epi_threshold),
+        "singularity_threshold": float(args.singularity_threshold),
         "srl_resid_sigma_mult": float(args.srl_resid_sigma_mult),
-        "topo_energy_sigma_mult": None
-        if args.topo_energy_sigma_mult is None
-        else float(args.topo_energy_sigma_mult),
+        "topo_energy_min": None
+        if args.topo_energy_min is None
+        else float(args.topo_energy_min),
         "keep_cols": keep_cols,
     }
+    def _normalize_resume_context(ctx: dict | None) -> dict | None:
+        if not isinstance(ctx, dict):
+            return ctx
+        normalized = dict(ctx)
+        if "signal_epi_threshold" not in normalized and "peace_threshold" in normalized:
+            normalized["signal_epi_threshold"] = float(normalized["peace_threshold"])
+        if "singularity_threshold" not in normalized and "peace_threshold_baseline" in normalized:
+            normalized["singularity_threshold"] = float(normalized["peace_threshold_baseline"])
+        if "topo_energy_min" not in normalized and "topo_energy_sigma_mult" in normalized:
+            topo_energy_min = normalized["topo_energy_sigma_mult"]
+            normalized["topo_energy_min"] = None if topo_energy_min is None else float(topo_energy_min)
+        normalized.pop("peace_threshold", None)
+        normalized.pop("peace_threshold_baseline", None)
+        normalized.pop("topo_energy_sigma_mult", None)
+        return normalized
     resume_context_path = shard_dir / "_resume_context.json"
     if resume_enabled and resume_context_path.exists():
         try:
             prev = json.loads(resume_context_path.read_text(encoding="utf-8"))
         except Exception:
             prev = None
-        if prev != resume_context:
+        if _normalize_resume_context(prev) != _normalize_resume_context(resume_context):
             raise SystemExit(
                 "Resume context mismatch in shard dir. Re-run with --no-resume to rebuild from scratch."
             )
@@ -979,10 +1016,10 @@ def main() -> int:
     forger = LocalManifoldForger(
         input_files=files,
         shard_dir=shard_dir,
-        peace_threshold=float(args.peace_threshold),
+        signal_epi_threshold=float(args.signal_epi_threshold),
         srl_resid_sigma_mult=float(args.srl_resid_sigma_mult),
-        topo_energy_sigma_mult=args.topo_energy_sigma_mult,
-        peace_threshold_baseline=float(args.peace_threshold_baseline),
+        topo_energy_min=args.topo_energy_min,
+        singularity_threshold=float(args.singularity_threshold),
         keep_cols=keep_cols,
     )
 
@@ -1057,14 +1094,23 @@ def main() -> int:
         "hash": str(args.hash),
         "sample_symbols": int(args.sample_symbols),
         "physics_gates": {
-            "peace_threshold": float(args.peace_threshold),
-            "peace_threshold_baseline": float(args.peace_threshold_baseline),
+            "signal_epi_threshold": float(args.signal_epi_threshold),
+            "singularity_threshold": float(args.singularity_threshold),
             "srl_resid_sigma_mult": float(args.srl_resid_sigma_mult),
-            "topo_energy_sigma_mult": float(
-                load_l2_pipeline_config().signal.topo_energy_sigma_mult
-                if args.topo_energy_sigma_mult is None
-                else args.topo_energy_sigma_mult
+            "topo_energy_min": float(
+                load_l2_pipeline_config().signal.topo_energy_min
+                if args.topo_energy_min is None
+                else args.topo_energy_min
             ),
+            "legacy_compat": {
+                "peace_threshold": float(args.signal_epi_threshold),
+                "peace_threshold_baseline": float(args.singularity_threshold),
+                "topo_energy_sigma_mult": float(
+                    load_l2_pipeline_config().signal.topo_energy_min
+                    if args.topo_energy_min is None
+                    else args.topo_energy_min
+                ),
+            },
         },
         "dtype_invariants": {
             "strict_float64_required": True,
