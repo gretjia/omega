@@ -76,7 +76,7 @@ def py_run_srl_loop(
     depth_floor, sigma_floor, spoof_ratio_eps, spoof_penalty_gamma,
     implied_y_min_impact, implied_y_min_penalty,
     y_min, y_max, y_alpha, anchor_y, anchor_w, clip_lo, clip_hi,
-    out_is_active, out_epi, peace_threshold, min_ofi_for_y
+    out_is_active, out_q_topo, brownian_q_threshold, min_ofi_for_y
 ):
     out_srl_resid = np.zeros(n_rows, dtype=np.float64)
     out_y = np.zeros(n_rows, dtype=np.float64)
@@ -101,7 +101,7 @@ def py_run_srl_loop(
         out_spoof[i] = spoof
         
         # Adaptive Y Update
-        if out_is_active[i] and out_epi[i] > peace_threshold and abs(net_ofi[i]) > min_ofi_for_y:
+        if out_is_active[i] and out_q_topo[i] < brownian_q_threshold and abs(net_ofi[i]) > min_ofi_for_y:
             new_y = float(np.clip(imp_y, y_min, y_max))
             current_y = (1.0 - y_alpha) * current_y + y_alpha * new_y
             
@@ -130,7 +130,7 @@ if NUMBA_AVAILABLE:
         depth_floor, sigma_floor, spoof_ratio_eps, spoof_penalty_gamma,
         implied_y_min_impact, implied_y_min_penalty,
         y_min, y_max, y_alpha, anchor_y, anchor_w, clip_lo, clip_hi,
-        out_is_active, out_epi, peace_threshold, min_ofi_for_y
+        out_is_active, out_q_topo, brownian_q_threshold, min_ofi_for_y
     ):
         out_srl_resid = np.zeros(n_rows, dtype=np.float64)
         out_y = np.zeros(n_rows, dtype=np.float64)
@@ -172,7 +172,7 @@ if NUMBA_AVAILABLE:
             # Adaptive Y Update
             # Numba handles boolean indexing efficiently? Here it's scalar bool
             # out_is_active[i] is bool or int
-            if out_is_active[i] and out_epi[i] > peace_threshold and abs(net_ofi[i]) > min_ofi_for_y:
+            if out_is_active[i] and out_q_topo[i] < brownian_q_threshold and abs(net_ofi[i]) > min_ofi_for_y:
                 # Clip new_y
                 if implied_y < y_min: implied_y = y_min
                 elif implied_y > y_max: implied_y = y_max
@@ -202,7 +202,7 @@ class TestKernelSRLNumba(unittest.TestCase):
         self.initial_y = 1.0
         
         self.out_is_active = np.random.randint(0, 2, self.n_rows).astype(bool)
-        self.out_epi = np.random.rand(self.n_rows).astype(np.float64)
+        self.out_q_topo = np.random.rand(self.n_rows).astype(np.float64)
         
         # Params
         self.params = {
@@ -212,7 +212,7 @@ class TestKernelSRLNumba(unittest.TestCase):
             "y_min": 0.1, "y_max": 5.0, "y_alpha": 0.05, 
             "anchor_y": 1.0, "anchor_w": 0.01, 
             "clip_lo": 0.4, "clip_hi": 1.5,
-            "peace_threshold": 0.5, "min_ofi_for_y": 10.0
+            "brownian_q_threshold": 0.5, "min_ofi_for_y": 10.0
         }
 
     def test_correctness(self):
@@ -226,7 +226,7 @@ class TestKernelSRLNumba(unittest.TestCase):
             self.params["implied_y_min_impact"], self.params["implied_y_min_penalty"],
             self.params["y_min"], self.params["y_max"], self.params["y_alpha"], self.params["anchor_y"], self.params["anchor_w"], 
             self.params["clip_lo"], self.params["clip_hi"],
-            self.out_is_active, self.out_epi, self.params["peace_threshold"], self.params["min_ofi_for_y"]
+            self.out_is_active, self.out_q_topo, self.params["brownian_q_threshold"], self.params["min_ofi_for_y"]
         )
         
         # Numba Run
@@ -238,7 +238,7 @@ class TestKernelSRLNumba(unittest.TestCase):
             self.params["implied_y_min_impact"], self.params["implied_y_min_penalty"],
             self.params["y_min"], self.params["y_max"], self.params["y_alpha"], self.params["anchor_y"], self.params["anchor_w"], 
             self.params["clip_lo"], self.params["clip_hi"],
-            self.out_is_active[:10], self.out_epi[:10], self.params["peace_threshold"], self.params["min_ofi_for_y"]
+            self.out_is_active[:10], self.out_q_topo[:10], self.params["brownian_q_threshold"], self.params["min_ofi_for_y"]
         )
         
         res_nb = nb_run_srl_loop(
@@ -248,7 +248,7 @@ class TestKernelSRLNumba(unittest.TestCase):
             self.params["implied_y_min_impact"], self.params["implied_y_min_penalty"],
             self.params["y_min"], self.params["y_max"], self.params["y_alpha"], self.params["anchor_y"], self.params["anchor_w"], 
             self.params["clip_lo"], self.params["clip_hi"],
-            self.out_is_active, self.out_epi, self.params["peace_threshold"], self.params["min_ofi_for_y"]
+            self.out_is_active, self.out_q_topo, self.params["brownian_q_threshold"], self.params["min_ofi_for_y"]
         )
         
         # Assert Close
@@ -268,7 +268,7 @@ class TestKernelSRLNumba(unittest.TestCase):
         cv = np.ascontiguousarray(np.tile(self.cancel_vol, N // self.n_rows))
         tv = np.ascontiguousarray(np.tile(self.trade_vol, N // self.n_rows))
         oa = np.ascontiguousarray(np.tile(self.out_is_active, N // self.n_rows))
-        oe = np.ascontiguousarray(np.tile(self.out_epi, N // self.n_rows))
+        oe = np.ascontiguousarray(np.tile(self.out_q_topo, N // self.n_rows))
         
         # Warmup Numba with the EXACT same arrays (slice) to ensure compilation matches
         nb_run_srl_loop(
@@ -277,7 +277,7 @@ class TestKernelSRLNumba(unittest.TestCase):
             self.params["implied_y_min_impact"], self.params["implied_y_min_penalty"],
             self.params["y_min"], self.params["y_max"], self.params["y_alpha"], self.params["anchor_y"], self.params["anchor_w"], 
             self.params["clip_lo"], self.params["clip_hi"],
-            oa[:100], oe[:100], self.params["peace_threshold"], self.params["min_ofi_for_y"]
+            oa[:100], oe[:100], self.params["brownian_q_threshold"], self.params["min_ofi_for_y"]
         )
         
         # Python Time
@@ -288,7 +288,7 @@ class TestKernelSRLNumba(unittest.TestCase):
             self.params["implied_y_min_impact"], self.params["implied_y_min_penalty"],
             self.params["y_min"], self.params["y_max"], self.params["y_alpha"], self.params["anchor_y"], self.params["anchor_w"], 
             self.params["clip_lo"], self.params["clip_hi"],
-            oa, oe, self.params["peace_threshold"], self.params["min_ofi_for_y"]
+            oa, oe, self.params["brownian_q_threshold"], self.params["min_ofi_for_y"]
         )
         t_py = time.time() - t0
         
@@ -300,7 +300,7 @@ class TestKernelSRLNumba(unittest.TestCase):
             self.params["implied_y_min_impact"], self.params["implied_y_min_penalty"],
             self.params["y_min"], self.params["y_max"], self.params["y_alpha"], self.params["anchor_y"], self.params["anchor_w"], 
             self.params["clip_lo"], self.params["clip_hi"],
-            oa, oe, self.params["peace_threshold"], self.params["min_ofi_for_y"]
+            oa, oe, self.params["brownian_q_threshold"], self.params["min_ofi_for_y"]
         )
         t_nb = time.time() - t0
         

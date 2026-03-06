@@ -5,7 +5,7 @@ Regression test for perf/stage2-speedup-v62 optimizations.
 Validates that:
   1. build_l2_features_from_l1 produces expected columns after rolling_mean_by refactor
   2. apply_recursive_physics produces expected physics columns including MDL arena
-  3. dominant_probe values are in {1, 2, 3} (when/then argmax equivalent)
+  3. dominant_probe values are in {1, 3} after removing the duplicate SRL compression channel
   4. epiplexity is zero where MDL gain <= 0 (Turing discipline)
   5. Schema dtypes match expectations
 
@@ -112,7 +112,7 @@ class TestStage2OutputEquivalence(unittest.TestCase):
         self.assertEqual(missing, set(), f"Missing physics columns: {missing}")
 
     def test_dominant_probe_values_in_valid_range(self):
-        """dominant_probe (when/then argmax) must produce values in {1, 2, 3}."""
+        """dominant_probe must only distinguish canonical compression (1) vs topology (3)."""
         l2_df = build_l2_features_from_l1(self.l1_df.lazy(), self.cfg)
         result_df = apply_recursive_physics(l2_df, self.cfg)
 
@@ -121,35 +121,30 @@ class TestStage2OutputEquivalence(unittest.TestCase):
 
         probe_vals = result_df.get_column("dominant_probe").drop_nulls().unique().to_list()
         for v in probe_vals:
-            self.assertIn(v, {1, 2, 3}, f"Invalid dominant_probe value: {v}")
+            self.assertIn(v, {1, 3}, f"Invalid dominant_probe value: {v}")
 
     def test_dominant_probe_null_semantics_match_concat_argmax(self):
-        """
-        when/then argmax optimization must match concat_list().list.arg_max()+1
-        semantics even when some bits_* values are null.
-        """
+        """Two-probe dominant selection must match concat argmax null semantics."""
         df = pl.DataFrame(
             {
                 "bits_linear": [0.0, 0.2, 0.2, None, 0.0, 0.5, None],
-                "bits_srl": [None, 0.3, None, 0.1, 0.5, 0.5, None],
                 "bits_topology": [0.4, 0.1, 0.2, 0.1, None, 0.5, 0.2],
             }
         )
 
         expected = df.with_columns(
-            (pl.concat_list(["bits_linear", "bits_srl", "bits_topology"]).list.arg_max() + 1)
+            pl.when(pl.concat_list(["bits_linear", "bits_topology"]).list.arg_max() == 1)
+            .then(pl.lit(3))
+            .otherwise(pl.lit(1))
             .alias("expected_probe")
         )
 
         bits_linear_cmp = pl.col("bits_linear").fill_null(float("-inf")).fill_nan(float("-inf"))
-        bits_srl_cmp = pl.col("bits_srl").fill_null(float("-inf")).fill_nan(float("-inf"))
         bits_topology_cmp = (
             pl.col("bits_topology").fill_null(float("-inf")).fill_nan(float("-inf"))
         )
         optimized = expected.with_columns(
-            pl.when((bits_srl_cmp > bits_linear_cmp) & (bits_srl_cmp >= bits_topology_cmp))
-            .then(pl.lit(2))
-            .when((bits_topology_cmp > bits_linear_cmp) & (bits_topology_cmp > bits_srl_cmp))
+            pl.when(bits_topology_cmp > bits_linear_cmp)
             .then(pl.lit(3))
             .otherwise(pl.lit(1))
             .alias("optimized_probe")
@@ -170,11 +165,13 @@ class TestStage2OutputEquivalence(unittest.TestCase):
         self.assertTrue(np.all(epi >= 0), "epiplexity should never be negative (Turing discipline)")
 
     def test_bits_columns_non_negative(self):
-        """bits_linear, bits_srl, bits_topology should all be >= 0 per MDL clipping."""
+        """bits_linear and bits_topology should both stay finite and non-negative."""
         l2_df = build_l2_features_from_l1(self.l1_df.lazy(), self.cfg)
         result_df = apply_recursive_physics(l2_df, self.cfg)
 
-        for col in ["bits_linear", "bits_srl", "bits_topology"]:
+        self.assertNotIn("bits_srl", result_df.columns, "bits_srl should not exist after V64.2 closure.")
+
+        for col in ["bits_linear", "bits_topology"]:
             if col not in result_df.columns:
                 continue
             vals = result_df.get_column(col).drop_nulls().to_numpy()

@@ -285,7 +285,7 @@ class OmegaTrainerV3:
         else:
             y = np.where(df.select(self.label_col).to_numpy().ravel() > 0, 1, 0)
         
-        epi = np.clip(df.get_column("epiplexity").to_numpy(), 0.0, 1.0)
+        epi = np.clip(df.get_column("epiplexity").to_numpy(), 0.0, None)
         topo = np.log1p(np.abs(df.get_column("topo_area").to_numpy()))
         
 

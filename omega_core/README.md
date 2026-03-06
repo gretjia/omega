@@ -11,12 +11,13 @@ This directory contains the pure mathematical and logic implementation of OMEGA 
 
 *   **`omega_math_core.py`**: The Physics Engine.
     *   **Universal SRL**: `calc_srl_state` enforces $\delta=0.5$ (Sato 2025).
-    *   **Compression Gain**: `calc_epiplexity` uses linear model R-squared (Finzi 2026).
+    *   **Legacy Linear-Probe Compression**: `calc_linear_probe_compression_gain` remains as a historical scalar helper and is not the canonical runtime `epiplexity`.
+    *   **Canonical Runtime Compression**: the live Stage 2 path uses `omega_math_rolling.calc_srl_compression_gain_rolling`, defined by the relative SRL compression score between `price_change` and `srl_residuals` under a prequential MDL interpretation with `Delta k = 0`.
 *   **`omega_etl.py`**: The Data Factory.
     *   **Causal Projection**: Implements time-weighted volume extrapolation to fix Paradox 3.
     *   **Multi-Slice Support**: Recursively loads list of files and sorts by time to ensure causal integrity.
 *   **`kernel.py`**: The Decision Logic.
-    *   **Holographic Damper**: Gating $Y$ updates based on Epiplexity.
+    *   **Holographic Damper**: Updates $Y$ only in the Brownian baseline regime (`Q_topo < brownian_q_threshold`), while the final signal gate is driven by canonical `epiplexity` plus geometry/spoof filters.
 *   **`trainer.py`**: The Learning Machine.
     *   SGD-based incremental learning with Epiplexity weighting.
     *   **Multi-Symbol Support**: Smartly handles mixed-symbol parquet files by using `.over("symbol")` for label generation and skipping redundant physics.

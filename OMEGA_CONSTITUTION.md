@@ -59,7 +59,7 @@ When facing any engineering challenge, test your solution against these four wal
 
 ### Axiom 4: Epistemic Slicing (No "Baseline" Poisoning)
 
-- Physics gates (`peace_threshold`) are NOT ML hyperparameters.
+- Physics gates (`signal_epi_threshold`, `singularity_threshold`) are NOT ML hyperparameters.
 - ❌ Never run "default baselines" on full data. Never re-run Edge ETL for hyperparameter sweeps.
 - ✅ Base Matrix on Edge → In-Memory Boolean Masking → XGBoost DMatrix in O(1).
 

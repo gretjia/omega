@@ -1,9 +1,10 @@
 """
 omega_math_core.py
 
-Level-2 (v5) deterministic math kernels (vectorized).
+Level-2 deterministic math kernels.
 Physics: Sato & Kanazawa (2025) - Strict SRL Universality (delta=0.5)
-Info: Finzi et al. (2026) - Epiplexity as Structural Compression Gain
+Info: legacy scalar linear-probe compression helpers kept separate from the
+canonical V64 runtime epiplexity definition.
 """
 
 from __future__ import annotations
@@ -18,25 +19,13 @@ from config import L2EpiplexityConfig, L2SRLConfig, L2TopoSNRConfig, L2TopologyR
 _TOPO_DEFAULTS = L2TopologyRaceConfig()
 
 
-def calc_epiplexity(trace: Sequence[float], cfg: L2EpiplexityConfig) -> float:
+def calc_linear_probe_compression_gain(trace: Sequence[float], cfg: L2EpiplexityConfig) -> float:
     """
-    v5.0 Entry Point: Compression Gain.
-    Replaces LZ76. Measures structural information S_T.
-    """
-    return calc_compression_gain(trace, cfg)
+    Legacy scalar compression helper based on a linear probe vs mean baseline.
 
-
-def calc_compression_gain(trace: Sequence[float], cfg: L2EpiplexityConfig) -> float:
-    """
-    v5.0 Epiplexity: Compression Gain (Finzi et al., 2026).
-    
-    Measures structural information (S_T) by comparing the error of a 
-    Linear Predictor vs a Naive (Mean/Random Walk) Predictor.
-    
-    Gain = 1 - (Variance_Residual / Variance_Total)
-    
-    Gain > 0 implies extractable structure (Signal).
-    Gain <= 0 implies pure entropy (Noise).
+    This helper is not the canonical V64 runtime `epiplexity` metric. The live
+    Stage 2 pipeline now defines epiplexity through the SRL relative compression
+    gain in `omega_math_rolling.calc_srl_compression_gain_rolling`.
     """
     arr = np.asarray(trace, dtype=float)
     n = arr.size
@@ -56,7 +45,6 @@ def calc_compression_gain(trace: Sequence[float], cfg: L2EpiplexityConfig) -> fl
 
     # 2. Time-Bounded Model (Linear Predictor)
     # We fit y = mx + c analytically (O(N)).
-    # This represents the simplest "Computational Observer".
     t = np.arange(n, dtype=float)
     t_mean = (n - 1) / 2.0
     x_mean = np.mean(arr)
@@ -73,13 +61,11 @@ def calc_compression_gain(trace: Sequence[float], cfg: L2EpiplexityConfig) -> fl
     intercept = x_mean - slope * t_mean
     
     # 3. Compression Gain
-    # Calculate residual variance after removing linear structure
     trend = slope * t + intercept
     residuals = arr - trend
     var_resid = np.mean(residuals ** 2)
 
     # Gain = 1 - (Unexplained_Entropy / Total_Entropy)
-    # Equivalent to R-squared for the linear fit.
     ratio = var_resid / var_total
     R_squared = float(np.clip(1.0 - ratio, 0.0, 0.9999))
     
@@ -98,6 +84,15 @@ def calc_compression_gain(trace: Sequence[float], cfg: L2EpiplexityConfig) -> fl
         return 0.0
         
     return float(mdl_gain_bits)
+
+
+def calc_compression_gain(trace: Sequence[float], cfg: L2EpiplexityConfig) -> float:
+    """
+    Backward-compatible alias for the legacy linear-probe compression helper.
+
+    It must not be confused with the canonical V64 runtime epiplexity signal.
+    """
+    return calc_linear_probe_compression_gain(trace, cfg)
 
 
 def calc_srl_state(
@@ -255,7 +250,7 @@ def topo_snr_from_traces(traces: Iterable[Sequence[float]], cfg: L2TopoSNRConfig
 
     real_vals: List[float] = []
     for t in traces_list:
-        real_vals.append(calc_epiplexity(t, epi_cfg))
+        real_vals.append(calc_linear_probe_compression_gain(t, epi_cfg))
 
     rng = np.random.default_rng(cfg.seed)
     shuffled_vals: List[float] = []
@@ -266,7 +261,7 @@ def topo_snr_from_traces(traces: Iterable[Sequence[float]], cfg: L2TopoSNRConfig
             if arr.size == 0:
                 continue
             idx = rng.permutation(arr.size)
-            shuffled_vals.append(calc_epiplexity(arr[idx], epi_cfg))
+            shuffled_vals.append(calc_linear_probe_compression_gain(arr[idx], epi_cfg))
 
     if len(shuffled_vals) < int(cfg.min_shuffles):
         return float("nan")

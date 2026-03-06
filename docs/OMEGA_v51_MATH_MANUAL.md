@@ -11,15 +11,15 @@ This manual documents the exact mathematical logic, algorithms, and data structu
 
 OMEGA v5.1 is based on the **"Holographic Damper"** hypothesis, which synthesizes two theoretical frameworks:
 1.  **Universal Square Root Law (SRL):** Market impact is a fixed physical law with $\delta=0.5$. Violations of this law create a restorative force (Residual).
-2.  **Epiplexity (Compression Gain):** Markets oscillate between "Noise" (High Entropy) and "Structure" (Low Entropy). Physics is only valid during structured regimes.
+2.  **Epiplexity (Relative SRL Compression Gain):** Markets oscillate between "Noise" (High Entropy) and "Structure" (Low Entropy). In the current runtime, structure is defined by how much the SRL model compresses residual energy relative to raw price-change energy.
 
 ### 1.1. Epiplexity (Structural Information)
 *Source: `omega_math_core.py` (Finzi et al., 2026)*
 
-Epiplexity measures the **Compression Gain** ($G$) of the price signal. It quantifies how much better a linear predictor is compared to a null (mean) predictor.
+Epiplexity is the canonical runtime compression score. In V64.2 it no longer means a linear-probe `R^2` surrogate; it means the relative SRL compression gain between raw price changes and SRL residuals, with `Zero-variance -> zero signal` and no extra in-window complexity penalty.
 
 $$
-G = 1 - \frac{	ext{Var}(R)}{	ext{Var}(X)}
+G_{\mathrm{runtime}} = \max\left(0,\ \frac{w}{2}\log\frac{\mathrm{Var}(\Delta P)}{\mathrm{Var}(R)}\right)
 $$
 
 Where:
@@ -71,14 +71,14 @@ Data flows through three distinct stages: **Kernel (Physics)** -> **Trainer (Lea
 1.  **Ingest:** Read raw L2 frames (Parquet).
 2.  **Gate:** Check `is_energy_active` ($\sigma \ge \sigma_{	ext{gate}}$).
 3.  **Compute:**
-    *   Calculate **Epiplexity** on the `trace` (recent ticks).
+    *   Calculate canonical **Epiplexity** from rolling `price_change` vs `srl_residuals`.
     *   Calculate **Holographic Topology** (Green's Theorem area on Price-OFI manifold).
     *   Calculate **SRL State** (Residual, Implied Y).
 4.  **Update State (Adaptive Y):**
-    *   *If* Epiplexity is high AND OFI is significant: Update $Y_t$ towards $Y_{	ext{implied}}$.
-    *   *Else:* Decay $Y_t$ towards anchor.
+    *   *If* `Q_topo < brownian_q_threshold` and OFI is significant: Update $Y_t$ towards $Y_{\text{implied}}$.
+    *   *Else:* freeze/decay $Y_t$ according to the Brownian-baseline recursion guard.
 5.  **Signal Generation (v5.1 Logic):**
-    *   **Trigger:** High Epiplexity + Symmetric Residual > Limit + High Topo Energy.
+    *   **Trigger:** positive Epiplexity + SRL residual gate + topology gate + spoofing/energy validity gates.
     *   **Direction:** `-sign(srl_resid)` (Reversion).
 
 ### Phase 2: The Trainer (`omega_core/trainer_v51.py`)
@@ -132,11 +132,14 @@ def calc_srl_state(dPrice, sigma, ofi, depth, Y):
 current_Y = initial_Y
 for row in dataframe:
     # 1. Compute Physics
-    epi = calc_epiplexity(row.trace)
+    # Legacy v5.1 pseudocode only: current V64 runtime no longer defines
+    # epiplexity via a linear probe on row.trace.
+    epi = calc_srl_compression_gain_rolling(price_change, srl_residuals)
     resid, implied_Y = calc_srl_state(row, current_Y)
     
     # 2. Update State (Recursion)
-    if epi > threshold and abs(ofi) > min_ofi:
+    # Current runtime updates Y only in the Brownian baseline regime.
+    if q_topo < brownian_q_threshold and abs(ofi) > min_ofi:
         current_Y = (1 - alpha) * current_Y + alpha * implied_Y
     
     # 3. Store Result
@@ -149,7 +152,7 @@ for row in dataframe:
 | Column | Type | Description | Source |
 | :--- | :--- | :--- | :--- |
 | `trace` | `List[f64]` | Recent price history (tick buffer) | Framer |
-| `epiplexity` | `f64` | Compression Gain [0, 1] | Kernel |
+| `epiplexity` | `f64` | Relative SRL compression gain (zero-floor, not capped at 1) | Kernel |
 | `srl_resid` | `f64` | Deviation from SRL Physics | Kernel |
 | `adaptive_y` | `f64` | Current elasticity state | Kernel (Recursive) |
 | `topo_area` | `f64` | Signed area of Price-OFI loop | Kernel |

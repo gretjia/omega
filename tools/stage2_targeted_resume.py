@@ -228,6 +228,10 @@ def main() -> int:
     pending: list[Path] = []
     for src in inputs:
         done = output_dir / f"{src.name}.done"
+        out_path = output_dir / src.name
+        if done.exists() and not out_path.exists():
+            done.unlink()
+            _append_line(log_file, f"STALE_DONE_CLEARED={src.name}")
         if not done.exists() and src.name not in existing_failed:
             pending.append(src)
 
@@ -319,4 +323,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

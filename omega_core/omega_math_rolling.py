@@ -106,12 +106,16 @@ def calc_srl_compression_gain_rolling(
     price_change: np.ndarray,     # [V64 绝对闭合] 引入原始价格波动 (Null Model)
     srl_residuals: np.ndarray,    # [V64 绝对闭合] SRL 残差 (Alternative Model)
     window: int,
-    dist_to_boundary: np.ndarray,
-    delta_k: float = 2.0          # [次级问题修复] 统一参数，与标量版本 \Delta k = 2.0 绝对对齐
+    dist_to_boundary: np.ndarray
 ) -> np.ndarray:
     """
-    第一性原理闭合: 计算 SRL 相对均值模型的信息论压缩增益 (MDL Gain)。
-    当 SRL 完美解释价格波动时，残差方差 -> 0，信息增益自然发散至正无穷大。
+    第一性原理闭合: 计算 SRL 相对均值模型的信息论压缩增益 (Prequential MDL Gain)。
+    在 V64.2 的序贯编码解释下，Null 与 Alternative 在窗口内都只编码局部均值和方差，
+    而 Holographic Damper 的状态路径由历史严格因果重建，不消耗窗口内自由度。
+    因此 Delta k = 0，复杂度惩罚项严格湮灭。
+
+    当 SRL 完美解释价格波动时，残差方差 -> 0，信息增益自然发散至正无穷大；
+    当原始价格方差本身塌缩时，增益归零。
     """
     n = len(srl_residuals)
     out = np.zeros(n, dtype=np.float64)
@@ -145,9 +149,7 @@ def calc_srl_compression_gain_rolling(
         
         # 只有模型提供了正向压缩(ratio > 1)，才计算对数增益
         if ratio > 1.0:
-            mdl_gain = (window / 2.0) * math.log(ratio) - (delta_k / 2.0) * math.log(window)
-            if mdl_gain > 0.0:
-                out[i] = mdl_gain
+            out[i] = (window / 2.0) * math.log(ratio)
 
     return out
 @njit(parallel=True, cache=True)

@@ -107,16 +107,15 @@ def new_rolling(lf, group_col):
 # ============================================================
 def old_argmax(df):
     window_len = 10
-    group_expr = pl.col("symbol")
     bits_linear = pl.col("epiplexity").forward_fill()
-    var_srl_resid = pl.col("srl_resid").rolling_var(window_size=window_len).over(group_expr).forward_fill()
-    var_price_change = pl.col("price_change").rolling_var(window_size=window_len).over(group_expr).forward_fill()
-    r2_srl = (1.0 - (var_srl_resid / (var_price_change + 1e-12))).clip(0.0, 0.9999)
-    bits_srl = (-(window_len / 2.0) * (1.0 - r2_srl).log() - 0.5 * math.log(window_len)).clip(0.0, 999.0)
     compactness = (4.0 * math.pi * pl.col("topo_area").abs()) / (pl.col("topo_energy")**2 + 1e-12)
     bits_topo = (compactness * math.log(window_len)).forward_fill().clip(0.0, 999.0)
-    df = df.with_columns([bits_linear.alias("bits_linear"), bits_srl.alias("bits_srl"), bits_topo.alias("bits_topology")])
-    dominant_probe = pl.concat_list(["bits_linear", "bits_srl", "bits_topology"]).list.arg_max() + 1
+    df = df.with_columns([bits_linear.alias("bits_linear"), bits_topo.alias("bits_topology")])
+    dominant_probe = (
+        pl.when(pl.concat_list(["bits_linear", "bits_topology"]).list.arg_max() == 1)
+        .then(pl.lit(3))
+        .otherwise(pl.lit(1))
+    )
     return df.with_columns(dominant_probe.alias("dominant_probe"))
 
 # ============================================================
@@ -124,25 +123,15 @@ def old_argmax(df):
 # ============================================================
 def new_argmax(df):
     window_len = 10
-    group_expr = pl.col("symbol")
     bits_linear = pl.col("epiplexity").forward_fill()
-    var_srl_resid = pl.col("srl_resid").rolling_var(window_size=window_len).over(group_expr).forward_fill()
-    var_price_change = pl.col("price_change").rolling_var(window_size=window_len).over(group_expr).forward_fill()
-    r2_srl = (1.0 - (var_srl_resid / (var_price_change + 1e-12))).clip(0.0, 0.9999)
-    bits_srl = (-(window_len / 2.0) * (1.0 - r2_srl).log() - 0.5 * math.log(window_len)).clip(0.0, 999.0)
     compactness = (4.0 * math.pi * pl.col("topo_area").abs()) / (pl.col("topo_energy")**2 + 1e-12)
     bits_topo = (compactness * math.log(window_len)).forward_fill().clip(0.0, 999.0)
-    df = df.with_columns([bits_linear.alias("bits_linear"), bits_srl.alias("bits_srl"), bits_topo.alias("bits_topology")])
+    df = df.with_columns([bits_linear.alias("bits_linear"), bits_topo.alias("bits_topology")])
     # Match concat_list().list.arg_max() null semantics by comparing
     # null/NaN-normalized values.
     bits_linear_cmp = pl.col("bits_linear").fill_null(float("-inf")).fill_nan(float("-inf"))
-    bits_srl_cmp = pl.col("bits_srl").fill_null(float("-inf")).fill_nan(float("-inf"))
     bits_topology_cmp = pl.col("bits_topology").fill_null(float("-inf")).fill_nan(float("-inf"))
-    dominant_probe = (
-        pl.when((bits_srl_cmp > bits_linear_cmp) & (bits_srl_cmp >= bits_topology_cmp)).then(pl.lit(2))
-        .when((bits_topology_cmp > bits_linear_cmp) & (bits_topology_cmp > bits_srl_cmp)).then(pl.lit(3))
-        .otherwise(pl.lit(1))
-    )
+    dominant_probe = pl.when(bits_topology_cmp > bits_linear_cmp).then(pl.lit(3)).otherwise(pl.lit(1))
     return df.with_columns(dominant_probe.alias("dominant_probe"))
 
 # ============================================================

@@ -230,14 +230,14 @@ python tools/compare_raw_manifests.py \
     - **Action:** Removed "SRL Race". Hardcoded $\delta = 0.5$.
     - **Implied Y:** We invert the law ($Y = \frac{\Delta P}{\sigma \sqrt{Q/D}}$) to measure the instantaneous "rigidity" of the market structure.
 
-2. **Epiplexity as Compression Gain (Finzi 2026)**
-    - **Principle:** Complexity is not randomness. Structure is defined by the ability of a bounded observer (Linear Model) to outperform a naive observer (Mean).
-    - **Metric:** $Gain = 1 - \frac{Var(Residuals)}{Var(Total)}$.
-    - **Action:** Replaced LZ76 with Compression Gain. High Gain = High Structure = Actionable Signal.
+2. **Epiplexity as Relative SRL Compression Gain (V64.2 Closure)**
+    - **Principle:** Structure is measured by how much SRL shrinks residual energy relative to raw price-change energy.
+    - **Metric:** the canonical runtime score is driven by the variance ratio $Var(\Delta P) / Var(R)$ with `Zero-variance -> zero signal`.
+    - **Action:** the live Stage 2 pipeline treats this SRL-relative compression gain as the only canonical `epiplexity`. Any legacy linear-probe helper is historical and must not drive runtime semantics.
 
 3. **The Holographic Damper**
-    - **Problem:** Updating internal state ($Y$) during noise (Low Epiplexity) causes model drift.
-    - **Solution:** A gating mechanism. The model only learns/updates when Epiplexity > Threshold.
+    - **Problem:** Updating internal state ($Y$) during compressed signal corrupts the baseline.
+    - **Solution:** update `Y` only in the Brownian baseline regime (`Q_topo < brownian_q_threshold` with OFI floor), and trigger the final signal gate separately with `epiplexity > signal_epi_threshold`.
     - **Metaphor:** A damper that stiffens when it hits a solid object (Structure) but remains loose in air (Noise).
 
 4. **Causal Volume Projection (Paradox 3 Fix)**
@@ -2251,7 +2251,7 @@ Only the final `"[ SYSTEM ARCHITECT ABSOLUTE OVERRIDE: THE BOURBAKI CLOSURE ]"` 
 4. Topology remains dimensionless:
    - `topo_energy_min` is the canonical lower bound.
    - Legacy `topo_energy_sigma_mult` is compatibility-only vocabulary and must not re-enter canonical config semantics.
-5. The Bourbaki closure uses `delta_k = 2.0` in the rolling MDL gain path to stay aligned with the scalar formulation.
+5. The Bourbaki closure uses a prequential MDL interpretation in the rolling gain path, so `Delta k = 0` and no extra complexity penalty is applied at runtime.
 
 ### Legacy Name -> Canonical Semantics
 

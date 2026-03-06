@@ -204,10 +204,8 @@ def _apply_recursive_physics(
         min_ofi_for_y=min_ofi_for_y,
     )
 
-    # Force residuals to 0 where singularity was detected
-    if "has_singularity" in frames.columns:
-        has_singularity_mask = _safe_bool_col("has_singularity")
-        out_srl_resid[has_singularity_mask] = 0.0
+    # V64.2 closure: singularity labels may gate activity, but must never rewrite
+    # the residual that feeds the compression score.
 
     # 4) True Compression Gain third
     from omega_core.omega_math_rolling import calc_srl_compression_gain_rolling
@@ -216,7 +214,6 @@ def _apply_recursive_physics(
         srl_residuals=out_srl_resid,
         window=window_len,
         dist_to_boundary=dist_to_boundary,
-        delta_k=2.0                            # [闭环] 统一常数
     )
     
     # Apply the activity mask without reintroducing any secondary threshold semantics.
@@ -303,47 +300,36 @@ def _apply_recursive_physics(
     if "symbol" in res_df.columns:
         group_expr = pl.col("symbol")
         
-        # 1. Epiplexity (线性压缩率：底层奇点已被释放)
+        # 1. Canonical V64.2 compression gain
         bits_linear = pl.col("epiplexity").forward_fill().over(group_expr)
 
-        # 2. Bits SRL (非线性压缩率：解除 0.9999 封印，允许逼近 1.0)
-        var_srl_resid = pl.col("srl_resid").rolling_var(window_size=window_len).over(group_expr).forward_fill().over(group_expr)
-        var_price_change = pl.col("price_change").rolling_var(window_size=window_len).over(group_expr).forward_fill().over(group_expr)
-        r2_srl = (1.0 - (var_srl_resid / (var_price_change + 1e-12))).clip(0.0, 1.0 - 1e-12)
-        bits_srl = (-(window_len / 2.0) * (1.0 - r2_srl).log() - 0.5 * math.log(window_len)).clip(lower_bound=0.0)
-
-        # 3. Bits Topology (高维拓扑：被折叠的空间)
+        # 2. Bits Topology (高维拓扑：被折叠的空间)
         compactness = (4.0 * math.pi * pl.col("topo_area").abs()) / (pl.col("topo_energy")**2 + 1e-12)
         bits_topo = (compactness * math.log(window_len)).forward_fill().over(group_expr).clip(lower_bound=0.0)
 
-        # 4. SRL Phase (主力算法单的微观破缺方向)
+        # 3. SRL Phase (主力算法单的微观破缺方向)
         srl_phase = pl.col("srl_resid").sign() * pl.col("srl_resid").abs().sqrt()
 
         res_df = res_df.with_columns([
             bits_linear.alias("bits_linear"),
-            bits_srl.alias("bits_srl"),
             bits_topo.alias("bits_topology"),
             srl_phase.alias("srl_phase")
         ])
-        
-        # -------------------------------------------------------------
-        # 🐺 [THE HOLY GRAIL]: 主力奇点向量 (Main Force Singularity Vector)
-        # 这就是你独狼狩猎的终极武器。
-        # 绝对压缩程度 (bits_linear + bits_srl + bits_topo) 赋予它巨大的杠铃“幅度”。
-        # SRL (srl_phase) 赋予它射击的“方向”。
-        # 散户行情下：压缩度趋近0，整个向量归于死寂。
-        # 主力入场时：压缩度呈指数爆发，伴随方向，模型给出必杀一击！
-        # -------------------------------------------------------------
+
+        bits_linear_cmp = pl.col("bits_linear").fill_null(float("-inf")).fill_nan(float("-inf"))
+        bits_topology_cmp = pl.col("bits_topology").fill_null(float("-inf")).fill_nan(float("-inf"))
+
         main_force_singularity = (
             pl.col("bits_linear").fill_null(0.0) + 
-            pl.col("bits_srl").fill_null(0.0) + 
             pl.col("bits_topology").fill_null(0.0)
         ) * pl.col("srl_phase")
         
         res_df = res_df.with_columns([
             main_force_singularity.alias("singularity_vector"),
-            # 兼容系统后续管线
-            pl.lit(1).alias("dominant_probe") 
+            pl.when(bits_topology_cmp > bits_linear_cmp)
+            .then(pl.lit(3))
+            .otherwise(pl.lit(1))
+            .alias("dominant_probe"),
         ])
         
     return res_df

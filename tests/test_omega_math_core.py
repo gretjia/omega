@@ -17,7 +17,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from config import L2EpiplexityConfig, L2SRLConfig, L2TopoSNRConfig, L2TopologyRaceConfig
 from omega_core.omega_math_core import (
     calc_compression_gain,
-    calc_epiplexity,
+    calc_linear_probe_compression_gain,
     calc_srl_state,
     calc_topology_area,
     calc_holographic_topology,
@@ -26,7 +26,7 @@ from omega_core.omega_math_core import (
 
 
 class TestCompressionGain(unittest.TestCase):
-    """Tests for calc_compression_gain (Epiplexity / MDL Gain)."""
+    """Tests for the legacy linear-probe compression helper."""
 
     def setUp(self):
         self.cfg = L2EpiplexityConfig()
@@ -34,7 +34,7 @@ class TestCompressionGain(unittest.TestCase):
     def test_pure_linear_trend_has_high_gain(self):
         """A perfectly linear sequence has maximum compressibility."""
         trace = [float(i) for i in range(50)]
-        gain = calc_compression_gain(trace, self.cfg)
+        gain = calc_linear_probe_compression_gain(trace, self.cfg)
         # Linear = perfect R², so MDL gain should be very high
         self.assertGreater(gain, 10.0)
 
@@ -42,25 +42,25 @@ class TestCompressionGain(unittest.TestCase):
         """Random noise should yield near-zero gain."""
         np.random.seed(42)
         trace = np.random.randn(100).tolist()
-        gain = calc_compression_gain(trace, self.cfg)
+        gain = calc_linear_probe_compression_gain(trace, self.cfg)
         # Noise has no linear structure, MDL gain should be low
         self.assertLessEqual(gain, 5.0)
 
     def test_constant_trace_returns_zero(self):
         """Zero-variance (constant) trace returns 0.0."""
         trace = [5.0] * 50
-        gain = calc_compression_gain(trace, self.cfg)
+        gain = calc_linear_probe_compression_gain(trace, self.cfg)
         self.assertEqual(gain, 0.0)
 
     def test_short_trace_returns_fallback(self):
         """Trace shorter than min_trace_len returns fallback value."""
         trace = [1.0, 2.0, 3.0]  # Only 3 points, default min=10
-        gain = calc_compression_gain(trace, self.cfg)
+        gain = calc_linear_probe_compression_gain(trace, self.cfg)
         self.assertEqual(gain, float(self.cfg.fallback_value))
 
     def test_empty_trace_returns_fallback(self):
         """Empty trace returns fallback."""
-        gain = calc_compression_gain([], self.cfg)
+        gain = calc_linear_probe_compression_gain([], self.cfg)
         self.assertEqual(gain, float(self.cfg.fallback_value))
 
     def test_gain_is_non_negative(self):
@@ -68,7 +68,7 @@ class TestCompressionGain(unittest.TestCase):
         for seed in range(10):
             np.random.seed(seed)
             trace = np.random.randn(50).tolist()
-            gain = calc_compression_gain(trace, self.cfg)
+            gain = calc_linear_probe_compression_gain(trace, self.cfg)
             self.assertGreaterEqual(gain, 0.0)
 
     def test_gain_increases_with_structure(self):
@@ -79,7 +79,7 @@ class TestCompressionGain(unittest.TestCase):
         gains = []
         for snr in [0.0, 0.5, 1.0, 5.0]:
             trace = (snr * np.arange(50) + noise).tolist()
-            gains.append(calc_compression_gain(trace, self.cfg))
+            gains.append(calc_linear_probe_compression_gain(trace, self.cfg))
         # Gains should be generally non-decreasing with SNR
         self.assertGreater(gains[-1], gains[0])
 

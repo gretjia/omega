@@ -1,23 +1,23 @@
 # OMEGA Active Mission Charter
 
-Status: Completed
-Task Name: V64 Bourbaki Closure Repo Alignment
+Status: Active
+Task Name: V64.2 Closure Finalization, Smoke Validation, and Release
 Owner: Human Owner
 Commander: Codex
 Date: 2026-03-06
 
 ## 1. Objective
 
-- Align the V64 codebase to the final Bourbaki Closure specification, starting from Stage 2.
-- Propagate the closure from Stage 2 through runtime glue, Stage 3, config, documentation, training, and backtest consumers.
-- Prepare the repository for PLAN -> CODING -> dual-audit execution under the permanent OMEGA Multi-Agent OS.
+- Finalize the V64.2 closure path after the post-launch auditor findings and architect override.
+- Keep Stage 2 as the execution starting boundary, but do not launch a new full Stage 2 run in this mission.
+- Pass dual audit, rerun the full V64 smoke chain (`Stage 2 -> Stage 3 -> base matrix -> training -> backtest`), then release by `commit + push` and post-push auditor review.
 
 ## 2. Canonical Spec
 
 Primary task-level implementation authority:
 
-- path: `audit/v64.md`
-- exact section or commit: `[ SYSTEM ARCHITECT ABSOLUTE OVERRIDE: THE BOURBAKI CLOSURE ]`
+- path: `audit/v642.md`
+- exact section or commit: latest `[ SYSTEM ARCHITECT ABSOLUTE OVERRIDE: THE BOURBAKI CLOSURE ]`
 
 Higher-order constraints:
 
