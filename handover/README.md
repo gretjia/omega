@@ -114,6 +114,8 @@ OMEGA now separates permanent governance from task-specific execution.
 | Mission charter template | `handover/ops/MISSION_CHARTER_TEMPLATE.md` |
 | Live runtime state | `handover/ai-direct/LATEST.md` |
 | Session history (40+ entries) | `handover/ai-direct/entries/` |
+| V64 audit evolution canon | `audit/v64_audit_evolution.md` |
+| Audit index | `audit/README.md` |
 | Debug lessons (searchable) | `handover/DEBUG_LESSONS.md` |
 | Costly mistakes ($43 ledger) | `handover/COSTLY_LESSONS.md` |
 | Network topology | `handover/ops/HOSTS_REGISTRY.yaml` |
@@ -203,6 +205,18 @@ Workers are on **isolated LANs** — no internet, no GitHub access.
 | `ai_handover` | Session handover protocol |
 
 Read skill details: `.agent/skills/{name}/SKILL.md`
+
+## 10. Audit Canon
+
+For V64 specifically, the fastest reliable way to reconstruct the math and audit history is:
+
+1. `audit/v64_audit_evolution.md`
+2. `audit/v64.md`
+3. `audit/v642.md`
+4. `audit/v643.md`
+5. `audit/v643_auditor_pass.md`
+
+Use `audit/v64_audit_evolution.md` as the narrative overview, then drill into the versioned audit files for the raw source text.
 
 ---
 
