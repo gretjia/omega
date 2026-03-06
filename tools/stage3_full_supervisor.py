@@ -21,6 +21,10 @@ import sys
 import time
 from typing import Any, Dict
 
+REPO_ROOT = pathlib.Path(__file__).resolve().parent.parent
+if str(REPO_ROOT) not in sys.path:
+    sys.path.append(str(REPO_ROOT))
+
 from configs.node_paths import get_node_config
 
 

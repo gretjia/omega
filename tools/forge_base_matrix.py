@@ -29,6 +29,10 @@ import numpy as np
 import polars as pl
 import os
 
+REPO_ROOT = Path(__file__).resolve().parent.parent
+if str(REPO_ROOT) not in sys.path:
+    sys.path.append(str(REPO_ROOT))
+
 from configs.node_paths import get_node_config
 
 # [V64 统御指令] 强制收缴所有底层库的并发生成权，防止 128G 节点发生线程踩踏死锁
@@ -45,10 +49,6 @@ except Exception:
     pa = None
     pc = None
     pq = None
-
-REPO_ROOT = Path(__file__).resolve().parent.parent
-if str(REPO_ROOT) not in sys.path:
-    sys.path.append(str(REPO_ROOT))
 
 from config import load_l2_pipeline_config
 from config_v6 import FEATURE_COLS
