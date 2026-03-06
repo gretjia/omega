@@ -32,10 +32,12 @@ def pad_traces(traces: List[Sequence[float]], max_len: int = None) -> tuple[np.n
 
 def calc_epiplexity_vectorized(traces: List[Sequence[float]], min_len: int = 10, fallback: float = 0.0) -> np.ndarray:
     """
-    Vectorized Compression Gain (Epiplexity).
-    G = 1 - Var(Resid) / Var(Total) = R^2 of Linear Fit.
-    
-    Computes R^2 for N traces simultaneously.
+    Legacy vectorized linear-probe compression helper.
+
+    This function is not the canonical runtime `epiplexity` path. It remains
+    only for historical/offline helper usage and, under V64.3 Bourbaki
+    Completion, must not retain the old hardcoded two-parameter complexity
+    penalty.
     """
     n = len(traces)
     if n == 0: return np.array([])
@@ -106,12 +108,10 @@ def calc_epiplexity_vectorized(traces: List[Sequence[float]], min_len: int = 10,
     is_computable = valid_mask & (denom > 1e-12)
     out[is_computable] = r2[is_computable]
     
-    # V62 Upgrade: Time-Bounded Minimum Description Length (MDL) Gain
     R_squared = np.clip(out, 0.0, 0.9999)
-    delta_k = 2.0
     
     with np.errstate(divide='ignore', invalid='ignore'):
-        mdl_gain = -(safe_cnt / 2.0) * np.log(1.0 - R_squared) - (delta_k / 2.0) * np.log(safe_cnt)
+        mdl_gain = -(safe_cnt / 2.0) * np.log(1.0 - R_squared)
         
     out_mdl = np.full(n, fallback, dtype=np.float64)
     is_mdl_valid = valid_mask & (safe_cnt >= 3)

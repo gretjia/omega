@@ -3,7 +3,7 @@
 - generated_by: `python3 .codex/skills/multi-agent-ops/scripts/deploy_and_check.py`
 - source_of_truth: `handover/ai-direct/entries/*.md` and `handover/DEBUG_LESSONS.md`
 - index_layer: `handover/index/memory_index.jsonl` and `handover/index/memory_index.sqlite3` (derived read-only)
-- indexed_records: 59
+- indexed_records: 104
 - recall_top_k: 5
 - query_task_id: TASK-20260222-V62-DUAL-STAGE1-RELAUNCH-MONITOR
 - query_keywords: linux, windows, monitoring, stage1, stage2, execution, omega_vnext, users, work, zephryj, command, early, path, workers, active, additional, auditor, count

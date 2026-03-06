@@ -230,7 +230,7 @@ python tools/compare_raw_manifests.py \
     - **Action:** Removed "SRL Race". Hardcoded $\delta = 0.5$.
     - **Implied Y:** We invert the law ($Y = \frac{\Delta P}{\sigma \sqrt{Q/D}}$) to measure the instantaneous "rigidity" of the market structure.
 
-2. **Epiplexity as Relative SRL Compression Gain (V64.2 Closure)**
+2. **Epiplexity as Relative SRL Compression Gain (V64.3 Bourbaki Completion)**
     - **Principle:** Structure is measured by how much SRL shrinks residual energy relative to raw price-change energy.
     - **Metric:** the canonical runtime score is driven by the variance ratio $Var(\Delta P) / Var(R)$ with `Zero-variance -> zero signal`.
     - **Action:** the live Stage 2 pipeline treats this SRL-relative compression gain as the only canonical `epiplexity`. Any legacy linear-probe helper is historical and must not drive runtime semantics.
@@ -278,8 +278,8 @@ graph TD
   - `adapters/`: Glue code that binds `omega_core` to the pipeline.
   - `engine/`: The logic for Framing, Training, and Backtesting.
 - **`omega_core/`**: **The Math Core.**
-  - `omega_math_core.py`: Pure physics formulas (SRL 0.5, Compression Gain).
-  - `kernel.py`: The Holographic Damper logic.
+  - `omega_math_core.py`: Pure physics formulas (SRL 0.5, plus historical scalar helpers that are not the canonical runtime `epiplexity`).
+  - `kernel.py`: The Holographic Damper logic and the single canonical compression path.
   - `trainer.py`: SGD Online Learning implementation (Multi-Symbol Aware).
 - **`configs/`**: **Configuration as Code.**
   - `hardware/`: Hardware profiles (e.g., `active_profile.yaml`).
@@ -2232,9 +2232,9 @@ ssh windows1-w1 "hostname && whoami"
 - **`tools/submit_vertex_sweep.py`**
 - *(`archive/tools/`: 包含与 V62 无关的历史遗留代码和日志，请勿在此处寻找最新实现)*
 
-## V64.1 Bourbaki Closure (Authoritative)
+## V64.3 Bourbaki Completion (Authoritative)
 
-Only the final `"[ SYSTEM ARCHITECT ABSOLUTE OVERRIDE: THE BOURBAKI CLOSURE ]"` section in `audit/v64.md` is binding. Earlier sections remain useful as context and motivation, but they are not the implementation source of truth.
+Only the final `"[ SYSTEM ARCHITECT FINAL OVERRIDE: THE BOURBAKI COMPLETION ]"` section in `audit/v643.md` is binding. Earlier sections in `audit/v64.md` and `audit/v642.md` remain useful as context and motivation, but they are not the implementation source of truth for the live repo.
 
 ### Closure Rules
 
@@ -2252,6 +2252,9 @@ Only the final `"[ SYSTEM ARCHITECT ABSOLUTE OVERRIDE: THE BOURBAKI CLOSURE ]"` 
    - `topo_energy_min` is the canonical lower bound.
    - Legacy `topo_energy_sigma_mult` is compatibility-only vocabulary and must not re-enter canonical config semantics.
 5. The Bourbaki closure uses a prequential MDL interpretation in the rolling gain path, so `Delta k = 0` and no extra complexity penalty is applied at runtime.
+6. `dominant_probe` is a compatibility placeholder only.
+   - It must stay pinned to `1`.
+   - No second SRL compression branch or argmax-based probe competition is permitted in the canonical runtime path.
 
 ### Legacy Name -> Canonical Semantics
 

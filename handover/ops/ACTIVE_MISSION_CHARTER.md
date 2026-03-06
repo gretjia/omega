@@ -1,14 +1,14 @@
 # OMEGA Active Mission Charter
 
 Status: Active
-Task Name: V64.2 Closure Finalization, Smoke Validation, and Release
+Task Name: V64.3 Bourbaki Completion, Dual Audit, Smoke Validation, and Release
 Owner: Human Owner
 Commander: Codex
 Date: 2026-03-06
 
 ## 1. Objective
 
-- Finalize the V64.2 closure path after the post-launch auditor findings and architect override.
+- Finalize the V64.3 closure path after the latest auditor findings and the Bourbaki Completion override.
 - Keep Stage 2 as the execution starting boundary, but do not launch a new full Stage 2 run in this mission.
 - Pass dual audit, rerun the full V64 smoke chain (`Stage 2 -> Stage 3 -> base matrix -> training -> backtest`), then release by `commit + push` and post-push auditor review.
 
@@ -16,8 +16,8 @@ Date: 2026-03-06
 
 Primary task-level implementation authority:
 
-- path: `audit/v642.md`
-- exact section or commit: latest `[ SYSTEM ARCHITECT ABSOLUTE OVERRIDE: THE BOURBAKI CLOSURE ]`
+- path: `audit/v643.md`
+- exact section or commit: latest `[ SYSTEM ARCHITECT FINAL OVERRIDE: THE BOURBAKI COMPLETION ]`
 
 Higher-order constraints:
 
@@ -27,7 +27,7 @@ Higher-order constraints:
 
 Conflict rule:
 
-- Earlier sections of `audit/v64.md` are context only. If they conflict with the Bourbaki Closure section, the Bourbaki Closure section wins.
+- Earlier sections of `audit/v64.md` and `audit/v642.md` are context only. If they conflict with the Bourbaki Completion section, the Bourbaki Completion section wins.
 - If the task-level spec conflicts with `OMEGA_CONSTITUTION.md`, escalate to the Commander.
 
 ## 3. Business Goal
@@ -91,6 +91,7 @@ Runtime audit:
 - Respect `handover/ai-direct/LATEST.md` before touching any live runtime path.
 - Do not interrupt active long-running jobs unless the mission is explicitly escalated and reopened.
 - Treat Stage 2 as the execution starting boundary for this mission; Stage 1 is out of scope.
+- Owner-approved exception for this mission: the pre-release full smoke may run on an isolated remote smoke workspace before `commit + push`, because it is validation-only and does not mutate or authorize any live worker repo state.
 - Prefer machine-level parallelism and bounded threading over Python `multiprocessing` fan-out.
 - Use `linux1-lx` for long-lived pipeline / matrix / backtest workloads unless a mission-specific manifest says otherwise.
 - Use `windows1-w1` only for disjoint workloads with isolated outputs and explicit handoff boundaries.
@@ -99,15 +100,15 @@ Runtime audit:
 
 The mission passes only when all are true:
 
-1. `omega_core/omega_math_rolling.py` uses the Bourbaki Closure MDL gain based on `Var(ΔP) / Var(R)`, with `Zero-variance -> zero signal` and no `999.0` pseudo-singularity in the MDL compression-gain path.
-2. `omega_core/kernel.py` separates `signal_epi_threshold`, `brownian_q_threshold`, and `topo_energy_min`, removes the topology override path that breaks geometry homology, and retains `topo_area_min_abs` plus `srl_resid_sigma_mult` in the final `is_signal` gate.
+1. `omega_core/omega_math_rolling.py` uses the Bourbaki Completion MDL gain based on `Var(ΔP) / Var(R)`, with `Zero-variance -> zero signal`, no `999.0` pseudo-singularity, and no `delta_k` parameter.
+2. `omega_core/kernel.py` separates `signal_epi_threshold`, `brownian_q_threshold`, and `topo_energy_min`, removes the topology override path that breaks geometry homology, never rewrites `srl_resid` from `has_singularity`, and retains `topo_area_min_abs` plus `srl_resid_sigma_mult` in the final `is_signal` gate.
 3. Stage 2 entrypoints and outputs remain operationally stable without disrupting currently running live jobs.
-4. `config.py` and repo-facing docs expose the new semantics and do not reintroduce deprecated configuration meanings into Stage 2 code paths.
+4. `config.py` and repo-facing docs expose the new semantics and do not reintroduce deprecated LZ/SAX compression meanings into Stage 2 code paths.
 5. Legacy parameter aliases, if retained, are constrained to Stage 3 CLIs and trainer evaluation helpers; canonical names remain the only source of truth for config and runtime semantics.
 6. Downstream consumers (`stage3_full_supervisor`, `trainer`, `forge_base_matrix`, Vertex training path) preserve the V64.1 in-memory reconstruction path and do not regress to stale V64 gate semantics.
 7. Stage 3 training and local backtest operate on explicitly disjoint data windows or equivalent by-construction isolation, rather than implicitly sharing the same Stage 2 corpus.
 8. Artifact naming and training provenance remain consistent across Vertex training, local model loading, and handover records.
-9. Regression coverage exists for the closure-specific hard bugs described by the architect.
+9. Regression coverage exists for the closure-specific hard bugs described by the architect, including `delta_k` removal, residual non-overwrite, and the single-compression rule.
 10. Math audit passes.
 11. Runtime audit passes.
 12. Commander-only integration, handover, commit, and push gates remain intact.

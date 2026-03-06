@@ -26,6 +26,11 @@ def calc_linear_probe_compression_gain(trace: Sequence[float], cfg: L2Epiplexity
     This helper is not the canonical V64 runtime `epiplexity` metric. The live
     Stage 2 pipeline now defines epiplexity through the SRL relative compression
     gain in `omega_math_rolling.calc_srl_compression_gain_rolling`.
+
+    V64.3 Bourbaki Completion note:
+    even this historical helper must not carry the old hardcoded two-parameter
+    complexity penalty. The repo-wide ghost-parameter purge keeps all
+    compression helpers free of that legacy surcharge.
     """
     arr = np.asarray(trace, dtype=float)
     n = arr.size
@@ -69,15 +74,11 @@ def calc_linear_probe_compression_gain(trace: Sequence[float], cfg: L2Epiplexity
     ratio = var_resid / var_total
     R_squared = float(np.clip(1.0 - ratio, 0.0, 0.9999))
     
-    # V62 Upgrade: Time-Bounded Minimum Description Length (MDL) Gain
-    # delta_k = 2 for linear probe (slope, intercept)
-    delta_k = 2.0
-    
     # Turing Discipline: Require enough degrees of freedom
     if n < 3:
         return 0.0
         
-    mdl_gain_bits = -(n / 2.0) * np.log(1.0 - R_squared) - (delta_k / 2.0) * np.log(n)
+    mdl_gain_bits = -(n / 2.0) * np.log(1.0 - R_squared)
     
     # Turing Discipline: If the model costs more bits to describe than the raw data itself, it is pure noise.
     if mdl_gain_bits <= 0:

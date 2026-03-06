@@ -15,7 +15,7 @@ from omega_core.omega_math_rolling import (
 )
 
 
-def _make_kernel_frames(n: int = 16) -> pl.DataFrame:
+def _make_kernel_frames(n: int = 128) -> pl.DataFrame:
     rows = []
     for i in range(n):
         open_px = 10.0 + 0.03 * i
@@ -110,6 +110,44 @@ def test_flaw4_dimensional_consistency():
     )
 
 
+def test_flaw5_prequential_mdl_delta_k_zero():
+    """Audit lock 5: repo-wide ghost delta_k must be eradicated."""
+    import inspect
+
+    sig = inspect.signature(calc_srl_compression_gain_rolling)
+    assert "delta_k" not in sig.parameters, (
+        "Hard Bug 5 Failed: Ghost parameter delta_k is still alive!"
+    )
+
+    for path in [
+        "omega_core/omega_math_core.py",
+        "omega_core/omega_math_vectorized.py",
+    ]:
+        with open(path, "r", encoding="utf-8") as f:
+            content = f.read()
+        assert "delta_k = 2.0" not in content, (
+            f"Hard Bug 5 Failed: repo-wide ghost delta_k survived in {path}!"
+        )
+
+
+def test_flaw6_no_srl_resid_overwrite():
+    """Audit lock 6: has_singularity must never manually overwrite SRL residuals."""
+    with open("omega_core/kernel.py", "r", encoding="utf-8") as f:
+        content = f.read()
+    assert "out_srl_resid[has_singularity_mask] = 0.0" not in content, (
+        "Hard Bug 6 Failed: srl_resid is being manually overridden by singularity mask!"
+    )
+
+
+def test_flaw7_single_compression_semantic():
+    """Audit lock 7: kernel must not carry a second compression branch."""
+    with open("omega_core/kernel.py", "r", encoding="utf-8") as f:
+        content = f.read()
+    assert "bits_srl =" not in content and "var_srl_resid / var_price_change" not in content, (
+        "Hard Bug 7 Failed: schizophrenic second compression branch bits_srl detected!"
+    )
+
+
 def test_kernel_keeps_singularity_residual_observable():
     """Kernel must never rewrite SRL residuals to zero just because a row is tagged singular."""
     cfg = load_l2_pipeline_config()
@@ -156,6 +194,9 @@ def test_kernel_removes_bits_srl_double_counting():
     result = apply_recursive_physics(_make_kernel_frames(), cfg)
 
     assert "bits_srl" not in result.columns, "bits_srl should not survive as a second compression definition."
+    assert set(result.get_column("dominant_probe").drop_nulls().unique().to_list()) <= {1}, (
+        "dominant_probe must remain a compatibility placeholder pinned to 1."
+    )
 
     bits_linear = result.get_column("bits_linear").fill_null(0.0).fill_nan(0.0).to_numpy()
     bits_topology = result.get_column("bits_topology").fill_null(0.0).fill_nan(0.0).to_numpy()

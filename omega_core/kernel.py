@@ -21,11 +21,6 @@ from omega_core.omega_etl import build_l2_features_from_l1, scan_l2_quotes
 from omega_core.omega_math_core import (
     calc_srl_state,
 )
-from omega_core.omega_math_vectorized import (
-    calc_epiplexity_vectorized,
-    calc_topology_area_vectorized,
-    calc_holographic_topology_vectorized
-)
 
 def _apply_recursive_physics(
     frames: pl.DataFrame,
@@ -294,14 +289,14 @@ def _apply_recursive_physics(
         (pl.col("srl_resid").sign()).alias("direction"),
     ])
 
-    # === V64 EXTREMISTAN ARENA: 三位一体大融合 (The Epistemic Trinity) ===
-    # 彻底贯彻核心洞察：Topology (空间折叠) + Epiplexity (信息压缩) + SRL (动量矢量) 
+    # === V64.3 BOURBAKI COMPLETION: 单一压缩语义收敛 ===
+    # 系统只保留唯一正统的 canonical epiplexity，并将 dominant_probe 降级为兼容占位符。
     
     if "symbol" in res_df.columns:
         group_expr = pl.col("symbol")
         
-        # 1. Canonical V64.2 compression gain
-        bits_linear = pl.col("epiplexity").forward_fill().over(group_expr)
+        # 1. Canonical prequential compression gain
+        canonical_epi = pl.col("epiplexity").forward_fill().over(group_expr)
 
         # 2. Bits Topology (高维拓扑：被折叠的空间)
         compactness = (4.0 * math.pi * pl.col("topo_area").abs()) / (pl.col("topo_energy")**2 + 1e-12)
@@ -310,26 +305,17 @@ def _apply_recursive_physics(
         # 3. SRL Phase (主力算法单的微观破缺方向)
         srl_phase = pl.col("srl_resid").sign() * pl.col("srl_resid").abs().sqrt()
 
-        res_df = res_df.with_columns([
-            bits_linear.alias("bits_linear"),
-            bits_topo.alias("bits_topology"),
-            srl_phase.alias("srl_phase")
-        ])
-
-        bits_linear_cmp = pl.col("bits_linear").fill_null(float("-inf")).fill_nan(float("-inf"))
-        bits_topology_cmp = pl.col("bits_topology").fill_null(float("-inf")).fill_nan(float("-inf"))
-
         main_force_singularity = (
-            pl.col("bits_linear").fill_null(0.0) + 
-            pl.col("bits_topology").fill_null(0.0)
-        ) * pl.col("srl_phase")
+            canonical_epi.fill_null(0.0) + 
+            bits_topo.fill_null(0.0)
+        ) * srl_phase
         
         res_df = res_df.with_columns([
+            canonical_epi.alias("bits_linear"),
+            bits_topo.alias("bits_topology"),
+            srl_phase.alias("srl_phase"),
             main_force_singularity.alias("singularity_vector"),
-            pl.when(bits_topology_cmp > bits_linear_cmp)
-            .then(pl.lit(3))
-            .otherwise(pl.lit(1))
-            .alias("dominant_probe"),
+            pl.lit(1).alias("dominant_probe"),
         ])
         
     return res_df

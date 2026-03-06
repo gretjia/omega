@@ -250,3 +250,57 @@ Write only reproducible, technical lessons.
 - fix: Fall back to native, kernel-space OS protocols on the pure physical LAN IP (`192.168.3.x`). Created a Windows SMB Share for the `D:\` drive and mounted it on Linux via `cifs-utils` to `/mnt/windows_d`. Then utilized `rsync -av --inplace` to perform a direct block-level copy.
 - guardrail: NEVER use `python -m http.server` for transferring production Parquet databases across nodes. Always use `rsync` over natively mounted SMB (`cifs`) or NFS shares over the physical `192.168.x.x` LAN IPs to saturate the 2.5G bandwidth. See `tools/sync_l1_smb.sh` for the codified standard.
 
+## 2026-03-06T11:42:11Z | V64.3 Mission Spec Confirmation Gate
+- task_id: TASK-20260306-V643-SPEC-GATE
+- git_hash: 1530968+working-tree
+- role: debug_scribe
+- model_profile: codex_commander
+- symptom: V64.3 patch drafting began before the Owner had explicitly confirmed the mission spec.
+- root_cause: The Commander skipped the mission-charter confirmation gate under time pressure and treated an inferred spec as executable authority.
+- fix: Freeze execution immediately when this happens, mark the patch as draft-only, present a formal mission spec, and resume only after explicit Owner confirmation.
+- guardrail: No coding, audit, or smoke may start on a new task-level override until the Owner confirms the canonical spec, workflow gates, and release conditions in writing.
+- refs: `audit/v643.md`, `handover/ops/ACTIVE_MISSION_CHARTER.md`, `handover/ops/MULTI_AGENT_OPERATING_SYSTEM.md`
+
+## 2026-03-06T11:42:11Z | README Must Be Commander-Owned and Post-Code-Audit
+- task_id: TASK-20260306-V643-README-GOVERNANCE
+- git_hash: 1530968+working-tree
+- role: debug_scribe
+- model_profile: codex_commander
+- symptom: Repeated audits flagged README drift even when the underlying code path was already close to correct.
+- root_cause: High-level repo docs were treated as trailing cleanup and were allowed to move too early or too casually in the implementation cycle.
+- fix: Reclassify `README.md` and `omega_core/README.md` as Commander-owned governance files. Normalize them only after code audit passes, then run final double audit on the normalized docs plus code/config/tests.
+- guardrail: Do not delegate high-level README updates to ordinary coder agents. Treat README normalization as a dedicated gate between code audit and final double audit.
+- refs: `README.md`, `omega_core/README.md`, `handover/ops/MULTI_AGENT_OPERATING_SYSTEM.md`
+
+## 2026-03-06T11:42:11Z | Repo-Wide Purge Locks Must Cover Literal Surfaces
+- task_id: TASK-20260306-V643-LITERAL-PURGE
+- git_hash: 1530968+working-tree
+- role: debug_scribe
+- model_profile: codex_commander
+- symptom: Repo-wide closure still failed after executable `delta_k` logic was removed because the prohibited literal survived in helper docstrings/comments and the string-scan test still caught it.
+- root_cause: The remediation treated the audit target as executable code only, while the actual audit lock was repo-wide and content-based.
+- fix: When a closure rule is phrased as a repo-wide purge, remove the forbidden construct from both executable formulas and literal surfaces, or narrow the audit lock so its scope is explicit.
+- guardrail: For repo-wide semantic purges, inspect runtime code, helper code, comments, docstrings, and string-scan tests together. Do not assume “runtime fixed” implies “repo fixed.”
+- refs: `omega_core/omega_math_core.py`, `omega_core/omega_math_vectorized.py`, `tests/test_v64_absolute_closure.py`
+
+## 2026-03-06T11:42:11Z | Controller May Lack Runtime Dependencies
+- task_id: TASK-20260306-V643-RUNTIME-SPLIT
+- git_hash: 1530968+working-tree
+- role: debug_scribe
+- model_profile: codex_commander
+- symptom: Controller-side validation failed immediately because local `python3` did not provide `numpy`, `polars`, or `pytest`.
+- root_cause: The controller machine is a governance/editing surface, not a guaranteed runtime environment.
+- fix: Route real validation to a prepared runtime node and use an explicit dependency harness (`uv run`) in a dedicated remote smoke workspace synced from the current controller tree.
+- guardrail: Check the dependency surface before planning validation. If the controller lacks the scientific stack, move tests/smoke to the prepared node early instead of burning cycles on local failures.
+- refs: `handover/ai-direct/LATEST.md`, `handover/ai-direct/entries/20260306_094148_v642_dual_audit_and_full_smoke_pass.md`
+
+## 2026-03-06T11:42:11Z | LATEST Must Distinguish Historical Smoke from Active Release Evidence
+- task_id: TASK-20260306-V643-HANDOVER-AUTHORITY
+- git_hash: 1530968+working-tree
+- role: debug_scribe
+- model_profile: codex_commander
+- symptom: Runtime audit flagged that the repo had moved to V64.3 while `LATEST.md` still narrated V64.2 smoke as the active authority surface.
+- root_cause: Handover was treated as trailing narrative instead of a live operational contract tied to the current patch set.
+- fix: The moment the mission-level canonical spec changes, update `LATEST.md` to mark prior smoke evidence as historical only and state the current release gate explicitly.
+- guardrail: `LATEST.md` is not a diary. It must always tell the next agent which version is active, which smoke evidence is historical, and what gate remains before release.
+- refs: `handover/ai-direct/LATEST.md`, `audit/v643.md`

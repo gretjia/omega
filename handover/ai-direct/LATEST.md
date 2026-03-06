@@ -1,10 +1,10 @@
 # LATEST (Authoritative Multi-Agent Snapshot)
 
 > 🚨 **[CRITICAL SYSTEM OVERRIDE - AGENT WAKE-UP DIRECTIVE]** 🚨
-> **V64.1 "Bourbaki Synthesis" Hotfix is LIVE in the codebase!**
+> **V64.3 "Bourbaki Completion" patch set is the active release candidate in the local repo!**
 > If you are a new AI agent waking up to execute Stage 3 (Base Matrix), Training, or Backtesting, your **IMMEDIATE FIRST ACTION MUST BE to verify code freshness through the controller-managed deploy path**. Use `tools/deploy.py` from the controller, then verify the target worker state through the deploy workflow. **Workers never run `git pull`.**
-> The physical L2 parquet files on disk contain the V64.0 (flawed) `is_signal` column. The Python code in `main` contains a hotfix that dynamically patches this column in-memory using absolute mathematical closure. **DO NOT run downstream stages until the deployed code state is confirmed on the target node.**
-> If you invoke Stage 3 outside the supervisor, you must preserve the V64.1 in-memory hotfix gates exactly (`signal_epi_threshold`, `srl_resid_sigma_mult`, `topo_area_min_abs`, `topo_energy_min`) or call the canonical forge/training entrypoints as scripted.
+> The physical L2 parquet files on disk may still contain older `is_signal` semantics from pre-v64.3 runs. The active Python code reconstructs the canonical gate in-memory. **DO NOT run downstream stages until the deployed code state is confirmed on the target node.**
+> If you invoke Stage 3 outside the supervisor, you must preserve the canonical in-memory gates exactly (`signal_epi_threshold`, `srl_resid_sigma_mult`, `topo_area_min_abs`, `topo_energy_min`) or call the canonical forge/training entrypoints as scripted.
 
 This file is the single source of current operational truth for all agents.
 
@@ -18,9 +18,9 @@ This file is the single source of current operational truth for all agents.
 ---
 
 ## 1. Project Phase
-**Current Macro Status: V64 STAGE 2 FULL RUN ⏸️ PAUSED FOR AUDIT FINDINGS**
+**Current Macro Status: V64.3 RELEASE CANDIDATE - DUAL AUDIT PASSED, FULL SMOKE PENDING**
 
-The repo-alignment mission is complete. The active mission is now `V64.2 Closure Finalization, Smoke Validation, and Release`. The full `Stage 2` build remains blocked pending dual-audit completion, smoke-only validation, and release sign-off. The legacy `epiplexity` path remains superseded by `singularity_vector`, and downstream stages must still preserve the V64.1 in-memory closure gates.
+The repo-alignment mission is complete. The active mission is now `V64.3 Bourbaki Completion, Dual Audit, Smoke Validation, and Release`. Dual audit is complete. The remaining gate is a fresh full smoke chain on the V64.3 code state, followed by `commit + push` and post-push auditor review. No new full `Stage 2` launch is authorized in this mission.
 
 ---
 
@@ -41,16 +41,16 @@ The repo-alignment mission is complete. The active mission is now `V64.2 Closure
 *(What the next agent should do immediately upon waking up)*
 
 1. **Do not resume Stage 2 yet:**
-   - The mission is in v64.2 fix-and-verify mode after the architect and auditor overrides.
+   - The mission is in v64.3 smoke-and-release mode after the architect and auditor overrides.
    - Do not launch a new full run in this session.
 2. **Treat the previous `stage2_full_20260306` run as historical, not resumable:**
    - The old run roots and ledgers were intentionally deleted cleanly on controller, Linux, and Windows by Owner request.
    - Any future full Stage 2 run must start from a fresh manifest and fresh output roots after the current code path is signed off.
 3. **Current gate order is fixed:**
-   - finish v64.2 code triage
-   - pass dual audit
+   - keep the v64.3 patch set as the current candidate
    - rerun the full v64 smoke chain from `Stage 2 -> Stage 3 -> base matrix -> training -> backtest`
-   - only then consider `git commit + push`
+   - only then `git commit + push`
+   - then send the pushed tree for post-push auditor review
 4. **Do not relaunch Stage 2 after smoke in this mission:**
    - The Owner explicitly requested smoke-only validation after dual audit.
    - A future run decision is separate and must start from a clean launch plan.
@@ -59,7 +59,7 @@ The repo-alignment mission is complete. The active mission is now `V64.2 Closure
 
 ## 4. Operational Guardrails
 
-- **V64.1 Closure Rule:** Downstream stages must preserve the Bourbaki Closure semantics now live in code: MDL gain is based on `Var(ΔP) / Var(R)`, `Zero-variance -> zero signal`, and the old `999.0` pseudo-singularity must not be reintroduced into Stage 3 or later paths.
+- **V64.3 Completion Rule:** Downstream stages must preserve the Bourbaki Completion semantics now live in code: MDL gain is based on `Var(ΔP) / Var(R)` with `Delta k = 0`, `Zero-variance -> zero signal`, `srl_resid` must never be rewritten by `has_singularity`, and no second compression branch may re-enter Stage 3 or later paths.
 - **Multi-Threading Constraints:** Always use `os.environ["POLARS_MAX_THREADS"] = str(max(1, os.cpu_count() // 2))` on 128G UMA machines to prevent ZFS ARC IO-thrashing. Linux must run under `heavy-workload.slice`. The same bounded-thread guidance applies to Stage 3 local backtest on `linux1-lx`.
 
 ---
@@ -132,4 +132,12 @@ The repo-alignment mission is complete. The active mission is now `V64.2 Closure
   - `Training`: PASS with model output `omega_xgb_final.pkl`.
   - `Local backtest`: PASS with output `audit/runtime/v642_full_smoke/local_backtest.json`.
 - **Mission state:** ready for `commit + push`, then post-push auditor review.
+- **Operational rule remains unchanged:** do **not** launch a new full Stage 2 run in this mission.
+
+## Update: 2026-03-06 11:35 UTC
+- **V64.3 mission active:** the current repo patch is now governed by `audit/v643.md`, exact section `[ SYSTEM ARCHITECT FINAL OVERRIDE: THE BOURBAKI COMPLETION ]`.
+- **Repo delta versus V64.2:** canonical `delta_k` removal remains in force; `dominant_probe` is now a compatibility placeholder pinned to `1`; `L2EpiplexityConfig` has been stripped of the old LZ/SAX runtime fields; `README` authority now points to `v643`.
+- **Release evidence rule:** the `2026-03-06 09:41 UTC` V64.2 smoke pass remains historical evidence only. It must not be used as release evidence for V64.3.
+- **Owner-approved validation exception:** the fresh V64.3 smoke may run on an isolated remote smoke workspace before `commit + push`, because it is validation-only and does not deploy or authorize any live worker repo state.
+- **Current release gate:** finish V64.3 dual audit, rerun the full smoke chain (`Stage 2 -> Stage 3 -> base matrix -> training -> backtest`) on the V64.3 code state, then `commit + push`, then post-push auditor review.
 - **Operational rule remains unchanged:** do **not** launch a new full Stage 2 run in this mission.

@@ -3,7 +3,7 @@
 A/B Benchmark: Old vs New Stage2 implementations.
 Measures wall-clock time for:
   1. ETL temporal rolling (old join vs new rolling_mean_by)
-  2. Kernel MDL arena (old concat_list vs new when/then)
+  2. Kernel MDL arena compatibility columns
   3. Full pipeline (build_l2 + apply_recursive_physics)
 """
 import os, sys, time
@@ -103,7 +103,7 @@ def new_rolling(lf, group_col):
     return lf.collect()
 
 # ============================================================
-# OLD kernel argmax (concat_list)
+# Compatibility placeholder write path
 # ============================================================
 def old_argmax(df):
     window_len = 10
@@ -111,28 +111,22 @@ def old_argmax(df):
     compactness = (4.0 * math.pi * pl.col("topo_area").abs()) / (pl.col("topo_energy")**2 + 1e-12)
     bits_topo = (compactness * math.log(window_len)).forward_fill().clip(0.0, 999.0)
     df = df.with_columns([bits_linear.alias("bits_linear"), bits_topo.alias("bits_topology")])
-    dominant_probe = (
-        pl.when(pl.concat_list(["bits_linear", "bits_topology"]).list.arg_max() == 1)
-        .then(pl.lit(3))
-        .otherwise(pl.lit(1))
-    )
+    dominant_probe = pl.lit(1)
     return df.with_columns(dominant_probe.alias("dominant_probe"))
 
 # ============================================================
-# NEW kernel argmax (when/then)
+# Canonical v64.3 compatibility write path
 # ============================================================
 def new_argmax(df):
     window_len = 10
     bits_linear = pl.col("epiplexity").forward_fill()
     compactness = (4.0 * math.pi * pl.col("topo_area").abs()) / (pl.col("topo_energy")**2 + 1e-12)
     bits_topo = (compactness * math.log(window_len)).forward_fill().clip(0.0, 999.0)
-    df = df.with_columns([bits_linear.alias("bits_linear"), bits_topo.alias("bits_topology")])
-    # Match concat_list().list.arg_max() null semantics by comparing
-    # null/NaN-normalized values.
-    bits_linear_cmp = pl.col("bits_linear").fill_null(float("-inf")).fill_nan(float("-inf"))
-    bits_topology_cmp = pl.col("bits_topology").fill_null(float("-inf")).fill_nan(float("-inf"))
-    dominant_probe = pl.when(bits_topology_cmp > bits_linear_cmp).then(pl.lit(3)).otherwise(pl.lit(1))
-    return df.with_columns(dominant_probe.alias("dominant_probe"))
+    return df.with_columns([
+        bits_linear.alias("bits_linear"),
+        bits_topo.alias("bits_topology"),
+        pl.lit(1).alias("dominant_probe"),
+    ])
 
 # ============================================================
 # Full pipeline benchmark
@@ -173,7 +167,7 @@ if __name__ == "__main__":
     print(f"  Speedup: {speedup_rolling:.2f}x")
 
     # --- Kernel Argmax ---
-    print("\n--- Kernel MDL Argmax ---")
+    print("\n--- Kernel MDL Compatibility Columns ---")
     # Need physics output for argmax benchmark
     from omega_core.omega_etl import build_l2_features_from_l1
     from omega_core.kernel import apply_recursive_physics
@@ -186,8 +180,8 @@ if __name__ == "__main__":
     t_old_a = timeit(old_argmax, phys_clean)
     t_new_a = timeit(new_argmax, phys_clean)
     speedup_argmax = t_old_a[0] / t_new_a[0]
-    print(f"  OLD (concat_list): median={t_old_a[0]*1000:.1f}ms  range=[{t_old_a[1]*1000:.1f}, {t_old_a[2]*1000:.1f}]ms")
-    print(f"  NEW (when/then):   median={t_new_a[0]*1000:.1f}ms  range=[{t_new_a[1]*1000:.1f}, {t_new_a[2]*1000:.1f}]ms")
+    print(f"  OLD (compat path): median={t_old_a[0]*1000:.1f}ms  range=[{t_old_a[1]*1000:.1f}, {t_old_a[2]*1000:.1f}]ms")
+    print(f"  NEW (v64.3 path):  median={t_new_a[0]*1000:.1f}ms  range=[{t_new_a[1]*1000:.1f}, {t_new_a[2]*1000:.1f}]ms")
     print(f"  Speedup: {speedup_argmax:.2f}x")
 
     # --- Full Pipeline ---

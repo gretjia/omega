@@ -18,6 +18,7 @@ This directory contains the pure mathematical and logic implementation of OMEGA 
     *   **Multi-Slice Support**: Recursively loads list of files and sorts by time to ensure causal integrity.
 *   **`kernel.py`**: The Decision Logic.
     *   **Holographic Damper**: Updates $Y$ only in the Brownian baseline regime (`Q_topo < brownian_q_threshold`), while the final signal gate is driven by canonical `epiplexity` plus geometry/spoof filters.
+    *   **Single Compression Semantics**: `bits_srl` is forbidden, `srl_resid` is never rewritten by `has_singularity`, and `dominant_probe` is a compatibility placeholder fixed at `1`.
 *   **`trainer.py`**: The Learning Machine.
     *   SGD-based incremental learning with Epiplexity weighting.
     *   **Multi-Symbol Support**: Smartly handles mixed-symbol parquet files by using `.over("symbol")` for label generation and skipping redundant physics.

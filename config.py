@@ -615,18 +615,12 @@ class L2SRLConfig:
 @dataclass(frozen=True)
 class L2EpiplexityConfig:
     """
-    Epiplexity (symbolic compression) settings.
+    Canonical runtime epiplexity settings.
     """
-    mode: str = "lz76_linear"
-    min_trace_len: int = 10
-    sax_scale_mult: float = 0.5
-    scale_eps: float = 0.01
-    compress_level: int = 6
-    min_bytes: int = 8
+    min_trace_len: int = 60
     fallback_value: float = 0.0
-    # v40 patch_02: energy gate (learned from market sigma distribution)
-    sigma_gate_enabled: bool = True
-    sigma_gate: float = 0.01
+    sigma_gate_enabled: bool = False
+    sigma_gate: float = 0.0
     sigma_gate_quantile: float = 0.10
     prior_sample_files: int = 50
     prior_min_sigma_points: int = 1000
@@ -833,7 +827,6 @@ def load_l2_pipeline_config(prod_conf_path: Optional[str] = None) -> L2PipelineC
     sigma_gate = params.get("PLANCK_SIGMA_GATE")
     anchor_y = params.get("ANCHOR_Y")
     epi_min_len = params.get("EPI_BLOCK_MIN_LEN")
-    epi_symbol_thresh = params.get("EPI_SYMBOL_THRESH")
     renorm_ortho_penalty_threshold = params.get("RENORM_ORTHO_PENALTY_THRESHOLD")
     renorm_ortho_penalty_factor = params.get("RENORM_ORTHO_PENALTY_FACTOR")
     backtest_ret_clip_abs = params.get("BACKTEST_RET_CLIP_ABS")
@@ -844,7 +837,6 @@ def load_l2_pipeline_config(prod_conf_path: Optional[str] = None) -> L2PipelineC
         and sigma_gate is None
         and anchor_y is None
         and epi_min_len is None
-        and epi_symbol_thresh is None
         and renorm_ortho_penalty_threshold is None
         and renorm_ortho_penalty_factor is None
         and backtest_ret_clip_abs is None
@@ -866,8 +858,6 @@ def load_l2_pipeline_config(prod_conf_path: Optional[str] = None) -> L2PipelineC
         epi = replace(epi, sigma_gate=float(sigma_gate))
     if epi_min_len is not None:
         epi = replace(epi, min_trace_len=int(epi_min_len))
-    if epi_symbol_thresh is not None:
-        epi = replace(epi, sax_scale_mult=float(epi_symbol_thresh))
     if renorm_ortho_penalty_threshold is not None:
         val = replace(val, renorm_ortho_penalty_threshold=float(renorm_ortho_penalty_threshold))
     if renorm_ortho_penalty_factor is not None:
