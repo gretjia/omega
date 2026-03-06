@@ -451,10 +451,30 @@ def _process_symbol_batch(task: dict) -> dict:
             f"Batch {batch_id}: forbidden non-Float64 columns detected: {sorted(forbidden_float_cols)}"
         )
 
-    # [V64 极端斯坦守则] 绝对捍卫物理奇点，废除一切对特征 X 的数值上限截断！
+    # [V64.1 极端斯坦绝对闭合守则] 捍卫物理奇点，切除缝合怪！
     # 1. 结构性空值吸敛为0，防止暴力 dropna 造成的级联误杀
     base_df = base_df.with_columns(pl.col("singularity_vector").fill_nan(0.0).fill_null(0.0))
+
+    # [HOTFIX V64.1] Dynamically reconstruct the true `is_signal` based on V64.1 math closure.
+    # The L2 parquets on disk have the old V64.0 `is_signal` which compared topo_energy with sigma_eff.
+    # We fix it here in-memory before forging the matrix to avoid rerunning Stage 2.
+    signal_epi_threshold = 0.5
+    topo_energy_min_dimensionless = 2.0
+    spoofing_ratio_max = 2.5
+    srl_resid_sigma_mult = 0.5
+    topo_area_min_abs = 0.0
     
+    base_df = base_df.with_columns([
+        (
+            (pl.col("is_energy_active") == True)
+            & (pl.col("epiplexity") > signal_epi_threshold) 
+            & (pl.col("srl_resid").abs() > srl_resid_sigma_mult * pl.col("sigma_eff"))
+            & (pl.col("topo_area").abs() > topo_area_min_abs)
+            & (pl.col("topo_energy") > topo_energy_min_dimensionless) # 纯几何无量纲门控比较 (HOTFIX)
+            & (pl.col("spoof_ratio") < spoofing_ratio_max)
+        ).alias("is_signal")
+    ])
+
     # 2. 自适应底噪阈值：只过滤毫无波动的“绝对死水期”，对顶部的巨大极值绝对放行
     filters: list[pl.Expr] = [
         (pl.col("is_physics_valid") == True),
