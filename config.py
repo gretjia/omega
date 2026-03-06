@@ -607,6 +607,7 @@ class L2SRLConfig:
     # v40 patch_02: anchor prior learned from market-wide implied Y distribution
     anchor_y: float = 0.75
     anchor_weight: float = 0.01
+    brownian_q_threshold: float = 0.5  # [V64.1] Baseline for high-entropy environment
     anchor_clip_min: float = 0.4
     anchor_clip_max: float = 1.5
 
@@ -678,10 +679,10 @@ class L2SignalConfig:
     Signal synthesis thresholds.
     """
     epiplexity_min: float = 0.4
-    peace_threshold: float = 0.8799  # Optimized (Hero Run)
+    signal_epi_threshold: float = 0.5  # [V64.1] MDL singularity trigger
     srl_resid_sigma_mult: float = 2.0
     topo_area_min_abs: float = 1e-9
-    topo_energy_sigma_mult: float = 10.0
+    topo_energy_min: float = 2.0       # [V64.1] Dimensionless minimum bound
     spoofing_ratio_max: float = 2.5
     min_ofi_for_y_update: float = 100.0
 

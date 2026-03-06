@@ -101,59 +101,53 @@ def calc_isoperimetric_topology_rolling(
 # [反脆弱底线] 普朗克常数守护物理奇点
 PLANCK_CONSTANT = 1e-12
 
-@njit(parallel=True, cache=True) # 严禁添加 fastmath=True! 捍卫 IEEE-754 极值
-def calc_residual_epiplexity_rolling(
-    srl_residuals: np.ndarray,
+@njit(parallel=True, cache=True)
+def calc_srl_compression_gain_rolling(
+    price_change: np.ndarray,     # [V64 绝对闭合] 引入原始价格波动 (Null Model)
+    srl_residuals: np.ndarray,    # [V64 绝对闭合] SRL 残差 (Alternative Model)
     window: int,
-    dist_to_boundary: np.ndarray
+    dist_to_boundary: np.ndarray,
+    delta_k: float = 2.0          # [次级问题修复] 统一参数，与标量版本 \Delta k = 2.0 绝对对齐
 ) -> np.ndarray:
+    """
+    第一性原理闭合: 计算 SRL 相对均值模型的信息论压缩增益 (MDL Gain)。
+    当 SRL 完美解释价格波动时，残差方差 -> 0，信息增益自然发散至正无穷大。
+    """
     n = len(srl_residuals)
     out = np.zeros(n, dtype=np.float64)
 
     if n < window:
         return out
 
-    T = np.arange(window, dtype=np.float64)
-    sum_t = np.sum(T)
-    sum_t2 = np.sum(T * T)
-    var_t = max(sum_t2 - (sum_t * sum_t / window), PLANCK_CONSTANT)
-
     for i in prange(window - 1, n):
         if dist_to_boundary[i] < window - 1:
             continue
 
-        y = srl_residuals[i - window + 1 : i + 1]
+        dp = price_change[i - window + 1 : i + 1]
+        r = srl_residuals[i - window + 1 : i + 1]
 
-        sum_y = np.sum(y)
-        sum_y2 = np.sum(y * y)
-        sum_ty = np.sum(T * y)
+        # 零假设方差: 原始价格的波动能量
+        mean_dp = np.sum(dp) / window
+        var_dp = (np.sum(dp * dp) / window) - (mean_dp * mean_dp)
 
-        cov = sum_ty - (sum_t * sum_y / window)
-        var_y = sum_y2 - (sum_y * sum_y / window)
+        # 备择假设方差: SRL 吸收冲击后的残差能量
+        mean_r = np.sum(r) / window
+        var_r = (np.sum(r * r) / window) - (mean_r * mean_r)
 
-        # ==========================================
-        # 🪐 奇点守护：Epiplexity 的终极觉醒
-        # ==========================================
-        if var_y < PLANCK_CONSTANT:
-            # 绝对控盘：残差方差塌缩。
-            # 【压缩即智能】：不可返回 0.0！赋予它极大的 MDL 增益（势能极值）！
-            out[i] = 999.0 
+        # 【第一性原理底线】：Zero-variance -> zero signal
+        # 如果价格原本就是死水，没有任何可压缩的智能
+        if var_dp < PLANCK_CONSTANT:
+            out[i] = 0.0
             continue
 
-        r2 = (cov * cov) / (var_t * var_y)
+        safe_var_r = max(var_r, PLANCK_CONSTANT)
+        ratio = var_dp / safe_var_r
         
-        # 拔掉 0.9999 的盖子！允许逼近1，仅保留微小底线防范 log(0)
-        if r2 < 0.0: 
-            r2 = 0.0
-        elif r2 > 1.0 - PLANCK_CONSTANT: 
-            r2 = 1.0 - PLANCK_CONSTANT
-
-        delta_k = 3.0
-        # 当 r2 逼近 1 时，mdl_gain 将呈对数爆炸，真正体现主力的智能碾压！
-        mdl_gain = -(window / 2.0) * math.log(1.0 - r2) - (delta_k / 2.0) * math.log(window)
-
-        if mdl_gain > 0.0:
-            out[i] = mdl_gain
+        # 只有模型提供了正向压缩(ratio > 1)，才计算对数增益
+        if ratio > 1.0:
+            mdl_gain = (window / 2.0) * math.log(ratio) - (delta_k / 2.0) * math.log(window)
+            if mdl_gain > 0.0:
+                out[i] = mdl_gain
 
     return out
 @njit(parallel=True, cache=True)

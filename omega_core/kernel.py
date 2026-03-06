@@ -210,11 +210,14 @@ def _apply_recursive_physics(
         has_singularity_mask = _safe_bool_col("has_singularity")
         out_srl_resid[has_singularity_mask] = 0.0
 
-    # 4) Residual MDL third
-    out_epi_raw = calc_residual_epiplexity_rolling(
+    # 4) True Compression Gain third
+    from omega_core.omega_math_rolling import calc_srl_compression_gain_rolling
+    out_epi_raw = calc_srl_compression_gain_rolling(
+        price_change=price_change,             # [闭环] 传入原始价格基准
         srl_residuals=out_srl_resid,
         window=window_len,
         dist_to_boundary=dist_to_boundary,
+        delta_k=2.0                            # [闭环] 统一常数
     )
     
     # Apply global activity mask
