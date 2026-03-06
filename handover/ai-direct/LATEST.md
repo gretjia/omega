@@ -1,5 +1,10 @@
 # LATEST (Authoritative Multi-Agent Snapshot)
 
+> 🚨 **[CRITICAL SYSTEM OVERRIDE - AGENT WAKE-UP DIRECTIVE]** 🚨
+> **V64.1 "Bourbaki Synthesis" Hotfix is LIVE in the codebase!** 
+> If you are a new AI agent waking up to execute Stage 3 (Base Matrix), Training, or Backtesting, your **IMMEDIATE FIRST ACTION MUST BE `git pull origin main`** on the target execution node (`linux1-lx` or `windows1-w1`). 
+> The physical L2 parquet files on disk contain the V64.0 (flawed) `is_signal` column. The Python code in `main` contains a hotfix that dynamically patches this column in-memory using absolute mathematical closure. **DO NOT run downstream stages without pulling this code first.**
+
 This file is the single source of current operational truth for all agents.
 
 ## 0. Update Contract

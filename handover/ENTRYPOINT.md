@@ -42,3 +42,8 @@ If SSH fails, check:
 
 Never store secrets in git. Only store credential *locations* and bootstrap steps.
 See `handover/ops/ACCESS_BOOTSTRAP.md` for details.
+
+## 🚨 V64.1 Hotfix Alert (2026-03-06)
+A mathematical closure hotfix (The Bourbaki Synthesis) has been applied to the downstream Python scripts (`forge_base_matrix.py`, `trainer.py`, `run_vertex_xgb_train.py`). This hotfix dynamically corrects the legacy `is_signal` column stored in the physical L2 parquet files.
+**Agents must ensure a `git pull origin main` is executed on the target node before running any Stage 3 or evaluation tasks.**
+
