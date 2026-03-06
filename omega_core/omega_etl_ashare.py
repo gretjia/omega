@@ -1,5 +1,5 @@
 """
-A-share ETL anchor expressions for v6 architecture.
+A-share ETL anchor expressions for the non-versioned A-share config bridge.
 
 These helpers are intentionally small and pure-expression based so they can
 be reused inside lazy Polars pipelines.
@@ -9,10 +9,10 @@ from __future__ import annotations
 
 import polars as pl
 
-from config_v6 import L2PipelineConfigV6
+from ashare_config import ASharePipelineConfig
 
 
-def _ashare_causal_time_fraction(time_col: str, cfg: L2PipelineConfigV6) -> pl.Expr:
+def _ashare_causal_time_fraction(time_col: str, cfg: ASharePipelineConfig) -> pl.Expr:
     """
     Fold lunch break (11:30-13:00) so elapsed causal time does not advance.
     `time_col` must already be normalized to ms-of-day.
@@ -30,7 +30,7 @@ def _ashare_causal_time_fraction(time_col: str, cfg: L2PipelineConfigV6) -> pl.E
     return (elapsed / s.total_duration_ms).clip(lower_bound=0.05, upper_bound=1.0)
 
 
-def _ashare_singularity_mask(cfg: L2PipelineConfigV6) -> pl.Expr:
+def _ashare_singularity_mask(cfg: ASharePipelineConfig) -> pl.Expr:
     """
     Mask limit-up/down singularities where top-of-book depth collapses.
     """

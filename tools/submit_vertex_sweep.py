@@ -45,11 +45,11 @@ def zip_and_upload_code(repo_root, gcs_uri):
       - omega_core/
       - tools/
       - config.py
-      - config_v6.py (if present)
+      - ashare_config.py (if present)
     """
     print(f"[*] Packaging code from repo root: {repo_root}", flush=True)
 
-    include_paths = ["omega_core", "tools", "config.py", "config_v6.py"]
+    include_paths = ["omega_core", "tools", "config.py", "ashare_config.py"]
     archive_path = os.path.join(repo_root, "omega_core.zip")
     if os.path.exists(archive_path):
         os.remove(archive_path)
@@ -58,7 +58,7 @@ def zip_and_upload_code(repo_root, gcs_uri):
         for rel in include_paths:
             abs_path = os.path.join(repo_root, rel)
             if not os.path.exists(abs_path):
-                if rel == "config_v6.py":
+                if rel == "ashare_config.py":
                     continue
                 print(f"[!] Warning: missing bundle path: {abs_path}", flush=True)
                 continue

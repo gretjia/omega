@@ -37,7 +37,7 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.append(str(REPO_ROOT))
 
 from config import load_l2_pipeline_config, L2PipelineConfig
-from config_v6 import FEATURE_COLS
+from ashare_config import FEATURE_COLS
 from omega_core.trainer import OmegaTrainerV3, evaluate_frames
 
 

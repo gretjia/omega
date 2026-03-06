@@ -1,8 +1,8 @@
 """
-v6-specific configuration anchors for A-share microstructure.
+A-share configuration anchors for microstructure-specific runtime wiring.
 
-These dataclasses mirror the architecture constraints in audit/v6.md and
-provide a conversion bridge to the runtime `config.L2PipelineConfig`.
+These dataclasses provide a stable, non-versioned bridge to the runtime
+`config.L2PipelineConfig`.
 """
 
 from __future__ import annotations
@@ -39,7 +39,7 @@ class AShareMicrostructureConfig:
 
 
 @dataclass(frozen=True)
-class L2PipelineConfigV6:
+class ASharePipelineConfig:
     session: AShareSessionConfig = field(default_factory=AShareSessionConfig)
     micro: AShareMicrostructureConfig = field(default_factory=AShareMicrostructureConfig)
     base: L2PipelineConfig = field(default_factory=L2PipelineConfig)
@@ -58,9 +58,9 @@ class L2PipelineConfigV6:
         return replace(self.base, ashare_session=runtime_session, micro=runtime_micro)
 
 
-def v6_feature_cols(cfg: L2PipelineConfig | None = None) -> list[str]:
+def canonical_feature_cols(cfg: L2PipelineConfig | None = None) -> list[str]:
     """
-    Canonical v6 feature list for tree models and swarm optimizers.
+    Canonical A-share feature list for tree models and swarm optimizers.
     Keep this centralized so scripts do not hard-code column names.
     """
     runtime_cfg = cfg or L2PipelineConfig()
@@ -84,5 +84,5 @@ def v6_feature_cols(cfg: L2PipelineConfig | None = None) -> list[str]:
     return list(dict.fromkeys(cols))
 
 
-# Architectural anchor used by v60 swarm scripts.
-FEATURE_COLS = tuple(v6_feature_cols())
+# Architectural anchor used by training / backtest / matrix scripts.
+FEATURE_COLS = tuple(canonical_feature_cols())
