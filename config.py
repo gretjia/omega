@@ -866,3 +866,32 @@ def load_l2_pipeline_config(prod_conf_path: Optional[str] = None) -> L2PipelineC
         val = replace(val, backtest_ret_clip_abs=float(backtest_ret_clip_abs))
 
     return replace(cfg, volume_clock=vc, srl=srl, epiplexity=epi, validation=val)
+
+
+def canonical_feature_cols(cfg: L2PipelineConfig | None = None) -> list[str]:
+    """
+    Canonical A-share feature list for tree models and swarm optimizers.
+    Keep this centralized so scripts do not hard-code column names.
+    """
+    runtime_cfg = cfg or L2PipelineConfig()
+    topo_race_cols: Sequence[str] = tuple(getattr(runtime_cfg.train, "topology_race_features", ()))
+    cols = [
+        "sigma_eff",
+        "net_ofi",
+        "depth_eff",
+        "epiplexity",
+        "srl_resid",
+        "topo_area",
+        "topo_energy",
+        *topo_race_cols,
+        "price_change",
+        "bar_duration_ms",
+        "adaptive_y",
+        "epi_x_srl_resid",
+        "epi_x_topo_area",
+        "epi_x_net_ofi",
+    ]
+    return list(dict.fromkeys(cols))
+
+
+FEATURE_COLS = tuple(canonical_feature_cols())

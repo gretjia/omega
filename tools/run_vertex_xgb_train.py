@@ -101,7 +101,7 @@ def run_global_training(args: argparse.Namespace) -> None:
     import numpy as np
     import polars as pl
     import xgboost as xgb
-    from ashare_config import FEATURE_COLS
+    from config import FEATURE_COLS
 
     base_uri = str(args.base_matrix_uri).strip()
     if not base_uri:

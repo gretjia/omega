@@ -444,7 +444,6 @@ ssh windows1-w1 "hostname && whoami"
 - **`README.md`**
 - **`README_TRAINER.md`**
 - **`config.py`**
-- **`ashare_config.py`**
 - **`context.md`**
 - **`gemini.md`**
 - **`n2-standard-32`**

@@ -18,9 +18,9 @@ This file is the single source of current operational truth for all agents.
 ---
 
 ## 1. Project Phase
-**Current Macro Status: V64.3 RELEASE CANDIDATE - DUAL AUDIT PASSED, FULL SMOKE PENDING**
+**Current Macro Status: V64.3 RELEASE CANDIDATE - FULL SMOKE PASSED, READY FOR COMMIT/PUSH**
 
-The repo-alignment mission is complete. The active mission is now `V64.3 Bourbaki Completion, Dual Audit, Smoke Validation, and Release`. Dual audit is complete. The remaining gate is a fresh full smoke chain on the V64.3 code state, followed by `commit + push` and post-push auditor review. No new full `Stage 2` launch is authorized in this mission.
+The repo-alignment mission is complete. The isolated V64.3 smoke is now green again after the backtest remediation. `Stage 2 -> forge/base_matrix -> training -> backtest` have all passed on `linux1-lx` in the isolated smoke workspace. The next gate is `commit + push`, followed by post-push auditor review. No new full `Stage 2` launch is authorized in this mission.
 
 ---
 
@@ -33,27 +33,24 @@ The repo-alignment mission is complete. The active mission is now `V64.3 Bourbak
 | **Stage2-MATH** | L2 Feature Injection | `kernel.py` & V64 Vectors | `windows1-w1` | `[BLOCKED]` | 2026-03-06 08:00 UTC | Full run remains intentionally stopped. The old `stage2_full_20260306` outputs and ledgers were deleted cleanly by Owner request during v64.2 triage. No relaunch is authorized in this mission. |
 | **Stage3-BASEMATRIX** | Feature Forging | `forge_base_matrix.py` | `linux1-lx` | `[PENDING]` | - | Will start only after both Stage 2 halves finish and Windows L2 is shadowed/copied back to Linux. |
 | **Stage3-BASEMATRIX** | AI Model Training | `run_vertex_xgb_train.py` | GCP / Vertex AI | `[PENDING]` | - | XGBoost (tree_method=hist) with `singularity_vector`. |
-| **Stage3-BASEMATRIX** | Local Backtest Evaluation | `evaluate_frames()` | `linux1-lx` | `[PENDING]` | - | Will evaluate trained model on 2025/2026 data. |
+| **Stage3-BASEMATRIX** | Local Backtest Evaluation | `evaluate_frames()` | `linux1-lx` | `[DONE]` | 2026-03-06 13:56 UTC | Backtest remediation applied. Isolated V64.3 smoke backtest completed `109/109` batches in `94.19s` and wrote `local_backtest.json`. |
 
 ---
 
 ## 3. Immediate Next Actions
 *(What the next agent should do immediately upon waking up)*
 
-1. **Do not resume Stage 2 yet:**
-   - The mission is in v64.3 smoke-and-release mode after the architect and auditor overrides.
-   - Do not launch a new full run in this session.
-2. **Treat the previous `stage2_full_20260306` run as historical, not resumable:**
-   - The old run roots and ledgers were intentionally deleted cleanly on controller, Linux, and Windows by Owner request.
-   - Any future full Stage 2 run must start from a fresh manifest and fresh output roots after the current code path is signed off.
-3. **Current gate order is fixed:**
-   - keep the v64.3 patch set as the current candidate
-   - rerun the full v64 smoke chain from `Stage 2 -> Stage 3 -> base matrix -> training -> backtest`
-   - only then `git commit + push`
-   - then send the pushed tree for post-push auditor review
-4. **Do not relaunch Stage 2 after smoke in this mission:**
-   - The Owner explicitly requested smoke-only validation after dual audit.
-   - A future run decision is separate and must start from a clean launch plan.
+1. **Do not resume or relaunch Stage 2:**
+   - The isolated V64.3 smoke is already complete.
+   - A future full Stage 2 launch is a separate mission.
+2. **Current release gate:**
+   - commit the current local tree
+   - push to `origin/main`
+   - send the pushed tree for post-push auditor review
+3. **Preserve the successful smoke evidence:**
+   - smoke workspace: `/home/zepher/work/Omega_vNext_v643_smoke`
+   - final backtest artifact: `.tmp/smoke_v64_v643/model/local_backtest.json`
+4. **Do not reopen the backtest stall scope unless post-push review finds a new blocker.**
 
 ---
 
@@ -69,6 +66,8 @@ The repo-alignment mission is complete. The active mission is now `V64.3 Bourbak
 
 - `20260306_074851_stage2_full_run_launch_and_contiguous_smoke` - Four-node sync complete; contiguous-day and wrapper-level smoke passed; full Stage 2 launched on contiguous-half manifests.
 - `20260306_094148_v642_dual_audit_and_full_smoke_pass` - V64.2 dual-audit closure finished; full smoke chain passed on `linux1-lx`; no new full Stage 2 launch authorized in this mission.
+- `20260306_135658_v643_backtest_remediation_smoke_pass` - Backtest remediation applied; isolated V64.3 smoke passed end-to-end again; ready for commit/push and post-push auditor review.
+- `20260306_134038_v643_backtest_stall_triage` - V64.3 isolated smoke reached training, then stalled in local backtest; Stage 2/forge/training preserved as pass evidence; active mission narrowed to backtest remediation.
 - `20260305_201500_v64_preflight_smoke_tests` - End-to-end smoke test completed successfully; pipeline updated for `singularity_vector`.
 - `20260305_142336_v63_training_backtest_alignment_audit` - Legacy post-mortem on sample collapse and threshold hyper-sensitivity.
 - `20260227_104435_stage2_v62_alignment_audit` - Past audit confirming rolling operations compliance.
@@ -141,3 +140,21 @@ The repo-alignment mission is complete. The active mission is now `V64.3 Bourbak
 - **Owner-approved validation exception:** the fresh V64.3 smoke may run on an isolated remote smoke workspace before `commit + push`, because it is validation-only and does not deploy or authorize any live worker repo state.
 - **Current release gate:** finish V64.3 dual audit, rerun the full smoke chain (`Stage 2 -> Stage 3 -> base matrix -> training -> backtest`) on the V64.3 code state, then `commit + push`, then post-push auditor review.
 - **Operational rule remains unchanged:** do **not** launch a new full Stage 2 run in this mission.
+
+## Update: 2026-03-06 13:40 UTC
+- **Stage 2 / forge / training evidence preserved:** the isolated V64.3 smoke on `linux1-lx` has already passed Stage 2, shard forge, base-matrix merge, and local training in `/home/zepher/work/Omega_vNext_v643_smoke`.
+- **Backtest blocker identified:** `tools/run_local_backtest.py` entered a no-progress stall during the smoke backtest leg. The run discovered `5409` symbols, built `109` batches, started two workers, then stopped making any forward progress.
+- **Runtime diagnosis:** all backtest processes parked in `futex_do_wait`, no `local_backtest.json` was produced, and a 15-second `/proc` delta sample showed zero I/O and zero context-switch movement across the parent and both worker processes.
+- **Operational action:** the stalled backtest was stopped. No active `run_local_backtest.py` process remains in the smoke workspace.
+- **Active mission narrowed:** the release path is now blocked only by `V64.3 Backtest Stall Remediation and Smoke Completion`. Do not rerun full Stage 2 or rebuild smoke artifacts unless the remediation proves the current base-matrix contract invalid.
+
+## Update: 2026-03-06 13:56 UTC
+- **Backtest remediation:** `tools/run_local_backtest.py` now defaults to sequential batch execution; Python multiprocessing is no longer the default local backtest path and remains explicit opt-in only.
+- **Runtime hardening:** batch progress logging was added, and the output parent directory is created before writing the final JSON artifact.
+- **Targeted audits:** runtime audit `PASS`; V64.3 math invariance audit `PASS`.
+- **Backtest rerun:** PASS on `linux1-lx` in `/home/zepher/work/Omega_vNext_v643_smoke`.
+  - `109/109` batches completed
+  - `n_frames = 891331`
+  - `seconds = 94.19`
+  - output: `.tmp/smoke_v64_v643/model/local_backtest.json`
+- **Mission state:** the isolated V64.3 smoke is now fully green. Next gate is `commit + push`, then post-push auditor review.

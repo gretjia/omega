@@ -51,7 +51,7 @@ except Exception:
     pq = None
 
 from config import load_l2_pipeline_config
-from ashare_config import FEATURE_COLS
+from config import FEATURE_COLS
 from omega_core.trainer import OmegaTrainerV3
 
 

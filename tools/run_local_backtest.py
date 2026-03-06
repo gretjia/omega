@@ -37,7 +37,7 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.append(str(REPO_ROOT))
 
 from config import load_l2_pipeline_config, L2PipelineConfig
-from ashare_config import FEATURE_COLS
+from config import FEATURE_COLS
 from omega_core.trainer import OmegaTrainerV3, evaluate_frames
 
 
@@ -259,8 +259,27 @@ def main() -> int:
             "years": backtest_years,
         })
 
-    # 5. Execution (Multiprocessing)
-    print(f"[*] Starting Backtest on {args.workers} workers...", flush=True)
+    # 5. Execution
+    requested_workers = max(1, int(args.workers))
+    mp_opt_in = os.environ.get("OMEGA_ENABLE_LOCAL_BACKTEST_MP", "").strip().lower() in {
+        "1",
+        "true",
+        "yes",
+        "on",
+    }
+    use_multiprocessing = mp_opt_in and requested_workers > 1 and len(tasks) > 1
+
+    if use_multiprocessing:
+        print(f"[*] Starting Backtest on {requested_workers} workers...", flush=True)
+    else:
+        if requested_workers > 1 and len(tasks) > 1:
+            print(
+                "[*] Multiprocessing path disabled by default for local backtest; "
+                f"falling back to sequential execution (requested_workers={requested_workers}).",
+                flush=True,
+            )
+        else:
+            print("[*] Starting Backtest on sequential execution path...", flush=True)
     
     global_stats = {
         "n_frames": 0.0,
@@ -288,20 +307,40 @@ def main() -> int:
                         global_stats[k] += v
 
         processed_batches += 1
-        if processed_batches % 10 == 0:
-            print(f"    Progress: {processed_batches}/{len(batches)} batches...", flush=True)
+        if processed_batches <= 3 or processed_batches == len(batches) or processed_batches % 10 == 0:
+            print(
+                "    Progress: "
+                f"{processed_batches}/{len(batches)} batches "
+                f"(rows={int(global_stats['n_frames'])}, "
+                f"elapsed={round(time.time() - start_time, 2)}s)",
+                flush=True,
+            )
 
-    if int(args.workers) <= 1 or len(tasks) <= 1:
+    if not use_multiprocessing:
         print("[*] Using sequential backtest execution path.", flush=True)
         for task in tasks:
             _accumulate_result(_process_backtest_batch(task))
     else:
+        print(
+            "[WARN] Local backtest multiprocessing is explicitly enabled; "
+            "this path remains compatibility-only.",
+            flush=True,
+        )
         # ACTION 4: Anti-Fragile Memory Release — force worker death after each batch
         # Rust/C++ jemalloc inside Polars does NOT reliably return freed pages to OS.
         # maxtasksperchild=1 forces process restart → OS Ring-0 reclaims all memory.
-        with mp.Pool(args.workers, maxtasksperchild=1) as pool:
-            for res in pool.imap_unordered(_process_backtest_batch, tasks):
-                _accumulate_result(res)
+        try:
+            with mp.Pool(requested_workers, maxtasksperchild=1) as pool:
+                for res in pool.imap_unordered(_process_backtest_batch, tasks):
+                    _accumulate_result(res)
+        except Exception as exc:
+            print(
+                "[WARN] Local backtest multiprocessing failed; "
+                f"falling back to sequential execution ({type(exc).__name__}: {exc})",
+                flush=True,
+            )
+            for task in tasks:
+                _accumulate_result(_process_backtest_batch(task))
 
     # 6. Aggregation
     total_n = global_stats["n_frames"]
@@ -317,10 +356,12 @@ def main() -> int:
     print("=== V61 Edge Backtest Results ===")
     print(json.dumps(global_stats, indent=2))
     
-    with open(args.output, "w") as f:
+    output_path = Path(args.output)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(output_path, "w") as f:
         json.dump(global_stats, f, indent=2)
         
-    print(f"[*] Results saved to {args.output}")
+    print(f"[*] Results saved to {output_path}")
     return 0
 
 if __name__ == "__main__":

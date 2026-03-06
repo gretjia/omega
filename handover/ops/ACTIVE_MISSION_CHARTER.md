@@ -1,16 +1,23 @@
 # OMEGA Active Mission Charter
 
-Status: Active
-Task Name: V64.3 Bourbaki Completion, Dual Audit, Smoke Validation, and Release
+Status: Ready for Release
+Task Name: V64.3 Backtest Stall Remediation and Smoke Completion
 Owner: Human Owner
 Commander: Codex
 Date: 2026-03-06
 
+Current checkpoint:
+
+- backtest remediation implemented
+- isolated V64.3 smoke is green again end-to-end
+- next gate is `commit + push`, then post-push auditor review
+
 ## 1. Objective
 
-- Finalize the V64.3 closure path after the latest auditor findings and the Bourbaki Completion override.
-- Keep Stage 2 as the execution starting boundary, but do not launch a new full Stage 2 run in this mission.
-- Pass dual audit, rerun the full V64 smoke chain (`Stage 2 -> Stage 3 -> base matrix -> training -> backtest`), then release by `commit + push` and post-push auditor review.
+- Complete the final missing leg of the isolated V64.3 smoke chain by fixing the local backtest stall.
+- Preserve the already-passed evidence for `Stage 2 -> forge/base_matrix -> training`.
+- Do not launch a new full Stage 2 run in this mission.
+- After the backtest path is repaired, rerun only the missing smoke leg needed to finish the chain, then release by `commit + push` and post-push auditor review.
 
 ## 2. Canonical Spec
 
@@ -24,6 +31,7 @@ Higher-order constraints:
 - `OMEGA_CONSTITUTION.md`
 - `handover/ops/MULTI_AGENT_OPERATING_SYSTEM.md`
 - `handover/ai-direct/LATEST.md` for live runtime state before any operational step
+- `handover/ai-direct/entries/20260306_134038_v643_backtest_stall_triage.md` for the exact blocker evidence
 
 Conflict rule:
 
@@ -32,92 +40,77 @@ Conflict rule:
 
 ## 3. Business Goal
 
-- Eliminate semantic drift between the V64 mathematical definition, the Stage 2 outputs, and the downstream Stage 3 / training / backtest pipeline.
-- Ensure the next implementation pass is mathematically correct, operationally stable, and aligned with the handover lessons already recorded in `/handover`.
+- Eliminate the runtime stall in the local backtest path without reopening already-passed upstream stages.
+- Keep the V64.3 mathematical closure intact while replacing or remediating the outdated multiprocessing-heavy backtest execution pattern.
+- Ensure the next implementation pass is operationally stable and aligned with the handover lessons already recorded in `/handover`.
 
 ## 4. Files In Scope
 
 Primary implementation scope:
 
-- `omega_core/omega_math_rolling.py`
-- `omega_core/kernel.py`
 - `config.py`
-- `README.md`
-- `tests/test_v64_absolute_closure.py`
-
-Stage 2 execution scope:
-
-- `tools/stage2_physics_compute.py`
-
-Downstream closure scope:
-
-- `tools/stage3_full_supervisor.py`
+- `tools/run_local_backtest.py`
 - `omega_core/trainer.py`
+- `tests/verify_pipeline.py`
+- `handover/ai-direct/LATEST.md`
+- `handover/ops/ACTIVE_MISSION_CHARTER.md`
+
+Conditional scope only if the remediation proves a contract issue:
+
 - `tools/forge_base_matrix.py`
 - `tools/run_vertex_xgb_train.py`
-- `tools/run_local_backtest.py`
-
-Possible audit-followup scope if findings require it:
-
-- `tests/test_kernel_srl_numba.py`
-- `tests/verify_pipeline.py`
-- `tests/test_stage2_output_equivalence.py`
-- `tools/run_v64_smoke_backtest.py`
+- `README.md`
 
 ## 5. Out of Scope
 
-- Historical handover entries except as context
-- Artifact regeneration without explicit mission-phase approval
-- Deployment, commit, and push before dual-audit pass
-- Unrelated strategy logic outside the V64 closure chain
-- Behavioral changes to `tools/stage2_targeted_resume.py` while live Stage 2 jobs are active
+- Recomputing Stage 2 smoke outputs
+- Recomputing Stage 3 shard forge unless the backtest fix proves the current base-matrix artifact contract invalid
+- Reopening kernel or rolling-math semantics without a new audit finding
+- Deployment, commit, and push before the repaired smoke leg passes
+- Unrelated strategy logic outside the V64.3 backtest completion path
 
 ## 6. Required Audits
 
 Math audit:
 
 - Engine: Gemini via `gemini -y`
-- Responsibility: verify strict alignment to `[ SYSTEM ARCHITECT ABSOLUTE OVERRIDE: THE BOURBAKI CLOSURE ]`
-- Focus: formula choice, gate separation, dimensional consistency, geometry homology, regression locks
+- Responsibility: verify that the backtest remediation does not regress the `v643` closure semantics
+- Focus: no reintroduction of stale `is_signal`, stale feature columns, or non-canonical V64.3 gating
 
 Runtime audit:
 
 - Engine: GPT-5 / Codex
 - Responsibility: verify repository-level integration, stable CLI / config propagation, and operational safety
-- Focus: no stale parameter semantics, no broken Stage 3 / training / backtest chain, no regression into deprecated multiprocessing-first execution patterns
+- Focus: no stalled multiprocessing path, no broken model-loading contract, no broken `frames-dir` consumption path, and no regression into deprecated multiprocessing-first execution patterns
 
 ## 7. Runtime and Efficiency Constraints
 
 - Respect `handover/ai-direct/LATEST.md` before touching any live runtime path.
 - Do not interrupt active long-running jobs unless the mission is explicitly escalated and reopened.
-- Treat Stage 2 as the execution starting boundary for this mission; Stage 1 is out of scope.
-- Owner-approved exception for this mission: the pre-release full smoke may run on an isolated remote smoke workspace before `commit + push`, because it is validation-only and does not mutate or authorize any live worker repo state.
-- Prefer machine-level parallelism and bounded threading over Python `multiprocessing` fan-out.
-- Use `linux1-lx` for long-lived pipeline / matrix / backtest workloads unless a mission-specific manifest says otherwise.
-- Use `windows1-w1` only for disjoint workloads with isolated outputs and explicit handoff boundaries.
+- Reuse the existing isolated smoke workspace at `/home/zepher/work/Omega_vNext_v643_smoke`.
+- Reuse the already-produced smoke artifacts under `.tmp/smoke_v64_v643`.
+- Prefer a bounded, observable execution path over Python `multiprocessing` fan-out in the backtest step.
+- Use `linux1-lx` as the only execution node for this remediation unless a new manifest says otherwise.
 
 ## 8. Acceptance Criteria
 
 The mission passes only when all are true:
 
-1. `omega_core/omega_math_rolling.py` uses the Bourbaki Completion MDL gain based on `Var(ΔP) / Var(R)`, with `Zero-variance -> zero signal`, no `999.0` pseudo-singularity, and no `delta_k` parameter.
-2. `omega_core/kernel.py` separates `signal_epi_threshold`, `brownian_q_threshold`, and `topo_energy_min`, removes the topology override path that breaks geometry homology, never rewrites `srl_resid` from `has_singularity`, and retains `topo_area_min_abs` plus `srl_resid_sigma_mult` in the final `is_signal` gate.
-3. Stage 2 entrypoints and outputs remain operationally stable without disrupting currently running live jobs.
-4. `config.py` and repo-facing docs expose the new semantics and do not reintroduce deprecated LZ/SAX compression meanings into Stage 2 code paths.
-5. Legacy parameter aliases, if retained, are constrained to Stage 3 CLIs and trainer evaluation helpers; canonical names remain the only source of truth for config and runtime semantics.
-6. Downstream consumers (`stage3_full_supervisor`, `trainer`, `forge_base_matrix`, Vertex training path) preserve the V64.1 in-memory reconstruction path and do not regress to stale V64 gate semantics.
-7. Stage 3 training and local backtest operate on explicitly disjoint data windows or equivalent by-construction isolation, rather than implicitly sharing the same Stage 2 corpus.
-8. Artifact naming and training provenance remain consistent across Vertex training, local model loading, and handover records.
-9. Regression coverage exists for the closure-specific hard bugs described by the architect, including `delta_k` removal, residual non-overwrite, and the single-compression rule.
-10. Math audit passes.
-11. Runtime audit passes.
-12. Commander-only integration, handover, commit, and push gates remain intact.
+1. The stalled backtest path is replaced or remediated without reopening Stage 2 smoke, shard forge, base-matrix merge, or training.
+2. The repaired backtest produces `.tmp/smoke_v64_v643/model/local_backtest.json` in the isolated smoke workspace.
+3. `config.py` remains the only active config entry for this path; no `ashare_config.py` or `config_v6.py` dependency re-enters the smoke chain.
+4. The fix does not regress the V64.3 canonical feature contract consumed by training and backtest.
+5. The repaired path does not depend on the deprecated multiprocessing-first execution pattern that caused the stall.
+6. Runtime audit passes.
+7. Math invariance audit passes if any semantics-adjacent code is touched.
+8. Commander-only handover, commit, and push gates remain intact.
 
 ## 9. Stop Conditions
 
 Stop and escalate if any of the following happens:
 
 - a required change expands beyond the in-scope file set
+- the existing `base_matrix` or model artifact contract proves invalid and forces upstream recomputation
 - the live runtime state in `handover/ai-direct/LATEST.md` would be disrupted by continuing
 - the closure spec and `OMEGA_CONSTITUTION.md` appear inconsistent
 - an auditor finds a block that requires mission reopen or scope reassignment
