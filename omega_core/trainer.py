@@ -260,10 +260,26 @@ class OmegaTrainerV3:
         epi = np.clip(df.get_column("epiplexity").to_numpy(), 0.0, 1.0)
         topo = np.log1p(np.abs(df.get_column("topo_area").to_numpy()))
         
-        if "is_signal" in df.columns:
-            is_valid = df.get_column("is_signal").to_numpy().astype(float)
-        else:
-            is_valid = np.ones_like(epi)
+
+        # [HOTFIX V64.1] Recompute is_signal on the fly if needed
+        signal_epi_threshold = 0.5
+        topo_energy_min_dimensionless = 2.0
+        spoofing_ratio_max = 2.5
+        srl_resid_sigma_mult = 0.5
+        topo_area_min_abs = 0.0
+        df = df.with_columns([
+            (
+                (pl.col("is_energy_active") == True)
+                & (pl.col("epiplexity") > signal_epi_threshold) 
+                & (pl.col("srl_resid").abs() > srl_resid_sigma_mult * pl.col("sigma_eff"))
+                & (pl.col("topo_area").abs() > topo_area_min_abs)
+                & (pl.col("topo_energy") > topo_energy_min_dimensionless)
+                & (pl.col("spoof_ratio") < spoofing_ratio_max)
+            ).alias("is_signal_v641")
+        ])
+        
+        is_valid = df.get_column("is_signal_v641").to_numpy().astype(float)
+
             
         if "is_physics_valid" in df.columns:
             is_phys = df.get_column("is_physics_valid").to_numpy().astype(float)
@@ -457,7 +473,11 @@ def _vector_alignment(
         return float("nan"), float("nan")
 
     if "is_physics_valid" in merged.columns:
-        is_valid_arr = np.asarray(merged.get_column("is_physics_valid").to_numpy(), dtype=bool)
+        # V64.1 absolute closure requires we also respect the updated is_signal logic
+        if "is_signal" in merged.columns:
+            is_valid_arr = np.asarray(merged.get_column("is_physics_valid").to_numpy() & merged.get_column("is_signal").to_numpy(), dtype=bool)
+        else:
+            is_valid_arr = np.asarray(merged.get_column("is_physics_valid").to_numpy(), dtype=bool)
     else:
         is_valid_arr = np.ones_like(singularity, dtype=bool)
 

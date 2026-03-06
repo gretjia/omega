@@ -128,6 +128,27 @@ def run_global_training(args: argparse.Namespace) -> None:
         "date",
         *list(FEATURE_COLS),
     }
+    
+    # [HOTFIX V64.1] Dynamically reconstruct the true `is_signal` based on V64.1 math closure.
+    # The L2 parquets on disk have the old V64.0 `is_signal` which compared topo_energy with sigma_eff.
+    # We fix it here in-memory before training.
+    signal_epi_threshold = 0.5
+    topo_energy_min_dimensionless = 2.0
+    spoofing_ratio_max = 2.5
+    srl_resid_sigma_mult = 0.5
+    topo_area_min_abs = 0.0
+    
+    df = df.with_columns([
+        (
+            (pl.col("is_energy_active") == True)
+            & (pl.col("epiplexity") > signal_epi_threshold) 
+            & (pl.col("srl_resid").abs() > srl_resid_sigma_mult * pl.col("sigma_eff"))
+            & (pl.col("topo_area").abs() > topo_area_min_abs)
+            & (pl.col("topo_energy") > topo_energy_min_dimensionless) # 纯几何无量纲门控比较 (HOTFIX)
+            & (pl.col("spoof_ratio") < spoofing_ratio_max)
+        ).alias("is_signal")
+    ])
+
     missing = sorted([c for c in required_cols if c not in df.columns])
     if missing:
         raise RuntimeError(f"base_matrix missing columns: {missing}")
