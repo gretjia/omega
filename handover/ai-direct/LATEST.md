@@ -164,3 +164,35 @@ The repo-alignment mission is complete. The isolated V64.3 smoke is now green ag
 - **Post-push runtime review:** `PASS`
 - **Post-push Gemini review:** `PASS`
 - **Release state:** V64.3 smoke, audits, push, and post-push review are all complete. The repo is no longer blocked by the local backtest stall.
+
+## Update: 2026-03-07 00:52 UTC
+- **Engineering speed patch status:** active local evaluation only. No `git commit` or `git push` has been authorized for the engineering-speed branch of work.
+- **Fair-comparison finding:** the first speed smoke was a `NO PASS`, but the dominant blocker was not a math regression. The training leg had drifted from the historical smoke contract:
+  - baseline smoke training: `xgb_max_depth=3`, `num_boost_round=2`, `seconds=10.98`
+  - first speed smoke training: `xgb_max_depth=5`, `num_boost_round=150`, `seconds=774.09`
+  - comparison smoke with baseline-matched training params restored training to `10.98s`, while the new backtest file-stream path remained fast (`~3.9s`)
+- **Informative-slice discovery status:** still unresolved. The following discovery passes all produced canonical zero-output slices under strict V64.3 semantics:
+  - `37` monthly tiny-symbol Stage 2 probes in `/home/zepher/work/Omega_vNext_v643_probe_smoke/.tmp/probe_l2`
+  - `5` full-day `fbd5c8b` probes in `/home/zepher/work/Omega_vNext_v643_probe_smoke/.tmp/fullprobe_l2`
+  - `5` full-day `b07c2229` probes in `/home/zepher/work/Omega_vNext_v643_probe_smoke/.tmp/fullprobe2_l2`
+- **Gate-chain diagnosis:** the zero-output condition is not caused by the downstream `sigma` or `spoof` gates. Across the `10` full-day probes:
+  - `is_physics_valid` and `is_energy_active` remain populated
+  - `sigma_gate_rows` and `spoof_ok_rows` are non-zero
+  - but `epiplexity`, `topo_area`, `topo_energy`, `is_signal`, and `singularity_vector` all remain zero
+  - authoritative artifact: `/home/zepher/work/Omega_vNext_v643_probe_smoke/audit/runtime/v643_probe/gate_chain_diagnosis.json`
+- **Baseline truth check:** the pre-speed baseline smoke workspace `/home/zepher/work/Omega_vNext_v643_smoke` is also zero-signal:
+  - the baseline L2 files for `20230320 -> 20230324` all have `epiplexity=0`, `is_signal=0`, `singularity_vector=0`, `topo_area=0`, `topo_energy=0`
+  - rows are highly symbol-interleaved (`max_consecutive_same_symbol <= 5` on sampled days)
+  - therefore the zero-output phenomenon predates the engineering speed patch and is not valid evidence that the patch introduced a new regression
+- **Workspace preservation contract:** do not delete or overwrite any of these workspaces:
+  - baseline: `/home/zepher/work/Omega_vNext_v643_smoke`
+  - speed smoke: `/home/zepher/work/Omega_vNext_v643_speed_smoke`
+  - training-comparison smoke: `/home/zepher/work/Omega_vNext_v643_traincmp_smoke`
+  - probe/discovery smoke: `/home/zepher/work/Omega_vNext_v643_probe_smoke`
+- **Current decision point:** separate the remaining work into two scopes before any release decision:
+  1. engineering speed-patch evaluation against fair baseline comparisons
+  2. long-standing zero-signal / ordering / slice-informativeness diagnosis that already existed in the baseline smoke
+- **Owner decision locked:** preserve both engineering routes for now.
+  - keep the old pre-speed engineering route as a valid comparison / rollback path
+  - keep the new engineering-speed route as an active candidate path
+  - do not eliminate either route until the root cause of the all-zero smoke outputs is understood
