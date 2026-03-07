@@ -304,3 +304,39 @@ Write only reproducible, technical lessons.
 - fix: The moment the mission-level canonical spec changes, update `LATEST.md` to mark prior smoke evidence as historical only and state the current release gate explicitly.
 - guardrail: `LATEST.md` is not a diary. It must always tell the next agent which version is active, which smoke evidence is historical, and what gate remains before release.
 - refs: `handover/ai-direct/LATEST.md`, `audit/v643.md`
+
+## 2026-03-07T03:23:37Z | Stage2 Ordering Contract Caused Canonical All-Zero Collapse
+- task_id: TASK-V643-STAGE2-ORDERING-REMEDIATION
+- git_hash: working_tree_pre_commit
+- role: debug_scribe
+- model_profile: codex_default
+- auto_key: TASK-V643-STAGE2-ORDERING-REMEDIATION|all_zero_root_cause
+- symptom: Baseline smoke, speed-route smoke, and targeted probes all showed `topo_area=0`, `topo_energy=0`, `epiplexity=0`, `is_signal=0`, and `singularity_vector=0`, making the V64.3 canonical chain appear dead.
+- root_cause: The defect was not in Stage1 raw parquet. It was the Stage2 ETL -> kernel contract: `build_l2_features_from_l1()` emitted symbol-interleaved frames, while `apply_recursive_physics()` computed `is_boundary` / `dist_to_boundary` as if rows were symbol/date contiguous. Rolling topology and compression windows were therefore reset continuously on the wrong trajectory.
+- fix: Repair ordering inside the Stage2 -> kernel handoff, sort locally by `symbol/date/time_end|bucket_id`, compute physics/topology/compression on the repaired order, then restore original row order on output. Add input-contract gates that fail fast on missing ordering keys or unrecoverable partition defects.
+- guardrail: Any Stage2 launch must prove one of two states before heavy compute: either input frames are already symbol/date/time contiguous, or the kernel explicitly repairs ordering using a declared time key. No future smoke is valid if it only proves process completion while the canonical chain remains degenerate.
+- refs: `audit/v643_all_0_root_cause.md`, `audit/v643_stage2_remediation_plan.md`, `audit/v643_stage2_code_audit.md`, `audit/v643_stage2fix_speed_smoke_pass.md`
+
+## 2026-03-07T03:23:37Z | Fail-Fast Gates Must Match Batch Granularity
+- task_id: TASK-V643-STAGE2-ORDERING-REMEDIATION
+- git_hash: working_tree_pre_commit
+- role: debug_scribe
+- model_profile: codex_default
+- auto_key: TASK-V643-STAGE2-ORDERING-REMEDIATION|gate_granularity
+- symptom: The first Stage2 remediation smoke falsely failed all 5 hot-week files with `no_groups_reach_window:window=60`, even though the files were valid and later produced non-zero signals.
+- root_cause: The warm-up reachability gate was applied at the 50-symbol batch level, but the operational contract that matters is file/input-level reachability. Individual batches can legitimately contain no `>=60` group while the file as a whole is still valid.
+- fix: Keep strict warm-up validation at file/input scope. At batch scope, downgrade `no_groups_reach_window` to diagnostic mode (`strict_batch_gate=False`) and allow empty batches to skip without killing the entire file.
+- guardrail: Never reuse a file-level validity predicate blindly at worker-batch granularity. Gate placement must match the scheduler's unit of failure.
+- refs: `tools/stage2_physics_compute.py`, `audit/v643_stage2_code_audit.md`, `handover/ai-direct/entries/20260307_032337_v643_stage2_ordering_fix_speed_smoke_pass.md`
+
+## 2026-03-07T03:23:37Z | Explicit Year Scope Is Mandatory Outside the 2023 Baseline
+- task_id: TASK-V643-STAGE2-ORDERING-REMEDIATION
+- git_hash: working_tree_pre_commit
+- role: debug_scribe
+- model_profile: codex_default
+- auto_key: TASK-V643-STAGE2-ORDERING-REMEDIATION|explicit_year_scope
+- symptom: `forge_base_matrix.py` initially failed with `No input frame files matched.` even though the Stage2 hot-week parquet files existed and were correctly listed.
+- root_cause: The forge CLI defaults to `--years=2023,2024`. The validating hot week was in `2025`, so the default year filter silently removed every input file.
+- fix: Explicitly pass `--years 2025` for the hot-week smoke and treat year scope as a required part of any non-baseline smoke contract.
+- guardrail: Never rely on implicit `years` defaults when validating a targeted window. Smoke manifests must always declare year scope explicitly.
+- refs: `tools/forge_base_matrix.py`, `handover/ai-direct/entries/20260307_032337_v643_stage2_ordering_fix_speed_smoke_pass.md`

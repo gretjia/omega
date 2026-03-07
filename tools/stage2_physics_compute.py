@@ -13,12 +13,36 @@ import sys
 import glob
 import argparse
 import gc
+import json
 import re
 import time
 import shutil
 import tempfile
 import subprocess
 import platform
+
+
+def _setdefault_numeric_thread_caps():
+    """
+    Constrain nested native thread pools before importing heavy runtimes.
+    Stage2 already parallelizes at the process/file level; letting Polars/BLAS/
+    OpenMP all fan out independently only creates thread thrash.
+    """
+    cpu_count = max(1, int(os.cpu_count() or 1))
+    default_polars = "2" if sys.platform == "win32" else str(max(1, cpu_count // 2))
+    os.environ.setdefault("OMEGA_STAGE2_POLARS_THREADS", default_polars)
+    os.environ.setdefault("NUMBA_NUM_THREADS", default_polars)
+    for name in (
+        "OPENBLAS_NUM_THREADS",
+        "MKL_NUM_THREADS",
+        "OMP_NUM_THREADS",
+        "NUMEXPR_NUM_THREADS",
+        "VECLIB_MAXIMUM_THREADS",
+    ):
+        os.environ.setdefault(name, "1")
+
+
+_setdefault_numeric_thread_caps()
 
 
 def _apply_windows_machine_probe_bypass():
@@ -86,6 +110,20 @@ TARGET_OOM_SCORE_ADJ = 300
 WINDOWS_RISKY_PYTHON_MAJOR_MINOR = (3, 14)
 PATHO_SYMBOL_MIN_ROWS_DEFAULT = 50000
 PATHO_SYMBOL_MAX_UNIQUE_TIMES_DEFAULT = 2
+_STAGE2_REQUIRED_FEATURE_COLS = {
+    "symbol",
+    "date",
+    "open",
+    "close",
+    "sigma",
+    "depth",
+    "net_ofi",
+    "trade_vol",
+    "cancel_vol",
+}
+_STAGE2_REQUIRED_RAW_COLS = {"symbol", "date"}
+_STAGE2_RAW_TIME_KEYS = ("__time_dt", "time", "time_start", "time_end")
+_STAGE2_ORDER_KEYS = ("time_end", "bucket_id")
 
 
 def _read_self_cgroup_path():
@@ -191,6 +229,77 @@ def _is_truthy_env_default(name, default):
     if raw is None:
         raw = default
     return str(raw).strip().lower() in {"1", "true", "yes"}
+
+
+def _first_present_name(names, candidates):
+    name_set = set(names)
+    for cand in candidates:
+        if cand in name_set:
+            return cand
+    return None
+
+
+def _strict_batch_window_gate_enabled():
+    return _is_truthy_env_default("OMEGA_STAGE2_STRICT_BATCH_WINDOW_GATE", "0")
+
+
+def _audit_stage2_feature_contract(feat_df, *, window_len, require_window_reachable=True):
+    missing = sorted(_STAGE2_REQUIRED_FEATURE_COLS - set(feat_df.columns))
+    if missing:
+        raise RuntimeError(f"missing_feature_columns:{','.join(missing)}")
+
+    order_key = _first_present_name(feat_df.columns, _STAGE2_ORDER_KEYS)
+    if order_key is None:
+        raise RuntimeError("missing_order_key:time_end|bucket_id")
+
+    group_sizes = feat_df.group_by(["symbol", "date"]).len()
+    max_group_rows = int(group_sizes.select(pl.col("len").max()).item() or 0)
+    eligible_groups = int(group_sizes.filter(pl.col("len") >= int(window_len)).height)
+    if eligible_groups <= 0 and require_window_reachable:
+        raise RuntimeError(
+            f"no_groups_reach_window:window={int(window_len)},max_group_rows={max_group_rows}"
+        )
+
+    run_df = (
+        feat_df.select([
+            pl.col("symbol").cast(pl.Utf8, strict=False).fill_null("").alias("__sym"),
+            pl.col("date").cast(pl.Utf8, strict=False).fill_null("").alias("__date"),
+        ])
+        .with_columns(
+            (
+                (pl.col("__sym") != pl.col("__sym").shift(1))
+                | (pl.col("__date") != pl.col("__date").shift(1))
+            ).fill_null(True).cast(pl.Int64).cum_sum().alias("__run_id")
+        )
+    )
+    disordered_groups = int(
+        run_df.group_by(["__sym", "__date"])
+        .agg(pl.col("__run_id").n_unique().alias("__n_runs"))
+        .filter(pl.col("__n_runs") > 1)
+        .height
+    )
+    max_run_rows = int(
+        run_df.group_by("__run_id").len().select(pl.col("len").max()).item() or 0
+    )
+
+    report = {
+        "rows": int(feat_df.height),
+        "window_len": int(window_len),
+        "order_key": order_key,
+        "eligible_groups": eligible_groups,
+        "max_group_rows": max_group_rows,
+        "disordered_groups": disordered_groups,
+        "max_consecutive_group_rows": max_run_rows,
+        "repairable_by_kernel_reorder": bool(disordered_groups > 0),
+    }
+
+    if disordered_groups > 0 and not _is_truthy_env_default("OMEGA_STAGE2_FIX_KERNEL_ORDERING", "1"):
+        raise RuntimeError(
+            "repairable_ordering_violation:"
+            + json.dumps(report, ensure_ascii=False, sort_keys=True)
+        )
+
+    return report
 
 
 def _profile_symbol_time_density(l1_file, symbol, *, unique_cap):
@@ -316,27 +425,45 @@ def _apply_worker_thread_budget(workers):
         return
 
     cpu_count = max(1, int(os.cpu_count() or 1))
-    current_threads = _coerce_positive_int(
+    current_polars = _coerce_positive_int(
         os.environ.get("POLARS_MAX_THREADS"),
         _coerce_positive_int(_DEFAULT_POLARS_THREADS, 1),
     )
     thread_budget = max(1, cpu_count // max(1, int(workers)))
-    tuned_threads = min(current_threads, thread_budget)
+    tuned_polars = min(current_polars, thread_budget)
+    os.environ["POLARS_MAX_THREADS"] = str(tuned_polars)
 
-    if tuned_threads != current_threads:
-        os.environ["POLARS_MAX_THREADS"] = str(tuned_threads)
-        print(
-            "[GUARDRAIL] POLARS_MAX_THREADS capped "
-            f"{current_threads} -> {tuned_threads} for workers={workers} "
-            f"(cpu_count={cpu_count})",
-            flush=True,
-        )
-    else:
-        print(
-            "[GUARDRAIL] POLARS_MAX_THREADS kept at "
-            f"{current_threads} for workers={workers} (cpu_count={cpu_count})",
-            flush=True,
-        )
+    current_numba = _coerce_positive_int(
+        os.environ.get("NUMBA_NUM_THREADS"),
+        thread_budget,
+    )
+    tuned_numba = min(current_numba, thread_budget)
+    os.environ["NUMBA_NUM_THREADS"] = str(tuned_numba)
+    for name in (
+        "OPENBLAS_NUM_THREADS",
+        "MKL_NUM_THREADS",
+        "OMP_NUM_THREADS",
+        "NUMEXPR_NUM_THREADS",
+        "VECLIB_MAXIMUM_THREADS",
+    ):
+        os.environ[name] = "1"
+
+    try:
+        import numba
+
+        if hasattr(numba, "set_num_threads"):
+            numba.set_num_threads(tuned_numba)
+    except Exception:
+        pass
+
+    print(
+        "[GUARDRAIL] thread budget applied "
+        f"POLARS_MAX_THREADS={current_polars}->{tuned_polars}, "
+        f"NUMBA_NUM_THREADS={current_numba}->{tuned_numba}, "
+        "native_threads=1, "
+        f"workers={workers}, cpu_count={cpu_count}",
+        flush=True,
+    )
 
 
 def _windows_runtime_risk_notes():
@@ -539,6 +666,25 @@ def _run_feature_physics_batch(batch_frames, writer, tmp_parquet):
         batch_df = build_l2_features_from_l1(input_df, GLOBAL_CFG)
 
         if batch_df is not None and batch_df.height > 0:
+            stage2_gate = _audit_stage2_feature_contract(
+                batch_df,
+                window_len=int(GLOBAL_CFG.epiplexity.min_trace_len),
+                require_window_reachable=_strict_batch_window_gate_enabled(),
+            )
+            if int(stage2_gate.get("eligible_groups", 0)) <= 0:
+                print(
+                    "[GATE] Stage2 batch has no window-reachable groups; "
+                    f"strict_batch_gate={_strict_batch_window_gate_enabled()} "
+                    f"report={json.dumps(stage2_gate, ensure_ascii=False, sort_keys=True)}",
+                    flush=True,
+                )
+            if int(stage2_gate.get("disordered_groups", 0)) > 0:
+                print(
+                    "[GATE] Stage2 detected repairable ordering violation; "
+                    f"kernel reorder enabled={_is_truthy_env_default('OMEGA_STAGE2_FIX_KERNEL_ORDERING', '1')} "
+                    f"report={json.dumps(stage2_gate, ensure_ascii=False, sort_keys=True)}",
+                    flush=True,
+                )
             batch_df = apply_recursive_physics(batch_df, GLOBAL_CFG)
 
         if batch_df is not None and batch_df.height > 0:
@@ -707,6 +853,7 @@ def _run_single_symbol_batch_file(l1_file, symbols_file, output_parquet):
 
     symbol_set = {str(s) for s in symbols if str(s)}
     symbol_tables = []
+    seen_symbols = set()
     try:
         # Fast path: iterate parquet once and only materialize requested symbols.
         for symbol_tbl in _iter_complete_symbol_frames_from_parquet(l1_file):
@@ -717,6 +864,9 @@ def _run_single_symbol_batch_file(l1_file, symbols_file, output_parquet):
             except Exception:
                 symbol_name = str(symbol_tbl.column("symbol")[0])
             if symbol_name in symbol_set:
+                if symbol_name in seen_symbols:
+                    raise RuntimeError(f"duplicate_symbol_partition_detected:{symbol_name}")
+                seen_symbols.add(symbol_name)
                 symbol_tables.append(symbol_tbl)
                 symbol_set.discard(symbol_name)
                 if not symbol_set:
@@ -740,6 +890,13 @@ def _run_single_symbol_batch_file(l1_file, symbols_file, output_parquet):
                         pass
         else:
             batch_df = pl.DataFrame()
+    except RuntimeError as exc:
+        if "duplicate_symbol_partition_detected:" in str(exc):
+            raise
+        # Compatibility fallback for unexpected parquet-layout edge cases.
+        lf = pl.scan_parquet(l1_file)
+        symbol_expr = pl.col("symbol").cast(pl.Utf8, strict=False)
+        batch_df = lf.filter(symbol_expr.is_in(symbols)).collect()
     except Exception:
         # Compatibility fallback for unexpected parquet-layout edge cases.
         lf = pl.scan_parquet(l1_file)
@@ -752,6 +909,29 @@ def _run_single_symbol_batch_file(l1_file, symbols_file, output_parquet):
     feat_df = build_l2_features_from_l1(batch_df, GLOBAL_CFG)
     if feat_df is None or feat_df.height <= 0:
         return 4
+    try:
+        stage2_gate = _audit_stage2_feature_contract(
+            feat_df,
+            window_len=int(GLOBAL_CFG.epiplexity.min_trace_len),
+            require_window_reachable=_strict_batch_window_gate_enabled(),
+        )
+    except Exception as exc:
+        print(f"[GATE] Stage2 feature contract failed: {exc}", flush=True)
+        return 4
+    if int(stage2_gate.get("eligible_groups", 0)) <= 0:
+        print(
+            "[GATE] Stage2 isolated batch has no window-reachable groups; "
+            f"strict_batch_gate={_strict_batch_window_gate_enabled()} "
+            f"report={json.dumps(stage2_gate, ensure_ascii=False, sort_keys=True)}",
+            flush=True,
+        )
+    if int(stage2_gate.get("disordered_groups", 0)) > 0:
+        print(
+            "[GATE] Stage2 detected repairable ordering violation; "
+            f"kernel reorder enabled={_is_truthy_env_default('OMEGA_STAGE2_FIX_KERNEL_ORDERING', '1')} "
+            f"report={json.dumps(stage2_gate, ensure_ascii=False, sort_keys=True)}",
+            flush=True,
+        )
     feat_df = apply_recursive_physics(feat_df, GLOBAL_CFG)
     if feat_df is None or feat_df.height <= 0:
         return 4
@@ -888,6 +1068,21 @@ def process_chunk(kwargs):
                 }
 
         has_symbol = "symbol" in schema_names
+        missing_raw = sorted(_STAGE2_REQUIRED_RAW_COLS - set(schema_names))
+        if missing_raw:
+            return {
+                "ok": False,
+                "status": "input_contract_failed",
+                "file": file_path.name,
+                "message": f"[{file_path.name}] Stage2 input contract failed: missing raw columns {missing_raw}",
+            }
+        if _first_present_name(schema_names, _STAGE2_RAW_TIME_KEYS) is None:
+            return {
+                "ok": False,
+                "status": "input_contract_failed",
+                "file": file_path.name,
+                "message": f"[{file_path.name}] Stage2 input contract failed: missing raw time key {list(_STAGE2_RAW_TIME_KEYS)}",
+            }
 
         default_batch_size = "20" if sys.platform == "win32" else "50"
         batch_size = max(1, int(os.environ.get("OMEGA_STAGE2_SYMBOL_BATCH_SIZE", default_batch_size)))
@@ -935,8 +1130,18 @@ def process_chunk(kwargs):
                 symbol_frames = []
                 symbols_seen = 0
                 batch_idx = 0
+                seen_symbols = set()
                 try:
                     for symbol_df in _iter_complete_symbol_frames_from_parquet(l1_file):
+                        try:
+                            symbol_name = str(symbol_df.column("symbol")[0].as_py())
+                        except Exception:
+                            symbol_name = str(symbol_df.column("symbol")[0])
+                        if symbol_name in seen_symbols:
+                            raise RuntimeError(
+                                f"duplicate_symbol_partition_detected:{symbol_name}"
+                            )
+                        seen_symbols.add(symbol_name)
                         symbol_frames.append(symbol_df)
                         symbols_seen += 1
                         if len(symbol_frames) >= batch_size:

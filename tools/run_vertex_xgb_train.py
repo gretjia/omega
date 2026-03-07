@@ -93,6 +93,39 @@ def _bootstrap_codebase(code_bundle_uri: str) -> None:
         sys.path.append(os.getcwd())
 
 
+def _audit_training_base_matrix_contract(df, *, singularity_threshold: float) -> dict:
+    import polars as pl
+
+    diag = (
+        df.select([
+            pl.len().alias("rows"),
+            (pl.col("epiplexity").fill_null(0.0).fill_nan(0.0) > 0.0).sum().alias("epi_pos_rows"),
+            (pl.col("topo_energy").fill_null(0.0).fill_nan(0.0) > 0.0).sum().alias("topo_energy_pos_rows"),
+            (pl.col("singularity_vector").fill_null(0.0).fill_nan(0.0).abs() > float(singularity_threshold)).sum().alias("signal_gate_rows"),
+        ])
+        .row(0, named=True)
+    )
+    diag = {k: int(v or 0) for k, v in diag.items()}
+    if diag["rows"] <= 0:
+        raise RuntimeError("training_input_contract_empty")
+    if diag["signal_gate_rows"] <= 0:
+        raise RuntimeError(
+            "training_input_contract_no_singularity_rows:"
+            + json.dumps(diag, ensure_ascii=False, sort_keys=True)
+        )
+    if diag["epi_pos_rows"] <= 0 or diag["topo_energy_pos_rows"] <= 0:
+        raise RuntimeError(
+            "training_input_contract_degenerate_canonical_signal_chain:"
+            + json.dumps(diag, ensure_ascii=False, sort_keys=True)
+        )
+    print(
+        "[GATE] Training input contract passed "
+        f"{json.dumps(diag, ensure_ascii=False, sort_keys=True)}",
+        flush=True,
+    )
+    return diag
+
+
 def run_global_training(args: argparse.Namespace) -> None:
     repo_root = str(Path(__file__).resolve().parent.parent)
     if repo_root not in sys.path:
@@ -146,6 +179,10 @@ def run_global_training(args: argparse.Namespace) -> None:
     missing = sorted([c for c in required_cols if c not in df.columns])
     if missing:
         raise RuntimeError(f"base_matrix missing columns: {missing}")
+    _audit_training_base_matrix_contract(
+        df,
+        singularity_threshold=float(args.singularity_threshold),
+    )
 
     # [HOTFIX V64.1] Dynamically reconstruct the true `is_signal` based on V64.1 math closure.
     # The L2 parquets on disk have the old V64.0 `is_signal` which compared topo_energy with sigma_eff.

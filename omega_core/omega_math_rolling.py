@@ -1,8 +1,9 @@
-import numpy as np
 import math
 
+import numpy as np
+
 try:
-    from numba import njit, prange
+    from numba import njit
 except ImportError:
     def njit(*args, **kwargs):
         def decorator(func):
@@ -10,12 +11,12 @@ except ImportError:
 
         return decorator
 
-    prange = range
 
-# Use numpy's 1.20+ sliding window view to create 2D strides with 0 memory copies
-from numpy.lib.stride_tricks import sliding_window_view 
+# [反脆弱底线] 普朗克常数守护物理奇点
+PLANCK_CONSTANT = 1e-12
 
-@njit(parallel=True, cache=True)
+
+@njit(cache=True, nogil=True, fastmath=False)
 def calc_isoperimetric_topology_rolling(
     prices: np.ndarray,
     ofis: np.ndarray,
@@ -23,179 +24,291 @@ def calc_isoperimetric_topology_rolling(
     price_scale_floor: float,
     ofi_scale_floor: float,
     green_coeff: float,
-    dist_to_boundary: np.ndarray
+    dist_to_boundary: np.ndarray,
 ):
     """
-    V63 topology gate: Q_topo = 4*pi*|A_closed| / L_closed^2
-    Note: green_coeff MUST be 0.5 at the call site for Shoelace/Green consistency.
+    V64 engineering fast path:
+    - preserves the canonical closed-area / closed-perimeter topology math
+    - removes per-row window slices and local cumulative-OFI allocations
+    - keeps the exact Q_topo = 4*pi*|A_closed| / L_closed^2 definition
     """
     n = len(prices)
     out_area = np.zeros(n, dtype=np.float64)
-    out_energy = np.zeros(n, dtype=np.float64)  # Semantically stores L_closed
+    out_energy = np.zeros(n, dtype=np.float64)
     out_q = np.zeros(n, dtype=np.float64)
 
-    if n < window:
+    if window <= 1 or n < window:
         return out_area, out_energy, out_q
 
-    for i in prange(window - 1, n):
-        if dist_to_boundary[i] < window - 1:
+    # Boundary-aware cumulative OFI. Because the canonical topology normalizes
+    # with window-local mean, any per-window additive constant cancels exactly.
+    cum_ofi = np.empty(n, dtype=np.float64)
+    segment_cum = 0.0
+    for i in range(n):
+        if dist_to_boundary[i] == 0:
+            segment_cum = 0.0
+        segment_cum += ofis[i]
+        cum_ofi[i] = segment_cum
+
+    sum_x = 0.0
+    sum_x2 = 0.0
+    sum_y = 0.0
+    sum_y2 = 0.0
+    pair_sum = 0.0
+    count = 0
+    prev_x = 0.0
+    prev_y = 0.0
+
+    for i in range(n):
+        if dist_to_boundary[i] == 0:
+            sum_x = 0.0
+            sum_x2 = 0.0
+            sum_y = 0.0
+            sum_y2 = 0.0
+            pair_sum = 0.0
+            count = 0
+
+        x = prices[i]
+        y = cum_ofi[i]
+
+        if count > 0:
+            pair_sum += prev_x * y - x * prev_y
+        prev_x = x
+        prev_y = y
+
+        sum_x += x
+        sum_x2 += x * x
+        sum_y += y
+        sum_y2 += y * y
+        count += 1
+
+        if count > window:
+            out_idx = i - window
+            x_out = prices[out_idx]
+            y_out = cum_ofi[out_idx]
+            x_next = prices[out_idx + 1]
+            y_next = cum_ofi[out_idx + 1]
+
+            pair_sum -= x_out * y_next - x_next * y_out
+            sum_x -= x_out
+            sum_x2 -= x_out * x_out
+            sum_y -= y_out
+            sum_y2 -= y_out * y_out
+            count = window
+
+        if count < window:
             continue
 
-        X = prices[i - window + 1 : i + 1]
+        mean_x = sum_x / window
+        mean_y = sum_y / window
+        var_x = (sum_x2 / window) - mean_x * mean_x
+        var_y = (sum_y2 / window) - mean_y * mean_y
 
-        # Local cumulative OFI inside the window, avoiding global drift contamination.
-        Y = np.empty(window, dtype=np.float64)
-        Y[0] = ofis[i - window + 1]
-        for j in range(1, window):
-            Y[j] = Y[j - 1] + ofis[i - window + 1 + j]
-
-        mx = np.sum(X) / window
-        my = np.sum(Y) / window
-
-        sx = math.sqrt(np.sum((X - mx) ** 2) / window)
-        sy = math.sqrt(np.sum((Y - my) ** 2) / window)
-
+        sx = math.sqrt(var_x) if var_x > 0.0 else 0.0
+        sy = math.sqrt(var_y) if var_y > 0.0 else 0.0
         if sx < price_scale_floor:
             sx = price_scale_floor
         if sy < ofi_scale_floor:
             sy = ofi_scale_floor
 
-        Xn = (X - mx) / sx
-        Yn = (Y - my) / sy
+        start = i - window + 1
+        first_x = prices[start]
+        first_y = cum_ofi[start]
+        raw_closed_area = pair_sum + x * first_y - first_x * y
 
-        area_sum = 0.0
+        area_val = green_coeff * raw_closed_area / (sx * sy)
+        out_area[i] = area_val
+
+        inv_sx = 1.0 / sx
+        inv_sy = 1.0 / sy
         energy_sum = 0.0
 
-        for j in range(window - 1):
-            area_sum += Xn[j] * Yn[j + 1] - Xn[j + 1] * Yn[j]
-            dx = Xn[j + 1] - Xn[j]
-            dy = Yn[j + 1] - Yn[j]
+        for j in range(start, i):
+            dx = (prices[j + 1] - prices[j]) * inv_sx
+            dy = (cum_ofi[j + 1] - cum_ofi[j]) * inv_sy
             energy_sum += math.sqrt(dx * dx + dy * dy)
 
-        # Close the polygon for area
-        area_sum += Xn[window - 1] * Yn[0] - Xn[0] * Yn[window - 1]
-
-        # Critical V63 fix: close the polygon for perimeter as well
-        dx_close = Xn[0] - Xn[window - 1]
-        dy_close = Yn[0] - Yn[window - 1]
+        dx_close = (first_x - x) * inv_sx
+        dy_close = (first_y - y) * inv_sy
         energy_sum += math.sqrt(dx_close * dx_close + dy_close * dy_close)
 
-        area_val = area_sum * green_coeff
-        out_area[i] = area_val
         out_energy[i] = energy_sum
 
-        if energy_sum > 1e-12:
+        if energy_sum > PLANCK_CONSTANT:
             q_val = (4.0 * math.pi * abs(area_val)) / (energy_sum * energy_sum)
-
-            # Numerical guard
             if q_val > 1.0:
                 q_val = 1.0
             elif q_val < 0.0:
                 q_val = 0.0
-
             out_q[i] = q_val
 
     return out_area, out_energy, out_q
 
 
-# [反脆弱底线] 普朗克常数守护物理奇点
-PLANCK_CONSTANT = 1e-12
-
-@njit(parallel=True, cache=True)
+@njit(cache=True, nogil=True, fastmath=False)
 def calc_srl_compression_gain_rolling(
-    price_change: np.ndarray,     # [V64 绝对闭合] 引入原始价格波动 (Null Model)
-    srl_residuals: np.ndarray,    # [V64 绝对闭合] SRL 残差 (Alternative Model)
+    price_change: np.ndarray,
+    srl_residuals: np.ndarray,
     window: int,
-    dist_to_boundary: np.ndarray
+    dist_to_boundary: np.ndarray,
 ) -> np.ndarray:
     """
     第一性原理闭合: 计算 SRL 相对均值模型的信息论压缩增益 (Prequential MDL Gain)。
-    在 V64.2 的序贯编码解释下，Null 与 Alternative 在窗口内都只编码局部均值和方差，
-    而 Holographic Damper 的状态路径由历史严格因果重建，不消耗窗口内自由度。
-    因此 Delta k = 0，复杂度惩罚项严格湮灭。
 
-    当 SRL 完美解释价格波动时，残差方差 -> 0，信息增益自然发散至正无穷大；
-    当原始价格方差本身塌缩时，增益归零。
+    V64 engineering fast path:
+    - exact same Delta k = 0 mathematics
+    - O(N) boundary-aware rolling state instead of O(N*W) slicing
+    - no temporary windows, no hidden allocator churn
     """
     n = len(srl_residuals)
     out = np.zeros(n, dtype=np.float64)
 
-    if n < window:
+    if window <= 1 or n < window:
         return out
 
-    for i in prange(window - 1, n):
-        if dist_to_boundary[i] < window - 1:
+    sum_dp = 0.0
+    sum_dp2 = 0.0
+    sum_r = 0.0
+    sum_r2 = 0.0
+    count = 0
+
+    for i in range(n):
+        if dist_to_boundary[i] == 0:
+            sum_dp = 0.0
+            sum_dp2 = 0.0
+            sum_r = 0.0
+            sum_r2 = 0.0
+            count = 0
+
+        dp = price_change[i]
+        resid = srl_residuals[i]
+
+        sum_dp += dp
+        sum_dp2 += dp * dp
+        sum_r += resid
+        sum_r2 += resid * resid
+        count += 1
+
+        if count > window:
+            out_idx = i - window
+            dp_out = price_change[out_idx]
+            resid_out = srl_residuals[out_idx]
+
+            sum_dp -= dp_out
+            sum_dp2 -= dp_out * dp_out
+            sum_r -= resid_out
+            sum_r2 -= resid_out * resid_out
+            count = window
+
+        if count < window:
             continue
 
-        dp = price_change[i - window + 1 : i + 1]
-        r = srl_residuals[i - window + 1 : i + 1]
-
-        # 零假设方差: 原始价格的波动能量
-        mean_dp = np.sum(dp) / window
-        var_dp = (np.sum(dp * dp) / window) - (mean_dp * mean_dp)
-
-        # 备择假设方差: SRL 吸收冲击后的残差能量
-        mean_r = np.sum(r) / window
-        var_r = (np.sum(r * r) / window) - (mean_r * mean_r)
-
-        # 【第一性原理底线】：Zero-variance -> zero signal
-        # 如果价格原本就是死水，没有任何可压缩的智能
+        mean_dp = sum_dp / window
+        var_dp = (sum_dp2 / window) - (mean_dp * mean_dp)
         if var_dp < PLANCK_CONSTANT:
             out[i] = 0.0
             continue
 
+        mean_r = sum_r / window
+        var_r = (sum_r2 / window) - (mean_r * mean_r)
         safe_var_r = max(var_r, PLANCK_CONSTANT)
         ratio = var_dp / safe_var_r
-        
-        # 只有模型提供了正向压缩(ratio > 1)，才计算对数增益
+
         if ratio > 1.0:
             out[i] = (window / 2.0) * math.log(ratio)
 
     return out
-@njit(parallel=True, cache=True)
+
+
+@njit(cache=True, nogil=True, fastmath=False)
 def calc_topology_area_rolling(
-    x_arr: np.ndarray, 
-    y_arr: np.ndarray, 
+    x_arr: np.ndarray,
+    y_arr: np.ndarray,
     window: int,
-    x_scale_floor: float, 
-    y_scale_floor: float, 
+    x_scale_floor: float,
+    y_scale_floor: float,
     green_coeff: float,
-    dist_to_boundary: np.ndarray
+    dist_to_boundary: np.ndarray,
 ) -> np.ndarray:
     """
-    Vectorized Green's Theorem Area for arbitrary Manifolds (X, Y) using rolling 1D contiguous arrays.
+    Vectorized Green's Theorem area for arbitrary manifolds (X, Y).
+
+    V64 engineering fast path:
+    - exact open-chain normalized area
+    - O(N) boundary-aware rolling state
+    - endpoint correction preserves the historical centered formula exactly
     """
     n = len(x_arr)
     out_area = np.zeros(n, dtype=np.float64)
-    
-    if n < window:
+
+    if window <= 1 or n < window:
         return out_area
 
-    for i in prange(window - 1, n):
-        if dist_to_boundary[i] < window - 1:
+    sum_x = 0.0
+    sum_x2 = 0.0
+    sum_y = 0.0
+    sum_y2 = 0.0
+    pair_sum = 0.0
+    count = 0
+    prev_x = 0.0
+    prev_y = 0.0
+
+    for i in range(n):
+        if dist_to_boundary[i] == 0:
+            sum_x = 0.0
+            sum_x2 = 0.0
+            sum_y = 0.0
+            sum_y2 = 0.0
+            pair_sum = 0.0
+            count = 0
+
+        x = x_arr[i]
+        y = y_arr[i]
+
+        if count > 0:
+            pair_sum += prev_x * y - x * prev_y
+        prev_x = x
+        prev_y = y
+
+        sum_x += x
+        sum_x2 += x * x
+        sum_y += y
+        sum_y2 += y * y
+        count += 1
+
+        if count > window:
+            out_idx = i - window
+            x_out = x_arr[out_idx]
+            y_out = y_arr[out_idx]
+            x_next = x_arr[out_idx + 1]
+            y_next = y_arr[out_idx + 1]
+
+            pair_sum -= x_out * y_next - x_next * y_out
+            sum_x -= x_out
+            sum_x2 -= x_out * x_out
+            sum_y -= y_out
+            sum_y2 -= y_out * y_out
+            count = window
+
+        if count < window:
             continue
 
-        X = x_arr[i - window + 1 : i + 1]
-        Y = y_arr[i - window + 1 : i + 1]
-        
-        mx = np.sum(X) / window
-        my = np.sum(Y) / window
-        
-        vx = np.sum((X - mx)**2) / window
-        vy = np.sum((Y - my)**2) / window
-        sx = math.sqrt(vx)
-        sy = math.sqrt(vy)
-        
-        if sx < x_scale_floor: sx = x_scale_floor
-        if sy < y_scale_floor: sy = y_scale_floor
-        
-        Xn = (X - mx) / sx
-        Yn = (Y - my) / sy
-        
-        area_sum = 0.0
-        for j in range(window - 1):
-            area_sum += Xn[j] * Yn[j+1] - Xn[j+1] * Yn[j]
-            
-        out_area[i] = area_sum * green_coeff
-        
+        mean_x = sum_x / window
+        mean_y = sum_y / window
+        var_x = (sum_x2 / window) - (mean_x * mean_x)
+        var_y = (sum_y2 / window) - (mean_y * mean_y)
+
+        sx = math.sqrt(var_x) if var_x > 0.0 else 0.0
+        sy = math.sqrt(var_y) if var_y > 0.0 else 0.0
+        if sx < x_scale_floor:
+            sx = x_scale_floor
+        if sy < y_scale_floor:
+            sy = y_scale_floor
+
+        first_x = x_arr[i - window + 1]
+        first_y = y_arr[i - window + 1]
+        area_sum = pair_sum + mean_y * (x - first_x) + mean_x * (first_y - y)
+
+        out_area[i] = green_coeff * area_sum / (sx * sy)
+
     return out_area

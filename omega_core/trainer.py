@@ -195,7 +195,10 @@ class OmegaTrainerV3:
         label_sigma_mult = float(tcfg.label_sigma_mult)
         min_valid_close = float(getattr(tcfg, "min_valid_close", 0.0))
 
-        df, use_t1 = self._build_t_plus_one_targets(df, cfg)
+        if "t1_close" in df.columns and int(max(0, getattr(cfg.micro, "t_plus_1_horizon_days", 0))) > 0:
+            use_t1 = True
+        else:
+            df, use_t1 = self._build_t_plus_one_targets(df, cfg)
 
         def _over_symbol(expr: pl.Expr) -> pl.Expr:
             if "symbol" in df.columns:

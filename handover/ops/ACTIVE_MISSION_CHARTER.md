@@ -1,31 +1,27 @@
 # OMEGA Active Mission Charter
 
-Status: In Progress
-Task Name: V64 engineering speed patch evaluation and zero-signal diagnosis
+Status: Completed
+Task Name: V64 Stage2 ordering-contract remediation, gate hardening, and speed-route validating smoke
 Owner: Human Owner
 Commander: Codex
 Date: 2026-03-07
 
 Current checkpoint:
 
-- the engineering speed patch remains local-only and uncommitted
-- the first speed smoke was `NO PASS`, but the dominant blocker was unfair training-parameter drift rather than a proven math regression
-- a baseline-comparison smoke restored training to the historical `10.98s` contract while keeping the new backtest path fast
-- non-zero slice discovery has not succeeded yet:
-  - `37` monthly tiny probes
-  - `5` full-day `fbd5c8b` probes
-  - `5` full-day `b07c2229` probes
-  all remained zero under strict V64.3 semantics
-- the pre-speed baseline smoke workspace is also zero-signal, so the zero-output condition predates the engineering speed patch
-- the Owner has explicitly ordered that both engineering routes remain preserved until the all-zero root cause is understood
+- the historical `all-zero` collapse was traced to the Stage2 ETL -> kernel ordering contract, not to Stage1 raw parquet
+- the remediation repaired ordering at the Stage2 -> kernel handoff and added fail-fast input gates on the main operational path
+- the validating hot-week smoke on `linux1-lx` passed on the engineered-speed route:
+  - `Stage 2 -> forge -> training -> backtest`
+  - non-zero canonical chain proven
+  - downstream consumability proven
+- both the pre-speed route and the speed route remain preserved as evidence and rollback anchors
+- the local tree is ready for `commit + push`
 
 ## 1. Objective
 
-- Evaluate the engineering speed patch against fair smoke comparisons without changing the approved V64.3 canonical runtime math core.
-- Preserve the previous successful smoke workspace and every follow-on comparison workspace as rollback and evidence anchors.
-- Separate two problem classes cleanly:
-  1. engineering release evaluation of the speed patch
-  2. long-standing zero-signal / non-informative-slice diagnosis that already existed in the baseline smoke
+- Repair the Stage2 ordering-contract defect without changing the approved V64.3 canonical runtime math core.
+- Add fail-fast input-contract gates so expensive downstream stages do not run on degenerate or malformed inputs.
+- Validate on the engineered-speed route that the canonical signal chain is non-degenerate and consumable end-to-end.
 
 ## 2. Canonical Spec
 
@@ -47,42 +43,37 @@ Conflict rule:
 
 ## 3. Business Goal
 
-- Determine whether the engineering speed patch can be released on fair performance grounds.
-- Avoid false attribution: do not blame the speed patch for zero-signal smoke behavior that already existed in the baseline workspace.
-- Preserve enough evidence so that the Owner can later decide whether to continue with:
-  - a release decision on the speed patch
-  - a separate mission for the older zero-signal / ordering / slice-informativeness problem
-- Keep both engineering routes alive until the all-zero root cause is identified:
-  - the pre-speed route as baseline / fallback
-  - the speed-patch route as candidate upgrade
+- Eliminate the historical `all-zero` critical defect from the V64 runtime path.
+- Prove that the approved V64.3 canonical chain can generate signal, direction, and non-zero topology/compression on a real contiguous hot-week input.
+- Preserve both engineering routes so future release decisions can still compare old and new execution paths.
 
 ## 4. Files In Scope
 
 Primary implementation scope:
 
-- `handover/ai-direct/LATEST.md`
-- `handover/ops/ACTIVE_MISSION_CHARTER.md`
-- `handover/ai-direct/entries/20260307_005243_v64_engineering_speed_patch_and_zero_signal_diagnosis.md`
-
-Evidence and diagnosis scope:
-
-- isolated smoke workspaces on `linux1-lx`
-- probe manifests and ranking artifacts under `/home/zepher/work/Omega_vNext_v643_probe_smoke/audit/runtime/v643_probe/`
-
-Conditional code scope only if a new owner-approved remediation mission is opened:
-
 - `omega_core/kernel.py`
-- `omega_core/omega_math_rolling.py`
+- `tools/stage2_physics_compute.py`
+- `tools/forge_base_matrix.py`
 - `tools/run_vertex_xgb_train.py`
 - `tools/run_local_backtest.py`
+- `tests/test_v64_absolute_closure.py`
+- `tests/test_v64_fastpath_equivalence.py`
+
+Evidence scope:
+
+- `handover/ai-direct/LATEST.md`
+- `handover/ai-direct/entries/20260307_032337_v643_stage2_ordering_fix_speed_smoke_pass.md`
+- `audit/v643_all_0_root_cause.md`
+- `audit/v643_stage2_remediation_plan.md`
+- `audit/v643_stage2_plan_audit.md`
+- `audit/v643_stage2_code_audit.md`
+- `audit/v643_stage2fix_speed_smoke_pass.md`
 
 ## 5. Out of Scope
 
-- any `git commit`
-- any `git push`
 - deleting or overwriting old smoke or probe workspaces
 - launching a new full Stage 2 run
-- silently folding the long-standing zero-signal issue into the engineering speed-patch verdict
+- changing the approved V64.3 canonical runtime math core
 
 ## 6. Required Audits
 
@@ -110,21 +101,14 @@ Runtime audit:
 
 ## 8. Acceptance Criteria
 
-This mission reaches a stable checkpoint when all are true:
+This mission is complete when all are true:
 
-1. the engineering speed patch has been evaluated against fair smoke comparisons
-2. the training slowdown has been correctly attributed to smoke harness drift rather than to the speed patch itself
-3. the non-zero slice discovery effort and gate-chain diagnosis are fully recorded
-4. the baseline smoke workspace has been checked directly, proving that the zero-signal condition predates the speed patch
-5. `/handover` contains enough evidence for the Owner to split the next work into:
-   - engineering release evaluation
-   - long-standing zero-signal diagnosis
+1. the Stage2 ordering-contract root cause is identified and repaired
+2. fail-fast input gates exist on the main Stage2/forge/training/backtest path
+3. a contiguous hot-week smoke proves non-zero canonical chain activation
+4. `forge`, `training`, and `backtest` all consume the repaired non-degenerate inputs successfully
+5. fixed memory and audit artifacts are updated for release
 
-## 9. Stop Conditions
+## 9. Completion Note
 
-Stop and escalate if any of the following happens:
-
-- a proposed remediation would require changing the approved V64.3 canonical runtime math core
-- an engineering verdict attempts to treat the older baseline zero-signal condition as if it were introduced by the speed patch
-- any step would overwrite preserved smoke or probe evidence
-- a new code-change mission is needed before the Owner approves the next spec
+The mission has completed successfully. Remaining work, if any, is release administration (`commit/push`) or later-layer signal-quality analysis, not this root-cause remediation.

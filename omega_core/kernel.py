@@ -22,6 +22,68 @@ from omega_core.omega_math_core import (
     calc_srl_state,
 )
 
+_FALSEY_ENV = {"0", "false", "no", "off"}
+_KERNEL_ORDER_FIX_ENV = "OMEGA_STAGE2_FIX_KERNEL_ORDERING"
+
+
+def _env_enabled(name: str, default: str = "1") -> bool:
+    return str(os.environ.get(name, default)).strip().lower() not in _FALSEY_ENV
+
+
+def _first_present(columns: list[str], candidates: tuple[str, ...]) -> str | None:
+    for cand in candidates:
+        if cand in columns:
+            return cand
+    return None
+
+
+def _next_temp_col(columns: list[str], base: str) -> str:
+    if base not in columns:
+        return base
+    idx = 1
+    while True:
+        cand = f"{base}_{idx}"
+        if cand not in columns:
+            return cand
+        idx += 1
+
+
+def _prepare_kernel_working_frames(frames: pl.DataFrame) -> tuple[pl.DataFrame, str | None]:
+    if frames.height <= 1 or not _env_enabled(_KERNEL_ORDER_FIX_ENV, "1"):
+        return frames, None
+
+    if "symbol" not in frames.columns or "date" not in frames.columns:
+        return frames, None
+
+    time_key = _first_present(frames.columns, ("time_end", "bucket_id"))
+    if time_key is None:
+        unique_symbols = int(frames.select(pl.col("symbol").n_unique()).item() or 0)
+        unique_dates = int(frames.select(pl.col("date").n_unique()).item() or 0)
+        if unique_symbols > 1 or unique_dates > 1:
+            raise RuntimeError("kernel_ordering_contract_missing_time_key")
+        return frames, None
+
+    orig_idx_col = _next_temp_col(frames.columns, "__omega_kernel_orig_idx")
+    sort_symbol = _next_temp_col(frames.columns, "__omega_sort_symbol")
+    sort_date = _next_temp_col(frames.columns, "__omega_sort_date")
+    sort_time_num = _next_temp_col(frames.columns, "__omega_sort_time_num")
+    sort_time_txt = _next_temp_col(frames.columns, "__omega_sort_time_txt")
+
+    working = (
+        frames
+        .with_row_index(orig_idx_col)
+        .with_columns([
+            pl.col("symbol").cast(pl.Utf8, strict=False).alias(sort_symbol),
+            pl.col("date").cast(pl.Utf8, strict=False).alias(sort_date),
+            pl.col(time_key).cast(pl.Int64, strict=False).alias(sort_time_num),
+            pl.col(time_key).cast(pl.Utf8, strict=False).alias(sort_time_txt),
+        ])
+        .sort([sort_symbol, sort_date, sort_time_num, sort_time_txt, orig_idx_col], nulls_last=True)
+        .drop([sort_symbol, sort_date, sort_time_num, sort_time_txt])
+    )
+    return working, orig_idx_col
+
+
 def _apply_recursive_physics(
     frames: pl.DataFrame,
     cfg: L2PipelineConfig,
@@ -29,6 +91,7 @@ def _apply_recursive_physics(
 ) -> pl.DataFrame:
     if frames.height == 0:
         return frames
+    frames, orig_idx_col = _prepare_kernel_working_frames(frames)
 
     srl = cfg.srl
     sig = cfg.signal
@@ -318,6 +381,9 @@ def _apply_recursive_physics(
             pl.lit(1).alias("dominant_probe"),
         ])
         
+    if orig_idx_col is not None and orig_idx_col in res_df.columns:
+        res_df = res_df.sort(orig_idx_col).drop(orig_idx_col)
+
     return res_df
 
 def apply_recursive_physics(

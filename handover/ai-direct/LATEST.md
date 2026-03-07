@@ -18,9 +18,18 @@ This file is the single source of current operational truth for all agents.
 ---
 
 ## 1. Project Phase
-**Current Macro Status: V64.3 RELEASE CANDIDATE - FULL SMOKE PASSED, READY FOR COMMIT/PUSH**
+**Current Macro Status: V64.3 STAGE2 ORDERING-CONTRACT REMEDIATION PASSED ON THE SPEED ROUTE**
 
-The repo-alignment mission is complete. The isolated V64.3 smoke is now green again after the backtest remediation. `Stage 2 -> forge/base_matrix -> training -> backtest` have all passed on `linux1-lx` in the isolated smoke workspace. The next gate is `commit + push`, followed by post-push auditor review. No new full `Stage 2` launch is authorized in this mission.
+The old `all-zero` critical defect has now been broken in an isolated hot-week smoke on `linux1-lx`. The canonical V64.3 signal chain is no longer degenerate:
+
+- `topo_area` is non-zero
+- `topo_energy` is non-zero
+- `epiplexity` is non-zero
+- `singularity_vector` is non-zero
+- `is_signal` is non-zero
+- `direction` is present and consumable downstream
+
+The validating chain `Stage 2 -> forge/base_matrix -> training -> backtest` has passed on the engineered-speed route in a new isolated workspace. The local remediation tree is ready for `commit + push`. Both the pre-speed route and the speed route remain preserved as historical evidence and rollback anchors.
 
 ---
 
@@ -40,17 +49,20 @@ The repo-alignment mission is complete. The isolated V64.3 smoke is now green ag
 ## 3. Immediate Next Actions
 *(What the next agent should do immediately upon waking up)*
 
-1. **Do not resume or relaunch Stage 2:**
-   - The isolated V64.3 smoke is already complete.
+1. **Do not relaunch full Stage 2.**
+   - The validated run in this mission is an isolated 5-day hot-week smoke.
    - A future full Stage 2 launch is a separate mission.
 2. **Current release gate:**
-   - commit the current local tree
+   - keep both routes preserved
+   - commit the current local remediation tree
    - push to `origin/main`
-   - send the pushed tree for post-push auditor review
-3. **Preserve the successful smoke evidence:**
-   - smoke workspace: `/home/zepher/work/Omega_vNext_v643_smoke`
-   - final backtest artifact: `.tmp/smoke_v64_v643/model/local_backtest.json`
-4. **Do not reopen the backtest stall scope unless post-push review finds a new blocker.**
+3. **Preserve all evidence workspaces:**
+   - `/home/zepher/work/Omega_vNext_v643_smoke`
+   - `/home/zepher/work/Omega_vNext_v643_speed_smoke`
+   - `/home/zepher/work/Omega_vNext_v643_traincmp_smoke`
+   - `/home/zepher/work/Omega_vNext_v643_probe_smoke`
+   - `/home/zepher/work/Omega_vNext_v643_stage2fix_speed_smoke`
+4. **If this mission is reopened later, treat the remaining zero-valued downstream alignment metrics as a later-layer diagnosis problem, not as the old Stage2 all-zero collapse.**
 
 ---
 
@@ -196,3 +208,43 @@ The repo-alignment mission is complete. The isolated V64.3 smoke is now green ag
   - keep the old pre-speed engineering route as a valid comparison / rollback path
   - keep the new engineering-speed route as an active candidate path
   - do not eliminate either route until the root cause of the all-zero smoke outputs is understood
+
+## Update: 2026-03-07 03:23 UTC
+- **Critical defect state:** the historical `all-zero` Stage2 collapse is now broken on the engineered-speed route after the Stage2 ordering-contract remediation.
+- **Validated hot week:** `20250723`, `20250724`, `20250725`, `20250728`, `20250729`.
+- **Isolated workspace:** `/home/zepher/work/Omega_vNext_v643_stage2fix_speed_smoke`
+- **Stage2 result:** `success=5`, `failed=0`, `STAGE2_SECONDS=1879.12`
+- **Stage2 aggregate proof:**
+  - `rows = 1,366,691`
+  - `epi_pos_rows = 2,006`
+  - `topo_area_nonzero_rows = 11,247`
+  - `topo_energy_pos_rows = 11,276`
+  - `sv_nonzero_rows = 10,822`
+  - `signal_rows = 466`
+- **Known probe symbol:** `20250725_b07c2229 / 002097.SZ`
+  - `topo_area_max_abs = 14.93`
+  - `topo_energy_max = 39.53`
+  - `epiplexity_max = 4.15`
+  - `signal_rows = 2`
+- **Forge result:** PASS
+  - `base_rows = 8549`
+  - `symbols_total = 7245`
+  - `FORGE_SECONDS = 186.89`
+- **Training result:** PASS
+  - `mask_rows = 8549`
+  - `total_training_rows = 8549`
+  - lightweight smoke contract: `xgb_max_depth=3`, `num_boost_round=2`
+  - `TRAIN_SECONDS = 14.90`
+- **Backtest result:** PASS
+  - `n_frames = 1055429.0`
+  - `BACKTEST_SECONDS = 6.80`
+  - `engine = file_stream`
+  - `Orthogonality = 0.00012346729376811198`
+- **Interpretation:** this is the first smoke in the V64 line that passes both:
+  - mathematical meaning: canonical signal chain activated
+  - engineering meaning: downstream stages consume non-degenerate inputs successfully
+- **Locked lessons:**
+  - a smoke is invalid if it does not explicitly prove non-degenerate canonical signal activation
+  - fail-fast gates must match batching granularity
+  - `forge_base_matrix.py` year scope must be explicit on non-baseline hot weeks
+- **Release gate:** fixed memory updated, local remediation tree ready for `commit + push`.

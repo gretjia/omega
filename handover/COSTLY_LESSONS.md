@@ -140,3 +140,61 @@ Before running `v60_autopilot.py` or any Vertex Job:
 ### 5) Phase-Level Observability Prevents Silent Cost Burn
 - **Observed:** State-only monitoring (`RUNNING`) hides semantic stalls and phase deadlocks.
 - **Practice:** Enforce milestone-based watchdog (`download`, `load`, `dedup`, `sort`, `prepare`, `evaluate`) with timeout-based auto-cancel.
+
+---
+
+## 2026-03-07 | The All-Zero Smoke Trap (A P0 Validation Failure)
+
+**Cost:** Multiple smoke cycles, probe cycles, and audit cycles across both the pre-speed route and the speed route.
+**Outcome:** We temporarily mistook successful process completion for mathematical validation.
+
+### What actually went wrong
+
+1. **Stage2 was computing on the wrong trajectory order.**
+- The defect was not in Stage1 raw parquet.
+- The ETL -> kernel interface broke symbol/date continuity before rolling physics ran.
+- This collapsed `topo_area`, `topo_energy`, `epiplexity`, `is_signal`, and `singularity_vector` to zero.
+
+2. **Historical smoke design was too weak.**
+- Earlier smokes proved that the pipeline could finish.
+- They did not prove that the canonical V64.3 signal chain was non-degenerate.
+- That allowed an `all-zero` chain to hide in plain sight.
+
+3. **A good fail-fast idea was initially placed at the wrong granularity.**
+- The first remediation smoke failed because a file-validity gate was applied at the 50-symbol worker-batch level.
+- This created false negatives and delayed the real proof.
+
+4. **Implicit defaults can silently invalidate a targeted validation.**
+- `forge_base_matrix.py` defaulted to `--years=2023,2024`.
+- The hot-week proof window was in `2025`.
+- Without explicit year scope, valid files were filtered out and the run looked broken for the wrong reason.
+
+### Permanent lessons
+
+1. **A smoke is not valid unless it proves non-degenerate canonical signal activation.**
+- Required minimum proof now includes non-zero:
+  - `epiplexity`
+  - `topo_area`
+  - `topo_energy`
+  - `singularity_vector`
+  - `is_signal`
+
+2. **Integration defects can have mathematical consequences.**
+- Even when the canonical math core is approved, a bad ordering contract can make the runtime output mathematically meaningless.
+
+3. **Fail-fast gates must align with the scheduler's unit of failure.**
+- File/input scope and worker-batch scope are not interchangeable.
+
+4. **Targeted smoke windows must declare year scope, path scope, and ordering assumptions explicitly.**
+- No hidden CLI defaults.
+- No assumed input contracts.
+
+5. **Preserve both routes until root cause is known.**
+- The correct move was to keep both the pre-speed route and the speed route alive until the `all-zero` root cause was proven.
+
+### Required pre-submit checklist for future V64+ smoke runs
+
+1. Prove the canonical chain is non-zero at Stage2 before running forge/training/backtest.
+2. Fail fast if ordering cannot be proven or repaired.
+3. Make year scope explicit for any non-baseline window.
+4. Treat `all-zero` as a `P0` defect candidate, not as a neutral smoke result.

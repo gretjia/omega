@@ -163,6 +163,53 @@ def _input_files_fingerprint(files: list[str]) -> str:
     return h.hexdigest()
 
 
+def _audit_forge_l2_contract(files: list[str], *, singularity_threshold: float) -> dict:
+    lf = _scan_parquet_safe(files)
+    schema_names = set(lf.collect_schema().names())
+    required = {
+        "symbol",
+        "date",
+        "epiplexity",
+        "topo_area",
+        "topo_energy",
+        "srl_resid",
+        "singularity_vector",
+        "is_signal",
+        "is_physics_valid",
+    }
+    missing = sorted(required - schema_names)
+    if missing:
+        raise SystemExit(f"Forge input contract failed: missing L2 columns {missing}")
+
+    diag = (
+        lf.select([
+            pl.len().alias("rows"),
+            (pl.col("epiplexity").fill_null(0.0).fill_nan(0.0) > 0.0).sum().alias("epi_pos_rows"),
+            (pl.col("topo_energy").fill_null(0.0).fill_nan(0.0) > 0.0).sum().alias("topo_energy_pos_rows"),
+            (pl.col("singularity_vector").fill_null(0.0).fill_nan(0.0).abs() > float(singularity_threshold)).sum().alias("signal_gate_rows"),
+            (pl.col("is_physics_valid") == True).sum().alias("physics_valid_rows"),
+        ])
+        .collect()
+        .row(0, named=True)
+    )
+    diag = {k: int(v or 0) for k, v in diag.items()}
+    if diag["rows"] <= 0:
+        raise SystemExit("Forge input contract failed: empty L2 input set.")
+    if diag["physics_valid_rows"] <= 0:
+        raise SystemExit(f"Forge input contract failed: no physics-valid rows ({diag}).")
+    if diag["epi_pos_rows"] <= 0 or diag["topo_energy_pos_rows"] <= 0 or diag["signal_gate_rows"] <= 0:
+        raise SystemExit(
+            "Forge input contract failed: degenerate canonical signal chain "
+            f"({json.dumps(diag, ensure_ascii=False, sort_keys=True)})."
+        )
+    print(
+        "[GATE] Forge input contract passed "
+        f"{json.dumps(diag, ensure_ascii=False, sort_keys=True)}",
+        flush=True,
+    )
+    return diag
+
+
 def _validate_local_input_files(files: list[str], source: str) -> list[str]:
     normalized: list[str] = []
     for raw in files:
@@ -956,6 +1003,7 @@ def main() -> int:
         files = files[: int(args.max_files)]
     if not files:
         raise SystemExit("No input frame files matched.")
+    _audit_forge_l2_contract(files, singularity_threshold=float(args.singularity_threshold))
 
     keep_cols = list(
         dict.fromkeys(
