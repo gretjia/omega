@@ -37,6 +37,25 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
   - Linux remains operationally unverified in the post-patch state because of SSH reachability, not because of a known code failure
   - the controller deploy path is currently incomplete locally because worker deploy remotes are missing
 
+### Project: V643-STAGE3-TRAIN-BASEMATRIX-2023-2024
+
+- Status: `RUNNING`
+- Hosts: `linux1-lx`, `windows1-w1`, `controller`
+- Goal: generate the Linux-side training base matrix for `2023,2024` from the repaired Stage2 corpus without relying on empty `latest_feature_l2/host=linux1`
+- Last signals:
+  - Linux SSH is restored and repo is on `699818f`
+  - Linux mounted Windows `D:` via `sshfs` at `/home/zepher/windows_d_sshfs`
+  - explicit training manifest built at:
+    - `/home/zepher/work/Omega_vNext/audit/runtime/stage3_base_matrix_train_20260308_095850/input_files_train_2023_2024.txt`
+  - manifest count:
+    - `484`
+  - forge launched on Linux:
+    - PID `1474539`
+    - output root `/omega_pool/parquet_data/stage3_base_matrix_train_20260308_095850`
+- Risks:
+  - current log file is still quiet early in the run because launch used buffered stdout
+  - current backtest entrypoints only support year-level filtering, so `2026-01` holdout needs a later explicit file-list or wrapper
+
 ### Project: V62-STAGE1-LINUX
 
 - Status: `COMPLETED`

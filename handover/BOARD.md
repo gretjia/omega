@@ -45,6 +45,34 @@
 ### Entries
 
 <!-- New session debriefs go here. Most recent on top. -->
+#### [2026-03-08 10:01] Agent: Codex | Session: Linux Stage3 Base-Matrix Launch For Train 2023-2024
+
+**What I did:**
+- Restored Linux worker reachability and pushed the repo to `linux1-lx`, bringing it to `699818f`.
+- Verified the current Stage3 blocker was not Stage2 math anymore but Linux-side data visibility.
+- Enabled Linux-to-Windows SSH access using the existing `omega-vm->workers-fixed` key already trusted by Windows and added the `windows1-w1` alias to Linux `~/.ssh/config`.
+- Mounted Windows `D:` on Linux via `sshfs` at `/home/zepher/windows_d_sshfs`.
+- Built an explicit `2023,2024` training manifest with `484` files and launched Linux `tools/forge_base_matrix.py` in the background.
+
+**What I discovered:**
+- `latest_feature_l2/host=linux1` is empty, so Stage3 default paths are not usable for this run.
+- The Windows full-run `2024` training-year outputs exist and are readable once `D:` is mounted on Linux.
+- Current Stage3/backtest entrypoints still filter holdout by year only and cannot directly express `2026-01`.
+
+**What confused me / blocked me:**
+- Linux `env_verify.py --strict` still fails in `.venv` because `xgboost=1.7.6` is below the pinned minimum. This does not block pure forge, but it will matter for later training.
+- `forge.log` is still quiet early in the run because the launch command was not forced unbuffered.
+
+**What the next agent should do:**
+- Monitor `/home/zepher/work/Omega_vNext/audit/runtime/stage3_base_matrix_train_20260308_095850/forge.log` and the shard/output directory until base matrix completion.
+- Do not use `stage3_full_supervisor.py` for the later holdout as-is if the requirement remains `2025 + 2026-01`; build a date-scoped manifest or wrapper instead.
+
+**Files I changed:**
+- `handover/ai-direct/LATEST.md` — recorded Linux recovery and Stage3 training base-matrix launch state.
+- `handover/ops/ACTIVE_PROJECTS.md` — added the in-flight Linux Stage3 training base-matrix project.
+- `handover/BOARD.md` — added this mandatory debrief block.
+- `handover/ai-direct/entries/20260308_100100_linux_stage3_base_matrix_launch_train_2023_2024.md` — new deep-dive runtime entry.
+
 #### [2026-03-08 09:30] Agent: Codex | Session: V643 Stage2 Windows Runtime Proof And Stage3 Whole-Set Forge Proof
 
 **What I did:**

@@ -8,6 +8,47 @@
 
 This file is the single source of current operational truth for all agents.
 
+## Update: 2026-03-08 10:01 UTC
+- **Linux reachability is restored and Stage3 training base-matrix generation has been launched.**
+- Connectivity:
+  - `ssh linux1-lx` is healthy again
+  - `linux1-lx` has been advanced to commit `699818f`
+- Linux data readiness:
+  - Linux half of the `stage2_full_20260307_v643fix` run is locally present at:
+    - `/omega_pool/parquet_data/stage2_full_20260307_v643fix/l2/host=linux1`
+    - count: `370` parquet files
+  - Windows full-run 2024 training-year outputs are reachable from Linux via a live `sshfs` mount:
+    - mount point: `/home/zepher/windows_d_sshfs`
+    - remote source: `windows1-w1:/D:`
+  - explicit training manifest was built instead of relying on empty `latest_feature_l2/host=linux1`
+- Stage3 launch:
+  - run id: `stage3_base_matrix_train_20260308_095850`
+  - host: `linux1-lx`
+  - entrypoint: `tools/forge_base_matrix.py`
+  - scope: training years only, `--years 2023,2024`
+  - manifest:
+    - `/home/zepher/work/Omega_vNext/audit/runtime/stage3_base_matrix_train_20260308_095850/input_files_train_2023_2024.txt`
+  - manifest count:
+    - `484` files
+    - composition:
+      - `370` Linux full-run outputs
+      - `112` Windows official `2024*` full-run outputs
+      - isolated repaired `20231219_b07c2229.parquet`
+      - isolated repaired `20241128_b07c2229.parquet`
+  - output root:
+    - `/omega_pool/parquet_data/stage3_base_matrix_train_20260308_095850`
+  - runtime:
+    - PID `1474539`
+    - log path:
+      - `/home/zepher/work/Omega_vNext/audit/runtime/stage3_base_matrix_train_20260308_095850/forge.log`
+- Important dataset-split note:
+  - current `tools/stage3_full_supervisor.py` and `tools/run_local_backtest.py` still filter holdout by year only
+  - they cannot express `2026` January-only scope directly
+  - current Stage3 action therefore launches only the training base matrix for `2023,2024`
+  - future backtest on `2025 + 2026-01` will require an explicit file-list or a date-scoped wrapper, not just `--backtest-years 2025,2026`
+- Deep dive:
+  - `handover/ai-direct/entries/20260308_100100_linux_stage3_base_matrix_launch_train_2023_2024.md`
+
 ## Update: 2026-03-08 09:30 UTC
 - **Three-file remediation proof is now complete on `windows1-w1`.**
 - Code and deploy state:
