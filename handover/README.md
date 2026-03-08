@@ -11,7 +11,9 @@
 2. OMEGA_CONSTITUTION.md                       → long-lived project invariants
 3. handover/ai-direct/LATEST.md                → live runtime state
 4. handover/ops/MULTI_AGENT_OPERATING_SYSTEM.md → permanent multi-agent governance
-5. Active mission charter (if present)         → task-level canonical spec
+5. handover/ops/CHILD_AGENT_OPERATING_PROFILE.md → delegated sub-agent protocol (only when child agents are used)
+6. .codex/config.toml                           → Codex CLI project-scoped child-role registry (only when Codex child roles are used)
+7. Active mission charter (if present)         → task-level canonical spec
 ```
 
 This reading order is equivalent to the repo-level order in `AGENTS.md` and the permanent governance order in `handover/ops/MULTI_AGENT_OPERATING_SYSTEM.md`.
@@ -45,6 +47,10 @@ OMEGA now separates permanent governance from task-specific execution.
 
 - `handover/ops/MULTI_AGENT_OPERATING_SYSTEM.md`
 - Permanent team structure, authority, gates, runtime discipline
+- `handover/ops/CHILD_AGENT_OPERATING_PROFILE.md`
+- Delegated child-agent authority and packet discipline
+- `.codex/config.toml` + `.codex/agents/*.toml`
+- Project-scoped Codex CLI child-role wiring for OMEGA only; not a global Codex role registry
 
 ### Layer 2: Mission Charter
 
@@ -78,6 +84,9 @@ OMEGA now separates permanent governance from task-specific execution.
 | Agent rules (ALL agents) | `AGENTS.md` |
 | Unified handover entrypoint | `handover/README.md` |
 | Multi-agent operating system | `handover/ops/MULTI_AGENT_OPERATING_SYSTEM.md` |
+| Child-agent operating profile | `handover/ops/CHILD_AGENT_OPERATING_PROFILE.md` |
+| Codex child-role registry (project-scoped) | `.codex/config.toml` |
+| Codex child-role configs | `.codex/agents/*.toml` |
 | Mission charter template | `handover/ops/MISSION_CHARTER_TEMPLATE.md` |
 | Physics constitution | `OMEGA_CONSTITUTION.md` |
 | Machine-readable principles | `.agent/principles.yaml` |
@@ -205,6 +214,16 @@ Workers are on **isolated LANs** — no internet, no GitHub access.
 | `ai_handover` | Session handover protocol |
 
 Read skill details: `.agent/skills/{name}/SKILL.md`
+
+## 9.1 Codex Child-Role Integration
+
+For Codex CLI only:
+
+- OMEGA-specific child roles are configured at the repo level in `.codex/config.toml`
+- Role-specific configs live in `.codex/agents/*.toml`
+- These roles are project-scoped and must not be copied into `~/.codex/config.toml` as global roles
+- The human-readable governance source remains `handover/ops/CHILD_AGENT_OPERATING_PROFILE.md`
+- The CLI-consumed role wiring remains `.codex/config.toml` + `.codex/agents/*.toml`
 
 ## 10. Audit Canon
 

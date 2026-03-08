@@ -1,0 +1,29 @@
+[agents.omega_plan]
+description = "OMEGA project-scoped planning child agent"
+model = "gpt-5.4"
+model_reasoning_effort = "xhigh"
+config_file = ".codex/agents/omega_plan.toml"
+
+[agents.omega_coder]
+description = "OMEGA project-scoped bounded coding child agent"
+model = "gpt-5.4"
+model_reasoning_effort = "medium"
+config_file = ".codex/agents/omega_coder.toml"
+
+[agents.omega_math_auditor]
+description = "OMEGA project-scoped mathematical audit child agent"
+model = "gpt-5.4"
+model_reasoning_effort = "xhigh"
+config_file = ".codex/agents/omega_math_auditor.toml"
+
+[agents.omega_runtime_auditor]
+description = "OMEGA project-scoped runtime and rollback audit child agent"
+model = "gpt-5.4"
+model_reasoning_effort = "high"
+config_file = ".codex/agents/omega_runtime_auditor.toml"
+
+[agents.omega_runtime_watcher]
+description = "OMEGA project-scoped live runtime watcher child agent"
+model = "gpt-5.4"
+model_reasoning_effort = "medium"
+config_file = ".codex/agents/omega_runtime_watcher.toml"

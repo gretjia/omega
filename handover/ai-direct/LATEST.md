@@ -8,6 +8,16 @@
 
 This file is the single source of current operational truth for all agents.
 
+## Update: 2026-03-08 04:15 UTC
+- **Codex child-role integration path is now project-scoped.**
+- OMEGA-specific child roles are **not** global Codex roles.
+- Codex CLI agents working inside this repo must use:
+  - `.codex/config.toml`
+  - `.codex/agents/*.toml`
+- The human-readable governance source remains:
+  - `handover/ops/CHILD_AGENT_OPERATING_PROFILE.md`
+- This prevents OMEGA-only roles such as the math auditor from polluting non-OMEGA projects while still using the documented multi-agent configuration path.
+
 ## 0. Update Contract
 
 - **FIRST ACTION PROTOCOL:** Before taking ANY operational action, you MUST read this file.
@@ -248,3 +258,51 @@ The validating chain `Stage 2 -> forge/base_matrix -> training -> backtest` has 
   - fail-fast gates must match batching granularity
   - `forge_base_matrix.py` year scope must be explicit on non-baseline hot weeks
 - **Release gate:** fixed memory updated, local remediation tree ready for `commit + push`.
+
+## Deferred closure note
+- Cross-host Stage2 outputs are currently V64.3-valid on canonical math columns, but `n_ticks` still drifts by host (`linux1=UInt32`, `windows1=UInt64`). This does not block disjoint host-local running, but it **must** be normalized before any future cross-host assist, mixed-host merge, or unified downstream promotion.
+
+## Current full Stage2 progress snapshot
+- Live run tag: `stage2_full_20260307_v643fix`
+- Code: `6b0afff`
+- `linux1-lx`: `19/371` done, `0` fail, current batch `20230206_fbd5c8b.parquet`, observed mean `220.39s/file`, ETA about `21.55h`, healthy.
+- `windows1-w1`: `44/372` done, `0` fail, current batch `20240925_fbd5c8b.parquet`, observed mean `88.14s/file`, ETA about `8.03h`, healthy.
+- Cluster interpretation: `windows1` is expected to finish much earlier; `linux1` remains the long pole.
+- Reminder: cross-host assist is still blocked by deferred `n_ticks` dtype drift until schema normalization is done.
+
+## Update 2026-03-07 UTC: load profile and input-failure snapshot
+- Full Stage2 live run remains active under `stage2_full_20260307_v643fix` on commit `6b0afff`.
+- Current snapshot:
+  - `linux1-lx`: `done=34`, `fail=0`, healthy
+  - `windows1-w1`: `done=68`, `fail=4`, still progressing
+- The low fan / low heat / low-utilization feel is real. Current live launcher is effectively single-file serial at the launcher level (`stage2_targeted_resume.py` with `files-per-process=1`), with bounded native thread pools. This is a throughput limitation of the launcher model, not evidence of idleness.
+- `windows1-w1` has 4 hard input parquet failures:
+  - `20240828_fbd5c8b.parquet`
+  - `20240902_fbd5c8b.parquet`
+  - `20240903_fbd5c8b.parquet`
+  - `20240905_fbd5c8b.parquet`
+- Failure mode: `schema probe failed: parquet: File out of specification: The file must end with PAR1`
+- Treat those 4 files as an input-data remediation item, not a V64.3 math-core regression.
+- Preserve current live launcher during this run. A later mission should redesign Stage2 launch for higher per-host utilization while keeping thread-budget guardrails and recoverability.
+- Detailed note: `handover/ai-direct/entries/20260307_072722_stage2_load_and_input_failure_snapshot.md`
+
+## Update 2026-03-07 UTC: why windows1 is faster than linux1 in full Stage2
+- Current evidence says `windows1-w1` is materially faster than `linux1-lx`, but **not** because it got an easier half of the corpus.
+- Observed input split:
+  - `linux1-lx`: `371` files, average about `2.75 GB/file`
+  - `windows1-w1`: `372` files, average about `3.62 GB/file`
+- Observed live speed:
+  - `linux1-lx`: about `244.33 s/file`
+  - `windows1-w1`: about `125.82 s/file`
+- Interpretation:
+  - the gap is real
+  - it is not explained by smaller files on windows
+  - the current live launcher is still single-file serial at the launcher level, so both hosts are underutilized by design
+- Most plausible near-term engineering cause:
+  - Windows currently uses smaller default Stage2 symbol batches (`20`) than Linux (`50`), which likely reduces reorder/concat/gate overhead under the repaired ordering-contract path
+- Future optimization mission for linux should focus on:
+  - multi-file parallel launcher per host
+  - benchmark of smaller symbol-batch sizes (`50/25/20`)
+  - same-file cross-host profiling
+- Do not change launcher model or batch-size defaults during the current live run.
+- Detailed note: `handover/ai-direct/entries/20260307_110209_windows_faster_than_linux_stage2_analysis.md`

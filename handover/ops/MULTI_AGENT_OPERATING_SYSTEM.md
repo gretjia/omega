@@ -37,6 +37,10 @@ Every session starts here:
 
 After these, the Commander must identify the active task-level canonical spec.
 
+If delegated sub-agents will be used, read:
+
+- `handover/ops/CHILD_AGENT_OPERATING_PROFILE.md`
+
 This canonical reading order is equivalent to the repo-level order in `AGENTS.md` and the `/handover` reading order in `handover/README.md`.
 
 This operating system is intentionally version-agnostic.
@@ -77,6 +81,7 @@ It defines:
 - workflow gates
 - audit protocol
 - runtime discipline
+- delegation discipline via `CHILD_AGENT_OPERATING_PROFILE.md`
 
 ### Layer 2: Mission Charter
 
@@ -122,6 +127,12 @@ It records:
 9. No agent may silently expand its own scope.
 
 ## 4. Roles
+
+Delegated child agents are governed by:
+
+- `handover/ops/CHILD_AGENT_OPERATING_PROFILE.md`
+
+That profile refines delegation behavior without changing the authority model defined here.
 
 ### 4.1 Commander
 
@@ -273,6 +284,14 @@ Commander defines:
 - mission charter
 - exact files in scope
 - explicit out-of-scope files
+
+If child agents are used, Commander must also define:
+
+- delegated role
+- writable file ownership
+- forbidden actions
+- required output format
+- stop conditions
 
 Output:
 

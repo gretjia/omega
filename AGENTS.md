@@ -15,6 +15,8 @@ Quick Start is equivalent to the canonical reading order in `handover/README.md`
 3. Read `OMEGA_CONSTITUTION.md` before any task
 4. Read `handover/ai-direct/LATEST.md` for live runtime state
 5. For substantial work, identify the active mission charter under `handover/ops/` or instantiate one from `handover/ops/MISSION_CHARTER_TEMPLATE.md`
+6. If you will delegate to child agents, read `handover/ops/CHILD_AGENT_OPERATING_PROFILE.md` before delegation
+7. If you are Codex CLI and will use child roles, load the repo-local child-role config at `.codex/config.toml`; OMEGA-specific child roles are project-scoped and must not be treated as global Codex roles
 
 ## Scope
 
@@ -100,6 +102,9 @@ python3 tools/cluster_health.py --quick                # Cluster
 
 - `handover/README.md` — unified `/handover` entrypoint (READ THIS)
 - `handover/ops/MULTI_AGENT_OPERATING_SYSTEM.md` — permanent OMEGA multi-agent governance layer
+- `handover/ops/CHILD_AGENT_OPERATING_PROFILE.md` — delegated child-agent authority and packet discipline
+- `.codex/config.toml` — project-scoped Codex child-role registry for OMEGA only
+- `.codex/agents/*.toml` — role-specific Codex child-agent configs consumed through the documented multi-agent config path
 - `handover/ops/MISSION_CHARTER_TEMPLATE.md` — task-level execution charter template
 - `handover/ai-direct/LATEST.md` — live runtime state
 - `handover/DEBUG_LESSONS.md` — searchable debug database
