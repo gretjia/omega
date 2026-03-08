@@ -8,6 +8,49 @@
 
 This file is the single source of current operational truth for all agents.
 
+## Update: 2026-03-08 09:01 UTC
+- **Local remediation patch is now in place.**
+- `tools/stage2_physics_compute.py` changes:
+  - the earlier non-tail symbol yield path now also applies `_filter_pathological()`
+  - the normal `process_chunk()` path now skips zero-row symbol frames before indexing `symbol[0]`
+- New local regression coverage was added for:
+  - non-tail pathological symbol filtering
+  - `process_chunk()` skipping a proactive empty frame and continuing to a valid symbol
+- Local verification passed:
+  - `py_compile` on the changed Stage2 files: PASS
+  - Stage2 regression suite: `15 passed in 5.47s`
+- Deployment state:
+  - patch is local only
+  - worker validation and forge proof are still pending
+  - next operational step must respect the controller-managed `commit + push + deploy` path
+- Deep dive:
+  - `handover/ai-direct/entries/20260308_090116_stage2_empty_frame_patch_local_regression_pass.md`
+
+## Update: 2026-03-08 08:55 UTC
+- **Active mission has changed.**
+- Current mission: `V643-STAGE2-PATHO-EMPTY-FRAME-REMEDIATION`
+- This mission supersedes the old speed-route-only release gate for current operational work.
+- Current unresolved Stage2 files:
+  - `20231219_b07c2229.parquet`
+  - `20241128_b07c2229.parquet`
+  - `20250908_fbd5c8b.parquet`
+- A direct Linux rerun on the current normal `v643` Stage2 path reproduced the same failure pattern on all three files:
+  - `Proactively dropping pathological symbol`
+  - immediate `CRITICAL Error: index out of bounds`
+- Working root-cause statement:
+  - proactive pathological-symbol drop can emit a zero-row symbol frame
+  - the normal `process_chunk()` path does not guard that frame before indexing `symbol[0]`
+- Definition of done has been tightened:
+  - the repaired files must not only complete Stage2
+  - they must also be consumable together by `tools/forge_base_matrix.py`
+- Stage3 forge validation rule:
+  - use `--input-file-list`
+  - pass explicit `--years 2023,2024,2025`
+  - do not rely on forge's default `--years=2023,2024`, or the 2025 file will be silently excluded
+- Canonical mission spec:
+  - `handover/ops/ACTIVE_MISSION_CHARTER.md`
+  - `handover/ai-direct/entries/20260308_085506_stage2_pathological_empty_frame_mission_spec.md`
+
 ## Update: 2026-03-08 04:42 UTC
 - **Child-role native integration validation completed.**
 - OMEGA child roles are now confirmed to be better integrated with Codex CLI than the earlier document-only setup.
@@ -43,18 +86,19 @@ This file is the single source of current operational truth for all agents.
 ---
 
 ## 1. Project Phase
-**Current Macro Status: V64.3 STAGE2 ORDERING-CONTRACT REMEDIATION PASSED ON THE SPEED ROUTE**
+**Current Macro Status: V643 STAGE2 PATHOLOGICAL EMPTY-FRAME REMEDIATION SPEC LOCKED**
 
-The old `all-zero` critical defect has now been broken in an isolated hot-week smoke on `linux1-lx`. The canonical V64.3 signal chain is no longer degenerate:
+The current live problem is no longer the historical Stage2 ordering-contract defect. The active blocker is a deterministic Stage2 normal-path crash on the remaining unresolved pathological files:
 
-- `topo_area` is non-zero
-- `topo_energy` is non-zero
-- `epiplexity` is non-zero
-- `singularity_vector` is non-zero
-- `is_signal` is non-zero
-- `direction` is present and consumable downstream
+- `20231219_b07c2229.parquet`
+- `20241128_b07c2229.parquet`
+- `20250908_fbd5c8b.parquet`
 
-The validating chain `Stage 2 -> forge/base_matrix -> training -> backtest` has passed on the engineered-speed route in a new isolated workspace. The local remediation tree is ready for `commit + push`. Both the pre-speed route and the speed route remain preserved as historical evidence and rollback anchors.
+The active mission is now code-local and operationally narrow:
+
+- harden Stage2 normal-path empty-frame handling
+- keep the current `v643` math and normal execution path unchanged
+- prove the repaired three-file set is consumable together by Stage3 forge
 
 ---
 
@@ -63,11 +107,11 @@ The validating chain `Stage 2 -> forge/base_matrix -> training -> backtest` has 
 | Track | Task | Sub-Task | Node | Status | Last Checked | Notes |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | **Stage1-ETL** | Base Parquet Synthesis | Ticks -> Base_L1 | `linux1-lx`,`windows1-w1`,`omega-vm`,`mac` | `[DONE]` | 2026-03-06 07:15 UTC | All four nodes are synced to commit `52c3b62`; both workers have the full `743`-file Stage 1 corpus locally. |
-| **Stage2-MATH** | L2 Feature Injection | `kernel.py` & V64 Vectors | `linux1-lx` | `[BLOCKED]` | 2026-03-06 08:00 UTC | Full run remains intentionally stopped. The old `stage2_full_20260306` outputs and ledgers were deleted cleanly by Owner request during v64.2 triage. No relaunch is authorized in this mission. |
-| **Stage2-MATH** | L2 Feature Injection | `kernel.py` & V64 Vectors | `windows1-w1` | `[BLOCKED]` | 2026-03-06 08:00 UTC | Full run remains intentionally stopped. The old `stage2_full_20260306` outputs and ledgers were deleted cleanly by Owner request during v64.2 triage. No relaunch is authorized in this mission. |
-| **Stage3-BASEMATRIX** | Feature Forging | `forge_base_matrix.py` | `linux1-lx` | `[PENDING]` | - | Will start only after both Stage 2 halves finish and Windows L2 is shadowed/copied back to Linux. |
-| **Stage3-BASEMATRIX** | AI Model Training | `run_vertex_xgb_train.py` | GCP / Vertex AI | `[PENDING]` | - | XGBoost (tree_method=hist) with `singularity_vector`. |
-| **Stage3-BASEMATRIX** | Local Backtest Evaluation | `evaluate_frames()` | `linux1-lx` | `[DONE]` | 2026-03-06 13:56 UTC | Backtest remediation applied. Isolated V64.3 smoke backtest completed `109/109` batches in `94.19s` and wrote `local_backtest.json`. |
+| **Stage2-MATH** | L2 Feature Injection | Pathological empty-frame remediation | `linux1-lx` | `[TRIAGED]` | 2026-03-08 | Main queue is finished. Remaining unresolved file is `20231219_b07c2229.parquet`. Normal-path rerun reproduces `Proactively dropping pathological symbol` followed by `index out of bounds`. |
+| **Stage2-MATH** | L2 Feature Injection | Pathological empty-frame remediation | `windows1-w1` | `[TRIAGED]` | 2026-03-08 | Main queue is finished. Four of the six historical failures are already remediated. Remaining unresolved files are `20241128_b07c2229.parquet` and `20250908_fbd5c8b.parquet`, which share the same failure pattern as Linux. |
+| **Stage3-BASEMATRIX** | Feature Forging | Three-file consumption proof | `linux1-lx` | `[BLOCKED ON STAGE2 FIX]` | 2026-03-08 | Current mission requires isolated forge validation of the repaired three-file set using explicit `--years 2023,2024,2025`. |
+| **Stage3-BASEMATRIX** | AI Model Training | `run_vertex_xgb_train.py` | GCP / Vertex AI | `[OUT OF SCOPE]` | 2026-03-08 | Current remediation mission stops at forge/base-matrix consumption proof. |
+| **Stage3-BASEMATRIX** | Local Backtest Evaluation | `evaluate_frames()` | `linux1-lx` | `[OUT OF SCOPE]` | 2026-03-08 | Backtest is not a blocker for this remediation mission. |
 
 ---
 
@@ -75,19 +119,22 @@ The validating chain `Stage 2 -> forge/base_matrix -> training -> backtest` has 
 *(What the next agent should do immediately upon waking up)*
 
 1. **Do not relaunch full Stage 2.**
-   - The validated run in this mission is an isolated 5-day hot-week smoke.
-   - A future full Stage 2 launch is a separate mission.
-2. **Current release gate:**
-   - keep both routes preserved
-   - commit the current local remediation tree
-   - push to `origin/main`
-3. **Preserve all evidence workspaces:**
-   - `/home/zepher/work/Omega_vNext_v643_smoke`
-   - `/home/zepher/work/Omega_vNext_v643_speed_smoke`
-   - `/home/zepher/work/Omega_vNext_v643_traincmp_smoke`
-   - `/home/zepher/work/Omega_vNext_v643_probe_smoke`
-   - `/home/zepher/work/Omega_vNext_v643_stage2fix_speed_smoke`
-4. **If this mission is reopened later, treat the remaining zero-valued downstream alignment metrics as a later-layer diagnosis problem, not as the old Stage2 all-zero collapse.**
+   - The active work is a narrow remediation mission on the three unresolved pathological files.
+   - Full-queue relaunch is out of scope.
+2. **Implement the Stage2 fix on the normal path only.**
+   - Local patch and regression coverage are complete.
+   - Next step is operational validation, not more speculative fallback work.
+3. **Use the controller-managed deploy path before worker validation.**
+   - Commit the local patch.
+   - Push and deploy from the controller; workers must not run from a dirty tree.
+4. **Validate on Linux first.**
+   - Rerun the three unresolved files on `linux1-lx` using the normal current `v643` Stage2 path.
+   - Do not enable forced scan fallback.
+5. **Stage3 proof is mandatory.**
+   - Run isolated `tools/forge_base_matrix.py` validation on the repaired three-file set.
+   - Use `--input-file-list` and explicit `--years 2023,2024,2025`.
+6. **Do not declare mission success at file level only.**
+   - The repaired files must be consumable together by Stage3 forge.
 
 ---
 

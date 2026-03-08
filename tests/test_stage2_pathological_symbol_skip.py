@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 import sys
+from pathlib import Path
 
 import pyarrow as pa
 import pyarrow.parquet as pq
@@ -11,8 +12,10 @@ if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
 from tools.stage2_physics_compute import (
+    _iter_complete_symbol_frames_from_parquet,
     _maybe_skip_pathological_symbol_failure,
     _profile_symbol_time_density,
+    process_chunk,
 )
 
 
@@ -73,3 +76,77 @@ def test_non_pathological_symbol_is_not_auto_skipped(tmp_path, monkeypatch):
         symbol="600000.SH",
         rc=3221225477,
     )
+
+
+def test_iter_complete_symbol_frames_filters_non_tail_pathological_symbol(tmp_path):
+    p = tmp_path / "mixed_symbols.parquet"
+    pathological_rows = 12000
+    normal_rows = 3
+
+    table = pa.table(
+        {
+            "symbol": ["123257.SZ"] * pathological_rows + ["600000.SH"] * normal_rows,
+            "time": [145700000, 150000000] * (pathological_rows // 2)
+            + [93000000, 93030000, 93060000],
+            "__time_ms": list(range(pathological_rows + normal_rows)),
+        }
+    )
+    pq.write_table(table, p)
+
+    frames = list(_iter_complete_symbol_frames_from_parquet(str(p)))
+
+    assert len(frames) == 2
+    assert frames[0].num_rows == 0
+    assert frames[1].num_rows == normal_rows
+    assert frames[1].column("symbol")[0].as_py() == "600000.SH"
+
+
+def test_process_chunk_skips_empty_symbol_frame_and_completes(tmp_path, monkeypatch):
+    l1_file = tmp_path / "20241128_b07c2229.parquet"
+    out_dir = tmp_path / "l2"
+    out_dir.mkdir()
+
+    source = pa.table(
+        {
+            "symbol": ["600000.SH"],
+            "date": ["20241128"],
+            "time": [93000000],
+            "__time_ms": [1],
+        }
+    )
+    pq.write_table(source, l1_file)
+
+    empty_symbol_tbl = pa.table({"symbol": pa.array([], type=pa.string())})
+    normal_symbol_tbl = pa.table({"symbol": ["600000.SH"]})
+    seen = {}
+
+    class _DummyWriter:
+        def close(self):
+            return None
+
+    def fake_iter_complete_symbol_frames(_l1_file):
+        return iter([empty_symbol_tbl, normal_symbol_tbl])
+
+    def fake_run_feature_physics_batch(batch_frames, writer, tmp_parquet):
+        seen["frame_count"] = len(batch_frames)
+        seen["symbols"] = [frame.column("symbol")[0].as_py() for frame in batch_frames]
+        Path(tmp_parquet).write_text("ok", encoding="utf-8")
+        return (_DummyWriter() if writer is None else writer), 7
+
+    monkeypatch.setattr(
+        "tools.stage2_physics_compute._iter_complete_symbol_frames_from_parquet",
+        fake_iter_complete_symbol_frames,
+    )
+    monkeypatch.setattr(
+        "tools.stage2_physics_compute._run_feature_physics_batch",
+        fake_run_feature_physics_batch,
+    )
+
+    result = process_chunk({"l1_file": str(l1_file), "out_dir": str(out_dir)})
+
+    assert result["ok"] is True
+    assert result["status"] == "completed"
+    assert seen["frame_count"] == 1
+    assert seen["symbols"] == ["600000.SH"]
+    assert (out_dir / l1_file.name).exists()
+    assert (out_dir / f"{l1_file.name}.done").exists()

@@ -45,6 +45,66 @@
 ### Entries
 
 <!-- New session debriefs go here. Most recent on top. -->
+#### [2026-03-08 09:01] Agent: Codex | Session: V643 Stage2 Empty-Frame Patch Local Regression Pass
+
+**What I did:**
+- Patched `tools/stage2_physics_compute.py` so the earlier non-tail symbol yield path also applies pathological filtering.
+- Patched `tools/stage2_physics_compute.py` so `process_chunk()` skips zero-row symbol frames before indexing `symbol[0]`.
+- Extended `tests/test_stage2_pathological_symbol_skip.py` with regressions for the proactive empty-frame path.
+- Ran local Stage2 regression verification and recorded the result in handover.
+
+**What I discovered:**
+- The root cause was not only the missing zero-row guard in `process_chunk()`.
+- `_iter_complete_symbol_frames_from_parquet()` had an asymmetric earlier yield path that bypassed `_filter_pathological()`, so pathological handling was inconsistent across symbol boundaries.
+- Local regression coverage is now strong enough to justify worker validation.
+
+**What confused me / blocked me:**
+- Real-file Linux and Stage3 forge validation are still pending because repo rules require the controller-managed `commit + push + deploy` path before worker execution.
+
+**What the next agent should do:**
+- Commit the local patch.
+- Push and deploy via the controller-managed path.
+- Validate the three unresolved files on `linux1-lx` using the normal `v643` path.
+- Run isolated forge validation on the repaired three-file set with explicit `--years 2023,2024,2025`.
+
+**Files I changed:**
+- `tools/stage2_physics_compute.py` — fixed normal-path empty-frame handling and made pathological filtering consistent across symbol-transition yields.
+- `tests/test_stage2_pathological_symbol_skip.py` — added proactive empty-frame regression coverage.
+- `handover/ai-direct/LATEST.md` — updated operational state and next actions after local verification.
+- `handover/ops/ACTIVE_PROJECTS.md` — updated project state to reflect local patch readiness.
+- `handover/ai-direct/entries/20260308_090116_stage2_empty_frame_patch_local_regression_pass.md` — new detailed patch entry.
+- `handover/BOARD.md` — added this mandatory debrief block.
+
+#### [2026-03-08 08:55] Agent: Codex | Session: V643 Stage2 Pathological Empty-Frame Mission Spec Lock
+
+**What I did:**
+- Converted the remaining Stage2 pathological-file issue into a new active mission with a concrete charter.
+- Locked the problem statement to the normal `v643` Stage2 path in `handover/ops/ACTIVE_MISSION_CHARTER.md`.
+- Added a new handover entry capturing the evidence, spec decisions, and immediate next actions.
+- Updated `handover/ai-direct/LATEST.md` and `handover/ops/ACTIVE_PROJECTS.md` so new agents do not wake up into the older speed-route mission context.
+- Added Stage3 forge consumption proof to the mission definition of done.
+
+**What I discovered:**
+- The active defect is narrower than the earlier Windows fallback triage: proactive pathological-symbol drop can emit a zero-row symbol frame, and the normal `process_chunk()` path appears to index `symbol[0]` without a guard.
+- The downstream proof must be `tools/forge_base_matrix.py`, not training or backtest.
+- Forge defaults to `--years=2023,2024`, so any proof for this three-file set must explicitly pass `--years 2023,2024,2025` or the 2025 file will be silently excluded.
+
+**What confused me / blocked me:**
+- `handover/ai-direct/LATEST.md` still carried the older speed-route release framing; without an explicit top-level update, a fresh agent could follow the wrong mission.
+
+**What the next agent should do:**
+- Patch `tools/stage2_physics_compute.py` normal-path empty-frame handling.
+- Add regression coverage for the proactive-drop empty-frame case.
+- Validate the three unresolved files on `linux1-lx` using the normal `v643` path.
+- Run isolated forge validation on the repaired three-file set with explicit year scope.
+
+**Files I changed:**
+- `handover/ops/ACTIVE_MISSION_CHARTER.md` — replaced the completed prior charter with the new active remediation mission.
+- `handover/ops/ACTIVE_PROJECTS.md` — added the new in-flight project and refreshed snapshot metadata.
+- `handover/ai-direct/LATEST.md` — added a top-level mission update and replaced stale immediate-action framing.
+- `handover/ai-direct/entries/20260308_085506_stage2_pathological_empty_frame_mission_spec.md` — new deep-dive spec entry.
+- `handover/BOARD.md` — added this mandatory debrief block.
+
 #### [2026-03-06 03:27] Agent: Codex | Session: V64 Bourbaki Closure Repo Alignment
 
 **What I did:**

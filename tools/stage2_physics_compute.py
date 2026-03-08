@@ -570,7 +570,7 @@ def _iter_complete_symbol_frames_from_parquet(l1_file):
             elif symbol == current_symbol:
                 current_parts.append(part)
             else:
-                yield pa.concat_tables(current_parts, promote_options="default")
+                yield _filter_pathological(pa.concat_tables(current_parts, promote_options="default"))
                 current_symbol = symbol
                 current_parts = [part]
 
@@ -1133,6 +1133,10 @@ def process_chunk(kwargs):
                 seen_symbols = set()
                 try:
                     for symbol_df in _iter_complete_symbol_frames_from_parquet(l1_file):
+                        # The proactive pathological guardrail may yield an empty frame.
+                        # Skip it instead of indexing symbol[0] and crashing.
+                        if symbol_df.num_rows <= 0 or "symbol" not in symbol_df.column_names:
+                            continue
                         try:
                             symbol_name = str(symbol_df.column("symbol")[0].as_py())
                         except Exception:

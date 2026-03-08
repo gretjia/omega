@@ -4,11 +4,36 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
 
 ## 1. Snapshot Metadata
 
-- `updated_at_local`: 2026-02-24 16:53:12 +0800
-- `updated_at_utc`: 2026-02-24 08:53:12 +0000
+- `updated_at_local`: 2026-03-08 08:55:06 +0000
+- `updated_at_utc`: 2026-03-08 08:55:06 +0000
 - `updated_by`: Codex (GPT-5)
 
 ## 2. In-Flight Work
+
+### Project: V643-STAGE2-PATHO-EMPTY-FRAME-REMEDIATION
+
+- Status: `IN_PROGRESS`
+- Hosts: `controller`, `linux1-lx`, `windows1-w1`
+- Goal: fix the normal `v643` Stage2 crash triggered after proactive pathological-symbol drop and prove the repaired three-file set is consumable by Stage3 forge as one input set
+- Last signals:
+  - unresolved files:
+    - `20231219_b07c2229.parquet`
+    - `20241128_b07c2229.parquet`
+    - `20250908_fbd5c8b.parquet`
+  - direct Linux rerun on the normal Stage2 path reproduces:
+    - `Proactively dropping pathological symbol`
+    - immediate `CRITICAL Error: index out of bounds`
+  - local patch status:
+    - `tools/stage2_physics_compute.py` hardened for zero-row symbol frames
+    - local Stage2 regression suite passed: `15 passed in 5.47s`
+  - forced fallback / pathology-discovery mode is explicitly out of scope for this remediation
+- Active gates:
+  - commit + push + deploy the local remediation patch
+  - rerun unresolved files on Linux normal path
+  - prove Stage3 forge consumption with `tools/forge_base_matrix.py --input-file-list ... --years 2023,2024,2025`
+- Risks:
+  - forge default year filter would silently drop the 2025 file if not overridden
+  - mission is not complete unless the repaired files pass forge together, not just Stage2 individually
 
 ### Project: V62-STAGE1-LINUX
 
@@ -67,4 +92,3 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
 - Update this board when project state changes materially.
 - Keep exact verification timestamps and host evidence.
 - Mirror high-level status in `handover/ai-direct/LATEST.md`.
-
