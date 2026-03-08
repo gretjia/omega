@@ -4,36 +4,38 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
 
 ## 1. Snapshot Metadata
 
-- `updated_at_local`: 2026-03-08 08:55:06 +0000
-- `updated_at_utc`: 2026-03-08 08:55:06 +0000
+- `updated_at_local`: 2026-03-08 09:30:41 +0000
+- `updated_at_utc`: 2026-03-08 09:30:41 +0000
 - `updated_by`: Codex (GPT-5)
 
 ## 2. In-Flight Work
 
 ### Project: V643-STAGE2-PATHO-EMPTY-FRAME-REMEDIATION
 
-- Status: `IN_PROGRESS`
+- Status: `PROOF_COMPLETE_PENDING_LINUX_CONNECTIVITY_DECISION`
 - Hosts: `controller`, `linux1-lx`, `windows1-w1`
 - Goal: fix the normal `v643` Stage2 crash triggered after proactive pathological-symbol drop and prove the repaired three-file set is consumable by Stage3 forge as one input set
 - Last signals:
-  - unresolved files:
-    - `20231219_b07c2229.parquet`
-    - `20241128_b07c2229.parquet`
-    - `20250908_fbd5c8b.parquet`
-  - direct Linux rerun on the normal Stage2 path reproduces:
-    - `Proactively dropping pathological symbol`
-    - immediate `CRITICAL Error: index out of bounds`
+  - remediation commit:
+    - `23fd229`
   - local patch status:
     - `tools/stage2_physics_compute.py` hardened for zero-row symbol frames
     - local Stage2 regression suite passed: `15 passed in 5.47s`
-  - forced fallback / pathology-discovery mode is explicitly out of scope for this remediation
+  - windows normal-path runtime proof:
+    - `20231219_b07c2229.parquet` -> `252844` rows in `86.5s`
+    - `20241128_b07c2229.parquet` -> `253227` rows in `128.1s`
+    - `20250908_fbd5c8b.parquet` -> `254884` rows in `169.6s`
+  - Stage3 forge proof:
+    - isolated Windows forge passed with `rows=760955`, `physics_valid_rows=760955`, `epi_pos_rows=716`, `topo_energy_pos_rows=4404`, `signal_gate_rows=3897`
+    - produced `base_rows=3074` from the three-file set
+  - Linux controller connectivity:
+    - `ssh linux1-lx` timed out during this validation window
 - Active gates:
-  - commit + push + deploy the local remediation patch
-  - rerun unresolved files on Linux normal path
-  - prove Stage3 forge consumption with `tools/forge_base_matrix.py --input-file-list ... --years 2023,2024,2025`
+  - decide whether a Linux mirror rerun is still required now that Stage3 whole-set proof has passed on Windows
+  - restore the canonical controller deploy remotes before the next worker rollout
 - Risks:
-  - forge default year filter would silently drop the 2025 file if not overridden
-  - mission is not complete unless the repaired files pass forge together, not just Stage2 individually
+  - Linux remains operationally unverified in the post-patch state because of SSH reachability, not because of a known code failure
+  - the controller deploy path is currently incomplete locally because worker deploy remotes are missing
 
 ### Project: V62-STAGE1-LINUX
 

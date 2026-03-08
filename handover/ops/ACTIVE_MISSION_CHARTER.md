@@ -9,15 +9,19 @@ Date: 2026-03-08
 Current checkpoint:
 
 - `windows1-w1` main Stage2 run originally produced six failures; four are already resolved by replacing complete files from Linux and rerunning.
-- Remaining Windows unresolved files:
-  - `20241128_b07c2229.parquet`
-  - `20250908_fbd5c8b.parquet`
-- `linux1-lx` main Stage2 run has one unresolved file:
-  - `20231219_b07c2229.parquet`
 - A direct Linux rerun on the normal current `v643` Stage2 path reproduced the same failure pattern on all three unresolved files:
   - `[GUARDRAIL] Proactively dropping pathological symbol ...`
   - immediate `CRITICAL Error: index out of bounds`
-- The mission is therefore narrowed to Stage2 control-flow hardening on the normal path, not fallback tuning or timeout extension.
+- The mission was then executed with the Stage2 control-flow hardening patch at commit `23fd229`.
+- `windows1-w1` isolated normal-path validation passed for all three previously unresolved files:
+  - `20231219_b07c2229.parquet` -> `252844` rows in `86.5s`
+  - `20241128_b07c2229.parquet` -> `253227` rows in `128.1s`
+  - `20250908_fbd5c8b.parquet` -> `254884` rows in `169.6s`
+- `windows1-w1` isolated Stage3 forge proof also passed on the three-file set using explicit `--input-file-list` and `--years 2023,2024,2025`:
+  - forge input contract: `rows=760955`, `physics_valid_rows=760955`, `epi_pos_rows=716`, `topo_energy_pos_rows=4404`, `signal_gate_rows=3897`
+  - forge output: `base_rows=3074`
+- `linux1-lx` post-patch mirror validation could not be run in this window because `ssh linux1-lx` timed out from the controller.
+- The user-required Stage3 whole-set consumption proof is satisfied; any remaining Linux rerun is now a follow-up decision, not an evidence gap on whole-set usability.
 
 ## 1. Objective
 
@@ -138,13 +142,32 @@ Runtime audit:
 
 ## 11. Run Manifest
 
-Record after execution:
+Recorded execution:
 
-- commit hash:
+- commit hash: `23fd229`
 - deploy path used:
+  - controller push to `origin`: PASS
+  - controller `tools/deploy.py --skip-commit --nodes windows`: unavailable locally because worker deploy remotes were missing
+  - Windows validation host was therefore aligned manually to `23fd229` from its `github` remote for this isolated runtime proof
 - linux validation workspace:
+  - blocked; `ssh linux1-lx` timed out from the controller during this session
 - windows validation workspace:
+  - `D:\Omega_frames\stage2_patho_fix_validate_20260308_091554\l2`
+  - runtime logs:
+    - `D:\work\Omega_vNext\audit\runtime\stage2_patho_fix_validate_20260308_091554\runner.log`
+    - `D:\work\Omega_vNext\audit\runtime\stage2_patho_fix_validate_20260308_20231219\runner.log`
 - forge validation workspace:
+  - `D:\Omega_frames\stage3_patho_fix_forge_20260308_1728`
+  - input list:
+    - `D:\work\Omega_vNext\audit\runtime\stage3_patho_fix_forge_20260308_1728\input_files.txt`
 - unresolved file set:
+  - `20231219_b07c2229.parquet`
+  - `20241128_b07c2229.parquet`
+  - `20250908_fbd5c8b.parquet`
 - Stage2 verdict:
+  - PASS on `windows1-w1` normal path for all three unresolved files
+  - no forced scan fallback used
 - forge verdict:
+  - PASS on `windows1-w1`
+  - explicit `--years 2023,2024,2025` used
+  - non-empty `base_matrix.parquet` produced with `base_rows=3074`

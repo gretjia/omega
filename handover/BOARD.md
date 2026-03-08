@@ -45,6 +45,35 @@
 ### Entries
 
 <!-- New session debriefs go here. Most recent on top. -->
+#### [2026-03-08 09:30] Agent: Codex | Session: V643 Stage2 Windows Runtime Proof And Stage3 Whole-Set Forge Proof
+
+**What I did:**
+- Validated the patched `v643` Stage2 normal path on `windows1-w1` against all three previously unresolved files in isolated workspaces.
+- Proved the repaired three-file set is consumable together by `tools/forge_base_matrix.py` using `--input-file-list` and explicit `--years 2023,2024,2025`.
+- Updated handover state and recorded the exact runtime artifacts.
+
+**What I discovered:**
+- The Stage2 empty-frame remediation is sufficient on real files: all three unresolved files now complete on the normal path without forced scan fallback.
+- The repaired three-file set is structurally usable as one Stage3 input set; forge input contract passed and produced a non-empty `base_matrix.parquet`.
+- `linux1-lx` was not blocked by a new code failure in this session; it was simply unreachable over SSH from the controller.
+- The controller repo currently lacks the worker deploy remotes expected by `tools/deploy.py`, so the canonical deploy path is not fully wired locally.
+
+**What confused me / blocked me:**
+- `ssh linux1-lx` timed out repeatedly, so I could not execute the preferred Linux post-patch mirror rerun.
+- `tools/deploy.py --skip-commit --nodes windows` could not proceed locally because no worker deploy remotes were configured in the controller repo.
+
+**What the next agent should do:**
+- Treat the user-required whole-set Stage3 proof as satisfied.
+- If the Owner still wants a Linux mirror, restore Linux SSH reachability first and then rerun the same isolated proof on `linux1-lx`.
+- Restore the canonical controller deploy remotes before the next worker rollout.
+
+**Files I changed:**
+- `handover/ai-direct/LATEST.md` — recorded the successful Windows normal-path runtime proof and Stage3 whole-set forge proof.
+- `handover/ops/ACTIVE_PROJECTS.md` — updated the project board to reflect proof completion and the remaining Linux/deploy follow-up.
+- `handover/ops/ACTIVE_MISSION_CHARTER.md` — recorded the actual run manifest and current checkpoint.
+- `handover/BOARD.md` — added this mandatory debrief block.
+- `handover/ai-direct/entries/20260308_093041_stage2_pathological_empty_frame_windows_runtime_and_stage3_proof.md` — new deep-dive runtime evidence entry.
+
 #### [2026-03-08 09:01] Agent: Codex | Session: V643 Stage2 Empty-Frame Patch Local Regression Pass
 
 **What I did:**

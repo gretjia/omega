@@ -8,6 +8,46 @@
 
 This file is the single source of current operational truth for all agents.
 
+## Update: 2026-03-08 09:30 UTC
+- **Three-file remediation proof is now complete on `windows1-w1`.**
+- Code and deploy state:
+  - remediation commit: `23fd229` (`fix(stage2): skip pathological empty frames on normal path`)
+  - controller push to `origin` succeeded
+  - controller-side `tools/deploy.py --skip-commit --nodes windows` could not run because the local repo had no worker deploy remotes configured
+  - `windows1-w1` was therefore aligned manually to `23fd229` from its `github` remote for this isolated validation window
+- Linux connectivity state:
+  - `ssh linux1-lx` timed out repeatedly during this validation window
+  - the Linux mirror rerun is currently blocked by connectivity, not by a new code-level failure
+- Windows isolated normal-path Stage2 reruns all passed without forced scan fallback:
+  - `20231219_b07c2229.parquet` -> `252844` rows in `86.5s`
+  - `20241128_b07c2229.parquet` -> `253227` rows in `128.1s`
+  - `20250908_fbd5c8b.parquet` -> `254884` rows in `169.6s`
+  - isolated L2 workspace:
+    - `D:\Omega_frames\stage2_patho_fix_validate_20260308_091554\l2`
+- Stage3 whole-set forge proof also passed on `windows1-w1`:
+  - invocation used `tools/forge_base_matrix.py --input-file-list ... --years 2023,2024,2025`
+  - forge input contract passed with:
+    - `rows=760955`
+    - `physics_valid_rows=760955`
+    - `epi_pos_rows=716`
+    - `topo_energy_pos_rows=4404`
+    - `signal_gate_rows=3897`
+  - output artifacts:
+    - `D:\Omega_frames\stage3_patho_fix_forge_20260308_1728\base_matrix.parquet`
+    - `D:\Omega_frames\stage3_patho_fix_forge_20260308_1728\base_matrix.parquet.meta.json`
+  - forge result:
+    - `base_rows=3074`
+    - `merged_rows=3074`
+    - `input_file_count=3`
+    - `symbols_total=7525`
+    - `worker_count=2`
+    - `seconds=40.13`
+- Mission status:
+  - the user-required proof is satisfied: the repaired three-file set is consumable together by Stage3 forge
+  - the only remaining operational gap is whether the Owner still wants a Linux mirror run after SSH connectivity is restored
+- Deep dive:
+  - `handover/ai-direct/entries/20260308_093041_stage2_pathological_empty_frame_windows_runtime_and_stage3_proof.md`
+
 ## Update: 2026-03-08 09:01 UTC
 - **Local remediation patch is now in place.**
 - `tools/stage2_physics_compute.py` changes:
@@ -86,19 +126,15 @@ This file is the single source of current operational truth for all agents.
 ---
 
 ## 1. Project Phase
-**Current Macro Status: V643 STAGE2 PATHOLOGICAL EMPTY-FRAME REMEDIATION SPEC LOCKED**
+**Current Macro Status: V643 STAGE2 EMPTY-FRAME REMEDIATION PROVEN ON WINDOWS; LINUX MIRROR BLOCKED BY SSH**
 
-The current live problem is no longer the historical Stage2 ordering-contract defect. The active blocker is a deterministic Stage2 normal-path crash on the remaining unresolved pathological files:
+The current live problem is no longer the deterministic Stage2 empty-frame crash itself. That defect has been patched and validated on `windows1-w1` using the normal `v643` path on all three previously unresolved files, followed by an isolated Stage3 forge proof on the three-file set.
 
-- `20231219_b07c2229.parquet`
-- `20241128_b07c2229.parquet`
-- `20250908_fbd5c8b.parquet`
+The remaining operational uncertainty is narrower:
 
-The active mission is now code-local and operationally narrow:
-
-- harden Stage2 normal-path empty-frame handling
-- keep the current `v643` math and normal execution path unchanged
-- prove the repaired three-file set is consumable together by Stage3 forge
+- `linux1-lx` is not currently reachable over SSH from the controller
+- therefore the preferred Linux mirror rerun has not yet been executed in this validation window
+- the user-required whole-set Stage3 consumption proof is already satisfied on Windows
 
 ---
 
@@ -107,9 +143,9 @@ The active mission is now code-local and operationally narrow:
 | Track | Task | Sub-Task | Node | Status | Last Checked | Notes |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | **Stage1-ETL** | Base Parquet Synthesis | Ticks -> Base_L1 | `linux1-lx`,`windows1-w1`,`omega-vm`,`mac` | `[DONE]` | 2026-03-06 07:15 UTC | All four nodes are synced to commit `52c3b62`; both workers have the full `743`-file Stage 1 corpus locally. |
-| **Stage2-MATH** | L2 Feature Injection | Pathological empty-frame remediation | `linux1-lx` | `[TRIAGED]` | 2026-03-08 | Main queue is finished. Remaining unresolved file is `20231219_b07c2229.parquet`. Normal-path rerun reproduces `Proactively dropping pathological symbol` followed by `index out of bounds`. |
-| **Stage2-MATH** | L2 Feature Injection | Pathological empty-frame remediation | `windows1-w1` | `[TRIAGED]` | 2026-03-08 | Main queue is finished. Four of the six historical failures are already remediated. Remaining unresolved files are `20241128_b07c2229.parquet` and `20250908_fbd5c8b.parquet`, which share the same failure pattern as Linux. |
-| **Stage3-BASEMATRIX** | Feature Forging | Three-file consumption proof | `linux1-lx` | `[BLOCKED ON STAGE2 FIX]` | 2026-03-08 | Current mission requires isolated forge validation of the repaired three-file set using explicit `--years 2023,2024,2025`. |
+| **Stage2-MATH** | L2 Feature Injection | Pathological empty-frame remediation | `linux1-lx` | `[SSH BLOCKED]` | 2026-03-08 09:23 UTC | Pre-patch direct rerun had reproduced `Proactively dropping pathological symbol` followed by `index out of bounds`. Post-patch mirror rerun could not be executed because `ssh linux1-lx` timed out from the controller. |
+| **Stage2-MATH** | L2 Feature Injection | Pathological empty-frame remediation | `windows1-w1` | `[DONE]` | 2026-03-08 09:27 UTC | All three previously unresolved files passed on the normal `v643` path in isolated workspaces at commit `23fd229`; no forced scan fallback was used. |
+| **Stage3-BASEMATRIX** | Feature Forging | Three-file consumption proof | `windows1-w1` | `[DONE]` | 2026-03-08 09:29 UTC | `tools/forge_base_matrix.py --input-file-list ... --years 2023,2024,2025` passed on the repaired three-file set and produced a non-empty `base_matrix.parquet` (`base_rows=3074`). |
 | **Stage3-BASEMATRIX** | AI Model Training | `run_vertex_xgb_train.py` | GCP / Vertex AI | `[OUT OF SCOPE]` | 2026-03-08 | Current remediation mission stops at forge/base-matrix consumption proof. |
 | **Stage3-BASEMATRIX** | Local Backtest Evaluation | `evaluate_frames()` | `linux1-lx` | `[OUT OF SCOPE]` | 2026-03-08 | Backtest is not a blocker for this remediation mission. |
 
@@ -119,22 +155,20 @@ The active mission is now code-local and operationally narrow:
 *(What the next agent should do immediately upon waking up)*
 
 1. **Do not relaunch full Stage 2.**
-   - The active work is a narrow remediation mission on the three unresolved pathological files.
+   - The empty-frame defect is already proven fixed on Windows in isolated reruns.
    - Full-queue relaunch is out of scope.
-2. **Implement the Stage2 fix on the normal path only.**
-   - Local patch and regression coverage are complete.
-   - Next step is operational validation, not more speculative fallback work.
-3. **Use the controller-managed deploy path before worker validation.**
-   - Commit the local patch.
-   - Push and deploy from the controller; workers must not run from a dirty tree.
-4. **Validate on Linux first.**
-   - Rerun the three unresolved files on `linux1-lx` using the normal current `v643` Stage2 path.
-   - Do not enable forced scan fallback.
-5. **Stage3 proof is mandatory.**
-   - Run isolated `tools/forge_base_matrix.py` validation on the repaired three-file set.
-   - Use `--input-file-list` and explicit `--years 2023,2024,2025`.
-6. **Do not declare mission success at file level only.**
-   - The repaired files must be consumable together by Stage3 forge.
+2. **Treat the user-required proof as satisfied.**
+   - The repaired three-file set has already passed Stage3 forge as one input set on `windows1-w1`.
+   - Do not reopen the fallback/pathology-discovery route.
+3. **If the Owner still wants a Linux mirror run, fix connectivity first.**
+   - `ssh linux1-lx` timed out repeatedly from the controller in this session.
+   - Restore Linux reachability before attempting any mirror rerun.
+4. **Normalize the deploy path before the next worker rollout.**
+   - The local controller repo is missing worker deploy remotes for `tools/deploy.py`.
+   - Restore the canonical controller-managed deploy workflow instead of relying on another manual worker sync.
+5. **Preserve the isolated validation artifacts.**
+   - Keep the Stage2 and Stage3 isolated workspaces intact for audit and comparison.
+   - Do not overwrite `latest_feature_l2` during follow-up checks.
 
 ---
 
@@ -148,6 +182,7 @@ The active mission is now code-local and operationally narrow:
 ## 5. Latest Related Entries (Handover Archive)
 *The most recent deep-dive logs available in `handover/ai-direct/entries/`*
 
+- `20260308_093041_stage2_pathological_empty_frame_windows_runtime_and_stage3_proof` - Real-file Windows normal-path reruns passed on all three unresolved files; isolated Stage3 forge proof passed on the repaired three-file set with explicit year scope.
 - `20260306_074851_stage2_full_run_launch_and_contiguous_smoke` - Four-node sync complete; contiguous-day and wrapper-level smoke passed; full Stage 2 launched on contiguous-half manifests.
 - `20260306_094148_v642_dual_audit_and_full_smoke_pass` - V64.2 dual-audit closure finished; full smoke chain passed on `linux1-lx`; no new full Stage 2 launch authorized in this mission.
 - `20260306_135658_v643_backtest_remediation_smoke_pass` - Backtest remediation applied; isolated V64.3 smoke passed end-to-end again; ready for commit/push and post-push auditor review.
