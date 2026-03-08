@@ -8,6 +8,21 @@
 
 This file is the single source of current operational truth for all agents.
 
+## Update: 2026-03-08 04:42 UTC
+- **Child-role native integration validation completed.**
+- OMEGA child roles are now confirmed to be better integrated with Codex CLI than the earlier document-only setup.
+- Confirmed:
+  - repo-local child-role registry works: `.codex/config.toml` + `.codex/agents/*.toml`
+  - real child-agent execution works in a live Codex CLI session
+  - OMEGA-specific child roles remain project-scoped and do not pollute `~/.codex/config.toml`
+- Important limitation:
+  - current Codex CLI `0.111.0` does **not** yet accept repo-local role names like `omega_plan` as direct first-class `agent_type` values
+  - the root agent can still read the repo-local role contract and instantiate a bounded child using that contract
+- Operational rule:
+  - treat OMEGA child-role configs as project-scoped role contracts, not as guaranteed first-class built-in role names
+- Deep dive:
+  - `handover/ai-direct/entries/20260308_044220_child_role_native_integration_validation.md`
+
 ## Update: 2026-03-08 04:15 UTC
 - **Codex child-role integration path is now project-scoped.**
 - OMEGA-specific child roles are **not** global Codex roles.
