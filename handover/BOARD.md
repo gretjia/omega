@@ -45,6 +45,31 @@
 ### Entries
 
 <!-- New session debriefs go here. Most recent on top. -->
+#### [2026-03-08 15:44] Agent: Codex | Session: Linux Stage3 Base-Matrix Progress Refresh
+
+**What I did:**
+- Re-checked `linux1-lx` connectivity, host health, and the live `forge_base_matrix.py` process for the training run `stage3_base_matrix_train_20260308_095850`.
+- Recomputed progress and ETA from actual shard output rather than relying on the buffered `forge.log`.
+- Updated `/handover` to reflect the latest runtime evidence and the current finish window.
+
+**What I discovered:**
+- The earlier Linux connectivity loss was transient; `ping` and `ssh` recovered and both workers are reachable again.
+- The Stage3 forge is still healthy and making progress: `62 / 155` batches were complete at the sample point, with the latest shard only about `2.1` minutes old.
+- Effective throughput is still limited by the dynamic worker cap forcing `effective=1`, not by disk or memory exhaustion.
+
+**What confused me / blocked me:**
+- `forge.log` still contains only startup lines because stdout is buffered, so it remains a poor source of real-time progress.
+
+**What the next agent should do:**
+- Continue monitoring shard timestamps and process liveness on `linux1-lx` until the final `base_matrix_train_2023_2024.parquet` appears.
+- Treat the current ETA as roughly `2026-03-09 00:00 - 00:15 UTC`, and revise only if the recent batch cadence changes materially.
+
+**Files I changed:**
+- `handover/ai-direct/LATEST.md` — added the current Linux Stage3 progress, health, and ETA snapshot.
+- `handover/ops/ACTIVE_PROJECTS.md` — refreshed the Stage3 project status and added the completed cloud-cleanup project record.
+- `handover/BOARD.md` — added this debrief block.
+- `handover/ai-direct/entries/20260308_154439_linux_stage3_base_matrix_progress_62_of_155.md` — added the detailed runtime snapshot.
+
 #### [2026-03-08 11:43] Agent: Codex | Session: GCP Legacy Artifact Cleanup
 
 **What I did:**

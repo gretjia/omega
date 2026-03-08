@@ -4,8 +4,8 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
 
 ## 1. Snapshot Metadata
 
-- `updated_at_local`: 2026-03-08 09:30:41 +0000
-- `updated_at_utc`: 2026-03-08 09:30:41 +0000
+- `updated_at_local`: 2026-03-08 15:44:39 +0000
+- `updated_at_utc`: 2026-03-08 15:44:39 +0000
 - `updated_by`: Codex (GPT-5)
 
 ## 2. In-Flight Work
@@ -43,7 +43,8 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
 - Hosts: `linux1-lx`, `windows1-w1`, `controller`
 - Goal: generate the Linux-side training base matrix for `2023,2024` from the repaired Stage2 corpus without relying on empty `latest_feature_l2/host=linux1`
 - Last signals:
-  - Linux SSH is restored and repo is on `699818f`
+  - Linux SSH recovered after a transient timeout and is reachable again
+  - Linux repo is on `699818f`
   - Linux mounted Windows `D:` via `sshfs` at `/home/zepher/windows_d_sshfs`
   - explicit training manifest built at:
     - `/home/zepher/work/Omega_vNext/audit/runtime/stage3_base_matrix_train_20260308_095850/input_files_train_2023_2024.txt`
@@ -52,9 +53,39 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
   - forge launched on Linux:
     - PID `1474539`
     - output root `/omega_pool/parquet_data/stage3_base_matrix_train_20260308_095850`
+  - latest runtime sample at `2026-03-08 15:37 UTC`:
+    - `62 / 155` batches complete
+    - latest shard: `base_matrix_batch_00061.parquet`
+    - shard freshness: about `2.1` minutes
+    - process sample: `CPU=62.7%`, `MEM=3.0%`
+    - host sample: `available_mem≈22 GiB`, `/omega_pool use=4%`
+  - current ETA:
+    - linear: `8.44h`
+    - recent-batch: `8.51h`
+    - practical finish window: `2026-03-09 00:00 - 00:15 UTC`
 - Risks:
   - current log file is still quiet early in the run because launch used buffered stdout
+  - dynamic worker cap is still forcing single-worker execution, so throughput remains bounded
   - current backtest entrypoints only support year-level filtering, so `2026-01` holdout needs a later explicit file-list or wrapper
+
+### Project: GCP-LEGACY-STORAGE-CLEANUP
+
+- Status: `COMPLETED`
+- Hosts: `controller`, `GCS`
+- Goal: remove `v63` or earlier billable cloud artifacts from legacy buckets to reduce spend
+- Last signals:
+  - verified Vertex AI custom jobs in project `gen-lang-client-0250995579` were all in terminal states before deletion
+  - removed old corpus from `gs://omega_v52_central`, including:
+    - `omega/omega/v52/frames/**` (about `126.24 GiB`)
+    - `omega/staging/base_matrix/v63/**`
+    - `omega/staging/models/v63/**`
+    - `omega/staging/backtest/v6/**`
+    - old code bundles, payloads, `aiplatform-*.tar.gz`, and stale `.done` markers
+  - post-delete verification:
+    - `gs://omega_v52_central/**` reports `0 B`
+    - `gs://omega_v52/**` reports `0 B`
+- Notes:
+  - current local Linux Stage3 base-matrix run was unaffected because cleanup touched only legacy cloud artifacts
 
 ### Project: V62-STAGE1-LINUX
 

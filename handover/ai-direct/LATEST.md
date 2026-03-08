@@ -8,6 +8,40 @@
 
 This file is the single source of current operational truth for all agents.
 
+## Update: 2026-03-08 15:44 UTC
+- **Linux training base-matrix run remains healthy and is still progressing.**
+- Connectivity:
+  - `linux1-lx` and `windows1-w1` are both reachable again over Tailscale and SSH
+  - the earlier Linux timeout was transient; subsequent `ping` and `ssh` checks recovered
+- Linux Stage3 runtime:
+  - host: `linux1-lx`
+  - run id: `stage3_base_matrix_train_20260308_095850`
+  - PID: `1474539`
+  - runtime sample:
+    - `run_minutes=337.7`
+    - `CPU=62.7%`
+    - `MEM=3.0%`
+  - host health sample:
+    - uptime: `8 days`
+    - load average: `4.17 / 3.46 / 3.06`
+    - available memory: about `22 GiB`
+    - `/omega_pool` usage: `4%`
+- Progress:
+  - completed batches: `62 / 155`
+  - latest shard: `base_matrix_batch_00061.parquet`
+  - latest shard timestamp: `2026-03-08 15:35:22 UTC`
+  - shard freshness at sample time: about `2.1` minutes old
+  - final `base_matrix_train_2023_2024.parquet` is not yet present; run remains in shard production phase
+- ETA:
+  - linear estimate: about `8.44h`
+  - recent-batch estimate: about `8.51h`
+  - practical completion window: `2026-03-09 00:00 - 00:15 UTC`
+- Important caveat:
+  - `forge.log` is still buffered and only shows startup lines; real health must be inferred from process liveness and shard timestamps
+  - dynamic worker cap is still forcing `effective=1`, which remains the main source of slow throughput
+- Deep dive:
+  - `handover/ai-direct/entries/20260308_154439_linux_stage3_base_matrix_progress_62_of_155.md`
+
 ## Update: 2026-03-08 11:43 UTC
 - **Legacy GCP storage cleanup is complete.**
 - Safety gate:
