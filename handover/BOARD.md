@@ -45,6 +45,33 @@
 ### Entries
 
 <!-- New session debriefs go here. Most recent on top. -->
+#### [2026-03-08 11:43] Agent: Codex | Session: GCP Legacy Artifact Cleanup
+
+**What I did:**
+- Audited the reachable GCS buckets `gs://omega_v52_central` and `gs://omega_v52` to find billable `v63` or earlier artifacts.
+- Verified Vertex AI job state in project `gen-lang-client-0250995579` across `us-central1` and `us-west1` before deletion; all matching jobs were already in terminal states.
+- Deleted the old cloud artifacts from `gs://omega_v52_central`, including the large legacy frame corpus, old Stage3 base-matrix/model/backtest outputs, old code bundles, old Vertex packaging tarballs, and stale zero-byte `.done` markers.
+- Re-checked bucket usage after deletion and confirmed the reachable old bucket now reports `0 B`.
+
+**What I discovered:**
+- The dominant cloud storage cost was not models or backtest JSON; it was the old `gs://omega_v52_central/omega/omega/v52/frames/**` corpus at about `126.24 GiB`.
+- `gs://omega_v52_central/omega/staging/base_matrix/v63/**` still held about `337.98 MiB`; old `models/backtest/code` artifacts were tiny by comparison.
+- `gs://omega_v52/**` was already empty before cleanup.
+- `gsutil ls -r` can still show empty prefix paths after deletion, but the bucket now reports `0 B`, so there are no remaining billable objects in the reachable legacy bucket.
+
+**What confused me / blocked me:**
+- `gcloud config` was pointed at the OMEGA project by project number context, but `gcloud ai custom-jobs list` requires the project ID string. I resolved this by mapping project number `269018079180` to project ID `gen-lang-client-0250995579`.
+
+**What the next agent should do:**
+- Do not rely on `omega_v52_central` for any current Stage3 pipeline work; it has been intentionally purged.
+- If cloud training/backtest is resumed later, stage fresh artifacts into the current bucket path only, not the legacy `omega_v52*` buckets.
+- Continue monitoring the active local Linux base-matrix run; this cleanup did not touch the current local Stage3 workspace.
+
+**Files I changed:**
+- `handover/ai-direct/LATEST.md` — recorded the GCP cleanup scope, safety check, and post-delete bucket state.
+- `handover/BOARD.md` — added this mandatory debrief block.
+- `handover/ai-direct/entries/20260308_114346_gcp_legacy_artifact_cleanup.md` — added the detailed cloud cleanup log.
+
 #### [2026-03-08 10:01] Agent: Codex | Session: Linux Stage3 Base-Matrix Launch For Train 2023-2024
 
 **What I did:**

@@ -8,6 +8,26 @@
 
 This file is the single source of current operational truth for all agents.
 
+## Update: 2026-03-08 11:43 UTC
+- **Legacy GCP storage cleanup is complete.**
+- Safety gate:
+  - verified Vertex AI custom jobs in project `gen-lang-client-0250995579` across `us-central1` and `us-west1`
+  - all matching `v63` or earlier jobs were already in terminal states before deletion
+- Deleted legacy objects from `gs://omega_v52_central`, including:
+  - old frame corpus under `omega/omega/v52/frames/**` (about `126.24 GiB`)
+  - old Stage3 base-matrix outputs under `omega/staging/base_matrix/v63/**` (about `337.98 MiB`)
+  - old model outputs under `omega/staging/models/v63/**`
+  - old backtest outputs under `omega/staging/backtest/v6/**`
+  - old Stage3 code bundles and payloads under `staging/code/**`
+  - residual old `aiplatform-*.tar.gz` packages and stale zero-byte `.done` markers
+- Post-delete verification:
+  - `gs://omega_v52_central/**` now reports `0 B`
+  - `gs://omega_v52/**` was already `0 B`
+  - `gsutil ls -r` may still show empty prefixes, but there are no remaining billable objects in the reachable legacy buckets
+- Current local Linux Stage3 base-matrix run remains unaffected; cleanup touched only legacy cloud artifacts
+- Deep dive:
+  - `handover/ai-direct/entries/20260308_114346_gcp_legacy_artifact_cleanup.md`
+
 ## Update: 2026-03-08 10:01 UTC
 - **Linux reachability is restored and Stage3 training base-matrix generation has been launched.**
 - Connectivity:
