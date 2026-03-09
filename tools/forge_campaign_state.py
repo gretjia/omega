@@ -12,7 +12,11 @@ from typing import Iterable
 
 import numpy as np
 import polars as pl
-from numba import njit
+
+try:
+    from numba import njit
+except Exception:  # pragma: no cover - runtime fallback for nodes without numba
+    njit = None
 
 
 # Keep local Phase-1 forge from oversubscribing controller UMA / worker CPUs.
@@ -156,8 +160,7 @@ def _collect_daily_events_from_l2(l2_files: list[str]) -> pl.DataFrame:
     return pl.concat(daily_frames, how="vertical_relaxed").sort(["symbol", "pure_date"])
 
 
-@njit(cache=True)
-def compute_triple_barrier_labels(
+def _compute_triple_barrier_labels_impl(
     sym_ids: np.ndarray,
     opens: np.ndarray,
     highs: np.ndarray,
@@ -200,6 +203,12 @@ def compute_triple_barrier_labels(
                 break
         out[i] = label
     return out
+
+
+if njit is not None:
+    compute_triple_barrier_labels = njit(cache=True)(_compute_triple_barrier_labels_impl)
+else:  # pragma: no cover - exercised on worker nodes without numba
+    compute_triple_barrier_labels = _compute_triple_barrier_labels_impl
 
 
 def build_campaign_state_frame(
