@@ -8,6 +8,39 @@
 
 This file is the single source of current operational truth for all agents.
 
+## Update: 2026-03-09 15:31 UTC
+- **The new Target Timescale Disconnect verdict is landed, and a V651 draft is now ready for owner review.**
+- New audit authority:
+  - `audit/v651_target_timescale_disconnect.md`
+- New mission draft:
+  - `handover/ai-direct/entries/20260309_153149_v651_target_timescale_alignment_pivot_spec_draft.md`
+- Gemini draft audit:
+  - `handover/ai-direct/entries/20260309_154100_v651_spec_draft_gemini_pass.md`
+  - verdict:
+    - `PASS WITH FIXES`
+- Draft core:
+  - keep `omega_core/*` frozen
+  - keep Path B continuous regression intent frozen
+  - keep learner loss frozen at the V650 local contract
+  - change only the target horizon
+  - bounded initial ladder:
+    - `t5`
+    - `t10`
+    - `t20`
+  - wave 1 stays:
+    - local-only
+    - train-only
+    - no holdouts
+    - no GCP
+- Resource bias folded into the draft:
+  - `windows1-w1` first for train-only target-expanded matrix forging
+  - controller for local sweeps
+  - `linux1-lx` only for parity verification after a local pass
+- Current state:
+  - V650 remains the completed mission
+  - active charter has **not** been switched
+  - V651 draft is now ready for owner confirmation
+
 ## Update: 2026-03-09 13:48 UTC
 - **A new evidence-only external-auditor packet is landed for the full V645 -> V650 chain.**
 - New packet:

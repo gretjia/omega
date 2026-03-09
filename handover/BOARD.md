@@ -45,6 +45,67 @@
 ### Entries
 
 <!-- New session debriefs go here. Most recent on top. -->
+#### [2026-03-09 15:41] Agent: Codex | Session: V651 Gemini Draft Pass
+
+**What I did:**
+- Audited the V651 draft with:
+  - `gemini -p`
+- Landed the audit record:
+  - `handover/ai-direct/entries/20260309_154100_v651_spec_draft_gemini_pass.md`
+- Folded the required fixes into:
+  - `handover/ai-direct/entries/20260309_153149_v651_target_timescale_alignment_pivot_spec_draft.md`
+
+**What I discovered:**
+- Gemini agreed the mission stays on a single bounded axis:
+  - target horizon only
+- Gemini also agreed that a new train-only target-expanded matrix contract is required, not optional.
+
+**What confused me / blocked me:**
+- `gemini 3.1 pro preview` initially hit repeated `429` capacity errors.
+- The audit eventually completed successfully on the same default model after retry; no model switch was used.
+
+**What the next agent should do:**
+- Ask the owner to confirm the V651 spec.
+- Do not switch the active charter until owner confirmation arrives.
+
+**Files I changed:**
+- `handover/ai-direct/entries/20260309_153149_v651_target_timescale_alignment_pivot_spec_draft.md` — folded Gemini fixes into the draft.
+- `handover/ai-direct/entries/20260309_154100_v651_spec_draft_gemini_pass.md` — recorded the Gemini audit result.
+- `handover/ai-direct/LATEST.md` — updated current state to draft-ready-for-confirmation.
+- `handover/BOARD.md` — added this debrief.
+#### [2026-03-09 15:31] Agent: Codex | Session: V651 Draft Prepared
+
+**What I did:**
+- Landed the new audit authority:
+  - `audit/v651_target_timescale_disconnect.md`
+- Drafted the next mission spec:
+  - `handover/ai-direct/entries/20260309_153149_v651_target_timescale_alignment_pivot_spec_draft.md`
+- Updated indexes:
+  - `audit/README.md`
+  - `handover/ai-direct/LATEST.md`
+
+**What I discovered:**
+- The current train base matrix cannot run a true `t5/t10/t20` experiment as-is because the live Stage3 contract only exposes:
+  - `t1_fwd_return`
+- So a real horizon-alignment mission must include a new train-only target-expanded matrix contract.
+
+**What confused me / blocked me:**
+- No operational blocker.
+- The only design care point is to keep the mission strictly on one axis:
+  - horizon expansion only
+  - no reopening of loss, weights, or Path A
+
+**What the next agent should do:**
+- Run `gemini -p` on the V651 draft.
+- Fold any required fixes into the draft.
+- Ask the owner to confirm the spec before switching the active charter.
+
+**Files I changed:**
+- `audit/v651_target_timescale_disconnect.md` — landed the new external audit authority.
+- `handover/ai-direct/entries/20260309_153149_v651_target_timescale_alignment_pivot_spec_draft.md` — drafted the new target-timescale alignment mission.
+- `audit/README.md` — indexed the new audit authority.
+- `handover/ai-direct/LATEST.md` — recorded the new draft state.
+- `handover/BOARD.md` — added this debrief.
 #### [2026-03-09 13:48] Agent: Codex | Session: V650 Evidence-Only Auditor Packet
 
 **What I did:**
