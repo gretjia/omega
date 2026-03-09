@@ -8,6 +8,43 @@
 
 This file is the single source of current operational truth for all agents.
 
+## Update: 2026-03-09 07:22 UTC
+- **The first live V644 alpha-first pilot completed and triggered the spec stop gate.**
+- New runtime record:
+  - `handover/ai-direct/entries/20260309_072256_v644_alpha_first_pilot_stop_gate.md`
+- Live pilot identity:
+  - results prefix:
+    - `gs://omega_v52_central/omega/staging/swarm_optuna/v644_pilot_20260309_071719`
+  - aggregate prefix:
+    - `gs://omega_v52_central/omega/staging/swarm_optuna/v644_pilot_20260309_071719/aggregate`
+  - local runtime root:
+    - `audit/runtime/swarm_optuna_v644_pilot_20260309_071719`
+- Runtime outcome:
+  - `2 / 2` workers succeeded
+  - `20 / 20` trials completed
+  - `20 / 20` trials passed the `AUC` guardrail
+  - canonical fingerprint matched across workers
+- Aggregate result:
+  - `objective_metric=alpha_top_quintile`
+  - `objective_best_value=-4.910318402430983e-06`
+  - `best_val_auc=0.7955525583877963`
+  - positive eligible `alpha_top_quintile` trials:
+    - `0`
+  - positive eligible `alpha_top_decile` trials:
+    - `0`
+- Operational verdict:
+  - the V644 mechanics are working
+  - but this pilot must **not** scale out yet
+  - it hit the explicit stop condition:
+    - no AUC-eligible positive validation alpha trial exists
+- Meaning:
+  - this strengthens the diagnosis beyond the frozen AUC-first baseline:
+    - the failure is not only champion tie-break or leaderboard ordering
+    - even direct alpha-first search on a small healthy pilot still found only negative tail-alpha trials
+- Immediate next step:
+  - inspect before widening search
+  - do not retrain or re-run holdouts from this pilot
+
 ## Update: 2026-03-09 07:14 UTC
 - **The bounded V644 alpha-first implementation wave is now complete locally and regression-covered.**
 - New execution record:

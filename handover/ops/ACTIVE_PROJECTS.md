@@ -12,7 +12,7 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
 
 ### Project: V644-GC-SWARM-ASYMMETRIC-OBJECTIVE
 
-- Status: `LOCAL_IMPL_PASS_PENDING_PILOT`
+- Status: `PILOT_STOP_GATE_TRIGGERED`
 - Hosts: `controller`, `GCP Vertex AI`
 - Goal: redesign the cloud swarm objective and champion rule so future sweeps optimize tail profitability, not just global `AUC`, while preserving the frozen holdout baseline as immutable audit evidence
 - Seed authority:
@@ -46,6 +46,21 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
     - `2023 -> 2024`
     - `objective_epsilon=1e-05`
     - fresh output prefixes only
+- Latest pilot result:
+  - prefix:
+    - `gs://omega_v52_central/omega/staging/swarm_optuna/v644_pilot_20260309_071719`
+  - completed workers:
+    - `2 / 2`
+  - completed trials:
+    - `20 / 20`
+  - AUC-eligible trials:
+    - `20 / 20`
+  - `objective_best_value`:
+    - `-4.910318402430983e-06`
+  - positive eligible `alpha_top_quintile` trials:
+    - `0`
+  - stop-gate verdict:
+    - do not widen swarm yet
 - Risks:
   - pure alpha optimization may overfit noisy tails
   - the inner XGBoost loss still remains binary-logloss unless a later mission changes it explicitly

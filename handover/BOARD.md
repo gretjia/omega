@@ -45,6 +45,58 @@
 ### Entries
 
 <!-- New session debriefs go here. Most recent on top. -->
+#### [2026-03-09 07:22] Agent: Codex | Session: V644 Alpha-First Pilot 1 Stop Gate
+
+**What I did:**
+- Committed and pushed the V644 alpha-first implementation to `main`.
+- Launched the first live V644 cloud pilot with:
+  - `2` workers
+  - `n2-standard-16`
+  - `spot`
+  - `objective_metric=alpha_top_quintile`
+  - `min_val_auc=0.75`
+  - `objective_epsilon=1e-05`
+  - fresh prefixes
+  - `--force-gcloud-fallback`
+  - `--watch`
+- Waited for both workers to finish and for aggregate output to land.
+
+**What I discovered:**
+- The new mechanics worked exactly as intended:
+  - real parallel fan-out
+  - fresh-prefix isolation
+  - AUC-guardrail enforcement
+  - alpha-first aggregation
+- But the pilot hit the explicit stop gate:
+  - `2 / 2` workers succeeded
+  - `20 / 20` trials completed
+  - `20 / 20` trials passed the AUC floor
+  - yet `0` eligible trials had positive `alpha_top_quintile`
+  - and `0` eligible trials had positive `alpha_top_decile`
+- Best alpha-first objective was still negative:
+  - `objective_best_value=-4.910318402430983e-06`
+- This tightens the diagnosis beyond the old AUC-first run:
+  - the issue is not only leaderboard ordering or AUC-first champion selection
+
+**What confused me / blocked me:**
+- Nothing operationally blocked this pilot.
+- The blocker is now conceptual:
+  - alpha-first search on a small clean pilot still produced only negative validation tail alpha
+
+**What the next agent should do:**
+- Do not widen this swarm yet.
+- Do not retrain or re-run holdouts from this pilot.
+- Inspect why all AUC-eligible trials still have negative tail alpha on the `2024` validation slice.
+- The next decision boundary is whether to:
+  - enlarge search coverage under the same math
+  - or open a deeper mission on feature/label/math mismatch
+
+**Files I changed:**
+- `handover/ai-direct/LATEST.md` — recorded the live V644 pilot stop-gate result.
+- `handover/ops/ACTIVE_PROJECTS.md` — moved the mission to pilot-stop-gate-triggered.
+- `handover/ai-direct/entries/20260309_072256_v644_alpha_first_pilot_stop_gate.md` — recorded the full pilot evidence and stop decision.
+- `handover/BOARD.md` — added this mandatory debrief block.
+
 #### [2026-03-09 07:14] Agent: Codex | Session: V644 Alpha-First Local Implementation Pass
 
 **What I did:**
