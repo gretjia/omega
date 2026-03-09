@@ -12,7 +12,15 @@ import subprocess
 from pathlib import Path
 
 
-OBJECTIVE_METRICS = {"val_auc", "alpha_top_decile", "alpha_top_quintile"}
+OBJECTIVE_METRICS = {
+    "val_auc",
+    "alpha_top_decile",
+    "alpha_top_quintile",
+    "structural_tail_monotonicity_gate",
+}
+HARD_LOSING_OBJECTIVE_VALUE = -1.0e9
+STRUCTURAL_TAIL_OBJECTIVE = "structural_tail_monotonicity_gate"
+STRUCTURAL_TAIL_MIN_AUC_FLOOR = 0.505
 
 
 def _parse_gcs_uri(uri: str) -> tuple[str, str]:
@@ -152,20 +160,54 @@ def _row_metric_value(row: dict, metric: str) -> float:
     return float(row.get(metric, 0.0) or 0.0)
 
 
-def _auc_guardrail_passed(row: dict, min_val_auc: float) -> bool:
-    if "auc_guardrail_passed" in row:
-        return bool(row.get("auc_guardrail_passed"))
-    return _row_metric_value(row, "val_auc") >= float(min_val_auc)
+def _objective_contract(
+    objective_metric: str,
+    *,
+    auc: float,
+    alpha_top_decile: float,
+    alpha_top_quintile: float,
+    min_val_auc: float,
+) -> dict:
+    metric = _resolve_objective_metric(objective_metric)
+    if metric == "val_auc":
+        raw_objective_value = float(auc)
+    elif metric == "alpha_top_decile":
+        raw_objective_value = float(alpha_top_decile)
+    elif metric == "alpha_top_quintile":
+        raw_objective_value = float(alpha_top_quintile)
+    else:
+        raw_objective_value = float((float(alpha_top_decile) + float(alpha_top_quintile)) / 2.0)
+    auc_guardrail_min = float(min_val_auc)
+    auc_guardrail_enabled = metric != "val_auc" and auc_guardrail_min > 0.0
+    auc_guardrail_passed = float(auc) >= auc_guardrail_min if auc_guardrail_enabled else True
+    tail_monotonicity_enabled = metric == STRUCTURAL_TAIL_OBJECTIVE
+    tail_monotonicity_passed = float(alpha_top_decile) >= float(alpha_top_quintile) if tail_monotonicity_enabled else True
+    structural_guardrail_passed = bool(auc_guardrail_passed and tail_monotonicity_passed)
+    objective_value = raw_objective_value if structural_guardrail_passed else HARD_LOSING_OBJECTIVE_VALUE
+    return {
+        "objective_metric": metric,
+        "raw_objective_value": float(raw_objective_value),
+        "objective_value": float(objective_value),
+        "auc_guardrail_min": auc_guardrail_min,
+        "auc_guardrail_enabled": bool(auc_guardrail_enabled),
+        "auc_guardrail_passed": bool(auc_guardrail_passed),
+        "tail_monotonicity_enabled": bool(tail_monotonicity_enabled),
+        "tail_monotonicity_passed": bool(tail_monotonicity_passed),
+        "structural_guardrail_passed": bool(structural_guardrail_passed),
+    }
 
 
 def _decorate_row(row: dict, *, objective_metric: str, min_val_auc: float) -> dict:
     clean = dict(row)
-    raw_objective_value = _row_metric_value(clean, objective_metric)
-    clean["objective_metric"] = str(objective_metric)
-    clean["raw_objective_value"] = float(clean.get("raw_objective_value", raw_objective_value) or raw_objective_value)
-    clean["auc_guardrail_min"] = float(clean.get("auc_guardrail_min", min_val_auc) or min_val_auc)
-    clean["auc_guardrail_passed"] = bool(_auc_guardrail_passed(clean, min_val_auc))
-    clean["objective_value"] = float(clean["raw_objective_value"])
+    clean.update(
+        _objective_contract(
+            objective_metric,
+            auc=_row_metric_value(clean, "val_auc"),
+            alpha_top_decile=_row_metric_value(clean, "alpha_top_decile"),
+            alpha_top_quintile=_row_metric_value(clean, "alpha_top_quintile"),
+            min_val_auc=float(min_val_auc),
+        )
+    )
     return clean
 
 
@@ -183,6 +225,11 @@ def main() -> None:
     objective_metric = _resolve_objective_metric(args.objective_metric)
     if objective_metric != "val_auc" and float(args.min_val_auc) <= 0.0:
         raise RuntimeError("alpha_first_requires_positive_min_val_auc")
+    if objective_metric == STRUCTURAL_TAIL_OBJECTIVE and float(args.min_val_auc) < STRUCTURAL_TAIL_MIN_AUC_FLOOR:
+        raise RuntimeError(
+            "structural_tail_objective_requires_min_val_auc_at_least:"
+            f"{STRUCTURAL_TAIL_MIN_AUC_FLOOR}"
+        )
 
     trial_uris = _list_trial_uris(str(args.results_prefix_uri))
     if not trial_uris:
@@ -223,7 +270,7 @@ def main() -> None:
         _decorate_row(row, objective_metric=objective_metric, min_val_auc=float(args.min_val_auc))
         for row in completed_rows
     ]
-    eligible_rows = [row for row in decorated_rows if bool(row.get("auc_guardrail_passed"))]
+    eligible_rows = [row for row in decorated_rows if bool(row.get("structural_guardrail_passed"))]
     if not eligible_rows:
         raise RuntimeError("no_auc_eligible_trials")
 
@@ -279,6 +326,7 @@ def main() -> None:
         "objective_best_value": best_objective_value,
         "objective_epsilon": epsilon,
         "auc_guardrail_min": float(args.min_val_auc),
+        "tail_monotonicity_required": bool(objective_metric == STRUCTURAL_TAIL_OBJECTIVE),
         "canonical_fingerprint": champion["canonical_fingerprint"],
         "worker_summaries": worker_summaries,
         "leaderboard": eligible_rows,
@@ -295,6 +343,9 @@ def main() -> None:
         "objective_epsilon": epsilon,
         "auc_guardrail_min": float(champion["auc_guardrail_min"]),
         "auc_guardrail_passed": bool(champion["auc_guardrail_passed"]),
+        "tail_monotonicity_enabled": bool(champion.get("tail_monotonicity_enabled", False)),
+        "tail_monotonicity_passed": bool(champion.get("tail_monotonicity_passed", True)),
+        "structural_guardrail_passed": bool(champion.get("structural_guardrail_passed", False)),
         "canonical_fingerprint": champion["canonical_fingerprint"],
         "alpha_top_decile": float(champion.get("alpha_top_decile", 0.0)),
         "alpha_top_quintile": float(champion.get("alpha_top_quintile", 0.0)),

@@ -4,8 +4,8 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
 
 ## 1. Snapshot Metadata
 
-- `updated_at_local`: 2026-03-09 10:55:40 +0000
-- `updated_at_utc`: 2026-03-09 10:55:40 +0000
+- `updated_at_local`: 2026-03-09 11:11:00 +0000
+- `updated_at_utc`: 2026-03-09 11:11:00 +0000
 - `updated_by`: Codex (GPT-5)
 
 ## 2. In-Flight Work
@@ -176,7 +176,7 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
 
 ### Project: V647-STRUCTURAL-TAIL-MONOTONICITY-GATE
 
-- Status: `SPEC_DRAFT_GEMINI_PASS_AWAITING_OWNER_CONFIRMATION`
+- Status: `LOCAL_SMOKE_PASS_READY_FOR_GCP_SWARM`
 - Hosts: `controller`, `GCP Vertex AI`
 - Goal: fix the Path A outer-loop objective so local winners preserve structural integrity and tail monotonicity instead of promoting anti-classifiers
 - Seed authority:
@@ -208,9 +208,35 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
     - `AUC > 0.505`
     - `alpha_top_decile > alpha_top_quintile`
     - `alpha_top_quintile > 0`
+- Latest result:
+  - execution record:
+    - `handover/ai-direct/entries/20260309_111100_v647_local_contract_and_smoke_pass.md`
+  - code contract now exists in:
+    - `tools/run_optuna_sweep.py`
+    - `tools/aggregate_vertex_swarm_results.py`
+    - `tools/launch_vertex_swarm_optuna.py`
+  - local regression:
+    - `23 passed in 1.25s`
+  - local smoke root:
+    - `audit/runtime/v647_local_smoke_20260309_110859`
+  - local smoke summary:
+    - `n_trials=10`
+    - `n_completed=10`
+    - `eligible_trials=3`
+    - `best_value=0.0001092397756326582`
+  - local champion:
+    - `trial_number=2`
+    - `val_auc=0.5072357533131951`
+    - `alpha_top_decile=0.00011617716323408274`
+    - `alpha_top_quintile=0.00010230238803123366`
+  - key conclusion:
+    - the first V647 local smoke did produce structurally valid positive-tail trials
+    - worker and aggregator stayed aligned on the same champion
+    - the escalation gate to GCP is now explicitly earned
 - Immediate next step:
-  - wait for owner confirmation
-  - do not switch the active charter or begin execution before that confirmation
+  - commit the V647 first-wave code/doc state
+  - launch a fresh-prefix `20`-trial GCP swarm under the same frozen contract
+  - keep holdouts untouched until that swarm proves a stronger champion exists
 
 ### Project: V644-GC-SWARM-ASYMMETRIC-OBJECTIVE
 

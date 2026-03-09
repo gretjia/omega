@@ -9,8 +9,13 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from config import FEATURE_COLS
-from tools.launch_vertex_swarm_optuna import _assert_empty_output_uri, _submit_one_worker
-from tools.run_optuna_sweep import _canonical_fingerprint, _prepare_temporal_split, _trial_payload
+from tools.launch_vertex_swarm_optuna import _assert_empty_output_uri, _submit_one_worker, _validate_launch_contract
+from tools.run_optuna_sweep import (
+    _canonical_fingerprint,
+    _prepare_temporal_split,
+    _trial_payload,
+    _validate_objective_runtime_contract,
+)
 
 
 def _row(date: str, time_value: int, t1_fwd_return: float, offset: float) -> dict:
@@ -341,6 +346,134 @@ def test_trial_payload_alpha_objective_can_disable_auc_guardrail() -> None:
     assert payload["objective_value"] == 0.01
 
 
+def test_trial_payload_structural_tail_metric_returns_mean_when_guards_pass() -> None:
+    class DummyTrial:
+        number = 10
+
+    payload = _trial_payload(
+        DummyTrial(),
+        params={
+            "max_depth": 4,
+            "learning_rate": 0.03,
+            "subsample": 0.9,
+            "colsample_bytree": 0.8,
+            "min_child_weight": 1.0,
+            "gamma": 0.0,
+            "reg_lambda": 1.0,
+            "reg_alpha": 0.0,
+            "num_boost_round": 120,
+        },
+        auc=0.52,
+        alpha_top_decile=0.03,
+        alpha_top_quintile=0.01,
+        objective_metric="structural_tail_monotonicity_gate",
+        min_val_auc=0.505,
+        learner_mode="binary_logistic_sign",
+    )
+    assert payload["objective_metric"] == "structural_tail_monotonicity_gate"
+    assert payload["raw_objective_value"] == 0.02
+    assert payload["auc_guardrail_passed"] is True
+    assert payload["tail_monotonicity_passed"] is True
+    assert payload["structural_guardrail_passed"] is True
+    assert payload["objective_value"] == 0.02
+
+
+def test_trial_payload_structural_tail_metric_penalizes_auc_floor_failure() -> None:
+    class DummyTrial:
+        number = 11
+
+    payload = _trial_payload(
+        DummyTrial(),
+        params={
+            "max_depth": 4,
+            "learning_rate": 0.03,
+            "subsample": 0.9,
+            "colsample_bytree": 0.8,
+            "min_child_weight": 1.0,
+            "gamma": 0.0,
+            "reg_lambda": 1.0,
+            "reg_alpha": 0.0,
+            "num_boost_round": 120,
+        },
+        auc=0.49,
+        alpha_top_decile=0.03,
+        alpha_top_quintile=0.01,
+        objective_metric="structural_tail_monotonicity_gate",
+        min_val_auc=0.505,
+        learner_mode="binary_logistic_sign",
+    )
+    assert payload["auc_guardrail_passed"] is False
+    assert payload["tail_monotonicity_passed"] is True
+    assert payload["structural_guardrail_passed"] is False
+    assert payload["objective_value"] < 0.0
+
+
+def test_trial_payload_structural_tail_metric_penalizes_inverted_tail() -> None:
+    class DummyTrial:
+        number = 12
+
+    payload = _trial_payload(
+        DummyTrial(),
+        params={
+            "max_depth": 4,
+            "learning_rate": 0.03,
+            "subsample": 0.9,
+            "colsample_bytree": 0.8,
+            "min_child_weight": 1.0,
+            "gamma": 0.0,
+            "reg_lambda": 1.0,
+            "reg_alpha": 0.0,
+            "num_boost_round": 120,
+        },
+        auc=0.53,
+        alpha_top_decile=0.01,
+        alpha_top_quintile=0.02,
+        objective_metric="structural_tail_monotonicity_gate",
+        min_val_auc=0.505,
+        learner_mode="binary_logistic_sign",
+    )
+    assert payload["auc_guardrail_passed"] is True
+    assert payload["tail_monotonicity_passed"] is False
+    assert payload["structural_guardrail_passed"] is False
+    assert payload["objective_value"] < 0.0
+
+
+def test_validate_objective_runtime_contract_locks_v647_to_sqrt_path_a() -> None:
+    args = Namespace(
+        objective_metric="structural_tail_monotonicity_gate",
+        min_val_auc=0.505,
+        weight_mode="sqrt_abs_excess_return",
+        learner_mode="binary_logistic_sign",
+    )
+    _validate_objective_runtime_contract(args)
+
+    bad_weight = Namespace(
+        objective_metric="structural_tail_monotonicity_gate",
+        min_val_auc=0.505,
+        weight_mode="abs_excess_return",
+        learner_mode="binary_logistic_sign",
+    )
+    try:
+        _validate_objective_runtime_contract(bad_weight)
+    except RuntimeError as exc:
+        assert "structural_tail_objective_requires_weight_mode" in str(exc)
+    else:
+        raise AssertionError("expected weight-mode lock failure")
+
+    bad_learner = Namespace(
+        objective_metric="structural_tail_monotonicity_gate",
+        min_val_auc=0.505,
+        weight_mode="sqrt_abs_excess_return",
+        learner_mode="reg_squarederror_excess_return",
+    )
+    try:
+        _validate_objective_runtime_contract(bad_learner)
+    except RuntimeError as exc:
+        assert "structural_tail_objective_requires_learner_mode" in str(exc)
+    else:
+        raise AssertionError("expected learner-mode lock failure")
+
+
 def test_launch_worker_seed_offsets_by_worker_index() -> None:
     captured = {}
 
@@ -357,6 +490,7 @@ def test_launch_worker_seed_offsets_by_worker_index() -> None:
         objective_metric="alpha_top_quintile",
         min_val_auc=0.75,
         weight_mode="abs_excess_return",
+        learner_mode="binary_logistic_sign",
         code_bundle_uri="gs://bucket/code.zip",
         sync=False,
         spot=True,
@@ -378,10 +512,35 @@ def test_launch_worker_seed_offsets_by_worker_index() -> None:
     objective_idx = script_args.index("--objective-metric")
     auc_idx = script_args.index("--min-val-auc")
     weight_idx = script_args.index("--weight-mode")
+    learner_idx = script_args.index("--learner-mode")
     assert script_args[objective_idx + 1] == "alpha_top_quintile"
     assert script_args[auc_idx + 1] == "0.75"
     assert script_args[weight_idx + 1] == "abs_excess_return"
+    assert script_args[learner_idx + 1] == "binary_logistic_sign"
     assert attempt["seed"] == 45
+
+
+def test_validate_launch_contract_locks_v647_to_sqrt_path_a() -> None:
+    good = Namespace(
+        objective_metric="structural_tail_monotonicity_gate",
+        min_val_auc=0.505,
+        weight_mode="sqrt_abs_excess_return",
+        learner_mode="binary_logistic_sign",
+    )
+    _validate_launch_contract(good)
+
+    bad = Namespace(
+        objective_metric="structural_tail_monotonicity_gate",
+        min_val_auc=0.505,
+        weight_mode="sqrt_abs_excess_return",
+        learner_mode="reg_squarederror_excess_return",
+    )
+    try:
+        _validate_launch_contract(bad)
+    except RuntimeError as exc:
+        assert "structural_tail_objective_requires_learner_mode" in str(exc)
+    else:
+        raise AssertionError("expected launch-contract learner-mode failure")
 
 
 def test_assert_empty_output_uri_rejects_nonempty_local_prefix(tmp_path: Path) -> None:

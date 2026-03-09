@@ -8,6 +8,72 @@
 
 This file is the single source of current operational truth for all agents.
 
+## Update: 2026-03-09 11:11 UTC
+- **V647 first-wave local implementation and local smoke have passed.**
+- New execution record:
+  - `handover/ai-direct/entries/20260309_111100_v647_local_contract_and_smoke_pass.md`
+- Code contract now landed:
+  - `tools/run_optuna_sweep.py`
+  - `tools/aggregate_vertex_swarm_results.py`
+  - `tools/launch_vertex_swarm_optuna.py`
+- New V647 runtime lock is explicit:
+  - `objective_metric=structural_tail_monotonicity_gate`
+  - `weight_mode=sqrt_abs_excess_return`
+  - `learner_mode=binary_logistic_sign`
+  - `min_val_auc=0.505`
+- Local regression:
+  - `23 passed in 1.25s`
+- Local smoke root:
+  - `audit/runtime/v647_local_smoke_20260309_110859`
+- Local smoke result:
+  - `n_trials=10`
+  - `n_completed=10`
+  - `eligible_trials=3`
+  - best local champion:
+    - `trial_number=2`
+    - `val_auc=0.5072357533131951`
+    - `alpha_top_decile=0.00011617716323408274`
+    - `alpha_top_quintile=0.00010230238803123366`
+    - `objective_value=0.0001092397756326582`
+- Gate meaning:
+  - the first local smoke did produce at least one structurally valid positive-tail trial
+  - the local aggregator selected the same trial under the same contract
+  - therefore the explicit escalation gate to GCP is now earned
+- Next step:
+  - commit the V647 first-wave code/doc state
+  - then launch the fresh-prefix `20`-trial GCP swarm under the same frozen contract
+
+## Update: 2026-03-09 11:01 UTC
+- **V647 is now the active mission.**
+- New mission-open authority:
+  - `handover/ai-direct/entries/20260309_110100_v647_structural_tail_monotonicity_gate_mission_open.md`
+- Active charter has been switched to:
+  - `handover/ops/ACTIVE_MISSION_CHARTER.md`
+- AgentOS convergence for the first wave:
+  - Plan:
+    - add one new objective mode:
+      - `structural_tail_monotonicity_gate`
+    - keep first wave inside:
+      - `run_optuna_sweep.py`
+      - `aggregate_vertex_swarm_results.py`
+      - corresponding tests
+  - Math:
+    - `PASS WITH FIXES`
+  - Runtime:
+    - `PASS WITH FIXES`
+- First-wave execution shape:
+  - local-first
+  - contract-and-tests wave
+  - one local `10`-trial smoke only
+  - no GCP before the local smoke gate passes
+- Frozen constraints for V647:
+  - `omega_core/*`
+  - `canonical_v64_1`
+  - Path A label
+  - temporal split
+  - holdout isolation
+  - `weight_mode=sqrt_abs_excess_return`
+
 ## Update: 2026-03-09 10:55 UTC
 - **The new recursive audit verdict has been landed, and the V647 spec draft has passed Gemini review.**
 - New audit authority:

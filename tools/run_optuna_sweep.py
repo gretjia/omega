@@ -20,7 +20,12 @@ from importlib.metadata import version as pkg_version
 from importlib.util import find_spec
 
 
-OBJECTIVE_METRICS = {"val_auc", "alpha_top_decile", "alpha_top_quintile"}
+OBJECTIVE_METRICS = {
+    "val_auc",
+    "alpha_top_decile",
+    "alpha_top_quintile",
+    "structural_tail_monotonicity_gate",
+}
 WEIGHT_MODES = {
     "physics_abs_singularity",
     "abs_excess_return",
@@ -31,6 +36,10 @@ WEIGHT_MODES = {
 }
 LEARNER_MODES = {"binary_logistic_sign", "reg_squarederror_excess_return"}
 HARD_LOSING_OBJECTIVE_VALUE = -1.0e9
+STRUCTURAL_TAIL_OBJECTIVE = "structural_tail_monotonicity_gate"
+STRUCTURAL_TAIL_REQUIRED_WEIGHT_MODE = "sqrt_abs_excess_return"
+STRUCTURAL_TAIL_REQUIRED_LEARNER_MODE = "binary_logistic_sign"
+STRUCTURAL_TAIL_MIN_AUC_FLOOR = 0.505
 
 
 def _install_dependencies() -> None:
@@ -223,7 +232,9 @@ def _raw_objective_value(
         return float(auc)
     if metric == "alpha_top_decile":
         return float(alpha_top_decile)
-    return float(alpha_top_quintile)
+    if metric == "alpha_top_quintile":
+        return float(alpha_top_quintile)
+    return float((float(alpha_top_decile) + float(alpha_top_quintile)) / 2.0)
 
 
 def _objective_contract(
@@ -234,24 +245,51 @@ def _objective_contract(
     alpha_top_quintile: float,
     min_val_auc: float,
 ) -> dict:
+    metric = _resolve_objective_metric(objective_metric)
     raw_objective_value = _raw_objective_value(
-        objective_metric,
+        metric,
         auc=auc,
         alpha_top_decile=alpha_top_decile,
         alpha_top_quintile=alpha_top_quintile,
     )
     auc_guardrail_min = float(min_val_auc)
-    auc_guardrail_enabled = _resolve_objective_metric(objective_metric) != "val_auc" and auc_guardrail_min > 0.0
+    auc_guardrail_enabled = metric != "val_auc" and auc_guardrail_min > 0.0
     auc_guardrail_passed = float(auc) >= auc_guardrail_min if auc_guardrail_enabled else True
-    objective_value = raw_objective_value if auc_guardrail_passed else HARD_LOSING_OBJECTIVE_VALUE
+    tail_monotonicity_enabled = metric == STRUCTURAL_TAIL_OBJECTIVE
+    tail_monotonicity_passed = float(alpha_top_decile) >= float(alpha_top_quintile) if tail_monotonicity_enabled else True
+    structural_guardrail_passed = bool(auc_guardrail_passed and tail_monotonicity_passed)
+    objective_value = raw_objective_value if structural_guardrail_passed else HARD_LOSING_OBJECTIVE_VALUE
     return {
-        "objective_metric": _resolve_objective_metric(objective_metric),
+        "objective_metric": metric,
         "objective_value": float(objective_value),
         "raw_objective_value": float(raw_objective_value),
         "auc_guardrail_min": auc_guardrail_min,
         "auc_guardrail_enabled": bool(auc_guardrail_enabled),
         "auc_guardrail_passed": bool(auc_guardrail_passed),
+        "tail_monotonicity_enabled": bool(tail_monotonicity_enabled),
+        "tail_monotonicity_passed": bool(tail_monotonicity_passed),
+        "structural_guardrail_passed": bool(structural_guardrail_passed),
     }
+
+
+def _validate_objective_runtime_contract(args: argparse.Namespace) -> None:
+    if args.objective_metric != STRUCTURAL_TAIL_OBJECTIVE:
+        return
+    if args.weight_mode != STRUCTURAL_TAIL_REQUIRED_WEIGHT_MODE:
+        raise RuntimeError(
+            "structural_tail_objective_requires_weight_mode:"
+            f"{STRUCTURAL_TAIL_REQUIRED_WEIGHT_MODE}"
+        )
+    if args.learner_mode != STRUCTURAL_TAIL_REQUIRED_LEARNER_MODE:
+        raise RuntimeError(
+            "structural_tail_objective_requires_learner_mode:"
+            f"{STRUCTURAL_TAIL_REQUIRED_LEARNER_MODE}"
+        )
+    if float(args.min_val_auc) < STRUCTURAL_TAIL_MIN_AUC_FLOOR:
+        raise RuntimeError(
+            "structural_tail_objective_requires_min_val_auc_at_least:"
+            f"{STRUCTURAL_TAIL_MIN_AUC_FLOOR}"
+        )
 
 
 def _prepare_temporal_split(args: argparse.Namespace) -> dict:
@@ -540,6 +578,7 @@ def main() -> None:
     args.objective_metric = _resolve_objective_metric(args.objective_metric)
     args.weight_mode = _resolve_weight_mode(args.weight_mode)
     args.learner_mode = _resolve_learner_mode(args.learner_mode)
+    _validate_objective_runtime_contract(args)
 
     _install_dependencies()
     if str(args.code_bundle_uri).strip():
@@ -633,13 +672,16 @@ def main() -> None:
         trial.set_user_attr("auc_guardrail_min", float(payload["auc_guardrail_min"]))
         trial.set_user_attr("auc_guardrail_enabled", bool(payload["auc_guardrail_enabled"]))
         trial.set_user_attr("auc_guardrail_passed", bool(payload["auc_guardrail_passed"]))
+        trial.set_user_attr("tail_monotonicity_enabled", bool(payload["tail_monotonicity_enabled"]))
+        trial.set_user_attr("tail_monotonicity_passed", bool(payload["tail_monotonicity_passed"]))
+        trial.set_user_attr("structural_guardrail_passed", bool(payload["structural_guardrail_passed"]))
         return float(payload["objective_value"])
 
     study = optuna.create_study(direction="maximize", sampler=TPESampler(seed=int(args.seed)))
     study.optimize(objective, n_trials=int(args.n_trials))
 
     completed = [t for t in study.trials if t.state == TrialState.COMPLETE]
-    eligible_rows = [row for row in trial_rows if bool(row.get("auc_guardrail_passed", False))]
+    eligible_rows = [row for row in trial_rows if bool(row.get("structural_guardrail_passed", False))]
     best_value = float(study.best_value) if completed else None
     best_params = dict(study.best_params) if completed else {}
 
@@ -659,6 +701,7 @@ def main() -> None:
         "objective_metric": str(args.objective_metric),
         "auc_guardrail_min": float(args.min_val_auc),
         "auc_guardrail_enabled": bool(float(args.min_val_auc) > 0.0 and str(args.objective_metric) != "val_auc"),
+        "tail_monotonicity_required": bool(str(args.objective_metric) == STRUCTURAL_TAIL_OBJECTIVE),
         "learner_mode": str(args.learner_mode),
         "weight_mode": str(args.weight_mode),
         "split_summary": split_summary,

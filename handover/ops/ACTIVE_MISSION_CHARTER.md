@@ -1,43 +1,35 @@
 # OMEGA Active Mission Charter
 
 Status: In Progress
-Task Name: V646 Path A refinement
+Task Name: V647 Structural Tail-Monotonicity Gate
 Owner: Human Owner
 Commander: Codex
 Date: 2026-03-09
 
 ## 1. Objective
 
-- Accept that `Path A` is now the leading learner-interface branch.
-- Refine `Path A` without reopening math-governance, `Path B`, or GC fan-out.
-- Preserve all previously recorded baselines as immutable audit evidence.
-- Improve the current `Path A` tradeoff:
-  - keep the economic gains already achieved
-  - reduce the remaining `2026-01` weakness
-  - avoid drifting into a branch that only improves alpha by destroying all ranking stability
+- Accept the recursive architect verdict that the monotone `Path A` weight family is closed.
+- Refuse both V645 and V646 promoted branches as globally insufficient.
+- Keep V64 math, Stage3 gates, and the Path A label contract frozen.
+- Fix the downstream outer-loop selection rule so local winners preserve:
+  - structural validity
+  - tail monotonicity
+  - positive tail alpha
 
 ## 2. Canonical Spec
 
 Primary task-level implementation authority:
 
-- `handover/ai-direct/entries/20260309_091728_v646_path_a_refinement_mission_open.md`
-  - exact section:
-    - why the mission now splits
-    - new canonical diagnosis
-    - allowed refinement family
-    - required runtime shape
-    - frozen reference baselines
-
-Seed authority that led to the final spec:
-
-- `audit/v644_mediocristan_label_bottleneck.md`
-- `handover/ai-direct/entries/20260309_080141_v645_path_a_local_micro_sweep_positive.md`
-- `handover/ai-direct/entries/20260309_084315_v645_path_a_retrain_and_fresh_holdout_partial_pass.md`
-- `handover/ai-direct/entries/20260309_090713_v645_path_b_local_compare_weaker_than_path_a.md`
+- `audit/v647_anti_classifier_paradox.md`
+- `handover/ai-direct/entries/20260309_105249_v647_structural_tail_monotonicity_gate_spec_draft.md`
+- `handover/ai-direct/entries/20260309_105540_v647_spec_draft_gemini_pass.md`
+- `handover/ai-direct/entries/20260309_110100_v647_structural_tail_monotonicity_gate_mission_open.md`
 
 Supporting context:
 
-- `handover/ai-direct/entries/20260309_054700_holdout_base_matrix_evaluation_complete.md`
+- `audit/v646_path_a_power_family_surface.md`
+- `handover/ai-direct/entries/20260309_084315_v645_path_a_retrain_and_fresh_holdout_partial_pass.md`
+- `handover/ai-direct/entries/20260309_094727_v646_path_a_sqrt_refinement_mixed_holdout_verdict.md`
 - `OMEGA_CONSTITUTION.md`
 
 If the canonical spec conflicts with `OMEGA_CONSTITUTION.md`, escalate to the Commander.
@@ -47,11 +39,10 @@ If the canonical spec conflicts with `OMEGA_CONSTITUTION.md`, escalate to the Co
 Writable files:
 
 - `tools/run_optuna_sweep.py`
-- `tools/run_vertex_xgb_train.py`
-- `tools/evaluate_xgb_on_base_matrix.py`
+- `tools/aggregate_vertex_swarm_results.py`
+- `tools/launch_vertex_swarm_optuna.py`
 - `tests/test_vertex_optuna_split.py`
-- `tests/test_vertex_train_weight_mode.py`
-- `tests/test_vertex_holdout_eval.py`
+- `tests/test_vertex_swarm_aggregate.py`
 - `handover/ops/ACTIVE_MISSION_CHARTER.md`
 - `handover/ops/ACTIVE_PROJECTS.md`
 - `handover/ai-direct/LATEST.md`
@@ -60,63 +51,66 @@ Writable files:
 
 Read-only but relevant files:
 
-- `tools/aggregate_vertex_swarm_results.py`
-- `tools/launch_vertex_swarm_optuna.py`
-- `handover/ai-direct/entries/20260309_054700_holdout_base_matrix_evaluation_complete.md`
+- `tools/run_vertex_xgb_train.py`
+- `tools/evaluate_xgb_on_base_matrix.py`
+- `audit/v647_anti_classifier_paradox.md`
+- `audit/v646_path_a_power_family_surface.md`
 - `handover/ai-direct/entries/20260309_084315_v645_path_a_retrain_and_fresh_holdout_partial_pass.md`
-- `handover/ai-direct/entries/20260309_090713_v645_path_b_local_compare_weaker_than_path_a.md`
-- `audit/v644_mediocristan_label_bottleneck.md`
+- `handover/ai-direct/entries/20260309_094727_v646_path_a_sqrt_refinement_mixed_holdout_verdict.md`
 
 Explicitly out of scope:
 
 - `omega_core/*`
 - Stage1 / Stage2 / Stage3 forge
-- widening back into GC by default
-- promoting `Path B` above `Path A` without new evidence
-- overwriting any frozen old or new holdout outputs
-- using `2025` or `2026-01` inside optimization scoring or local sweep selection
+- Path B
+- new weight-family search
+- changing label semantics
+- widening to GCP before the first local smoke gate passes
+- overwriting any frozen V645 / V646 evidence
 
 ## 4. Roles
 
 Plan Agent:
 
 - responsibility:
-  - choose the minimum decisive `Path A` refinement and map it to a bounded file-level implementation plan
+  - choose the minimum decisive first implementation wave inside the objective/aggregator axis only
 
 Coder Agent:
 
 - writable files only:
   - `tools/run_optuna_sweep.py`
-  - `tools/run_vertex_xgb_train.py`
+  - `tools/aggregate_vertex_swarm_results.py`
+  - `tools/launch_vertex_swarm_optuna.py`
   - `tests/test_vertex_optuna_split.py`
-  - `tests/test_vertex_train_weight_mode.py`
+  - `tests/test_vertex_swarm_aggregate.py`
 
 Math Auditor:
 
 - audit target:
-  - verify that the refinement stays inside `Path A`, outside `omega_core/*`, and preserves frozen gates
+  - verify that V647 stays inside Path A and preserves frozen V64 math, labels, splits, and gates
 
 Runtime Auditor:
 
 - audit target:
-  - verify that the refinement remains local-first, fresh-prefix isolated, and does not reopen GC prematurely
+  - verify that the first wave stays local-first and only escalates to GCP after the local smoke gate passes
 
 ## 5. Acceptance Criteria
 
-- a concrete `Path A refinement` mission spec exists and is recorded in handover
-- the frozen-baseline rule is explicit for:
-  - old holdout baseline
-  - fresh Path A holdout branch
-  - fresh Path B local compare
-- AgentOS plan/runtime/math review packets have been issued for the refinement mission
-- the next live work is constrained to:
-  - local-first
-  - fresh output prefix only
-  - bounded `Path A` refinement only
-- no ambiguity remains about:
-  - GC staying paused
-  - `Path B` staying secondary
-  - math and Stage3 gates remaining frozen
+- a concrete V647 mission-open authority exists in handover
+- the active charter explicitly freezes:
+  - `omega_core/*`
+  - Stage3 gates
+  - Path A label
+  - temporal split
+  - holdout isolation
+  - `weight_mode=sqrt_abs_excess_return`
+- AgentOS plan/math/runtime packets have been issued for the first V647 wave
+- the first wave implements:
+  - `val_auc < 0.505` hard penalty / prune
+  - composite score `(alpha_top_decile + alpha_top_quintile) / 2`
+  - hard penalty when `alpha_top_decile < alpha_top_quintile`
+- local tests pass
+- one local smoke sweep passes the escalation gate before any GCP swarm is launched
 
 ## 6. Runtime Preflight
 
@@ -124,59 +118,57 @@ Required before execution:
 
 - target node:
   - controller first
-  - dual-host only after a refined local candidate earns promotion
 - expected commit or branch:
   - `main`
-- controller-only code freshness requirement (if any):
-  - worker deploy path must remain controller-managed
-- worker deploy path via `tools/deploy.py` (workers never `git pull`):
-  - note current Windows deploy caveat:
-    - `ext::ssh windows1-w1 %S D:/work/Omega_vNext/.git`
-    - controller-side push still requires `protocol.ext.allow=always`
 - launcher mode:
-  - no GC launcher by default for this mission
-- shard assignment:
-  - local-first refinement only
-- thread caps:
-  - keep current worker-local defaults unless the next plan changes them explicitly
+  - local-first only for the first wave
 - output root:
-  - must be a fresh refinement prefix, not any frozen prior prefix
+  - must be a fresh V647 prefix
 - host isolation check:
   - no holdout matrix enters optimization
+- weight mode:
+  - must be `sqrt_abs_excess_return`
+- learner mode:
+  - must be `binary_logistic_sign`
 
 ## 7. Fail-Fast Conditions
 
-- stop if the new mission proposes overwriting any frozen baseline
-- stop if the new mission widens scope into `omega_core/*` without a separate math-governance mission
-- stop if the new mission drops holdout isolation
-- stop if the mission mutates Stage3 gates or `omega_core/*`
-- stop if the mission widens into GC before a refined local `Path A` candidate is proven
-- stop if anyone reopens `Path B` as the leading branch without new evidence
+- stop if the implementation changes:
+  - `omega_core/*`
+  - Stage3 gates
+  - label semantics
+  - temporal split
+  - holdout isolation
+- stop if V647 runs can still silently use a non-`sqrt_abs_excess_return` weight mode
+- stop if worker and aggregator encode different composite/penalty logic
+- stop if anyone proposes GCP before the first local smoke gate passes
 - retry allowed only after named root cause and changed condition
 
 ## 8. Audits Required
 
 Math audit must verify:
 
-- frozen canonical gates remain unchanged
-- no hidden mutation of physics semantics outside the explicitly allowed `Path A` refinement
+- frozen canonical math remains unchanged
+- V647 stays inside Path A
+- weight mode remains locked to `sqrt_abs_excess_return`
 
 Runtime audit must verify:
 
-- the refinement stays local-first
-- new outputs are isolated from all frozen baseline outputs
+- first wave stays local-first
+- the escalation gate to GCP is explicit
+- no frozen evidence is overwritten
 
 ## 9. Definition of Done
 
-- new active mission charter instantiated
-- AgentOS role packets started for the refinement mission
-- AgentOS convergence achieved on the first refinement slice
-- no blocking ambiguity remains about:
-  - allowed refinement family
-  - out-of-scope math boundary
-  - GC pause
-  - fresh-prefix isolation across all frozen baselines
+- V647 mission is active in handover
+- the first bounded code wave is implemented
+- local regression tests pass
+- one local smoke sweep validates the new contract
+- either:
+  - the escalation gate to GCP is earned
+  - or the mission records why local validation blocked further escalation
 - handover updated
+- Commander-only commit/push completed
 
 ## 10. Run Manifest
 
@@ -184,16 +176,13 @@ Record after execution:
 
 - commit hash:
 - node:
-- shard set:
-- thread caps:
 - launcher mode:
 - dataset role:
 - math audit verdict:
 - runtime audit verdict:
-- refinement branch:
-  - `Path A`
-- learner objective:
-  - `binary:logistic`
-- weight shaping:
+- objective metric:
+  - `structural_tail_monotonicity_gate`
+- weight mode:
+  - `sqrt_abs_excess_return`
 - fresh prefix check:
   - `passed`

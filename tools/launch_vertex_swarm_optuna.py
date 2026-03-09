@@ -13,6 +13,12 @@ import time
 from pathlib import Path
 
 
+STRUCTURAL_TAIL_OBJECTIVE = "structural_tail_monotonicity_gate"
+STRUCTURAL_TAIL_REQUIRED_WEIGHT_MODE = "sqrt_abs_excess_return"
+STRUCTURAL_TAIL_REQUIRED_LEARNER_MODE = "binary_logistic_sign"
+STRUCTURAL_TAIL_MIN_AUC_FLOOR = 0.505
+
+
 def _write_manifest(path: Path, payload: dict) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -99,6 +105,8 @@ def _submit_one_worker(*, submit_job, args: argparse.Namespace, script_path: str
             str(args.min_val_auc),
             "--weight-mode",
             str(args.weight_mode),
+            "--learner-mode",
+            str(args.learner_mode),
             "--code-bundle-uri",
             str(args.code_bundle_uri),
         ],
@@ -161,6 +169,25 @@ def _aggregate_results(*, repo_root: Path, args: argparse.Namespace) -> None:
     subprocess.run(cmd, check=True)
 
 
+def _validate_launch_contract(args: argparse.Namespace) -> None:
+    if str(args.objective_metric) == STRUCTURAL_TAIL_OBJECTIVE:
+        if str(args.weight_mode) != STRUCTURAL_TAIL_REQUIRED_WEIGHT_MODE:
+            raise RuntimeError(
+                "structural_tail_objective_requires_weight_mode:"
+                f"{STRUCTURAL_TAIL_REQUIRED_WEIGHT_MODE}"
+            )
+        if str(args.learner_mode) != STRUCTURAL_TAIL_REQUIRED_LEARNER_MODE:
+            raise RuntimeError(
+                "structural_tail_objective_requires_learner_mode:"
+                f"{STRUCTURAL_TAIL_REQUIRED_LEARNER_MODE}"
+            )
+        if float(args.min_val_auc) < STRUCTURAL_TAIL_MIN_AUC_FLOOR:
+            raise RuntimeError(
+                "structural_tail_objective_requires_min_val_auc_at_least:"
+                f"{STRUCTURAL_TAIL_MIN_AUC_FLOOR}"
+            )
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description="Launch Vertex swarm Optuna workers")
     ap.add_argument("--base-matrix-uri", required=True)
@@ -187,6 +214,7 @@ def main() -> None:
     ap.add_argument("--min-val-auc", type=float, default=0.0)
     ap.add_argument("--objective-epsilon", type=float, default=None)
     ap.add_argument("--weight-mode", default="physics_abs_singularity")
+    ap.add_argument("--learner-mode", default="binary_logistic_sign")
     ap.add_argument("--require-empty-results-prefix", action="store_true")
     ap.add_argument("--require-empty-aggregate-output-uri", action="store_true")
     args = ap.parse_args()
@@ -198,6 +226,7 @@ def main() -> None:
         _assert_empty_output_uri(str(args.results_prefix_uri), label="results_prefix_uri")
     if bool(args.require_empty_aggregate_output_uri) and str(args.aggregate_output_uri).strip():
         _assert_empty_output_uri(str(args.aggregate_output_uri), label="aggregate_output_uri")
+    _validate_launch_contract(args)
 
     repo_root = Path(__file__).resolve().parent.parent
     submit_job, zip_and_upload_code = _load_submitters(repo_root)
@@ -240,6 +269,7 @@ def main() -> None:
         "machine_type": str(args.machine_type),
         "spot": bool(args.spot),
         "weight_mode": str(args.weight_mode),
+        "learner_mode": str(args.learner_mode),
         "workers": launch_rows,
     }
     manifest_path = Path(str(args.manifest_path))
