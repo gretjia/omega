@@ -12,7 +12,7 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
 
 ### Project: V653-FRACTAL-CAMPAIGN-AWAKENING
 
-- Status: `FIRST_LINUX_PROBE_FAILED_FIX_READY_FOR_REDEPLOY`
+- Status: `BOUNDED_FORGE_SUCCESS_EVENT_GATE_PENDING_H1_RUNNING`
 - Hosts: `controller`, `windows1-w1`, `linux1-lx`
 - Goal: replace sparse pseudo-time downstream logic with a real daily temporal spine plus recursive campaign-state compression, then prove monotonic event-study edge before reopening ML
 - Audit authority:
@@ -66,10 +66,18 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
     - inline `Psi` expression
     - forge observability / duplicate-key / zero-pulse guards
     - date-neutral event-study aggregation
-  - next step is:
-    - commit + push
-    - deploy to `linux1-lx`
-    - relaunch the bounded forge probe
+  - successful repaired bounded forge probe:
+    - `audit/runtime/v653_probe_linux_20260309_182600`
+  - bounded probe proved:
+    - zero-mass collapse is gone on the campaign path
+  - bounded event study is informative but not sufficient:
+    - top-decile domination is not yet clean
+    - proof gate is still pending
+  - widened local H1 probe is now running:
+    - `audit/runtime/v653_probe_linux_h1_2023_20260309_184700`
+  - current next step:
+    - wait for widened H1 forge completion
+    - rerun pure event study on the wider sample
 
 ### Project: V648-PATH-B-CONTINUOUS-LABEL-PIVOT
 

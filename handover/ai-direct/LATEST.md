@@ -8,6 +8,38 @@
 
 This file is the single source of current operational truth for all agents.
 
+## Update: 2026-03-09 18:56 UTC
+- **The first successful V653 bounded forge probe has completed, the zero-mass collapse is gone on the campaign path, but the pure event-study proof gate is still pending on a wider H1 run.**
+- New execution record:
+  - `handover/ai-direct/entries/20260309_185650_v653_bounded_probe_success_event_gate_pending_h1_launched.md`
+- Successful bounded runtime root:
+  - `audit/runtime/v653_probe_linux_20260309_182600`
+- Key forge facts:
+  - `rows=85290`
+  - `symbols=5372`
+  - `min_date=20230103`
+  - `max_date=20230131`
+  - `l1_files=36`
+  - `l2_files=36`
+- Critical Phase-3 result:
+  - `excess_ret_t1_to_5d_zero_fraction = 0.0`
+  - `excess_ret_t1_to_10d_zero_fraction = 0.0`
+  - `excess_ret_t1_to_20d_zero_fraction = 0.0`
+- Interpretation:
+  - the V649/V650 mechanical zero-mass black hole does **not** survive the V653 campaign-state construction
+- Event-study state:
+  - both date-neutral and zero-signal-filtered event studies were run on the bounded sample
+  - `D10 - D1` and barrier-win spreads are often positive
+  - but no horizon / signal family yet shows clean top-decile monotonic domination
+  - therefore the V653 event-study proof gate is **not yet passed**
+- Current next step already in flight:
+  - widened local Linux probe:
+    - `audit/runtime/v653_probe_linux_h1_2023_20260309_184700`
+  - scope:
+    - Linux-local `2023-01 .. 2023-06`
+  - purpose:
+    - obtain a materially wider scored date window before final event-study judgment
+
 ## Update: 2026-03-09 18:24 UTC
 - **The first bounded Linux V653 forge probe failed on a confirmed Polars alias-resolution bug, and the controller fix is now landed.**
 - New execution record:

@@ -45,6 +45,63 @@
 ### Entries
 
 <!-- New session debriefs go here. Most recent on top. -->
+#### [2026-03-09 18:56] Agent: Codex | Session: V653 Bounded Probe Repaired, Wider H1 Probe Running
+
+**What I did:**
+- Diagnosed the first repaired V653 Linux forge failure as a real Polars alias bug from:
+  - `audit/runtime/v653_probe_linux_20260309_180719/forge.out`
+- Fixed and redeployed:
+  - `tools/forge_campaign_state.py`
+  - `tools/run_campaign_event_study.py`
+- Added supporting tests:
+  - `tests/test_campaign_state_contract.py`
+  - `tests/test_campaign_event_study.py`
+- Ran local targeted verification with:
+  - `uv run --with pytest --with polars --with numpy pytest tests/test_campaign_state_contract.py tests/test_campaign_event_study.py -q`
+- Ran `gemini -p` twice:
+  - once for the forge/runtime bugfix wave
+  - once for the zero-signal-filtered event-study alignment
+- Completed the repaired bounded forge probe:
+  - `audit/runtime/v653_probe_linux_20260309_182600`
+- Ran pure event study on the bounded campaign matrix:
+  - unfiltered and zero-signal-filtered variants
+- Launched the widened Linux-local H1 2023 probe:
+  - `audit/runtime/v653_probe_linux_h1_2023_20260309_184700`
+
+**What I discovered:**
+- The V653 forge path is now working end-to-end.
+- The campaign-state construction eliminates the old zero-mass collapse:
+  - `excess_ret_t1_to_5d/10d/20d_zero_fraction = 0.0`
+- The bounded Jan-window event study is informative but not decisive:
+  - spreads are often positive
+  - clean top-decile monotonic domination is still absent
+- The small probe only scores through `20230131`, so it is not wide enough for a final campaign-state verdict.
+
+**What confused me / blocked me:**
+- The polling child agent kept echoing stale “no material change” summaries, so I had to rely on direct SSH sampling for runtime truth.
+- No prebuilt daily-spine dataset has yet been found under the obvious local pool paths; current forge still derives day bars from raw tick parquet.
+
+**What the next agent should do:**
+- Check whether the widened H1 probe has finished:
+  - `audit/runtime/v653_probe_linux_h1_2023_20260309_184700`
+- If the forge is complete, immediately run pure event study on that H1 campaign matrix for:
+  - `Psi_5d`
+  - `Psi_10d`
+  - `Psi_20d`
+  - and optionally `Omega_*` as secondary evidence
+- Record whether the wider sample finally satisfies the V653 event-study gate.
+- Do not reopen ML before that wider event-study verdict exists.
+
+**Files I changed:**
+- `tools/forge_campaign_state.py` — fixed the Polars alias bug, added observability, duplicate-key guard, and zero-pulse guard.
+- `tools/run_campaign_event_study.py` — made aggregation date-neutral and later aligned it to drop zero-signal rows before deciling.
+- `tests/test_campaign_state_contract.py` — added duplicate-key guard coverage.
+- `tests/test_campaign_event_study.py` — added date-neutral and zero-signal-filter coverage.
+- `handover/ai-direct/entries/20260309_182426_v653_first_linux_probe_alias_bug_fixed.md` — recorded the first repaired probe failure and fix.
+- `handover/ai-direct/entries/20260309_185650_v653_bounded_probe_success_event_gate_pending_h1_launched.md` — recorded the successful bounded probe, zero-mass result, and H1 launch.
+- `handover/ai-direct/LATEST.md` — updated live runtime state.
+- `handover/ops/ACTIVE_PROJECTS.md` — updated V653 project status.
+- `handover/BOARD.md` — added this debrief.
 #### [2026-03-09 17:55] Agent: Codex | Session: V653 Phase-1 Readiness And Tooling Landed
 
 **What I did:**
