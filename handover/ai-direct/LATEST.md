@@ -8,6 +8,66 @@
 
 This file is the single source of current operational truth for all agents.
 
+## Update: 2026-03-09 17:55 UTC
+- **V653 Phase-1 readiness has converged, and the first tooling wave is now landed.**
+- New execution record:
+  - `handover/ai-direct/entries/20260309_175537_v653_phase1_readiness_and_tooling_landed.md`
+- New math-audit record:
+  - `handover/ai-direct/entries/20260309_175642_v653_phase1_impl_gemini_pass.md`
+- Readiness conclusion:
+  - `bridge first`
+  - no immediate Stage2 recomputation is required
+- Concrete lineage findings:
+  - current Stage2 L2 already exposes:
+    - `singularity_vector`
+    - `epiplexity`
+    - `bits_topology`
+  - current full-run raw input already exposes:
+    - `symbol`
+    - `date`
+    - `time`
+    - `price`
+  - therefore:
+    - pulse source can come from current L2
+    - daily spine can come from raw L1 tick aggregation
+- Training-domain reality:
+  - `2023,2024` manifest has:
+    - `484` files total
+    - `370` Linux L2 files
+    - `114` Windows L2 files mounted on Linux via sshfs
+- New tools:
+  - `tools/forge_campaign_state.py`
+  - `tools/run_campaign_event_study.py`
+- New tests:
+  - `tests/test_campaign_state_contract.py`
+  - `tests/test_campaign_event_study.py`
+- Math audit:
+  - `gemini -p`
+  - verdict:
+    - `PASS`
+- Static verification:
+  - `python3 -m py_compile` passed for the new tools and tests
+- Current blocker:
+  - controller lacks local `polars`, so first functional probe still needs the normal `commit + push + deploy` path to a node with the runtime
+
+## Update: 2026-03-09 17:42 UTC
+- **V653 is now the active mission.**
+- Mission-open authority:
+  - `handover/ai-direct/entries/20260309_174239_v653_fractal_campaign_awakening_mission_open.md`
+- Active charter has been switched to:
+  - `handover/ops/ACTIVE_MISSION_CHARTER.md`
+- Phase-1 live objective:
+  - determine the authoritative daily temporal spine
+  - determine whether current Stage2 outputs already provide a sufficient micro pulse source
+  - decide whether bridge work or Stage2 recomputation is required
+- Frozen sequencing:
+  - daily spine first
+  - event study before ML
+  - no Vertex / GCP
+  - no holdouts
+- Current execution state:
+  - V653 Phase-1 readiness investigation is in progress
+
 ## Update: 2026-03-09 17:35 UTC
 - **A pre-execution identity clarification for V653 is now frozen.**
 - New audit clarification:

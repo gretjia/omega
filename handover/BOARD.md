@@ -45,6 +45,90 @@
 ### Entries
 
 <!-- New session debriefs go here. Most recent on top. -->
+#### [2026-03-09 17:55] Agent: Codex | Session: V653 Phase-1 Readiness And Tooling Landed
+
+**What I did:**
+- Resolved V653 Phase-1 readiness from real artifacts and code contracts.
+- Landed the execution record:
+  - `handover/ai-direct/entries/20260309_175537_v653_phase1_readiness_and_tooling_landed.md`
+- Added new V653 tools:
+  - `tools/forge_campaign_state.py`
+  - `tools/run_campaign_event_study.py`
+- Added new tests:
+  - `tests/test_campaign_state_contract.py`
+  - `tests/test_campaign_event_study.py`
+- Ran `gemini -p` on the new V653 implementation wave and got:
+  - `PASS`
+- Ran static verification:
+  - `python3 -m py_compile`
+
+**What I discovered:**
+- No immediate Stage2 recomputation is needed to open V653.
+- Current Stage2 L2 already contains the pulse lineage:
+  - `singularity_vector`
+  - `epiplexity`
+  - `bits_topology`
+- Current full-run raw input already contains enough price ticks to derive a true daily spine:
+  - `symbol`
+  - `date`
+  - `time`
+  - `price`
+- The `2023,2024` training domain is dual-source:
+  - `370` Linux L2 files
+  - `114` Windows L2 files via sshfs on Linux
+
+**What confused me / blocked me:**
+- The controller currently lacks a local `polars` runtime.
+- So I could finish code, static checks, and math audit, but not run the first functional forge probe locally.
+
+**What the next agent should do:**
+- Commit and deploy this V653 tooling wave.
+- Run a bounded forge probe on a node with `polars`.
+- Then run the first pure event-study probe before opening anything ML-related.
+
+**Files I changed:**
+- `tools/forge_campaign_state.py` — added the V653 campaign-state forge from raw L1 daily spine plus Stage2 pulse source.
+- `tools/run_campaign_event_study.py` — added the V653 pure event-study tool.
+- `tests/test_campaign_state_contract.py` — added contract tests for zero-fill and barrier semantics.
+- `tests/test_campaign_event_study.py` — added event-study summary tests.
+- `handover/ai-direct/entries/20260309_175537_v653_phase1_readiness_and_tooling_landed.md` — recorded readiness findings and audit verdict.
+- `handover/ai-direct/LATEST.md` — updated current mission state.
+- `handover/ops/ACTIVE_PROJECTS.md` — updated V653 project status.
+- `handover/BOARD.md` — added this debrief.
+#### [2026-03-09 17:42] Agent: Codex | Session: V653 Mission Open
+
+**What I did:**
+- Switched the active mission from V650 to V653.
+- Landed the mission-open record:
+  - `handover/ai-direct/entries/20260309_174239_v653_fractal_campaign_awakening_mission_open.md`
+- Replaced the active charter with the V653 execution charter:
+  - `handover/ops/ACTIVE_MISSION_CHARTER.md`
+- Updated live status boards:
+  - `handover/ai-direct/LATEST.md`
+  - `handover/ops/ACTIVE_PROJECTS.md`
+
+**What I discovered:**
+- V653 is now legally in execution shape.
+- The first real blocker is no longer spec approval.
+- The first real blocker is data readiness:
+  - daily spine source
+  - sufficient pulse source
+  - bridge vs Stage2 recompute
+
+**What confused me / blocked me:**
+- No blocker yet.
+- Phase-1 readiness investigation is still open.
+
+**What the next agent should do:**
+- Continue V653 Phase-1 readiness investigation.
+- Do not open ML, holdouts, or cloud before the event-study gate.
+
+**Files I changed:**
+- `handover/ops/ACTIVE_MISSION_CHARTER.md` — switched the active charter to V653.
+- `handover/ai-direct/entries/20260309_174239_v653_fractal_campaign_awakening_mission_open.md` — opened the V653 mission.
+- `handover/ops/ACTIVE_PROJECTS.md` — added V653 as the active top project.
+- `handover/ai-direct/LATEST.md` — recorded V653 mission-open state.
+- `handover/BOARD.md` — added this debrief.
 #### [2026-03-09 17:35] Agent: Codex | Session: V653 Identity Clarification Frozen
 
 **What I did:**

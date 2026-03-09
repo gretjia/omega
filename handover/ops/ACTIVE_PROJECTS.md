@@ -4,11 +4,63 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
 
 ## 1. Snapshot Metadata
 
-- `updated_at_local`: 2026-03-09 11:32:00 +0000
-- `updated_at_utc`: 2026-03-09 11:32:00 +0000
+- `updated_at_local`: 2026-03-09 17:42:39 +0000
+- `updated_at_utc`: 2026-03-09 17:42:39 +0000
 - `updated_by`: Codex (GPT-5)
 
 ## 2. In-Flight Work
+
+### Project: V653-FRACTAL-CAMPAIGN-AWAKENING
+
+- Status: `PHASE1_TOOLING_LANDED_PENDING_RUNTIME_PROBE`
+- Hosts: `controller`, `windows1-w1`, `linux1-lx`
+- Goal: replace sparse pseudo-time downstream logic with a real daily temporal spine plus recursive campaign-state compression, then prove monotonic event-study edge before reopening ML
+- Audit authority:
+  - `audit/v653_fractal_campaign_awakening.md`
+  - `audit/v653_identity_preservation_gemini_verdict.md`
+- Draft spec:
+  - `handover/ai-direct/entries/20260309_172447_v653_fractal_campaign_awakening_spec_draft.md`
+- Gemini review:
+  - `handover/ai-direct/entries/20260309_172925_v653_spec_draft_gemini_pass.md`
+  - verdict:
+    - `PASS WITH FIXES`
+- Identity clarification:
+  - `handover/ai-direct/entries/20260309_173514_v653_identity_preservation_gemini_verdict.md`
+- Mission-open authority:
+  - `handover/ai-direct/entries/20260309_174239_v653_fractal_campaign_awakening_mission_open.md`
+- Locked constraints:
+  - freeze the V653 formulas for:
+    - `F`
+    - `A`
+    - `S`
+    - `V`
+    - `Omega`
+    - `Psi`
+    - tradable `Y_ret`
+    - triple-barrier first-passage label
+  - keep `delta = 0.5`
+  - no ML before event-study proof
+  - no Vertex / GCP before local proof
+  - no `2025` / `2026-01` holdout use before ML admission
+- Phase-1 objective:
+  - determine the authoritative daily-spine source
+  - determine whether current Stage2 outputs already provide a sufficient micro pulse source
+  - decide whether bridge work or Stage2 recomputation is required
+- Execution order:
+  - daily spine
+  - campaign forge
+  - pure event study
+  - ML admission review only after proof
+- Current state:
+  - mission is active
+  - active charter has been switched
+  - Phase-1 readiness has converged:
+    - bridge first
+    - no immediate Stage2 recomputation
+  - first tooling wave is landed:
+    - `tools/forge_campaign_state.py`
+    - `tools/run_campaign_event_study.py`
+  - next step is a bounded runtime probe on a node with `polars`
 
 ### Project: V648-PATH-B-CONTINUOUS-LABEL-PIVOT
 
