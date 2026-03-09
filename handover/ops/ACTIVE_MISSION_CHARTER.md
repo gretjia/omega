@@ -1,34 +1,29 @@
 # OMEGA Active Mission Charter
 
 Status: In Progress
-Task Name: V648 Path B Continuous-Label Pivot
+Task Name: V649 Path B Flat-Predictor Diagnosis
 Owner: Human Owner
 Commander: Codex
 Date: 2026-03-09
 
 ## 1. Objective
 
-- Accept the recursive architect verdict that Path A is structurally exhausted.
-- Keep V64 math, Stage3 gates, temporal splits, and holdout isolation frozen.
-- Pivot the learner interface from weighted binary classification to Path B continuous-label regression.
-- Test whether the frozen physical signal can survive translation into:
-  - positive structural ranking
-  - monotonic positive tail alpha
-  - future-holdout stability
+- Accept V648 as mechanically implemented but blocked at the local smoke gate.
+- Keep V64 math, Stage3 gates, train matrix, and holdouts frozen.
+- Diagnose why the current Path B regression contract collapses into a near-flat predictor on the frozen `2023 -> 2024` split.
+- Produce an evidence-backed recommendation for the next bounded learner change.
 
 ## 2. Canonical Spec
 
 Primary task-level implementation authority:
 
-- `audit/v648_path_a_collapse_anti_classifier_paradox.md`
-- `handover/ai-direct/entries/20260309_122200_v648_path_b_continuous_label_pivot_spec_draft.md`
-- `handover/ai-direct/entries/20260309_122800_v648_spec_draft_gemini_pass.md`
-- `handover/ai-direct/entries/20260309_122827_v648_path_b_continuous_label_pivot_mission_open.md`
+- `handover/ai-direct/entries/20260309_124249_v648_local_contract_and_smoke_blocked.md`
+- `handover/ai-direct/entries/20260309_124940_v649_path_b_flat_predictor_diagnosis_spec_draft.md`
+- `handover/ai-direct/entries/20260309_125400_v649_spec_draft_gemini_pass.md`
+- `handover/ai-direct/entries/20260309_125420_v649_path_b_flat_predictor_diagnosis_mission_open.md`
 
 Supporting context:
 
-- `audit/v647_anti_classifier_paradox.md`
-- `handover/ai-direct/entries/20260309_112400_v647_gcp_swarm_and_holdout_gate_failed.md`
 - `tools/run_optuna_sweep.py`
 - `tools/run_vertex_xgb_train.py`
 - `tools/evaluate_xgb_on_base_matrix.py`
@@ -40,15 +35,8 @@ If the canonical spec conflicts with `OMEGA_CONSTITUTION.md`, escalate to the Co
 
 Writable files:
 
-- `tools/run_optuna_sweep.py`
-- `tools/aggregate_vertex_swarm_results.py`
-- `tools/launch_vertex_swarm_optuna.py`
-- `tools/run_vertex_xgb_train.py`
-- `tools/evaluate_xgb_on_base_matrix.py`
-- `tests/test_vertex_optuna_split.py`
-- `tests/test_vertex_swarm_aggregate.py`
-- `tests/test_vertex_train_weight_mode.py`
-- `tests/test_vertex_holdout_eval.py`
+- one optional local diagnostic tool under `tools/` if needed
+- corresponding narrow tests only if diagnostic code is added
 - `handover/ops/ACTIVE_MISSION_CHARTER.md`
 - `handover/ops/ACTIVE_PROJECTS.md`
 - `handover/ai-direct/LATEST.md`
@@ -57,145 +45,76 @@ Writable files:
 
 Read-only but relevant files:
 
-- `audit/v648_path_a_collapse_anti_classifier_paradox.md`
-- `audit/v647_anti_classifier_paradox.md`
-- all frozen V645 / V646 / V647 mission records
-- `omega_core/*`
+- `tools/run_optuna_sweep.py`
+- `tools/run_vertex_xgb_train.py`
+- `tools/evaluate_xgb_on_base_matrix.py`
+- the frozen training matrix URI recorded in handover
+- all frozen V648 runtime evidence
 
 Explicitly out of scope:
 
 - `omega_core/*`
 - Stage1 / Stage2 / Stage3 forge
-- any base-matrix rebuild
-- any Path A weighting or label experiments
-- widening to GCP before the first local smoke gate passes
-- touching `2025` or `2026-01` holdouts before retrain parity exists
-- overwriting any frozen V645 / V646 / V647 evidence
+- any new base-matrix build
+- any GCP launch
+- any holdout consumption
+- any model promotion
+- any Path A reopening
 
 ## 4. Roles
 
 Plan Agent:
 
 - responsibility:
-  - validate that the first wave is the minimum decisive Path B contract/test implementation
-
-Coder Agent:
-
-- writable files only:
-  - `tools/run_optuna_sweep.py`
-  - `tools/aggregate_vertex_swarm_results.py`
-  - `tools/launch_vertex_swarm_optuna.py`
-  - `tools/run_vertex_xgb_train.py`
-  - `tools/evaluate_xgb_on_base_matrix.py`
-  - `tests/test_vertex_optuna_split.py`
-  - `tests/test_vertex_swarm_aggregate.py`
-  - `tests/test_vertex_train_weight_mode.py`
-  - `tests/test_vertex_holdout_eval.py`
+  - validate that the diagnosis wave is still minimal and local-only
 
 Math Auditor:
 
 - audit target:
-  - verify that V648 preserves frozen V64 math and the continuous-label pivot does not reopen Path A or math-governance
+  - verify that the diagnosis does not reopen frozen math or smuggle in new learner changes
 
 Runtime Auditor:
 
 - audit target:
-  - verify that the first wave stays local-first, keeps holdouts untouched, and does not widen to GCP before the local smoke gate passes
+  - verify that the diagnosis remains local-only and does not touch holdouts or cloud
 
 ## 5. Acceptance Criteria
 
-- a concrete V648 mission-open authority exists in handover
+- a concrete V649 mission-open authority exists in handover
 - the active charter explicitly freezes:
   - `omega_core/*`
   - Stage3 gates
-  - temporal split
-  - holdout isolation
-  - Path A closure
-- AgentOS plan/math/runtime packets have been issued for the first V648 wave
-- the first wave implements:
-  - `learner_mode=reg_squarederror_excess_return`
-  - label = raw `t1_excess_return`
-  - no sample weights in Path B
-  - `val_spearman_ic <= 0` hard losing penalty / prune
-  - composite score `(alpha_top_decile + alpha_top_quintile) / 2`
-  - hard penalty when `alpha_top_decile < alpha_top_quintile`
-- local tests pass
-- one local smoke sweep proves or disproves the V648 local gate before any GCP swarm is launched
+  - train matrix
+  - holdouts
+  - no GCP
+- AgentOS plan/math/runtime packets have been issued for the first V649 wave
+- the diagnosis produces concrete evidence for:
+  - target sparsity / scale
+  - prediction variance or collapse
+  - deterministic single-model Path B behavior
+- the mission ends with one bounded next-step recommendation
 
 ## 6. Runtime Preflight
 
 Required before execution:
 
-- target node:
-  - controller first
-- expected commit or branch:
-  - `main`
-- launcher mode:
-  - local-first only for the first wave
-- output root:
-  - must be a fresh V648 prefix
-- host isolation check:
-  - no holdout matrix enters optimization
-- learner mode:
-  - must be `reg_squarederror_excess_return`
-- weight contract:
-  - no sample weights for Path B
+- controller only
+- local-only commands
+- fresh V649 runtime roots if any new artifacts are written
+- no cloud endpoints
+- no holdout paths
 
 ## 7. Fail-Fast Conditions
 
-- stop if the implementation changes:
-  - `omega_core/*`
-  - Stage3 gates
-  - temporal split
-  - holdout isolation
-- stop if V648 can still silently use Path A sample weights in regression mode
-- stop if worker and aggregator encode different structural-floor or tail-monotonicity logic
-- stop if anyone proposes GCP before the first local smoke gate passes
-- stop if holdout evaluation is attempted before retrain parity exists
-- retry allowed only after named root cause and changed condition
+- stop if any step requires GCP
+- stop if any step requires `2025` or `2026-01`
+- stop if any step proposes a new learner branch before the collapse is explained
+- stop if any step touches `omega_core/*` or Stage3 gates
 
-## 8. Audits Required
+## 8. Definition of Done
 
-Math audit must verify:
-
-- frozen canonical math remains unchanged
-- Path B uses continuous labels without reopening Path A
-- the structural metric for Path B is Spearman-based, not AUC-based
-
-Runtime audit must verify:
-
-- first wave stays local-first
-- the escalation gate to GCP is explicit
-- no frozen evidence is overwritten
-- holdouts remain untouched until replay parity exists
-
-## 9. Definition of Done
-
-- V648 mission is active in handover
-- the first bounded code wave is implemented
-- local regression tests pass
-- one local smoke sweep validates the new Path B contract
-- either:
-  - the escalation gate to GCP is earned
-  - or the mission records why local validation blocked further escalation
+- V649 mission is active in handover
+- the flat-predictor collapse is described with direct evidence
+- one bounded next-step recommendation is produced
 - handover updated
 - Commander-only commit/push completed
-
-## 10. Run Manifest
-
-Record after execution:
-
-- commit hash:
-- node:
-- launcher mode:
-- dataset role:
-- math audit verdict:
-- runtime audit verdict:
-- learner mode:
-  - `reg_squarederror_excess_return`
-- structural metric:
-  - `val_spearman_ic`
-- weight contract:
-  - `none`
-- fresh prefix check:
-  - `passed`

@@ -45,6 +45,70 @@
 ### Entries
 
 <!-- New session debriefs go here. Most recent on top. -->
+#### [2026-03-09 12:55] Agent: Codex | Session: V649 Flat-Predictor Diagnosis Complete
+
+**What I did:**
+- Drafted V649 as a bounded local diagnosis mission:
+  - `handover/ai-direct/entries/20260309_124940_v649_path_b_flat_predictor_diagnosis_spec_draft.md`
+- Ran `gemini -p` and recorded:
+  - `PASS`
+  - `handover/ai-direct/entries/20260309_125400_v649_spec_draft_gemini_pass.md`
+- Switched the active mission to V649.
+- Sent fresh AgentOS read-only packets.
+- Ran local diagnostic probes against the frozen `2023 -> 2024` train matrix only.
+- Recorded the final diagnosis in:
+  - `handover/ai-direct/entries/20260309_125538_v649_flat_predictor_diagnosis_complete.md`
+
+**What I discovered:**
+- The current Path B regression target is extremely zero-dominated:
+  - train zero fraction:
+    - `0.9126383026960623`
+  - val zero fraction:
+    - `0.9085788270110304`
+  - median absolute excess return:
+    - `0.0` on both splits
+- Replaying the V648 trial-0 parameter shape as a deterministic regression probe yields an exact constant predictor:
+  - `train_pred_std=0.0`
+  - `val_pred_std=0.0`
+  - rounded unique predictions:
+    - `1`
+  - feature importance count:
+    - `0`
+- So V648’s collapse was a real no-split model collapse, not an Optuna logging artifact.
+- But a low-regularization contrast probe proves Path B is not mathematically forced to stay constant:
+  - `val_pred_std=0.0026945871260126695`
+  - `val_spearman_ic=0.008458359767276777`
+  - all `16` features were used
+- That same probe still fails the structural-tail contract:
+  - `val_auc=0.49061062250083853`
+  - `alpha_top_decile < alpha_top_quintile`
+
+**What confused me / blocked me:**
+- Nothing operational blocked V649.
+- The diagnosis is complete enough that the only remaining ambiguity is design choice:
+  - what exact bounded variance-recovery axis to try next
+
+**What the next agent should do:**
+- Do not reopen GCP.
+- Do not touch `2025` or `2026-01`.
+- Treat V649 as completed diagnosis.
+- Use:
+  - `handover/ai-direct/entries/20260309_125538_v649_flat_predictor_diagnosis_complete.md`
+  as the authority for the next mission draft.
+- The next mission should stay inside Path B and target:
+  - variance recovery / degeneracy avoidance
+  not cloud expansion or holdout reruns.
+
+**Files I changed:**
+- `handover/ai-direct/entries/20260309_124940_v649_path_b_flat_predictor_diagnosis_spec_draft.md` — wrote the V649 diagnosis draft.
+- `handover/ai-direct/entries/20260309_125400_v649_spec_draft_gemini_pass.md` — recorded Gemini `PASS`.
+- `handover/ai-direct/entries/20260309_125420_v649_path_b_flat_predictor_diagnosis_mission_open.md` — opened V649.
+- `handover/ai-direct/entries/20260309_125538_v649_flat_predictor_diagnosis_complete.md` — recorded final V649 diagnosis and recommendation.
+- `handover/ops/ACTIVE_MISSION_CHARTER.md` — switched active mission to V649.
+- `handover/ai-direct/LATEST.md` — updated runtime truth with the V649 diagnosis result.
+- `handover/ops/ACTIVE_PROJECTS.md` — added V649 diagnosis status and result.
+- `handover/BOARD.md` — added this debrief block.
+
 #### [2026-03-09 12:42] Agent: Codex | Session: V648 Local Path B First Wave Blocked
 
 **What I did:**

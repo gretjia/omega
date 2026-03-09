@@ -110,6 +110,61 @@ This file is the single source of current operational truth for all agents.
   - freeze this blocked local result
   - diagnose the flat-predictor collapse before opening any next wave
 
+## Update: 2026-03-09 12:54 UTC
+- **V649 flat-predictor diagnosis spec is now drafted, Gemini-passed, and active.**
+- New mission draft:
+  - `handover/ai-direct/entries/20260309_124940_v649_path_b_flat_predictor_diagnosis_spec_draft.md`
+- Gemini audit:
+  - `handover/ai-direct/entries/20260309_125400_v649_spec_draft_gemini_pass.md`
+  - verdict:
+    - `PASS`
+- New mission-open authority:
+  - `handover/ai-direct/entries/20260309_125420_v649_path_b_flat_predictor_diagnosis_mission_open.md`
+- Active charter has been switched to:
+  - `handover/ops/ACTIVE_MISSION_CHARTER.md`
+- Mission shape:
+  - local-only diagnosis
+  - no GCP
+  - no holdouts
+  - no promotion
+- Immediate next step:
+  - quantify the zero-mass / scale of `t1_excess_return`
+  - run one deterministic local Path B probe
+  - explain the flat-predictor collapse mechanically
+
+## Update: 2026-03-09 12:55 UTC
+- **V649 diagnosis is now complete.**
+- New diagnosis record:
+  - `handover/ai-direct/entries/20260309_125538_v649_flat_predictor_diagnosis_complete.md`
+- Key frozen findings:
+  - the frozen Path B target is extremely zero-dominated
+  - train zero fraction:
+    - `0.9126383026960623`
+  - val zero fraction:
+    - `0.9085788270110304`
+  - median absolute excess return is `0.0` on both splits
+- Deterministic replay of the V648 trial-0 shape shows an exact constant predictor:
+  - `train_pred_std = 0.0`
+  - `val_pred_std = 0.0`
+  - rounded unique predictions:
+    - `1`
+  - feature importance count:
+    - `0`
+  - validation RMSE is effectively the constant-baseline regime
+- Low-regularization local contrast proves Path B is not mathematically forced to stay constant:
+  - `val_pred_std = 0.0026945871260126695`
+  - `val_spearman_ic = 0.008458359767276777`
+  - `16` features are used
+  - but the model is still not structurally valid:
+    - `val_auc = 0.49061062250083853`
+    - `alpha_top_decile < alpha_top_quintile`
+- Operational conclusion:
+  - do not reopen GCP
+  - do not consume holdouts
+  - next bounded axis should be:
+    - Path B variance-recovery / degeneracy-avoidance
+  - not another cloud expansion
+
 ## Update: 2026-03-09 11:32 UTC
 - **V647 now has a full live verdict, and it failed the real promotion gate.**
 - New execution verdict:

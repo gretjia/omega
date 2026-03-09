@@ -95,6 +95,42 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
   - do not touch holdouts
   - prepare a new bounded spec for the next learner-interface adjustment
 
+### Project: V649-PATH-B-FLAT-PREDICTOR-DIAGNOSIS
+
+- Status: `ACTIVE_LOCAL_DIAGNOSIS`
+- Hosts: `controller` only
+- Goal: explain why the V648 Path B regression contract collapses into a near-flat predictor on the frozen `2023 -> 2024` split before any further learner redesign
+- Seed authority:
+  - `handover/ai-direct/entries/20260309_124249_v648_local_contract_and_smoke_blocked.md`
+- Draft spec:
+  - `handover/ai-direct/entries/20260309_124940_v649_path_b_flat_predictor_diagnosis_spec_draft.md`
+- Gemini review:
+  - `handover/ai-direct/entries/20260309_125400_v649_spec_draft_gemini_pass.md`
+  - verdict:
+    - `PASS`
+- Mission-open authority:
+  - `handover/ai-direct/entries/20260309_125420_v649_path_b_flat_predictor_diagnosis_mission_open.md`
+- Locked constraints:
+  - keep `omega_core/*` frozen
+  - keep `canonical_v64_1` Stage3 gates frozen
+  - keep train matrix frozen
+  - keep `2025` and `2026-01` untouched
+  - no GCP
+  - no promotion
+- Required outputs:
+  - target sparsity / scale evidence
+  - deterministic single-model Path B probe
+  - one bounded next-step recommendation
+- Latest result:
+  - diagnosis record:
+    - `handover/ai-direct/entries/20260309_125538_v649_flat_predictor_diagnosis_complete.md`
+  - key conclusion:
+    - V648 collapsed into a true constant predictor under its search regime
+    - Path B is not inherently forced to remain constant
+    - but simple variance recovery still does not satisfy the structural-tail contract
+  - next recommended axis:
+    - local-only Path B variance-recovery / degeneracy-avoidance
+
 ### Project: V645-GC-ASYMMETRIC-LABEL-PIVOT
 
 - Status: `FOLLOW_ON_MISSION_SPLIT_TO_V646_PATH_A_REFINEMENT`
