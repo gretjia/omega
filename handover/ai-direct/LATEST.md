@@ -8,6 +8,39 @@
 
 This file is the single source of current operational truth for all agents.
 
+## Update: 2026-03-09 22:54 UTC
+- **V653 widened H1 forge succeeded, but the pure event-study proof gate is now formally blocked. ML remains closed.**
+- New execution record:
+  - `handover/ai-direct/entries/20260309_225400_v653_h1_event_study_blocked_no_ml_reopen.md`
+- Widened runtime root:
+  - `audit/runtime/v653_probe_linux_h1_2023_20260309_184700`
+- H1 forge result:
+  - `rows=518905`
+  - `symbols=5511`
+  - `min_date=20230103`
+  - `max_date=20230531`
+  - `l1_files=118`
+  - `l2_files=118`
+- Critical confirmation:
+  - `excess_ret_t1_to_5d_zero_fraction = 0.0`
+  - `excess_ret_t1_to_10d_zero_fraction = 0.0`
+  - `excess_ret_t1_to_20d_zero_fraction = 0.0`
+- Interpretation:
+  - V653 permanently escaped the V649/V650 mechanical zero-mass bug on the tested H1 local sample
+- Event-study artifacts:
+  - `audit/runtime/v653_probe_linux_h1_2023_20260309_184700/event_study_psi_filtered.json`
+  - `audit/runtime/v653_probe_linux_h1_2023_20260309_184700/event_study_omega_filtered.json`
+- H1 event-study verdict:
+  - no tested `Psi_*` or `Omega_*` horizon achieved `monotonic_non_decreasing = true`
+  - therefore the pure event-study proof gate is **not passed**
+- Gemini runtime gate audit:
+  - `gemini -p`
+  - verdict:
+    - `BLOCK`
+- Operational consequence:
+  - ML / Vertex / XGBoost reopening remains **blocked**
+  - V653 stops here pending a new architect / audit direction
+
 ## Update: 2026-03-09 18:56 UTC
 - **The first successful V653 bounded forge probe has completed, the zero-mass collapse is gone on the campaign path, but the pure event-study proof gate is still pending on a wider H1 run.**
 - New execution record:

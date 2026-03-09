@@ -45,6 +45,54 @@
 ### Entries
 
 <!-- New session debriefs go here. Most recent on top. -->
+#### [2026-03-09 22:54] Agent: Codex | Session: V653 H1 Event Study Blocked
+
+**What I did:**
+- Continued the widened V653 local H1 campaign forge:
+  - `audit/runtime/v653_probe_linux_h1_2023_20260309_184700`
+- Waited for forge completion and confirmed successful output:
+  - `campaign_matrix.parquet`
+  - `campaign_matrix.parquet.meta.json`
+- Ran filtered pure event study on:
+  - `Psi_5d`
+  - `Psi_10d`
+  - `Psi_20d`
+  - `Omega_5d`
+  - `Omega_10d`
+  - `Omega_20d`
+- Asked `gemini -p` to judge the widened H1 event-study result against the frozen V653 proof gate.
+- Landed the blocked verdict:
+  - `handover/ai-direct/entries/20260309_225400_v653_h1_event_study_blocked_no_ml_reopen.md`
+
+**What I discovered:**
+- V653 forge and label construction now work on a materially wider sample.
+- The zero-mass collapse remains gone on H1:
+  - all `excess_ret_t1_to_*d_zero_fraction` are `0.0`
+- But the widened event study still fails the crucial monotonic proof requirement:
+  - every tested `Psi_*` / `Omega_*` family has `monotonic_non_decreasing = false`
+- `gemini -p` explicitly returned:
+  - `BLOCK`
+- So V653 has not earned ML reopening.
+
+**What confused me / blocked me:**
+- No engineering blocker remained.
+- The blocker is now scientific:
+  - the campaign-state event study did not produce the required monotonic decile structure even after fixing the mechanical pathology.
+
+**What the next agent should do:**
+- Do not reopen ML / Vertex / XGBoost under V653.
+- Treat V653 as a blocked research branch with a valid negative result.
+- Start from:
+  - `handover/ai-direct/entries/20260309_225400_v653_h1_event_study_blocked_no_ml_reopen.md`
+  - `audit/runtime/v653_probe_linux_h1_2023_20260309_184700/event_study_psi_filtered.json`
+  - `audit/runtime/v653_probe_linux_h1_2023_20260309_184700/event_study_omega_filtered.json`
+- Wait for new architect / audit guidance before defining the next mission.
+
+**Files I changed:**
+- `handover/ai-direct/entries/20260309_225400_v653_h1_event_study_blocked_no_ml_reopen.md` — recorded the widened H1 blocked verdict.
+- `handover/ai-direct/LATEST.md` — marked V653 as blocked for ML reopening.
+- `handover/ops/ACTIVE_PROJECTS.md` — updated V653 project status to blocked.
+- `handover/BOARD.md` — added this debrief.
 #### [2026-03-09 18:56] Agent: Codex | Session: V653 Bounded Probe Repaired, Wider H1 Probe Running
 
 **What I did:**

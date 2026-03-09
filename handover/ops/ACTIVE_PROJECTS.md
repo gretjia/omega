@@ -12,7 +12,7 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
 
 ### Project: V653-FRACTAL-CAMPAIGN-AWAKENING
 
-- Status: `BOUNDED_FORGE_SUCCESS_EVENT_GATE_PENDING_H1_RUNNING`
+- Status: `H1_EVENT_STUDY_BLOCKED_ML_NOT_ADMITTED`
 - Hosts: `controller`, `windows1-w1`, `linux1-lx`
 - Goal: replace sparse pseudo-time downstream logic with a real daily temporal spine plus recursive campaign-state compression, then prove monotonic event-study edge before reopening ML
 - Audit authority:
@@ -73,11 +73,17 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
   - bounded event study is informative but not sufficient:
     - top-decile domination is not yet clean
     - proof gate is still pending
-  - widened local H1 probe is now running:
+  - widened local H1 probe completed:
     - `audit/runtime/v653_probe_linux_h1_2023_20260309_184700`
+  - H1 forge still confirmed zero-mass elimination:
+    - `excess_ret_t1_to_5d/10d/20d_zero_fraction = 0.0`
+  - but widened pure event study remained blocked:
+    - no tested `Psi_*` or `Omega_*` family achieved clean monotonic top-decile ordering
+  - `gemini -p` runtime gate verdict:
+    - `BLOCK`
   - current next step:
-    - wait for widened H1 forge completion
-    - rerun pure event study on the wider sample
+    - do not reopen ML
+    - wait for a new architect / audit direction
 
 ### Project: V648-PATH-B-CONTINUOUS-LABEL-PIVOT
 
