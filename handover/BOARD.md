@@ -45,6 +45,65 @@
 ### Entries
 
 <!-- New session debriefs go here. Most recent on top. -->
+#### [2026-03-09 11:32] Agent: Codex | Session: V647 Live Verdict And External Audit Packet
+
+**What I did:**
+- Completed the full V647 live path:
+  - local contract wave
+  - local smoke
+  - fresh-prefix GCP swarm
+  - fresh deterministic retrain
+  - fresh `2025` / `2026-01` holdout rerun
+- Recorded the final live verdict in:
+  - `handover/ai-direct/entries/20260309_112400_v647_gcp_swarm_and_holdout_gate_failed.md`
+- Wrote a new external auditor prompt packet in:
+  - `handover/ai-direct/entries/20260309_113200_external_ai_auditor_prompt_v647_structural_gate.md`
+- Updated:
+  - `handover/ai-direct/LATEST.md`
+  - `handover/ops/ACTIVE_PROJECTS.md`
+
+**What I discovered:**
+- V647 worked mechanically exactly as designed:
+  - the local smoke passed
+  - the GCP swarm produced a validation-time champion that passed:
+    - `AUC >= 0.505`
+    - positive tail alpha
+    - `decile > quintile`
+- But that champion failed the real future promotion gate after fresh retrain:
+  - `2025`:
+    - `auc=0.45678581566340537`
+    - `alpha_top_decile=2.834900301646075e-05`
+    - `alpha_top_quintile=4.74009864016068e-05`
+  - `2026-01`:
+    - `auc=0.4480397363190845`
+    - `alpha_top_decile=0.0002709845808747919`
+    - `alpha_top_quintile=6.184377649589757e-05`
+- So V647 is a successful diagnostic mission, not a promotable branch.
+- Fresh retrain on:
+  - `736,163` rows
+  - `16` features
+  - `120` rounds
+  completed in `6.2s`; I currently judge that plausible, but I explicitly included it as an audit question.
+
+**What confused me / blocked me:**
+- Vertex control-plane state lagged one worker after both worker artifacts were already complete.
+- Windows SSH + PowerShell quoting still corrupts `$var`-style inline commands when sent naïvely through bash.
+- Using `-EncodedCommand` was the stable Windows execution path for the fresh V647 holdout evaluation.
+
+**What the next agent should do:**
+- Do not open a new promotion or overwrite any frozen branch.
+- Use:
+  - `handover/ai-direct/entries/20260309_113200_external_ai_auditor_prompt_v647_structural_gate.md`
+  as the external recursive audit packet.
+- Wait for that audit before drafting the next mission.
+
+**Files I changed:**
+- `handover/ai-direct/entries/20260309_112400_v647_gcp_swarm_and_holdout_gate_failed.md` — recorded the full V647 live verdict.
+- `handover/ai-direct/entries/20260309_113200_external_ai_auditor_prompt_v647_structural_gate.md` — wrote the new external audit packet with evidence paths and questions.
+- `handover/ai-direct/LATEST.md` — updated operational truth with the failed promotion gate and new auditor packet.
+- `handover/ops/ACTIVE_PROJECTS.md` — marked V647 as frozen live evidence awaiting external audit.
+- `handover/BOARD.md` — added this mandatory debrief block.
+
 #### [2026-03-09 10:55] Agent: Codex | Session: V647 Mission Draft Awaiting Confirmation
 
 **What I did:**

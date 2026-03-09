@@ -4,8 +4,8 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
 
 ## 1. Snapshot Metadata
 
-- `updated_at_local`: 2026-03-09 11:11:00 +0000
-- `updated_at_utc`: 2026-03-09 11:11:00 +0000
+- `updated_at_local`: 2026-03-09 11:32:00 +0000
+- `updated_at_utc`: 2026-03-09 11:32:00 +0000
 - `updated_by`: Codex (GPT-5)
 
 ## 2. In-Flight Work
@@ -176,7 +176,7 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
 
 ### Project: V647-STRUCTURAL-TAIL-MONOTONICITY-GATE
 
-- Status: `LOCAL_SMOKE_PASS_READY_FOR_GCP_SWARM`
+- Status: `LIVE_VERDICT_FROZEN_AWAITING_EXTERNAL_AUDIT`
 - Hosts: `controller`, `GCP Vertex AI`
 - Goal: fix the Path A outer-loop objective so local winners preserve structural integrity and tail monotonicity instead of promoting anti-classifiers
 - Seed authority:
@@ -233,10 +233,34 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
     - the first V647 local smoke did produce structurally valid positive-tail trials
     - worker and aggregator stayed aligned on the same champion
     - the escalation gate to GCP is now explicitly earned
+  - final live verdict:
+    - `handover/ai-direct/entries/20260309_112400_v647_gcp_swarm_and_holdout_gate_failed.md`
+  - GCP swarm:
+    - `2` workers
+    - `20` total trials
+    - champion:
+      - `worker_id=w00`
+      - `trial_number=2`
+      - `best_val_auc=0.5072357725415971`
+      - `alpha_top_decile=0.00011617716323408273`
+      - `alpha_top_quintile=0.00010230238803123365`
+  - fresh holdout verdict:
+    - `2025`:
+      - `auc=0.45678581566340537`
+      - `alpha_top_decile=2.834900301646075e-05`
+      - `alpha_top_quintile=4.74009864016068e-05`
+    - `2026-01`:
+      - `auc=0.4480397363190845`
+      - `alpha_top_decile=0.0002709845808747919`
+      - `alpha_top_quintile=6.184377649589757e-05`
+  - final conclusion:
+    - V647 succeeded as a diagnostic mission
+    - V647 failed the actual promotion gate
+    - it must remain frozen evidence, not a promoted branch
 - Immediate next step:
-  - commit the V647 first-wave code/doc state
-  - launch a fresh-prefix `20`-trial GCP swarm under the same frozen contract
-  - keep holdouts untouched until that swarm proves a stronger champion exists
+  - use the new auditor packet:
+    - `handover/ai-direct/entries/20260309_113200_external_ai_auditor_prompt_v647_structural_gate.md`
+  - obtain external recursive audit before opening any follow-on mission
 
 ### Project: V644-GC-SWARM-ASYMMETRIC-OBJECTIVE
 

@@ -8,6 +8,56 @@
 
 This file is the single source of current operational truth for all agents.
 
+## Update: 2026-03-09 11:32 UTC
+- **V647 now has a full live verdict, and it failed the real promotion gate.**
+- New execution verdict:
+  - `handover/ai-direct/entries/20260309_112400_v647_gcp_swarm_and_holdout_gate_failed.md`
+- New external auditor packet:
+  - `handover/ai-direct/entries/20260309_113200_external_ai_auditor_prompt_v647_structural_gate.md`
+- V647 live path that completed:
+  - local contract wave
+  - local smoke
+  - fresh-prefix GCP swarm
+  - fresh deterministic retrain
+  - fresh `2025` / `2026-01` holdout rerun
+- V647 GCP swarm summary:
+  - results prefix:
+    - `gs://omega_v52_central/omega/staging/swarm_optuna/v647_pilot_20260309_111500`
+  - `2` workers
+  - `20` total trials
+  - aggregate champion:
+    - `worker_id=w00`
+    - `trial_number=2`
+    - `best_val_auc=0.5072357725415971`
+    - `alpha_top_decile=0.00011617716323408273`
+    - `alpha_top_quintile=0.00010230238803123365`
+- V647 fresh retrain:
+  - root:
+    - `audit/runtime/v647_champion_retrain_20260309_111700/model`
+  - `seconds=6.2`
+- V647 fresh holdouts:
+  - `2025`:
+    - `auc=0.45678581566340537`
+    - `alpha_top_decile=2.834900301646075e-05`
+    - `alpha_top_quintile=4.74009864016068e-05`
+  - `2026-01`:
+    - `auc=0.4480397363190845`
+    - `alpha_top_decile=0.0002709845808747919`
+    - `alpha_top_quintile=6.184377649589757e-05`
+- Promotion-gate verdict:
+  - `2025` failed:
+    - `AUC > 0.505`
+    - `alpha_top_decile > alpha_top_quintile`
+  - `2026-01` failed:
+    - `AUC > 0.505`
+- Operational interpretation:
+  - V647 is a successful diagnostic mission
+  - V647 is not a promotable branch
+  - prior frozen V645 / V646 evidence remains intact and not overwritten
+- Next step:
+  - external recursive audit against the new prompt packet
+  - no new promotion before that audit
+
 ## Update: 2026-03-09 11:11 UTC
 - **V647 first-wave local implementation and local smoke have passed.**
 - New execution record:
