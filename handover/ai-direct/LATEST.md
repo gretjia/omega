@@ -26,6 +26,14 @@ This file is the single source of current operational truth for all agents.
   - keep `AUC` as a future guardrail even if the new swarm becomes alpha-first
 - Active charter has been switched to the new mission:
   - `handover/ops/ACTIVE_MISSION_CHARTER.md`
+- A second Gemini review has now aligned this mission explicitly against the `v643` design canon:
+  - `handover/ai-direct/entries/20260309_060200_gemini_v643_alignment_on_asymmetric_mission.md`
+  - conclusion:
+    - `GO`
+    - no separate math-governance mission is required yet
+    - the next mission should be treated as a discriminating test between:
+      - correct math + wrong optimization objective
+      - versus insufficient math requiring a later version
 - Next operational step:
   - enter AgentOS review flow for the new alpha-first cloud mission
 
