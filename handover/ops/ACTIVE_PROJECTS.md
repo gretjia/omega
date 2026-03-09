@@ -135,6 +135,49 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
   - next recommended axis:
     - local-only Path B variance-recovery / degeneracy-avoidance
 
+### Project: V650-ZERO-MASS-GRAVITY-WELL
+
+- Status: `DRAFT_PENDING_OWNER_CONFIRMATION`
+- Hosts: `controller` only for first wave
+- Goal: keep Path B as the leading branch, but test whether a robust regression loss plus an explicit non-degeneracy gate can escape the zero-mass collapse while keeping the raw `t1_excess_return` label frozen
+- Audit authority:
+  - `audit/v650_zero_mass_gravity_well.md`
+- Draft spec:
+  - `handover/ai-direct/entries/20260309_131310_v650_zero_mass_gravity_well_spec_draft.md`
+- Draft audit:
+  - `handover/ai-direct/entries/20260309_131707_v650_spec_draft_gemini_pass.md`
+- Locked constraints:
+  - keep `omega_core/*` frozen
+  - keep `canonical_v64_1` Stage3 gates frozen
+  - keep raw `t1_excess_return` frozen
+  - keep `2023 -> 2024` split frozen
+  - keep `2025` and `2026-01` untouched
+  - no GCP
+  - no Path A reopening
+  - no target transformation in this mission
+- Proposed single-axis change:
+  - robust regression loss:
+    - default `reg:pseudohubererror`
+  - plus explicit non-degeneracy gate
+- Proposed first-wave runtime shape:
+  - local-only
+  - sweep-only
+  - `10-20` trials
+  - no retrain execution
+  - no holdout evaluation
+- Proposed local continuation gate:
+  - `val_pred_std >= 1e-6`
+  - `val_spearman_ic > 0.02`
+  - `val_auc_sign > 0.505`
+  - rounded unique predictions:
+    - `> 1`
+  - non-zero feature-importance count:
+    - `> 0`
+- Current state:
+  - draft only
+  - waiting for owner confirmation
+  - active charter not yet switched
+
 ### Project: V645-GC-ASYMMETRIC-LABEL-PIVOT
 
 - Status: `FOLLOW_ON_MISSION_SPLIT_TO_V646_PATH_A_REFINEMENT`

@@ -8,6 +8,47 @@
 
 This file is the single source of current operational truth for all agents.
 
+## Update: 2026-03-09 13:17 UTC
+- **The new Zero-Mass Gravity Well verdict is landed, and the V650 spec draft has now passed `gemini -p`.**
+- New audit authority:
+  - `audit/v650_zero_mass_gravity_well.md`
+- New mission draft:
+  - `handover/ai-direct/entries/20260309_131310_v650_zero_mass_gravity_well_spec_draft.md`
+- Draft audit record:
+  - `handover/ai-direct/entries/20260309_131707_v650_spec_draft_gemini_pass.md`
+- AgentOS read-only convergence:
+  - Plan:
+    - `PASS WITH FIXES`
+    - folded fix:
+      - wave 1 must remain sweep-only
+  - Runtime:
+    - `PASS WITH FIXES`
+    - folded fix:
+      - explicit non-degeneracy gate before any structural ranking trust
+  - Repo Math:
+    - `PASS WITH FIXES`
+    - folded fixes:
+      - make the robust-loss authority sequence explicit
+      - define non-degeneracy as a guardrail, not a second modeling axis
+- Gemini audit:
+  - verdict:
+    - `PASS`
+- Draft core:
+  - Path B remains the leading branch
+  - raw `t1_excess_return` stays frozen
+  - single-axis change:
+    - robust regression loss
+    - plus explicit non-degeneracy gate
+  - first wave stays:
+    - local-only
+    - sweep-only
+    - no GCP
+    - no holdouts
+- Current state:
+  - draft is ready for owner confirmation
+  - active charter has **not** been switched
+  - no V650 code execution has started
+
 ## Update: 2026-03-09 13:02 UTC
 - **The V649 audit packet is now prepared for external review.**
 - New frozen audit summary:

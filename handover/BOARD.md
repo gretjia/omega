@@ -45,6 +45,47 @@
 ### Entries
 
 <!-- New session debriefs go here. Most recent on top. -->
+#### [2026-03-09 13:17] Agent: Codex | Session: V650 Draft Prepared And Gemini-Passed
+
+**What I did:**
+- Landed the new external audit authority:
+  - `audit/v650_zero_mass_gravity_well.md`
+- Drafted the next mission spec:
+  - `handover/ai-direct/entries/20260309_131310_v650_zero_mass_gravity_well_spec_draft.md`
+- Ran AgentOS read-only convergence:
+  - Plan: `PASS WITH FIXES`
+  - Runtime: `PASS WITH FIXES`
+- Ran `gemini -p` against the draft and recorded:
+  - `PASS`
+  - `handover/ai-direct/entries/20260309_131707_v650_spec_draft_gemini_pass.md`
+
+**What I discovered:**
+- The strongest spec correction from AgentOS was scope discipline:
+  - V650 wave 1 must remain sweep-only even if code parity surfaces are prepared.
+- Runtime discipline also needs to be explicit:
+  - non-degeneracy must be enforced before any structural ranking is trusted.
+- Repo Math Auditor also converged before close-out:
+  - `PASS WITH FIXES`
+  - the draft now explicitly treats the non-degeneracy gate as a guardrail, not a second modeling axis.
+
+**What confused me / blocked me:**
+- No hard blocker remained after the repo-local Math Auditor child returned.
+- `gemini -p` remained the stronger external math reasoning gate and also returned `PASS`.
+
+**What the next agent should do:**
+- Wait for owner confirmation before switching the active charter.
+- Do not start V650 execution under the current V649 charter.
+- If confirmed, execute only the bounded V650 local sweep wave first.
+
+**Files I changed:**
+- `audit/v650_zero_mass_gravity_well.md` — landed the new external audit authority.
+- `audit/README.md` — indexed the new V650 audit authority.
+- `handover/ai-direct/entries/20260309_131310_v650_zero_mass_gravity_well_spec_draft.md` — wrote the V650 draft.
+- `handover/ai-direct/entries/20260309_131707_v650_spec_draft_gemini_pass.md` — recorded AgentOS convergence and Gemini `PASS`.
+- `handover/ai-direct/LATEST.md` — recorded that V650 is draft-ready and still awaiting confirmation.
+- `handover/ops/ACTIVE_PROJECTS.md` — added the pending V650 project card.
+- `handover/BOARD.md` — added this debrief.
+
 #### [2026-03-09 13:02] Agent: Codex | Session: V649 Audit Packet Prepared
 
 **What I did:**
