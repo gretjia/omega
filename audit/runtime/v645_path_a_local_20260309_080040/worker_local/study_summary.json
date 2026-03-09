@@ -1,0 +1,81 @@
+{
+  "status": "completed",
+  "worker_id": "local_w00",
+  "job_id": "unknown",
+  "best_value": 6.299795037680448e-05,
+  "best_params": {
+    "max_depth": 5,
+    "learning_rate": 0.023200867504756827,
+    "subsample": 0.8170784332632994,
+    "colsample_bytree": 0.6563696899899051,
+    "min_child_weight": 9.824166788294436,
+    "gamma": 0.3727532183988541,
+    "reg_lambda": 8.862326508576253,
+    "reg_alpha": 0.7264803074826727,
+    "num_boost_round": 119
+  },
+  "n_trials": 10,
+  "n_completed": 10,
+  "n_auc_guardrail_passed": 2,
+  "seconds": 16.92,
+  "objective_metric": "alpha_top_quintile",
+  "auc_guardrail_min": 0.501,
+  "weight_mode": "abs_excess_return",
+  "split_summary": {
+    "base_matrix_uri": "gs://omega_v52_central/omega/staging/base_matrix/latest/stage3_train_2023_2024_20260309_005839/base_matrix_train_2023_2024.parquet",
+    "train_year": "2023",
+    "val_year": "2024",
+    "train_rows": 379331,
+    "val_rows": 356832,
+    "train_positive_rows": 15414,
+    "val_positive_rows": 15224,
+    "train_max_date": "20231229",
+    "val_min_date": "20240102",
+    "temporal_assertion_passed": true,
+    "dtrain_build_count": 1,
+    "dval_build_count": 1,
+    "weight_mode": "abs_excess_return",
+    "train_weight_sum": 509.21991260399363,
+    "val_weight_sum": 611.2757508794464,
+    "contract_diag": {
+      "rows": 736163,
+      "epi_pos_rows": 96955,
+      "topo_energy_pos_rows": 736163,
+      "signal_gate_rows": 736163
+    },
+    "feature_cols": [
+      "sigma_eff",
+      "net_ofi",
+      "depth_eff",
+      "epiplexity",
+      "srl_resid",
+      "topo_area",
+      "topo_energy",
+      "topo_micro",
+      "topo_classic",
+      "topo_trend",
+      "price_change",
+      "bar_duration_ms",
+      "adaptive_y",
+      "epi_x_srl_resid",
+      "epi_x_topo_area",
+      "epi_x_net_ofi"
+    ]
+  },
+  "canonical_fingerprint": {
+    "stage3_param_contract": "canonical_v64_1",
+    "signal_epi_threshold": 0.5,
+    "singularity_threshold": 0.1,
+    "srl_resid_sigma_mult": 2.0,
+    "topo_energy_min": 2.0,
+    "sha256": "c77437f3eb3e8347f6bc1ae177dbec83fa4c3e41a10fc9e792f13561a2a230b1"
+  },
+  "runtime_versions": {
+    "python": "3.11.2",
+    "numpy": "2.4.3",
+    "polars": "1.38.1",
+    "xgboost": "3.2.0",
+    "optuna": "4.7.0",
+    "scikit-learn": "1.8.0"
+  }
+}

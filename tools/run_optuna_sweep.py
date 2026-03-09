@@ -17,13 +17,29 @@ import time
 from pathlib import Path
 
 from importlib.metadata import version as pkg_version
+from importlib.util import find_spec
 
 
 OBJECTIVE_METRICS = {"val_auc", "alpha_top_decile", "alpha_top_quintile"}
+WEIGHT_MODES = {"physics_abs_singularity", "abs_excess_return"}
 HARD_LOSING_OBJECTIVE_VALUE = -1.0e9
 
 
 def _install_dependencies() -> None:
+    required_modules = [
+        "optuna",
+        "polars",
+        "gcsfs",
+        "fsspec",
+        "numpy",
+        "xgboost",
+        "google.cloud.storage",
+        "sklearn",
+        "pythonjsonlogger",
+        "psutil",
+    ]
+    if all(find_spec(name) is not None for name in required_modules):
+        return
     subprocess.check_call(
         [
             sys.executable,
@@ -173,6 +189,13 @@ def _resolve_objective_metric(metric: str) -> str:
     return clean
 
 
+def _resolve_weight_mode(mode: str) -> str:
+    clean = str(mode or "").strip()
+    if clean not in WEIGHT_MODES:
+        raise RuntimeError(f"unsupported_weight_mode: {clean}")
+    return clean
+
+
 def _raw_objective_value(
     objective_metric: str,
     *,
@@ -309,17 +332,17 @@ def _prepare_temporal_split(args: argparse.Namespace) -> dict:
     date_all = df.get_column("date").cast(pl.Utf8, strict=False).to_numpy()
 
     physics_mask = np.abs(singularity) > float(args.singularity_threshold)
-    weights_all = np.abs(singularity)
-    finite = np.isfinite(weights_all) & (weights_all > 1e-8)
+    physics_weights_all = np.abs(singularity)
+    finite = np.isfinite(physics_weights_all) & (physics_weights_all > 1e-8)
     full_mask = physics_mask & finite
 
     X_clean = X_all[full_mask]
     y_clean = y_all[full_mask]
-    weights_clean = weights_all[full_mask]
+    physics_weights_clean = physics_weights_all[full_mask]
     excess_clean = excess_all[full_mask]
     date_clean = date_all[full_mask]
 
-    del df, singularity, X_all, y_all, excess_all, date_all, physics_mask, weights_all, finite, full_mask
+    del df, singularity, X_all, y_all, excess_all, date_all, physics_mask, physics_weights_all, finite, full_mask
     gc.collect()
 
     train_mask = _year_mask(date_clean, str(args.train_year))
@@ -349,16 +372,33 @@ def _prepare_temporal_split(args: argparse.Namespace) -> dict:
             f"temporal_split_violation: max(train_date)={train_max_date} min(val_date)={val_min_date}"
         )
 
+    weight_mode = _resolve_weight_mode(args.weight_mode)
+    if weight_mode == "physics_abs_singularity":
+        selected_weights_clean = physics_weights_clean
+    else:
+        selected_weights_clean = np.abs(excess_clean)
+
+    train_weights = selected_weights_clean[train_mask]
+    val_weights = selected_weights_clean[val_mask]
+    if not np.all(np.isfinite(train_weights)):
+        raise RuntimeError("temporal_split_train_weights_non_finite")
+    if not np.all(np.isfinite(val_weights)):
+        raise RuntimeError("temporal_split_val_weights_non_finite")
+    if float(np.sum(train_weights)) <= 0.0:
+        raise RuntimeError("temporal_split_train_weights_non_positive")
+    if float(np.sum(val_weights)) <= 0.0:
+        raise RuntimeError("temporal_split_val_weights_non_positive")
+
     dtrain = xgb.DMatrix(
         X_clean[train_mask],
         label=y_clean[train_mask],
-        weight=weights_clean[train_mask],
+        weight=train_weights,
         feature_names=list(FEATURE_COLS),
     )
     dval = xgb.DMatrix(
         X_clean[val_mask],
         label=y_clean[val_mask],
-        weight=weights_clean[val_mask],
+        weight=val_weights,
         feature_names=list(FEATURE_COLS),
     )
 
@@ -375,6 +415,9 @@ def _prepare_temporal_split(args: argparse.Namespace) -> dict:
         "temporal_assertion_passed": True,
         "dtrain_build_count": 1,
         "dval_build_count": 1,
+        "weight_mode": weight_mode,
+        "train_weight_sum": float(np.sum(train_weights)),
+        "val_weight_sum": float(np.sum(val_weights)),
         "contract_diag": contract_diag,
         "feature_cols": list(FEATURE_COLS),
     }
@@ -451,15 +494,18 @@ def main() -> None:
     ap.add_argument("--topo-energy-min", type=float, default=2.0)
     ap.add_argument("--objective-metric", default="val_auc")
     ap.add_argument("--min-val-auc", type=float, default=0.0)
+    ap.add_argument("--weight-mode", default="physics_abs_singularity")
 
-    ap.add_argument("--code-bundle-uri", required=True)
+    ap.add_argument("--code-bundle-uri", default="")
     args, _ = ap.parse_known_args()
     args.objective_metric = _resolve_objective_metric(args.objective_metric)
+    args.weight_mode = _resolve_weight_mode(args.weight_mode)
     if args.objective_metric != "val_auc" and float(args.min_val_auc) <= 0.0:
         raise RuntimeError("alpha_first_requires_positive_min_val_auc")
 
     _install_dependencies()
-    _bootstrap_codebase(args.code_bundle_uri)
+    if str(args.code_bundle_uri).strip():
+        _bootstrap_codebase(args.code_bundle_uri)
 
     import numpy as np
     import optuna
@@ -567,6 +613,7 @@ def main() -> None:
         "seconds": round(time.time() - t0, 2),
         "objective_metric": str(args.objective_metric),
         "auc_guardrail_min": float(args.min_val_auc),
+        "weight_mode": str(args.weight_mode),
         "split_summary": split_summary,
         "canonical_fingerprint": canonical_fingerprint,
         "runtime_versions": {

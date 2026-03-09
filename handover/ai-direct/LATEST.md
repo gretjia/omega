@@ -8,6 +8,70 @@
 
 This file is the single source of current operational truth for all agents.
 
+## Update: 2026-03-09 08:01 UTC
+- **The first V645 Path A local micro-sweep has now produced positive validation tail alpha.**
+- New execution record:
+  - `handover/ai-direct/entries/20260309_080141_v645_path_a_local_micro_sweep_positive.md`
+- AgentOS convergence:
+  - Plan / Math / Runtime all chose Path A first:
+    - keep `binary:logistic`
+    - keep binary label
+    - pivot training weights to `abs(t1_excess_return)`
+    - collapse `AUC` guardrail to `0.501`
+    - run local-first
+- Local run identity:
+  - runtime root:
+    - `audit/runtime/v645_path_a_local_20260309_080040`
+  - shape:
+    - `1` local worker
+    - `10` trials
+    - `objective_metric=alpha_top_quintile`
+    - `min_val_auc=0.501`
+    - `weight_mode=abs_excess_return`
+- Local result:
+  - `n_completed=10`
+  - `n_auc_guardrail_passed=2`
+  - `best_value=6.299795037680448e-05`
+  - first positive validation `alpha_top_quintile` signal under the new mission is now proven
+- Meaning:
+  - the external architect verdict is now materially strengthened
+  - positive validation tail alpha became reachable without changing `omega_core/*` or frozen Stage3 gates
+- Immediate next step:
+  - retrain a fresh Path A champion on full `2023,2024`
+  - then evaluate it on fresh isolated `2025` and `2026-01` holdout roots
+
+## Update: 2026-03-09 07:49 UTC
+- **The external architect verdict has now been accepted into `audit/`, and the active mission has been switched from V644 alpha-first search to the new asymmetric-label pivot mission.**
+- New audit authority:
+  - `audit/v644_mediocristan_label_bottleneck.md`
+- New active mission entry:
+  - `handover/ai-direct/entries/20260309_074955_asymmetric_label_pivot_mission_open.md`
+- Core accepted diagnosis:
+  - the current bottleneck is the ML label / objective interface
+  - not the frozen `v64.3 / v643` math core
+- New mission boundary:
+  - keep `omega_core/*` frozen
+  - keep Stage3 gate contract frozen
+  - keep frozen holdout outputs immutable
+  - pivot the learner interface only
+- Allowed first-wave experiment family:
+  - Path A:
+    - keep `binary:logistic`
+    - keep binary label
+    - inject magnitude via `abs(t1_excess_return)` sample weights
+    - remove or near-null the AUC guardrail
+  - Path B:
+    - switch to `reg:squarederror`
+    - use `t1_excess_return` as label
+    - rank by predicted expected return magnitude
+- Operational rule:
+  - the next run must be a micro-sweep
+  - `10-20` trials total
+  - local or `1`-worker GCP
+  - fresh prefix only
+- Next operational step:
+  - AgentOS must choose the minimum decisive pivot path before implementation
+
 ## Update: 2026-03-09 07:29 UTC
 - **A GitHub-shareable external-auditor prompt packet has now been prepared for the last two GCP swarm runs.**
 - Prompt packet:

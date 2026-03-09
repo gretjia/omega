@@ -4,15 +4,65 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
 
 ## 1. Snapshot Metadata
 
-- `updated_at_local`: 2026-03-09 07:07:52 +0000
-- `updated_at_utc`: 2026-03-09 07:07:52 +0000
+- `updated_at_local`: 2026-03-09 08:01:41 +0000
+- `updated_at_utc`: 2026-03-09 08:01:41 +0000
 - `updated_by`: Codex (GPT-5)
 
 ## 2. In-Flight Work
 
+### Project: V645-GC-ASYMMETRIC-LABEL-PIVOT
+
+- Status: `PATH_A_LOCAL_MICRO_SWEEP_POSITIVE`
+- Hosts: `controller`, `GCP Vertex AI`
+- Goal: test the external architect verdict that the live bottleneck is now the XGBoost label / objective interface, not the frozen `v64.3 / v643` math core
+- Seed authority:
+  - `audit/v644_mediocristan_label_bottleneck.md`
+- Locked constraints:
+  - do not touch `omega_core/*`
+  - do not mutate frozen `canonical_v64_1` Stage3 gates
+  - do not overwrite frozen holdout outputs
+  - do not widen into larger cloud fan-out before the pivot is validated
+- Allowed first-wave pivot family:
+  - Path A:
+    - `binary:logistic`
+    - binary label retained
+    - training weights pivot to `abs(t1_excess_return)`
+    - remove or near-null the AUC guardrail
+  - Path B:
+    - `reg:squarederror`
+    - label becomes `t1_excess_return`
+    - validation ranking by predicted expected return magnitude
+- Required first live test:
+  - micro-sweep only
+  - `10-20` trials total
+  - local or `1`-worker GCP
+  - fresh output prefix only
+- Open question AgentOS must resolve:
+  - resolved:
+    - choose Path A first
+    - local-first
+    - micro-sweep before any wider cloud spend
+- Latest result:
+  - runtime root:
+    - `audit/runtime/v645_path_a_local_20260309_080040`
+  - completed trials:
+    - `10 / 10`
+  - AUC-eligible trials:
+    - `2 / 10`
+  - `best_value`:
+    - `6.299795037680448e-05`
+  - key conclusion:
+    - positive validation `alpha_top_quintile` became reachable once training weights pivoted to `abs(t1_excess_return)`
+- Immediate next step:
+  - retrain a fresh Path A champion on full `2023,2024`
+  - run fresh isolated holdout evaluation on `2025` and `2026-01`
+- Risks:
+  - a pure interface pivot may still fail, in which case the repo must revisit deeper feature/label or math adequacy
+  - regression mode may need more evaluator changes than weighted-binary mode
+
 ### Project: V644-GC-SWARM-ASYMMETRIC-OBJECTIVE
 
-- Status: `PILOT_STOP_GATE_TRIGGERED`
+- Status: `STOPPED_AT_PILOT_GATE`
 - Hosts: `controller`, `GCP Vertex AI`
 - Goal: redesign the cloud swarm objective and champion rule so future sweeps optimize tail profitability, not just global `AUC`, while preserving the frozen holdout baseline as immutable audit evidence
 - Seed authority:
@@ -64,7 +114,7 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
 - Risks:
   - pure alpha optimization may overfit noisy tails
   - the inner XGBoost loss still remains binary-logloss unless a later mission changes it explicitly
-  - if alpha-first fails again on frozen holdouts, the next mission boundary is likely math-governance, not more leaderboard tweaking
+  - external architect review has now redirected the next mission boundary away from larger V644 sweeps and toward the learner-interface pivot
 
 ### Project: V643-HOLDOUT-BASEMATRIX-EVALUATION
 

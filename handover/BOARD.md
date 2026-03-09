@@ -45,6 +45,50 @@
 ### Entries
 
 <!-- New session debriefs go here. Most recent on top. -->
+#### [2026-03-09 08:01] Agent: Codex | Session: V645 Path A Local Micro-Sweep Positive
+
+**What I did:**
+- Accepted the external architect verdict into `audit/v644_mediocristan_label_bottleneck.md`.
+- Opened the new V645 asymmetric-label pivot mission.
+- Sent strict AgentOS packets to Plan / Math / Runtime.
+- Integrated their convergence:
+  - Path A first
+  - local-first
+  - `10`-trial micro-sweep
+  - `weight_mode=abs_excess_return`
+  - `min_val_auc=0.501`
+- Implemented the bounded Path A code wave and ran the first local micro-sweep.
+
+**What I discovered:**
+- The first Path A local micro-sweep produced the first positive validation tail-alpha signal under the frozen math:
+  - `best_value=6.299795037680448e-05`
+- This materially strengthens the external audit claim that the live bottleneck was the learner interface, not `omega_core/*` or frozen Stage3 gates.
+- The positive signal appeared without reopening math-governance.
+
+**What confused me / blocked me:**
+- The payload originally assumed `python -m pip` existed inside the runtime, which broke under `uv` because that temporary env had no `pip` module.
+- I fixed that by making dependency bootstrap first check whether the required modules are already present.
+
+**What the next agent should do:**
+- Treat Path A selection as resolved.
+- Do not go back to larger V644 alpha-first sweeps.
+- Use the new positive local micro-sweep as the basis for:
+  - a fresh Path A champion retrain on full `2023,2024`
+  - then fresh isolated holdout evaluation on `2025` and `2026-01`
+- Keep frozen holdout outputs immutable.
+
+**Files I changed:**
+- `audit/v644_mediocristan_label_bottleneck.md` — recorded the external architect verdict in the audit canon.
+- `audit/README.md` — indexed the new post-V644 audit.
+- `handover/ai-direct/entries/20260309_074955_asymmetric_label_pivot_mission_open.md` — opened the V645 mission.
+- `tools/run_optuna_sweep.py` — added explicit weight-mode support and local-friendly dependency bootstrap.
+- `tools/launch_vertex_swarm_optuna.py` — forwarded the new weight-mode arg.
+- `tests/test_vertex_optuna_split.py` — added coverage for the new weight mode wiring.
+- `handover/ai-direct/entries/20260309_080141_v645_path_a_local_micro_sweep_positive.md` — recorded the successful local micro-sweep.
+- `handover/ai-direct/LATEST.md` — recorded the new mission and the positive local Path A result.
+- `handover/ops/ACTIVE_PROJECTS.md` — moved V645 to positive local micro-sweep status.
+- `handover/BOARD.md` — added this mandatory debrief block.
+
 #### [2026-03-09 07:29] Agent: Codex | Session: External Auditor Packet For Last Two GCP Runs
 
 **What I did:**

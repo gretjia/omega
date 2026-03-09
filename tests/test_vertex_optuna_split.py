@@ -52,6 +52,7 @@ def test_prepare_temporal_split_builds_train_val_once(tmp_path: Path) -> None:
         signal_epi_threshold=0.5,
         srl_resid_sigma_mult=2.0,
         topo_energy_min=2.0,
+        weight_mode="physics_abs_singularity",
     )
     datasets = _prepare_temporal_split(args)
 
@@ -64,7 +65,37 @@ def test_prepare_temporal_split_builds_train_val_once(tmp_path: Path) -> None:
     assert datasets["summary"]["temporal_assertion_passed"] is True
     assert datasets["summary"]["train_max_date"] == "20230105"
     assert datasets["summary"]["val_min_date"] == "20240108"
+    assert datasets["summary"]["weight_mode"] == "physics_abs_singularity"
     assert datasets["canonical_fingerprint"] == _canonical_fingerprint(args)
+
+
+def test_prepare_temporal_split_supports_abs_excess_return_weights(tmp_path: Path) -> None:
+    matrix_path = tmp_path / "base_matrix_train_2023_2024.parquet"
+    df = pl.DataFrame(
+        [
+            _row("20230105", 1, 0.06, 0.0),
+            _row("20230105", 1, -0.01, 0.5),
+            _row("20240108", 1, 0.09, 1.0),
+            _row("20240108", 1, -0.02, 1.5),
+        ]
+    )
+    df.write_parquet(matrix_path)
+
+    args = Namespace(
+        base_matrix_uri=str(matrix_path),
+        train_year="2023",
+        val_year="2024",
+        singularity_threshold=0.10,
+        signal_epi_threshold=0.5,
+        srl_resid_sigma_mult=2.0,
+        topo_energy_min=2.0,
+        weight_mode="abs_excess_return",
+    )
+    datasets = _prepare_temporal_split(args)
+
+    assert datasets["summary"]["weight_mode"] == "abs_excess_return"
+    assert datasets["summary"]["train_weight_sum"] > 0.0
+    assert datasets["summary"]["val_weight_sum"] > 0.0
 
 
 def test_trial_payload_does_not_require_runtime_trial_state() -> None:
@@ -138,6 +169,7 @@ def test_launch_worker_seed_offsets_by_worker_index() -> None:
         val_year="2024",
         objective_metric="alpha_top_quintile",
         min_val_auc=0.75,
+        weight_mode="abs_excess_return",
         code_bundle_uri="gs://bucket/code.zip",
         sync=False,
         spot=True,
@@ -158,8 +190,10 @@ def test_launch_worker_seed_offsets_by_worker_index() -> None:
     assert script_args[seed_idx + 1] == "45"
     objective_idx = script_args.index("--objective-metric")
     auc_idx = script_args.index("--min-val-auc")
+    weight_idx = script_args.index("--weight-mode")
     assert script_args[objective_idx + 1] == "alpha_top_quintile"
     assert script_args[auc_idx + 1] == "0.75"
+    assert script_args[weight_idx + 1] == "abs_excess_return"
     assert attempt["seed"] == 45
 
 

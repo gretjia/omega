@@ -97,6 +97,8 @@ def _submit_one_worker(*, submit_job, args: argparse.Namespace, script_path: str
             str(args.objective_metric),
             "--min-val-auc",
             str(args.min_val_auc),
+            "--weight-mode",
+            str(args.weight_mode),
             "--code-bundle-uri",
             str(args.code_bundle_uri),
         ],
@@ -184,6 +186,7 @@ def main() -> None:
     ap.add_argument("--objective-metric", default="val_auc")
     ap.add_argument("--min-val-auc", type=float, default=0.0)
     ap.add_argument("--objective-epsilon", type=float, default=None)
+    ap.add_argument("--weight-mode", default="physics_abs_singularity")
     ap.add_argument("--require-empty-results-prefix", action="store_true")
     ap.add_argument("--require-empty-aggregate-output-uri", action="store_true")
     args = ap.parse_args()
@@ -236,6 +239,7 @@ def main() -> None:
         "n_trials_per_worker": int(args.n_trials_per_worker),
         "machine_type": str(args.machine_type),
         "spot": bool(args.spot),
+        "weight_mode": str(args.weight_mode),
         "workers": launch_rows,
     }
     manifest_path = Path(str(args.manifest_path))
