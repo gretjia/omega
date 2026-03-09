@@ -8,6 +8,43 @@
 
 This file is the single source of current operational truth for all agents.
 
+## Update: 2026-03-09 04:34 UTC
+- **The GC swarm-optuna implementation foundation now exists in active `tools/`, and local pilot prerequisites are no longer blocked on missing code paths.**
+- New active cloud tooling:
+  - `tools/run_optuna_sweep.py`
+  - `tools/aggregate_vertex_swarm_results.py`
+  - `tools/launch_vertex_swarm_optuna.py`
+- Compatibility glue added:
+  - `tools/run_vertex_xgb_train.py` now accepts the extra XGBoost knobs searched by the swarm:
+    - `xgb_min_child_weight`
+    - `xgb_gamma`
+    - `xgb_reg_lambda`
+    - `xgb_reg_alpha`
+  - aggregator now emits `trainer_overrides` so the champion can be injected into the active trainer without dropping searched params
+- Launcher behavior now covers the pilot control path:
+  - async multi-worker fan-out
+  - optional watch-to-terminal-state
+  - bounded one-shot spot-to-on-demand retry
+  - optional post-run aggregation
+- Local validation passed:
+  - `python3 -m py_compile` on:
+    - `tools/submit_vertex_sweep.py`
+    - `tools/run_vertex_xgb_train.py`
+    - `tools/run_optuna_sweep.py`
+    - `tools/aggregate_vertex_swarm_results.py`
+    - `tools/launch_vertex_swarm_optuna.py`
+    - `tests/test_vertex_swarm_aggregate.py`
+    - `tests/test_vertex_optuna_split.py`
+  - `uv run --python /usr/bin/python3.11 --with pytest --with polars --with xgboost --with optuna pytest -q tests/test_vertex_swarm_aggregate.py tests/test_vertex_optuna_split.py`
+  - result:
+    - `3 passed in 0.85s`
+- Operational note:
+  - controller-side launch still requires `uv run --with google-cloud-aiplatform --with google-cloud-storage python ...` because the system `python3` environment does not ship Vertex/GCS modules
+- Mission state:
+  - the active mission has moved from holdout-matrix completion to `gc swarm-optuna` pilot implementation and execution
+- Deep dive:
+  - `handover/ai-direct/entries/20260309_043429_gc_swarm_optuna_foundation_local_pass.md`
+
 ## Update: 2026-03-09 03:40 UTC
 - **The two missing holdout Stage3 artifacts are now fully built, audited, and copied into clean evaluation roots.**
 - Actual execution mode used:

@@ -4,8 +4,8 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
 
 ## 1. Snapshot Metadata
 
-- `updated_at_local`: 2026-03-09 02:46:58 +0000
-- `updated_at_utc`: 2026-03-09 02:46:58 +0000
+- `updated_at_local`: 2026-03-09 04:34:29 +0000
+- `updated_at_utc`: 2026-03-09 04:34:29 +0000
 - `updated_by`: Codex (GPT-5)
 
 ## 2. In-Flight Work
@@ -91,11 +91,11 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
   - current active cloud train path is still a single-job offload path, not true cloud-parallel optimization
   - `tools/stage3_full_supervisor.py` currently points to absent bucket `gs://omega_central/...`, while successful live staging still used `gs://omega_v52_central/...`
   - current backtest entrypoints only support year-level filtering, so `2026-01` holdout needs a later explicit file-list or wrapper
-  - this artifact is only the training shard of the optimal allocation scheme; separate `2025` and `2026-01` holdout base matrices are still missing
+  - this artifact is only the training shard of the optimal allocation scheme; the separate `2025` and `2026-01` holdout base matrices now exist and must remain isolated from optimization logic
 
 ### Project: V643-GC-SWARM-OPTUNA-REVIVAL
 
-- Status: `PROPOSED_SPEC_READY`
+- Status: `IMPLEMENTATION_FOUNDATION_READY`
 - Hosts: `controller`, `GCP Vertex AI`, `linux1-lx`
 - Goal: restore the original cloud value proposition by replacing single-job train offload with real cloud-parallel Optuna/XGBoost optimization over the completed `2023,2024` training base matrix
 - Historical evidence locked:
@@ -128,11 +128,32 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
   - explicit complexity tie-breaker for champion selection when score deltas are negligible
   - per-trial alpha / excess-return proxy diagnostics in addition to AUC
 - Immediate blockers:
-  - bucket authority is inconsistent: active supervisor points at absent `gs://omega_central/...`, while the live successful path still used `gs://omega_v52_central/...`
-  - no active `tools/run_optuna_sweep.py` / swarm orchestrator currently exists
+  - bucket authority is inconsistent in older supervisor code: active supervisor points at absent `gs://omega_central/...`, while the live successful path still uses `gs://omega_v52_central/...`
+  - controller launch still depends on `uv run` for Vertex/GCS dependencies
   - current backtest entrypoints cannot directly express `2026-01`
 - Holdout artifact status:
   - the two missing holdout artifacts are now built and date-clean
+- Implementation progress:
+  - new active files now exist:
+    - `tools/run_optuna_sweep.py`
+    - `tools/aggregate_vertex_swarm_results.py`
+    - `tools/launch_vertex_swarm_optuna.py`
+  - active trainer compatibility expanded:
+    - `tools/run_vertex_xgb_train.py` now accepts searched XGBoost knobs:
+      - `min_child_weight`
+      - `gamma`
+      - `reg_lambda`
+      - `reg_alpha`
+  - launcher now supports:
+    - multi-worker async submit
+    - watch-to-terminal-state
+    - one-shot spot-to-on-demand retry
+    - post-run aggregation hook
+  - local validation passed:
+    - `python3 -m py_compile` on changed tooling
+    - `3 passed` on:
+      - `tests/test_vertex_swarm_aggregate.py`
+      - `tests/test_vertex_optuna_split.py`
 - Spec source:
   - `handover/ai-direct/entries/20260309_012152_gc_swarm_optuna_project_spec.md`
   - `handover/ai-direct/entries/20260309_014638_gemini_swarm_spec_audit.md`
@@ -140,6 +161,7 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
   - `handover/ai-direct/entries/20260309_025500_holdout_basematrix_dual_host_execution_spec.md`
   - `handover/ai-direct/entries/20260309_030257_gemini_holdout_dual_host_spec_audit.md`
   - `handover/ai-direct/entries/20260309_034012_holdout_matrices_dual_host_execution_complete.md`
+  - `handover/ai-direct/entries/20260309_043429_gc_swarm_optuna_foundation_local_pass.md`
 
 ### Project: GCP-LEGACY-STORAGE-CLEANUP
 

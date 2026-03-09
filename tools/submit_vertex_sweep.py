@@ -150,7 +150,7 @@ def _submit_via_gcloud_fallback(
     code_bundle_uri: str,
     spot: bool = False,
     sync_timeout_sec: int = 0,
-) -> None:
+) -> dict:
     payload_uri = _upload_payload_script(script_path, job_name)
     shell_script = _render_fallback_shell(code_bundle_uri, payload_uri, script_args)
     cfg = textwrap.dedent(
@@ -202,7 +202,16 @@ def _submit_via_gcloud_fallback(
         print(f"[+] Fallback submit succeeded: {resource_name}", flush=True)
 
         if not sync:
-            return
+            return {
+                "display_name": job_name,
+                "resource_name": resource_name,
+                "dashboard_uri": "",
+                "submission_backend": "gcloud_fallback",
+                "sync": False,
+                "spot": bool(spot),
+                "machine_type": str(machine_type),
+                "payload_uri": payload_uri,
+            }
 
         terminal_ok = {"JOB_STATE_SUCCEEDED"}
         terminal_fail = {
@@ -284,7 +293,17 @@ def _submit_via_gcloud_fallback(
             last_state = state
             print(f"    [Fallback] state={state} elapsed={elapsed}s", flush=True)
             if state in terminal_ok:
-                return
+                return {
+                    "display_name": job_name,
+                    "resource_name": resource_name,
+                    "dashboard_uri": "",
+                    "submission_backend": "gcloud_fallback",
+                    "sync": True,
+                    "terminal_state": state,
+                    "spot": bool(spot),
+                    "machine_type": str(machine_type),
+                    "payload_uri": payload_uri,
+                }
             if state in terminal_fail:
                 raise RuntimeError(f"Fallback custom job failed with state={state} resource={resource_name}")
             time.sleep(30)
@@ -328,7 +347,7 @@ def submit_job(
         print("[*] Scheduling strategy: SPOT", flush=True)
     if force_gcloud_fallback:
         print("[*] Forcing gcloud fallback submission path.", flush=True)
-        _submit_via_gcloud_fallback(
+        return _submit_via_gcloud_fallback(
             script_path=script_path,
             machine_type=machine_type,
             script_args=list(script_args),
@@ -338,7 +357,6 @@ def submit_job(
             spot=bool(spot),
             sync_timeout_sec=int(sync_timeout_sec),
         )
-        return
 
     job = aiplatform.CustomJob.from_local_script(
         display_name=job_name,
@@ -362,7 +380,7 @@ def submit_job(
                 raise
             if attempt >= int(max_submit_retries):
                 print("[Warn] Vertex SDK submit retries exhausted. Switching to gcloud fallback submit...", flush=True)
-                _submit_via_gcloud_fallback(
+                return _submit_via_gcloud_fallback(
                     script_path=script_path,
                     machine_type=machine_type,
                     script_args=list(script_args),
@@ -372,7 +390,6 @@ def submit_job(
                     spot=bool(spot),
                     sync_timeout_sec=int(sync_timeout_sec),
                 )
-                return
             sleep_sec = min(120, 10 * attempt)
             print(
                 f"[Warn] Vertex submit transient failure ({attempt}/{max_submit_retries}): {exc}. "
@@ -400,6 +417,15 @@ def submit_job(
         print(f"    Dashboard: {dashboard}", flush=True)
     if resource:
         print(f"    Resource : {resource}", flush=True)
+    return {
+        "display_name": job_name,
+        "resource_name": resource,
+        "dashboard_uri": dashboard,
+        "submission_backend": "vertex_sdk",
+        "sync": bool(sync),
+        "spot": bool(spot),
+        "machine_type": str(machine_type),
+    }
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

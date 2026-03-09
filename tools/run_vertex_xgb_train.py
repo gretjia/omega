@@ -273,6 +273,10 @@ def run_global_training(args: argparse.Namespace) -> None:
         "eta": float(args.xgb_learning_rate),
         "subsample": float(args.xgb_subsample),
         "colsample_bytree": float(args.xgb_colsample_bytree),
+        "min_child_weight": float(args.xgb_min_child_weight),
+        "gamma": float(args.xgb_gamma),
+        "lambda": float(args.xgb_reg_lambda),
+        "alpha": float(args.xgb_reg_alpha),
         "tree_method": "hist",
         "n_jobs": int(args.n_jobs),
         "seed": int(args.seed),
@@ -320,6 +324,10 @@ def run_global_training(args: argparse.Namespace) -> None:
             "xgb_learning_rate": float(args.xgb_learning_rate),
             "xgb_subsample": float(args.xgb_subsample),
             "xgb_colsample_bytree": float(args.xgb_colsample_bytree),
+            "xgb_min_child_weight": float(args.xgb_min_child_weight),
+            "xgb_gamma": float(args.xgb_gamma),
+            "xgb_reg_lambda": float(args.xgb_reg_lambda),
+            "xgb_reg_alpha": float(args.xgb_reg_alpha),
             "num_boost_round": rounds,
             "seed": int(args.seed),
             "stage3_param_contract": "canonical_v64_1",
@@ -364,6 +372,10 @@ def main() -> None:
     ap.add_argument("--xgb-learning-rate", type=float, default=0.03)
     ap.add_argument("--xgb-subsample", type=float, default=0.9)
     ap.add_argument("--xgb-colsample-bytree", type=float, default=0.8)
+    ap.add_argument("--xgb-min-child-weight", type=float, default=1.0)
+    ap.add_argument("--xgb-gamma", type=float, default=0.0)
+    ap.add_argument("--xgb-reg-lambda", type=float, default=1.0)
+    ap.add_argument("--xgb-reg-alpha", type=float, default=0.0)
     ap.add_argument("--num-boost-round", type=int, default=150)
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--n-jobs", type=int, default=-1)
