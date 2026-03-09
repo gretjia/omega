@@ -45,6 +45,55 @@
 ### Entries
 
 <!-- New session debriefs go here. Most recent on top. -->
+#### [2026-03-09 08:43] Agent: Codex | Session: V645 Path A Fresh Retrain And Fresh Holdout
+
+**What I did:**
+- Extended `tools/run_vertex_xgb_train.py` so the training payload can honor the new Path A weighting mode:
+  - `weight_mode=abs_excess_return`
+- Added regression coverage in `tests/test_vertex_train_weight_mode.py`.
+- Ran a fresh Path A retrain on full `2023,2024`.
+- Evaluated the fresh retrain on:
+  - `2025` holdout on `windows1-w1`
+  - `2026-01` holdout on `linux1-lx`
+- Recorded the results in a new handover entry.
+
+**What I discovered:**
+- The learner-interface pivot is real, not cosmetic.
+- Fresh `2025` holdout alpha is now positive at both:
+  - decile
+  - quintile
+- Fresh `2026-01` decile alpha is also positive.
+- But fresh `2026-01` quintile alpha is still negative.
+- The old high-`AUC` regime collapsed:
+  - old holdout `AUC` was around `0.81-0.82`
+  - new holdout `AUC` is around `0.54`
+- That means the new weighting scheme is moving the model toward economic ranking, but probably overshooting away from broad classification quality.
+
+**What confused me / blocked me:**
+- Windows OpenSSH + PowerShell stdin remained unreliable for multiline scripts.
+- Several earlier Windows attempts silently failed to enter the evaluator because PowerShell continuation parsing swallowed the command body.
+- The reliable fallback was:
+  - stage artifacts first
+  - then invoke the evaluator through `cmd /c ...run_eval.cmd`
+
+**What the next agent should do:**
+- Keep GC paused for now.
+- Treat the new Path A result as a partial pass, not a final solution.
+- Do not overwrite:
+  - the frozen baseline holdout outputs
+  - or the new fresh Path A holdout outputs
+- Next decision boundary should stay local-first:
+  - refine Path A
+  - or compare Path B regression
+
+**Files I changed:**
+- `tools/run_vertex_xgb_train.py` — added Path A training weight-mode support and local-friendly bootstrap behavior.
+- `tests/test_vertex_train_weight_mode.py` — added coverage for both training weight modes.
+- `handover/ai-direct/entries/20260309_084315_v645_path_a_retrain_and_fresh_holdout_partial_pass.md` — recorded retrain and fresh holdout evidence.
+- `handover/ai-direct/LATEST.md` — updated live runtime truth with the fresh holdout verdict.
+- `handover/ops/ACTIVE_PROJECTS.md` — moved V645 to fresh-holdout-partial-pass status.
+- `handover/BOARD.md` — added this mandatory debrief block.
+
 #### [2026-03-09 08:01] Agent: Codex | Session: V645 Path A Local Micro-Sweep Positive
 
 **What I did:**

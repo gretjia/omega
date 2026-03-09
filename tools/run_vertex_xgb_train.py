@@ -17,9 +17,26 @@ import time
 from pathlib import Path
 
 from importlib.metadata import version as pkg_version
+from importlib.util import find_spec
+
+
+WEIGHT_MODES = {"physics_abs_singularity", "abs_excess_return"}
 
 
 def _install_dependencies() -> None:
+    required_modules = [
+        "polars",
+        "gcsfs",
+        "fsspec",
+        "numpy",
+        "xgboost",
+        "google.cloud.storage",
+        "sklearn",
+        "pythonjsonlogger",
+        "psutil",
+    ]
+    if all(find_spec(name) is not None for name in required_modules):
+        return
     subprocess.check_call(
         [
             sys.executable,
@@ -91,6 +108,22 @@ def _bootstrap_codebase(code_bundle_uri: str) -> None:
     shutil.unpack_archive("omega_core.zip", extract_dir=".")
     if os.getcwd() not in sys.path:
         sys.path.append(os.getcwd())
+
+
+def _resolve_weight_mode(mode: str) -> str:
+    clean = str(mode or "").strip()
+    if clean not in WEIGHT_MODES:
+        raise RuntimeError(f"unsupported_weight_mode: {clean}")
+    return clean
+
+
+def _select_training_weights(*, mode: str, singularity: "np.ndarray", excess_returns: "np.ndarray"):
+    import numpy as np
+
+    resolved = _resolve_weight_mode(mode)
+    if resolved == "physics_abs_singularity":
+        return np.abs(singularity)
+    return np.abs(excess_returns)
 
 
 def _audit_training_base_matrix_contract(df, *, singularity_threshold: float) -> dict:
@@ -227,7 +260,8 @@ def run_global_training(args: argparse.Namespace) -> None:
     X_all = df.select(list(FEATURE_COLS)).to_numpy()
     
     # Use Excess Return for label
-    y_all = (df.get_column("t1_excess_return").to_numpy() > 0).astype(int)
+    excess_all = df.get_column("t1_excess_return").to_numpy()
+    y_all = (excess_all > 0).astype(int)
 
     print(
         "[*] Applying V64 physics gates "
@@ -241,22 +275,29 @@ def run_global_training(args: argparse.Namespace) -> None:
     mask_rows = int(np.sum(physics_mask))
     X_clean = X_all[physics_mask]
     y_clean = y_all[physics_mask]
-    
-    # V64: The weight of the sample IS the amplitude of the singularity
-    weights_clean = np.abs(singularity)[physics_mask]
+    excess_clean = excess_all[physics_mask]
+    singularity_clean = singularity[physics_mask]
+    weights_clean = _select_training_weights(
+        mode=str(args.weight_mode),
+        singularity=singularity_clean,
+        excess_returns=excess_clean,
+    )
 
-    finite = np.isfinite(weights_clean) & (weights_clean > 1e-8)
+    finite = np.isfinite(weights_clean)
     X_clean = X_clean[finite]
     y_clean = y_clean[finite]
     weights_clean = weights_clean[finite]
+    excess_clean = excess_clean[finite]
 
     base_rows = int(df.height)
     train_rows = int(len(y_clean))
     print(f"[*] Sliced rows for training: {train_rows} / {base_rows} (mask_rows={mask_rows})", flush=True)
     if train_rows <= 0:
         raise RuntimeError("Physics gates removed all rows; cannot train.")
+    if float(np.sum(weights_clean)) <= 0.0:
+        raise RuntimeError("training_weights_non_positive")
 
-    del df, singularity, X_all, y_all, physics_mask, finite
+    del df, singularity, X_all, y_all, excess_all, physics_mask, finite, excess_clean, singularity_clean
     gc.collect()
 
     dtrain = xgb.DMatrix(
@@ -331,6 +372,7 @@ def run_global_training(args: argparse.Namespace) -> None:
             "num_boost_round": rounds,
             "seed": int(args.seed),
             "stage3_param_contract": "canonical_v64_1",
+            "weight_mode": str(args.weight_mode),
         },
     }
     metrics_path = Path("train_metrics.json")
@@ -379,9 +421,10 @@ def main() -> None:
     ap.add_argument("--num-boost-round", type=int, default=150)
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--n-jobs", type=int, default=-1)
+    ap.add_argument("--weight-mode", default="physics_abs_singularity")
 
     # Legacy args kept for compatibility with old submitters.
-    ap.add_argument("--code-bundle-uri", required=True, help="Run-pinned code bundle URI.")
+    ap.add_argument("--code-bundle-uri", default="", help="Run-pinned code bundle URI.")
     ap.add_argument("--data-pattern", default="")
     ap.add_argument("--train-years", default="")
     ap.add_argument("--max-files", type=int, default=0)
@@ -392,8 +435,10 @@ def main() -> None:
         raise RuntimeError("`--data-pattern` is forbidden for this training payload. Use `--base-matrix-uri` only.")
     if str(args.train_years).strip():
         raise RuntimeError("`--train-years` is forbidden for this training payload. Use prebuilt base_matrix scope.")
+    args.weight_mode = _resolve_weight_mode(args.weight_mode)
     _install_dependencies()
-    _bootstrap_codebase(args.code_bundle_uri)
+    if str(args.code_bundle_uri).strip():
+        _bootstrap_codebase(args.code_bundle_uri)
     run_global_training(args)
 
 

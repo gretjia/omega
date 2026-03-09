@@ -8,6 +8,44 @@
 
 This file is the single source of current operational truth for all agents.
 
+## Update: 2026-03-09 08:43 UTC
+- **Fresh Path A retrain plus fresh isolated holdout evaluation is now complete, and the result is a partial pass.**
+- New execution record:
+  - `handover/ai-direct/entries/20260309_084315_v645_path_a_retrain_and_fresh_holdout_partial_pass.md`
+- Fresh retrain identity:
+  - runtime root:
+    - `audit/runtime/v645_path_a_retrain_20260309_081034`
+  - output root:
+    - `audit/runtime/v645_path_a_retrain_20260309_081034/model`
+  - weight mode:
+    - `abs_excess_return`
+- Fresh `2025` holdout result:
+  - output:
+    - `D:\work\Omega_vNext\audit\runtime\holdout_eval_path_a_2025_20260309_084300\results\holdout_metrics.json`
+  - metrics:
+    - `auc=0.5392160785083961`
+    - `alpha_top_decile=8.733709672524669e-05`
+    - `alpha_top_quintile=0.00011493529740600989`
+- Fresh `2026-01` holdout result:
+  - output:
+    - `/home/zepher/work/Omega_vNext/audit/runtime/holdout_eval_path_a_2026_01_20260309_082500/results/holdout_metrics.json`
+  - metrics:
+    - `auc=0.5444775661061128`
+    - `alpha_top_decile=9.280953096675273e-05`
+    - `alpha_top_quintile=-9.652552940517018e-05`
+- Meaning:
+  - the Path A learner-interface pivot materially improved the economic metrics
+  - `2025` tail alpha is now positive at both decile and quintile
+  - `2026-01` decile alpha is also positive
+  - but `2026-01` quintile alpha is still negative
+  - and holdout `AUC` has collapsed from the old `~0.81-0.82` regime to `~0.54`
+- Operational decision:
+  - keep GC paused for now
+  - do not widen swarm yet
+  - next step remains local / dual-host:
+    - refine Path A
+    - or compare Path B
+
 ## Update: 2026-03-09 08:01 UTC
 - **The first V645 Path A local micro-sweep has now produced positive validation tail alpha.**
 - New execution record:

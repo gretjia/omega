@@ -12,7 +12,7 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
 
 ### Project: V645-GC-ASYMMETRIC-LABEL-PIVOT
 
-- Status: `PATH_A_LOCAL_MICRO_SWEEP_POSITIVE`
+- Status: `FRESH_HOLDOUT_PARTIAL_PASS`
 - Hosts: `controller`, `GCP Vertex AI`
 - Goal: test the external architect verdict that the live bottleneck is now the XGBoost label / objective interface, not the frozen `v64.3 / v643` math core
 - Seed authority:
@@ -43,22 +43,30 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
     - local-first
     - micro-sweep before any wider cloud spend
 - Latest result:
-  - runtime root:
-    - `audit/runtime/v645_path_a_local_20260309_080040`
-  - completed trials:
-    - `10 / 10`
-  - AUC-eligible trials:
-    - `2 / 10`
-  - `best_value`:
-    - `6.299795037680448e-05`
+  - fresh retrain runtime root:
+    - `audit/runtime/v645_path_a_retrain_20260309_081034`
+  - fresh `2025` holdout:
+    - `auc=0.5392160785083961`
+    - `alpha_top_decile=8.733709672524669e-05`
+    - `alpha_top_quintile=0.00011493529740600989`
+  - fresh `2026-01` holdout:
+    - `auc=0.5444775661061128`
+    - `alpha_top_decile=9.280953096675273e-05`
+    - `alpha_top_quintile=-9.652552940517018e-05`
   - key conclusion:
-    - positive validation `alpha_top_quintile` became reachable once training weights pivoted to `abs(t1_excess_return)`
+    - the learner-interface pivot materially improved holdout economic ranking
+    - but `2026-01` quintile alpha remains negative
+    - and holdout `AUC` collapsed toward coin-flip
 - Immediate next step:
-  - retrain a fresh Path A champion on full `2023,2024`
-  - run fresh isolated holdout evaluation on `2025` and `2026-01`
+  - keep GC paused
+  - continue local / dual-host only
+  - decide between:
+    - Path A refinement
+    - or Path B comparison
 - Risks:
-  - a pure interface pivot may still fail, in which case the repo must revisit deeper feature/label or math adequacy
-  - regression mode may need more evaluator changes than weighted-binary mode
+  - the new weighting mode may be trading away too much global ranking signal for tail alpha
+  - the remaining `2026-01` negative quintile alpha means the new interface is still not fully stable
+  - cross-runtime XGBoost version skew continues to emit old-pickle warnings even though evaluation succeeds
 
 ### Project: V644-GC-SWARM-ASYMMETRIC-OBJECTIVE
 
