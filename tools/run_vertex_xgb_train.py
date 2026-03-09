@@ -20,7 +20,7 @@ from importlib.metadata import version as pkg_version
 from importlib.util import find_spec
 
 
-WEIGHT_MODES = {"physics_abs_singularity", "abs_excess_return"}
+WEIGHT_MODES = {"physics_abs_singularity", "abs_excess_return", "sqrt_abs_excess_return"}
 
 
 def _install_dependencies() -> None:
@@ -123,7 +123,9 @@ def _select_training_weights(*, mode: str, singularity: "np.ndarray", excess_ret
     resolved = _resolve_weight_mode(mode)
     if resolved == "physics_abs_singularity":
         return np.abs(singularity)
-    return np.abs(excess_returns)
+    if resolved == "abs_excess_return":
+        return np.abs(excess_returns)
+    return np.sqrt(np.abs(excess_returns))
 
 
 def _audit_training_base_matrix_contract(df, *, singularity_threshold: float) -> dict:

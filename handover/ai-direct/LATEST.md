@@ -8,6 +8,56 @@
 
 This file is the single source of current operational truth for all agents.
 
+## Update: 2026-03-09 09:47 UTC
+- **The first live V646 Path A refinement slice is now complete, and the holdout verdict is mixed.**
+- New execution record:
+  - `handover/ai-direct/entries/20260309_094727_v646_path_a_sqrt_refinement_mixed_holdout_verdict.md`
+- AgentOS convergence:
+  - Plan chose a single tempered Path A refinement:
+    - `weight_mode=sqrt_abs_excess_return`
+  - Math audit:
+    - `PASS WITH FIXES`
+  - Runtime audit:
+    - `PASS`
+- Local first-slice result:
+  - runtime root:
+    - `audit/runtime/v646_path_a_refine_local_20260309_093827`
+  - `best_value=0.00010345929832144143`
+  - old V645 local Path A reference:
+    - `6.299795037680448e-05`
+  - improvement factor:
+    - `1.6422645134108143`
+- Fresh retrain identity:
+  - runtime root:
+    - `audit/runtime/v646_path_a_retrain_20260309_094045`
+  - weight mode:
+    - `sqrt_abs_excess_return`
+- Fresh `2025` holdout:
+  - output:
+    - `D:\work\Omega_vNext\audit\runtime\holdout_eval_v646_2025_20260309_094500\results\holdout_metrics.json`
+  - metrics:
+    - `auc=0.4824941845966547`
+    - `alpha_top_decile=5.8729942639996136e-05`
+    - `alpha_top_quintile=4.034581066262975e-05`
+- Fresh `2026-01` holdout:
+  - output:
+    - `/home/zepher/work/Omega_vNext/audit/runtime/holdout_eval_v646_2026_01_20260309_094500/results/holdout_metrics.json`
+  - metrics:
+    - `auc=0.48036047756825606`
+    - `alpha_top_decile=2.8311302723807468e-05`
+    - `alpha_top_quintile=7.837793103528386e-05`
+- Meaning:
+  - the first V646 slice fixed the V645 `2026-01` quintile-sign defect
+  - but it weakened the stronger V645 `2025` holdout profile
+  - and both holdout `AUC` values fell below `0.5`
+- Operational decision:
+  - keep V646 open
+  - freeze this slice as new audit evidence
+  - do not widen back into GC
+  - do not replace the V645 fresh Path A branch as the leading promoted candidate yet
+  - next step stays local-first:
+    - AgentOS should choose the second bounded Path A refinement slice
+
 ## Update: 2026-03-09 09:17 UTC
 - **`Path A refinement` is now the next formal AgentOS mission.**
 - New mission-open authority:

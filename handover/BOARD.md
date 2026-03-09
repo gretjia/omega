@@ -45,6 +45,65 @@
 ### Entries
 
 <!-- New session debriefs go here. Most recent on top. -->
+#### [2026-03-09 09:47] Agent: Codex | Session: V646 Path A Sqrt Refinement Mixed Holdout Verdict
+
+**What I did:**
+- Executed the first bounded V646 refinement slice under strict AgentOS convergence.
+- Implemented one new tempered Path A weight mode:
+  - `sqrt_abs_excess_return`
+- Added parity support so the same weight mode can be used in:
+  - local sweep
+  - promoted retrain
+- Ran the first local `10`-trial refinement sweep and confirmed it beat the frozen V645 local Path A reference.
+- Promoted the winning slice to a fresh full retrain.
+- Evaluated that fresh retrain on:
+  - `2025` holdout on `windows1-w1`
+  - `2026-01` holdout on `linux1-lx`
+- Wrote the new mixed-verdict handover entry and updated the live project state.
+
+**What I discovered:**
+- The first V646 slice improved the local validation objective materially:
+  - old V645 local best:
+    - `6.299795037680448e-05`
+  - new V646 local best:
+    - `0.00010345929832144143`
+- The fresh V646 retrain fixed the old V645 `2026-01` quintile-sign defect:
+  - old V645 `2026-01 alpha_top_quintile`:
+    - `-9.652552940517018e-05`
+  - new V646 `2026-01 alpha_top_quintile`:
+    - `7.837793103528386e-05`
+- But this came with a real tradeoff:
+  - `2025` alpha weakened materially versus the frozen V645 fresh Path A branch
+  - both fresh holdout `AUC` values fell below `0.5`
+- So this slice is a mixed result, not a clean champion replacement.
+
+**What confused me / blocked me:**
+- Windows SSH remained intermittent during the fresh holdout rerun.
+- Direct quoted PowerShell one-liners were fragile.
+- The reliable Windows execution path was:
+  - locally base64-encode the PowerShell script
+  - send it through `powershell -EncodedCommand`
+  - reuse the controller-side temporary HTTP server for model handoff
+
+**What the next agent should do:**
+- Keep V646 as the active mission.
+- Treat this first slice as frozen evidence, not as the new promoted branch.
+- Do not widen into GC.
+- Do not replace the V645 fresh Path A holdout branch as the leading promoted candidate yet.
+- Re-run AgentOS for a second bounded local Path A refinement slice that explicitly targets:
+  - keeping the V646 `2026-01` quintile fix
+  - while recovering more of the V645 `2025` profile and ranking stability
+
+**Files I changed:**
+- `tools/run_optuna_sweep.py` — added `sqrt_abs_excess_return` support for the first V646 refinement slice.
+- `tests/test_vertex_optuna_split.py` — added coverage for the new sweep-side tempered weight mode.
+- `tools/run_vertex_xgb_train.py` — added retrain parity for `sqrt_abs_excess_return`.
+- `tests/test_vertex_train_weight_mode.py` — added coverage for the new retrain-side weight mode.
+- `handover/ai-direct/entries/20260309_094727_v646_path_a_sqrt_refinement_mixed_holdout_verdict.md` — recorded the first-slice execution and mixed holdout verdict.
+- `handover/ai-direct/LATEST.md` — updated the live runtime truth with the V646 slice outcome.
+- `handover/ops/ACTIVE_PROJECTS.md` — marked V646 as first-slice-complete with a mixed holdout verdict.
+- `handover/BOARD.md` — added this mandatory debrief block.
+
 #### [2026-03-09 09:17] Agent: Codex | Session: V646 Path A Refinement Mission Open
 
 **What I did:**

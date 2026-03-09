@@ -4,8 +4,8 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
 
 ## 1. Snapshot Metadata
 
-- `updated_at_local`: 2026-03-09 09:17:28 +0000
-- `updated_at_utc`: 2026-03-09 09:17:28 +0000
+- `updated_at_local`: 2026-03-09 09:47:27 +0000
+- `updated_at_utc`: 2026-03-09 09:47:27 +0000
 - `updated_by`: Codex (GPT-5)
 
 ## 2. In-Flight Work
@@ -75,7 +75,7 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
 
 ### Project: V646-PATH-A-REFINEMENT
 
-- Status: `MISSION_OPEN`
+- Status: `FIRST_SLICE_COMPLETED_MIXED_HOLDOUT_VERDICT`
 - Hosts: `controller`, `windows1-w1`, `linux1-lx`
 - Goal: refine the leading `Path A` learner-interface branch without reopening GC, `Path B`, or math-governance
 - Mission authority:
@@ -97,12 +97,45 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
   - fresh prefix only
   - bounded Path A refinement only
   - no fresh holdout rerun until a refined local Path A candidate clearly beats the current Path A reference
+- Latest result:
+  - first slice:
+    - `weight_mode=sqrt_abs_excess_return`
+  - local runtime root:
+    - `audit/runtime/v646_path_a_refine_local_20260309_093827`
+  - local best objective:
+    - `0.00010345929832144143`
+  - old V645 local Path A reference:
+    - `6.299795037680448e-05`
+  - improvement factor:
+    - `1.6422645134108143`
+  - fresh retrain runtime root:
+    - `audit/runtime/v646_path_a_retrain_20260309_094045`
+  - fresh `2025` holdout:
+    - `auc=0.4824941845966547`
+    - `alpha_top_decile=5.8729942639996136e-05`
+    - `alpha_top_quintile=4.034581066262975e-05`
+  - fresh `2026-01` holdout:
+    - `auc=0.48036047756825606`
+    - `alpha_top_decile=2.8311302723807468e-05`
+    - `alpha_top_quintile=7.837793103528386e-05`
+  - direct compare versus frozen V645 fresh Path A branch:
+    - `2025` quintile alpha weakened by:
+      - `-7.458948674338014e-05`
+    - `2026-01` quintile alpha improved by:
+      - `+0.00017490346044045404`
+  - key conclusion:
+    - first-slice refinement fixed the old `2026-01` quintile-sign defect
+    - but it materially weakened the stronger V645 `2025` profile
+    - and both holdout `AUC` values fell below `0.5`
 - Immediate next step:
-  - AgentOS plan/runtime/math packets issued
-  - waiting on convergence for the first refinement slice
+  - keep this first slice frozen as new evidence
+  - do not widen into GC
+  - do not replace the V645 fresh Path A branch as the leading promoted candidate yet
+  - run AgentOS again for a second bounded local Path A refinement slice
 - Risks:
-  - over-refining Path A may destroy the only holdout alpha that currently exists
-  - under-refining Path A may leave the current `2026-01` quintile defect untouched
+  - over-refining Path A may keep fixing one holdout shard by damaging the other
+  - local validation gains may still overstate cross-holdout quality
+  - cross-runtime XGBoost version skew continues to emit old-pickle warnings even though evaluation succeeds
 
 ### Project: V644-GC-SWARM-ASYMMETRIC-OBJECTIVE
 

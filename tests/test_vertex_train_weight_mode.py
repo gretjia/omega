@@ -26,3 +26,12 @@ def test_select_training_weights_uses_abs_excess_return() -> None:
         excess_returns=np.array([0.01, -0.02, 0.03]),
     )
     assert weights.tolist() == [0.01, 0.02, 0.03]
+
+
+def test_select_training_weights_uses_sqrt_abs_excess_return() -> None:
+    weights = _select_training_weights(
+        mode="sqrt_abs_excess_return",
+        singularity=np.array([0.25, -0.5, 0.1]),
+        excess_returns=np.array([0.04, -0.09, 0.0]),
+    )
+    assert np.allclose(weights, np.array([0.2, 0.3, 0.0], dtype=np.float64))
