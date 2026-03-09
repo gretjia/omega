@@ -45,6 +45,76 @@
 ### Entries
 
 <!-- New session debriefs go here. Most recent on top. -->
+#### [2026-03-09 17:29] Agent: Codex | Session: V653 Gemini Draft Pass
+
+**What I did:**
+- Audited the V653 draft with:
+  - `gemini -p`
+- Landed the audit record:
+  - `handover/ai-direct/entries/20260309_172925_v653_spec_draft_gemini_pass.md`
+- Folded the only required fix back into:
+  - `handover/ai-direct/entries/20260309_172447_v653_fractal_campaign_awakening_spec_draft.md`
+
+**What I discovered:**
+- Gemini accepted the widened truth-first rule:
+  - `omega_core/*` may change if needed
+  - Stage2 may be recomputed if needed
+- Gemini agreed the key sequencing is correct:
+  - daily spine
+  - recursive campaign forge
+  - pure event study
+  - ML only after proof
+- The only drift was wording precision in the triple-barrier formulas.
+
+**What confused me / blocked me:**
+- No blocker remained after Gemini returned.
+
+**What the next agent should do:**
+- Show the now-audited V653 spec to the owner.
+- Do not switch the active charter until owner confirmation arrives.
+
+**Files I changed:**
+- `handover/ai-direct/entries/20260309_172447_v653_fractal_campaign_awakening_spec_draft.md` — folded the exact triple-barrier price formulas into the draft and updated draft status.
+- `handover/ai-direct/entries/20260309_172925_v653_spec_draft_gemini_pass.md` — recorded the Gemini PASS WITH FIXES verdict.
+- `handover/ai-direct/LATEST.md` — marked V653 as Gemini-audited and awaiting owner confirmation.
+- `handover/BOARD.md` — added this debrief.
+#### [2026-03-09 17:24] Agent: Codex | Session: V653 Fractal Campaign Draft Prepared
+
+**What I did:**
+- Landed the new architect override:
+  - `audit/v653_fractal_campaign_awakening.md`
+- Drafted the next large-upgrade mission:
+  - `handover/ai-direct/entries/20260309_172447_v653_fractal_campaign_awakening_spec_draft.md`
+- Rebased the team design around:
+  - temporal spine
+  - Stage2 integrity / recompute
+  - campaign-state forge
+  - event-study-first gating
+
+**What I discovered:**
+- The latest architect override no longer wants sparse rolling windows at all.
+- The new core is:
+  - real daily spine
+  - EMA/IIR state recursion
+  - tradable next-open to future-close label
+  - first-passage barrier
+
+**What confused me / blocked me:**
+- No blocker yet.
+- The remaining required gate is:
+  - `gemini -p` audit on the V653 draft
+
+**What the next agent should do:**
+- Audit the V653 draft with `gemini -p`.
+- Fold any required fixes into the spec.
+- Only then ask the owner to confirm and switch the active charter.
+
+**Files I changed:**
+- `audit/v653_fractal_campaign_awakening.md` — landed the newest architect override.
+- `handover/ai-direct/entries/20260309_172447_v653_fractal_campaign_awakening_spec_draft.md` — drafted the new mission.
+- `audit/README.md` — indexed the new override.
+- `handover/ai-direct/LATEST.md` — recorded the new superseding draft.
+- `handover/BOARD.md` — added this debrief.
 #### [2026-03-09 16:23] Agent: Codex | Session: V652 Gemini Draft Pass
 
 **What I did:**

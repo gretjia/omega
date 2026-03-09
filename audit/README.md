@@ -19,6 +19,7 @@ For the V64 line, read in this order:
 11. [v650_zero_mass_gravity_well.md](/home/zephryj/projects/omega/audit/v650_zero_mass_gravity_well.md)
 12. [v651_target_timescale_disconnect.md](/home/zephryj/projects/omega/audit/v651_target_timescale_disconnect.md)
 13. [v652_campaign_state_revelation.md](/home/zephryj/projects/omega/audit/v652_campaign_state_revelation.md)
+14. [v653_fractal_campaign_awakening.md](/home/zephryj/projects/omega/audit/v653_fractal_campaign_awakening.md)
 
 ## Purpose of each file
 
@@ -35,3 +36,4 @@ For the V64 line, read in this order:
 - [v650_zero_mass_gravity_well.md](/home/zephryj/projects/omega/audit/v650_zero_mass_gravity_well.md): recursive audit verdict that keeps Path B alive, identifies the zero-mass gravity well as the immediate blocker, and recommends a robust-loss plus non-degeneracy local mission before any cloud or holdout use
 - [v651_target_timescale_disconnect.md](/home/zephryj/projects/omega/audit/v651_target_timescale_disconnect.md): recursive audit verdict that declares the one-step target horizon the next blocker, freezes the learner geometry, and recommends a bounded `t5/t10/t20` target-timescale alignment mission
 - [v652_campaign_state_revelation.md](/home/zephryj/projects/omega/audit/v652_campaign_state_revelation.md): architect absolute override that freezes the campaign-state formulas, reframes OMEGA as a multi-week campaign-state machine, and mandates campaign forge plus event study before any ML escalation
+- [v653_fractal_campaign_awakening.md](/home/zephryj/projects/omega/audit/v653_fractal_campaign_awakening.md): architect absolute override that replaces sparse rolling logic with a real daily temporal spine plus EMA/IIR campaign-state recursion, authorizes `omega_core/*` and Stage2 changes if required by truth, and mandates pure event study before any ML

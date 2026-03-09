@@ -8,6 +8,64 @@
 
 This file is the single source of current operational truth for all agents.
 
+## Update: 2026-03-09 17:29 UTC
+- **The V653 fractal-campaign draft has now passed `gemini -p` and is ready for owner confirmation.**
+- New audit authority:
+  - `audit/v653_fractal_campaign_awakening.md`
+- Draft spec:
+  - `handover/ai-direct/entries/20260309_172447_v653_fractal_campaign_awakening_spec_draft.md`
+- Gemini draft audit:
+  - `handover/ai-direct/entries/20260309_172925_v653_spec_draft_gemini_pass.md`
+  - verdict:
+    - `PASS WITH FIXES`
+- Folded fix:
+  - triple-barrier shorthand was replaced with the frozen exact price formulas:
+    - `entry = P_open(i, d+1)`
+    - `entry * (1 + 2 * sigma)`
+    - `entry * (1 - 1 * sigma)`
+- Draft core:
+  - rebuild a real daily temporal spine
+  - fold micro singularity pulses into daily `F` / `A`
+  - compute EMA/IIR campaign tensors:
+    - `S`
+    - `V`
+    - `Omega`
+    - `Psi`
+  - build tradable multi-day labels and first-passage barriers
+  - require pure event study before any ML reopening
+- Truth-first expansion remains authorized:
+  - `omega_core/*` may be changed if necessary
+  - Stage2 may be recomputed if necessary
+- Current state:
+  - V653 is Gemini-audited
+  - active charter has **not** been switched
+  - V653 is now waiting for owner confirmation only
+
+## Update: 2026-03-09 17:24 UTC
+- **A newer architect override has superseded V652 before execution, and a V653 draft is now prepared.**
+- New audit authority:
+  - `audit/v653_fractal_campaign_awakening.md`
+- New mission draft:
+  - `handover/ai-direct/entries/20260309_172447_v653_fractal_campaign_awakening_spec_draft.md`
+- Draft core:
+  - real daily temporal spine
+  - EMA/IIR campaign-state recursion over:
+    - `5d`
+    - `10d`
+    - `20d`
+  - tradable label uses:
+    - next-day open entry
+    - future close exit
+  - first-passage triple barrier uses:
+    - future highs/lows
+    - conservative stop-loss precedence
+  - event study remains mandatory before any ML
+- Truth-first expansion:
+  - `omega_core/*` may be changed if necessary
+  - Stage2 may be recomputed if necessary
+- Current state:
+  - V653 draft is awaiting `gemini -p` audit before owner confirmation
+
 ## Update: 2026-03-09 16:19 UTC
 - **A higher-level architect override has superseded the narrower V651 framing, and a V652 large-upgrade draft is now prepared.**
 - New audit authority:
