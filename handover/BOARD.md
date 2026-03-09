@@ -45,6 +45,56 @@
 ### Entries
 
 <!-- New session debriefs go here. Most recent on top. -->
+#### [2026-03-09 09:07] Agent: Codex | Session: V645 Path B Local Compare
+
+**What I did:**
+- Ran a strict local-only Path B compare under the active V645 mission.
+- Kept the patch surface bounded to:
+  - `tools/run_optuna_sweep.py`
+  - `tests/test_vertex_optuna_split.py`
+- Added explicit learner-mode support so the sweep worker can run a true Path B regression mode:
+  - `reg:squarederror`
+  - label = `t1_excess_return`
+- Preserved binary sign labels separately for diagnostics like `AUC`.
+- Allowed alpha-first runs to disable the AUC gate entirely for this compare.
+- Ran the first Path B local micro-sweep:
+  - `1` worker
+  - `10` trials
+  - `2023 -> 2024`
+  - fresh runtime root
+
+**What I discovered:**
+- Path B is not dead: it produced positive validation `alpha_top_quintile`.
+- But it is clearly weaker than Path A:
+  - Path A local best:
+    - `6.299795037680448e-05`
+  - Path B local best:
+    - `2.0080714362500344e-06`
+- So Path A is roughly `31x` stronger on the same local micro-sweep shape.
+- Path B trials also collapsed into almost flat tiny values, which suggests weak ranking separation in this first regression form.
+
+**What confused me / blocked me:**
+- The Plan child did not return before execution.
+- I proceeded using the narrower combined constraints from:
+  - mission-open spec
+  - Math Auditor
+  - Runtime Auditor
+- That was enough to keep the compare bounded and safe.
+
+**What the next agent should do:**
+- Keep GC paused.
+- Keep Path A as the leading branch.
+- Do not promote Path B to retrain or fresh holdout yet.
+- Next local-first step should be Path A refinement, not wider Path B spend.
+
+**Files I changed:**
+- `tools/run_optuna_sweep.py` — added learner-mode support and optional removal of the AUC gate for alpha-first compares.
+- `tests/test_vertex_optuna_split.py` — added coverage for Path B regression labels and disabled-guardrail payload behavior.
+- `handover/ai-direct/entries/20260309_090713_v645_path_b_local_compare_weaker_than_path_a.md` — recorded the first Path B compare result.
+- `handover/ai-direct/LATEST.md` — updated live runtime truth with the Path B compare outcome.
+- `handover/ops/ACTIVE_PROJECTS.md` — kept V645 on the Path A leading branch after Path B compare.
+- `handover/BOARD.md` — added this mandatory debrief block.
+
 #### [2026-03-09 08:43] Agent: Codex | Session: V645 Path A Fresh Retrain And Fresh Holdout
 
 **What I did:**

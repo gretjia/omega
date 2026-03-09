@@ -22,6 +22,7 @@ from importlib.util import find_spec
 
 OBJECTIVE_METRICS = {"val_auc", "alpha_top_decile", "alpha_top_quintile"}
 WEIGHT_MODES = {"physics_abs_singularity", "abs_excess_return"}
+LEARNER_MODES = {"binary_logistic_sign", "reg_squarederror_excess_return"}
 HARD_LOSING_OBJECTIVE_VALUE = -1.0e9
 
 
@@ -196,6 +197,13 @@ def _resolve_weight_mode(mode: str) -> str:
     return clean
 
 
+def _resolve_learner_mode(mode: str) -> str:
+    clean = str(mode or "").strip()
+    if clean not in LEARNER_MODES:
+        raise RuntimeError(f"unsupported_learner_mode: {clean}")
+    return clean
+
+
 def _raw_objective_value(
     objective_metric: str,
     *,
@@ -226,13 +234,15 @@ def _objective_contract(
         alpha_top_quintile=alpha_top_quintile,
     )
     auc_guardrail_min = float(min_val_auc)
-    auc_guardrail_passed = float(auc) >= auc_guardrail_min
+    auc_guardrail_enabled = _resolve_objective_metric(objective_metric) != "val_auc" and auc_guardrail_min > 0.0
+    auc_guardrail_passed = float(auc) >= auc_guardrail_min if auc_guardrail_enabled else True
     objective_value = raw_objective_value if auc_guardrail_passed else HARD_LOSING_OBJECTIVE_VALUE
     return {
         "objective_metric": _resolve_objective_metric(objective_metric),
         "objective_value": float(objective_value),
         "raw_objective_value": float(raw_objective_value),
         "auc_guardrail_min": auc_guardrail_min,
+        "auc_guardrail_enabled": bool(auc_guardrail_enabled),
         "auc_guardrail_passed": bool(auc_guardrail_passed),
     }
 
@@ -327,8 +337,8 @@ def _prepare_temporal_split(args: argparse.Namespace) -> dict:
 
     singularity = df.get_column("singularity_vector").fill_nan(0.0).fill_null(0.0).to_numpy()
     X_all = df.select(list(FEATURE_COLS)).to_numpy()
-    y_all = (df.get_column("t1_excess_return").to_numpy() > 0).astype(int)
     excess_all = df.get_column("t1_excess_return").to_numpy()
+    y_sign_all = (excess_all > 0).astype(int)
     date_all = df.get_column("date").cast(pl.Utf8, strict=False).to_numpy()
 
     physics_mask = np.abs(singularity) > float(args.singularity_threshold)
@@ -337,12 +347,12 @@ def _prepare_temporal_split(args: argparse.Namespace) -> dict:
     full_mask = physics_mask & finite
 
     X_clean = X_all[full_mask]
-    y_clean = y_all[full_mask]
+    y_sign_clean = y_sign_all[full_mask]
     physics_weights_clean = physics_weights_all[full_mask]
     excess_clean = excess_all[full_mask]
     date_clean = date_all[full_mask]
 
-    del df, singularity, X_all, y_all, excess_all, date_all, physics_mask, physics_weights_all, finite, full_mask
+    del df, singularity, X_all, y_sign_all, excess_all, date_all, physics_mask, physics_weights_all, finite, full_mask
     gc.collect()
 
     train_mask = _year_mask(date_clean, str(args.train_year))
@@ -352,8 +362,8 @@ def _prepare_temporal_split(args: argparse.Namespace) -> dict:
     val_rows = int(np.sum(val_mask))
     if train_rows <= 0 or val_rows <= 0:
         raise RuntimeError(f"temporal_split_empty: train_rows={train_rows} val_rows={val_rows}")
-    train_positive_rows = int(np.sum(y_clean[train_mask]))
-    val_positive_rows = int(np.sum(y_clean[val_mask]))
+    train_positive_rows = int(np.sum(y_sign_clean[train_mask]))
+    val_positive_rows = int(np.sum(y_sign_clean[val_mask]))
     if train_positive_rows <= 0 or train_positive_rows >= train_rows:
         raise RuntimeError(
             f"temporal_split_train_one_class: train_rows={train_rows} train_positive_rows={train_positive_rows}"
@@ -389,15 +399,23 @@ def _prepare_temporal_split(args: argparse.Namespace) -> dict:
     if float(np.sum(val_weights)) <= 0.0:
         raise RuntimeError("temporal_split_val_weights_non_positive")
 
+    learner_mode = _resolve_learner_mode(args.learner_mode)
+    if learner_mode == "binary_logistic_sign":
+        y_train = y_sign_clean[train_mask]
+        y_val = y_sign_clean[val_mask]
+    else:
+        y_train = excess_clean[train_mask]
+        y_val = excess_clean[val_mask]
+
     dtrain = xgb.DMatrix(
         X_clean[train_mask],
-        label=y_clean[train_mask],
+        label=y_train,
         weight=train_weights,
         feature_names=list(FEATURE_COLS),
     )
     dval = xgb.DMatrix(
         X_clean[val_mask],
-        label=y_clean[val_mask],
+        label=y_val,
         weight=val_weights,
         feature_names=list(FEATURE_COLS),
     )
@@ -415,6 +433,7 @@ def _prepare_temporal_split(args: argparse.Namespace) -> dict:
         "temporal_assertion_passed": True,
         "dtrain_build_count": 1,
         "dval_build_count": 1,
+        "learner_mode": learner_mode,
         "weight_mode": weight_mode,
         "train_weight_sum": float(np.sum(train_weights)),
         "val_weight_sum": float(np.sum(val_weights)),
@@ -426,7 +445,7 @@ def _prepare_temporal_split(args: argparse.Namespace) -> dict:
     return {
         "dtrain": dtrain,
         "dval": dval,
-        "y_val": y_clean[val_mask],
+        "y_val_sign": y_sign_clean[val_mask],
         "excess_val": excess_clean[val_mask],
         "summary": summary,
         "canonical_fingerprint": _canonical_fingerprint(args),
@@ -442,6 +461,7 @@ def _trial_payload(
     *,
     objective_metric: str = "val_auc",
     min_val_auc: float = 0.0,
+    learner_mode: str = "binary_logistic_sign",
 ) -> dict:
     payload = {
         "trial_number": int(trial.number),
@@ -449,6 +469,7 @@ def _trial_payload(
         "val_auc": float(auc),
         "alpha_top_decile": float(alpha_top_decile),
         "alpha_top_quintile": float(alpha_top_quintile),
+        "learner_mode": _resolve_learner_mode(learner_mode),
         "max_depth": int(params["max_depth"]),
         "num_boost_round": int(params["num_boost_round"]),
         "params": dict(params),
@@ -495,13 +516,13 @@ def main() -> None:
     ap.add_argument("--objective-metric", default="val_auc")
     ap.add_argument("--min-val-auc", type=float, default=0.0)
     ap.add_argument("--weight-mode", default="physics_abs_singularity")
+    ap.add_argument("--learner-mode", default="binary_logistic_sign")
 
     ap.add_argument("--code-bundle-uri", default="")
     args, _ = ap.parse_known_args()
     args.objective_metric = _resolve_objective_metric(args.objective_metric)
     args.weight_mode = _resolve_weight_mode(args.weight_mode)
-    if args.objective_metric != "val_auc" and float(args.min_val_auc) <= 0.0:
-        raise RuntimeError("alpha_first_requires_positive_min_val_auc")
+    args.learner_mode = _resolve_learner_mode(args.learner_mode)
 
     _install_dependencies()
     if str(args.code_bundle_uri).strip():
@@ -518,7 +539,7 @@ def main() -> None:
     datasets = _prepare_temporal_split(args)
     dtrain = datasets["dtrain"]
     dval = datasets["dval"]
-    y_val = datasets["y_val"]
+    y_val_sign = datasets["y_val_sign"]
     excess_val = datasets["excess_val"]
     split_summary = datasets["summary"]
     canonical_fingerprint = datasets["canonical_fingerprint"]
@@ -527,8 +548,6 @@ def main() -> None:
 
     def objective(trial: optuna.Trial) -> float:
         params = {
-            "objective": "binary:logistic",
-            "eval_metric": "auc",
             "tree_method": "hist",
             "seed": int(args.seed),
             "max_depth": trial.suggest_int("max_depth", 3, 8),
@@ -541,6 +560,12 @@ def main() -> None:
             "alpha": trial.suggest_float("reg_alpha", 1e-4, 10.0, log=True),
             "n_jobs": -1,
         }
+        if args.learner_mode == "binary_logistic_sign":
+            params["objective"] = "binary:logistic"
+            params["eval_metric"] = "auc"
+        else:
+            params["objective"] = "reg:squarederror"
+            params["eval_metric"] = "rmse"
         num_boost_round = trial.suggest_int("num_boost_round", 50, 400)
         evals_result: dict = {}
         booster = xgb.train(
@@ -557,7 +582,7 @@ def main() -> None:
             preds = booster.predict(dval)
         else:
             preds = booster.predict(dval, iteration_range=(0, int(best_iteration) + 1))
-        auc = float(roc_auc_score(y_val, preds))
+        auc = float(roc_auc_score(y_val_sign, preds))
         alpha_top_decile = _top_quantile_alpha(preds, excess_val, 0.90)
         alpha_top_quintile = _top_quantile_alpha(preds, excess_val, 0.80)
 
@@ -579,14 +604,17 @@ def main() -> None:
             alpha_top_quintile=alpha_top_quintile,
             objective_metric=str(args.objective_metric),
             min_val_auc=float(args.min_val_auc),
+            learner_mode=str(args.learner_mode),
         )
         trial_rows.append(payload)
         trial.set_user_attr("alpha_top_decile", alpha_top_decile)
         trial.set_user_attr("alpha_top_quintile", alpha_top_quintile)
+        trial.set_user_attr("learner_mode", str(args.learner_mode))
         trial.set_user_attr("objective_metric", str(payload["objective_metric"]))
         trial.set_user_attr("objective_value", float(payload["objective_value"]))
         trial.set_user_attr("raw_objective_value", float(payload["raw_objective_value"]))
         trial.set_user_attr("auc_guardrail_min", float(payload["auc_guardrail_min"]))
+        trial.set_user_attr("auc_guardrail_enabled", bool(payload["auc_guardrail_enabled"]))
         trial.set_user_attr("auc_guardrail_passed", bool(payload["auc_guardrail_passed"]))
         return float(payload["objective_value"])
 
@@ -613,6 +641,8 @@ def main() -> None:
         "seconds": round(time.time() - t0, 2),
         "objective_metric": str(args.objective_metric),
         "auc_guardrail_min": float(args.min_val_auc),
+        "auc_guardrail_enabled": bool(float(args.min_val_auc) > 0.0 and str(args.objective_metric) != "val_auc"),
+        "learner_mode": str(args.learner_mode),
         "weight_mode": str(args.weight_mode),
         "split_summary": split_summary,
         "canonical_fingerprint": canonical_fingerprint,

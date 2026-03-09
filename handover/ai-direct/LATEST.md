@@ -8,6 +8,38 @@
 
 This file is the single source of current operational truth for all agents.
 
+## Update: 2026-03-09 09:07 UTC
+- **The first local Path B compare is now complete, and it is weaker than Path A.**
+- New execution record:
+  - `handover/ai-direct/entries/20260309_090713_v645_path_b_local_compare_weaker_than_path_a.md`
+- Path B run identity:
+  - runtime root:
+    - `audit/runtime/v645_path_b_local_20260309_090552`
+  - shape:
+    - local only
+    - `1` worker
+    - `10` trials
+    - `objective_metric=alpha_top_quintile`
+    - `min_val_auc=0.0`
+    - `auc_guardrail_enabled=false`
+    - `learner_mode=reg_squarederror_excess_return`
+    - `weight_mode=physics_abs_singularity`
+- Path B result:
+  - `n_completed=10`
+  - `best_value=2.0080714362500344e-06`
+  - positive validation tail alpha exists
+  - but most trials collapsed into tiny near-flat values
+- Direct comparison:
+  - Path A local best:
+    - `6.299795037680448e-05`
+  - Path B local best:
+    - `2.0080714362500344e-06`
+  - Path A remains about `31x` stronger on the same local micro-sweep shape
+- Operational decision:
+  - keep GC paused
+  - keep Path A as the leading branch
+  - do not promote Path B to retrain / holdout yet
+
 ## Update: 2026-03-09 08:43 UTC
 - **Fresh Path A retrain plus fresh isolated holdout evaluation is now complete, and the result is a partial pass.**
 - New execution record:

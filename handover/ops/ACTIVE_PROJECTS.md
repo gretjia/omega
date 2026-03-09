@@ -12,7 +12,7 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
 
 ### Project: V645-GC-ASYMMETRIC-LABEL-PIVOT
 
-- Status: `FRESH_HOLDOUT_PARTIAL_PASS`
+- Status: `PATH_A_LEADS_AFTER_PATH_B_COMPARE`
 - Hosts: `controller`, `GCP Vertex AI`
 - Goal: test the external architect verdict that the live bottleneck is now the XGBoost label / objective interface, not the frozen `v64.3 / v643` math core
 - Seed authority:
@@ -43,29 +43,32 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
     - local-first
     - micro-sweep before any wider cloud spend
 - Latest result:
-  - fresh retrain runtime root:
-    - `audit/runtime/v645_path_a_retrain_20260309_081034`
-  - fresh `2025` holdout:
-    - `auc=0.5392160785083961`
-    - `alpha_top_decile=8.733709672524669e-05`
-    - `alpha_top_quintile=0.00011493529740600989`
-  - fresh `2026-01` holdout:
-    - `auc=0.5444775661061128`
-    - `alpha_top_decile=9.280953096675273e-05`
-    - `alpha_top_quintile=-9.652552940517018e-05`
+  - Path A fresh holdout branch:
+    - `2025`:
+      - `auc=0.5392160785083961`
+      - `alpha_top_quintile=0.00011493529740600989`
+    - `2026-01`:
+      - `auc=0.5444775661061128`
+      - `alpha_top_quintile=-9.652552940517018e-05`
+  - Path B first local compare:
+    - runtime root:
+      - `audit/runtime/v645_path_b_local_20260309_090552`
+    - `best_value=2.0080714362500344e-06`
+    - `learner_mode=reg_squarederror_excess_return`
+    - `weight_mode=physics_abs_singularity`
+    - no `AUC` guardrail
   - key conclusion:
-    - the learner-interface pivot materially improved holdout economic ranking
-    - but `2026-01` quintile alpha remains negative
-    - and holdout `AUC` collapsed toward coin-flip
+    - Path B is not falsified
+    - but it is materially weaker than Path A on the same local micro-sweep shape
+    - Path A remains the leading branch
 - Immediate next step:
   - keep GC paused
   - continue local / dual-host only
-  - decide between:
-    - Path A refinement
-    - or Path B comparison
+  - refine Path A before any Path B promotion
 - Risks:
   - the new weighting mode may be trading away too much global ranking signal for tail alpha
   - the remaining `2026-01` negative quintile alpha means the new interface is still not fully stable
+  - Path B's tiny near-flat objective levels suggest a weak ranking signal under the first regression compare
   - cross-runtime XGBoost version skew continues to emit old-pickle warnings even though evaluation succeeds
 
 ### Project: V644-GC-SWARM-ASYMMETRIC-OBJECTIVE
