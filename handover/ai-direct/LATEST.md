@@ -8,6 +8,33 @@
 
 This file is the single source of current operational truth for all agents.
 
+## Update: 2026-03-09 10:55 UTC
+- **The new recursive audit verdict has been landed, and the V647 spec draft has passed Gemini review.**
+- New audit authority:
+  - `audit/v647_anti_classifier_paradox.md`
+- New mission draft:
+  - `handover/ai-direct/entries/20260309_105249_v647_structural_tail_monotonicity_gate_spec_draft.md`
+- Gemini audit:
+  - `handover/ai-direct/entries/20260309_105540_v647_spec_draft_gemini_pass.md`
+  - verdict:
+    - `PASS`
+- Proposed new mission:
+  - `V647 Structural Tail-Monotonicity Gate`
+- Spec-draft core:
+  - keep V64 math frozen
+  - lock `weight_mode=sqrt_abs_excess_return`
+  - change only the outer-loop objective and aggregator champion rule
+  - impose:
+    - `AUC < 0.505` hard penalty / prune
+    - heavy penalty when:
+      - `alpha_top_decile < alpha_top_quintile`
+    - composite score:
+      - `(alpha_top_decile + alpha_top_quintile) / 2`
+- Current state:
+  - draft is ready
+  - Gemini says no fixes are required
+  - owner confirmation is required before switching the active charter and starting execution
+
 ## Update: 2026-03-09 10:09 UTC
 - **The bounded V646 Path A monotone power-family scan is now complete enough for external audit.**
 - New standalone slice records:

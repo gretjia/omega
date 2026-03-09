@@ -45,6 +45,58 @@
 ### Entries
 
 <!-- New session debriefs go here. Most recent on top. -->
+#### [2026-03-09 10:55] Agent: Codex | Session: V647 Mission Draft Awaiting Confirmation
+
+**What I did:**
+- Landed the new recursive architect verdict into:
+  - `audit/v647_anti_classifier_paradox.md`
+- Indexed it in:
+  - `audit/README.md`
+- Drafted the next mission directly from that verdict:
+  - `V647 Structural Tail-Monotonicity Gate`
+- Wrote the draft spec to:
+  - `handover/ai-direct/entries/20260309_105249_v647_structural_tail_monotonicity_gate_spec_draft.md`
+- Ran `gemini -p` against the architect verdict plus the spec draft.
+- Recorded the Gemini result:
+  - `PASS`
+- Updated the live project board and latest snapshot to reflect:
+  - spec draft exists
+  - Gemini passed it
+  - owner confirmation is still required
+
+**What I discovered:**
+- The new architect verdict is much stricter than the prior V646 boundary:
+  - refuse both V645 and V646 for promotion
+  - close the monotone power family
+  - keep `sqrt_abs_excess_return` fixed
+  - move the next axis entirely to:
+    - outer-loop objective
+    - aggregator champion rule
+- Gemini found the draft to be a faithful 1:1 translation of that verdict.
+
+**What confused me / blocked me:**
+- Nothing technical blocked the draft.
+- The only intentional stop is governance:
+  - the user explicitly asked that spec must be confirmed first
+  - so I did not switch `ACTIVE_MISSION_CHARTER.md` yet
+  - and I did not start execution
+
+**What the next agent should do:**
+- Do not execute V647 until the owner confirms the draft.
+- After confirmation:
+  - switch the active charter
+  - start AgentOS execution
+  - keep the hard penalties exactly as drafted unless the owner changes them
+
+**Files I changed:**
+- `audit/v647_anti_classifier_paradox.md` — landed the new recursive architect verdict.
+- `audit/README.md` — indexed the new audit authority.
+- `handover/ai-direct/entries/20260309_105249_v647_structural_tail_monotonicity_gate_spec_draft.md` — wrote the new mission draft.
+- `handover/ai-direct/entries/20260309_105540_v647_spec_draft_gemini_pass.md` — recorded Gemini `PASS`.
+- `handover/ai-direct/LATEST.md` — updated live runtime truth.
+- `handover/ops/ACTIVE_PROJECTS.md` — opened V647 in draft-awaiting-confirmation status.
+- `handover/BOARD.md` — added this mandatory debrief block.
+
 #### [2026-03-09 10:09] Agent: Codex | Session: V646 Path A Power-Family Closure
 
 **What I did:**

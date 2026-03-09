@@ -4,8 +4,8 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
 
 ## 1. Snapshot Metadata
 
-- `updated_at_local`: 2026-03-09 10:09:01 +0000
-- `updated_at_utc`: 2026-03-09 10:09:01 +0000
+- `updated_at_local`: 2026-03-09 10:55:40 +0000
+- `updated_at_utc`: 2026-03-09 10:55:40 +0000
 - `updated_by`: Codex (GPT-5)
 
 ## 2. In-Flight Work
@@ -173,6 +173,44 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
   - over-refining Path A may keep fixing one holdout shard by damaging the other
   - local validation gains may still overstate cross-holdout quality
   - cross-runtime XGBoost version skew continues to emit old-pickle warnings even though evaluation succeeds
+
+### Project: V647-STRUCTURAL-TAIL-MONOTONICITY-GATE
+
+- Status: `SPEC_DRAFT_GEMINI_PASS_AWAITING_OWNER_CONFIRMATION`
+- Hosts: `controller`, `GCP Vertex AI`
+- Goal: fix the Path A outer-loop objective so local winners preserve structural integrity and tail monotonicity instead of promoting anti-classifiers
+- Seed authority:
+  - `audit/v647_anti_classifier_paradox.md`
+- Draft spec:
+  - `handover/ai-direct/entries/20260309_105249_v647_structural_tail_monotonicity_gate_spec_draft.md`
+- Gemini review:
+  - `handover/ai-direct/entries/20260309_105540_v647_spec_draft_gemini_pass.md`
+  - verdict:
+    - `PASS`
+- Proposed frozen constraints:
+  - keep `omega_core/*` frozen
+  - keep Stage3 gates frozen
+  - keep Path A label frozen
+  - keep temporal split and holdout isolation frozen
+  - lock `weight_mode=sqrt_abs_excess_return`
+- Proposed exact change axis:
+  - Optuna objective formulation in `tools/run_optuna_sweep.py`
+  - aggregator champion rule in `tools/aggregate_vertex_swarm_results.py`
+- Proposed hard guardrails:
+  - prune or heavily penalize when:
+    - `val_auc < 0.505`
+  - heavily penalize when:
+    - `alpha_top_decile < alpha_top_quintile`
+  - score:
+    - `(alpha_top_decile + alpha_top_quintile) / 2`
+- Proposed acceptance gate:
+  - champion must satisfy on both `2025` and `2026-01`:
+    - `AUC > 0.505`
+    - `alpha_top_decile > alpha_top_quintile`
+    - `alpha_top_quintile > 0`
+- Immediate next step:
+  - wait for owner confirmation
+  - do not switch the active charter or begin execution before that confirmation
 
 ### Project: V644-GC-SWARM-ASYMMETRIC-OBJECTIVE
 
