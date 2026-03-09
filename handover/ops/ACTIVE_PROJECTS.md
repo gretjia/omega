@@ -5,10 +5,54 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
 ## 1. Snapshot Metadata
 
 - `updated_at_local`: 2026-03-09 05:07:02 +0000
-- `updated_at_utc`: 2026-03-09 05:07:02 +0000
+- `updated_at_utc`: 2026-03-09 05:47:00 +0000
 - `updated_by`: Codex (GPT-5)
 
 ## 2. In-Flight Work
+
+### Project: V643-HOLDOUT-BASEMATRIX-EVALUATION
+
+- Status: `COMPLETED`
+- Hosts: `controller`, `windows1-w1`, `linux1-lx`
+- Goal: evaluate the swarm champion retrain artifact on the isolated `2025` outer holdout and `2026-01` final canary base matrices without mixing holdout data back into optimization
+- Last signals:
+  - active evaluator added:
+    - `tools/evaluate_xgb_on_base_matrix.py`
+  - local regression suite passed:
+    - `9 passed`
+  - `2025` on `windows1-w1`:
+    - output:
+      - `D:\work\Omega_vNext\audit\runtime\holdout_eval_2025_20260309_054300\results\holdout_metrics.json`
+    - metrics:
+      - `auc=0.8235655072013123`
+      - `alpha_top_decile=-0.00011772199576048959`
+      - `alpha_top_quintile=-3.151894696127132e-05`
+  - `2026-01` on `linux1-lx`:
+    - output:
+      - `/home/zepher/work/Omega_vNext/audit/runtime/holdout_eval_2026_01_20260309_054300/results/holdout_metrics.json`
+    - metrics:
+      - `auc=0.8097376879061562`
+      - `alpha_top_decile=-0.0008295253060950895`
+      - `alpha_top_quintile=-0.0002874404451020619`
+  - both runs validated:
+    - date-prefix scope
+    - champion retrain gate overrides
+    - `stage3_param_contract=canonical_v64_1`
+- Key finding:
+  - holdout AUC remains high on both future shards
+  - but top-quantile alpha proxies are negative on both shards
+  - the current champion therefore does not yet have positive future alpha evidence
+- Runtime lessons:
+  - controller deploy remotes had to be repaired manually
+  - Windows worker deploy required:
+    - `ext::ssh windows1-w1 %S D:/work/Omega_vNext/.git`
+    - and controller-side `git -c protocol.ext.allow=always push ...`
+  - a small temporary controller HTTP server on the Tailscale address was the reliable way to hand the champion `model + train_metrics` to both workers
+- Next step:
+  - open a follow-on mission to revise the cloud optimization objective / champion selection rule so that negative holdout alpha does not survive champion promotion
+- Spec source:
+  - `handover/ai-direct/entries/20260309_012152_gc_swarm_optuna_project_spec.md`
+  - `handover/ai-direct/entries/20260309_054700_holdout_base_matrix_evaluation_complete.md`
 
 ### Project: V643-STAGE3-HOLDOUT-MATRIX-BUILD
 
@@ -95,7 +139,7 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
 
 ### Project: V643-GC-SWARM-OPTUNA-REVIVAL
 
-- Status: `PILOT_COMPLETE`
+- Status: `PILOT_COMPLETE_HOLDOUT_EVALUATED`
 - Hosts: `controller`, `GCP Vertex AI`, `linux1-lx`
 - Goal: restore the original cloud value proposition by replacing single-job train offload with real cloud-parallel Optuna/XGBoost optimization over the completed `2023,2024` training base matrix
 - Historical evidence locked:
@@ -169,6 +213,16 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
   - deterministic retrain:
     - `model_uri=gs://omega_v52_central/omega/staging/swarm_optuna/pilot_20260309_045700/champion_retrain/omega_xgb_final.pkl`
     - `total_training_rows=736163`
+- Downstream holdout evidence:
+  - `2025` outer holdout:
+    - `auc=0.8235655072013123`
+    - `alpha_top_decile=-0.00011772199576048959`
+  - `2026-01` final canary:
+    - `auc=0.8097376879061562`
+    - `alpha_top_decile=-0.0008295253060950895`
+  - current interpretation:
+    - the cloud pilot produced a high-AUC classifier
+    - but it still failed to show positive top-quantile excess-return on future holdouts
 - Runtime lessons:
   - controller-side Vertex SDK `from_local_script()` was not reliable in the transient `uv` environment because local packaging expected `setuptools`; the stable path was `--force-gcloud-fallback`
   - worker payload initially used `trial.state` inside the objective path; that bug was fixed and regression-covered
@@ -183,6 +237,7 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
   - `handover/ai-direct/entries/20260309_034012_holdout_matrices_dual_host_execution_complete.md`
   - `handover/ai-direct/entries/20260309_043429_gc_swarm_optuna_foundation_local_pass.md`
   - `handover/ai-direct/entries/20260309_050702_gc_swarm_optuna_pilot_and_champion_retrain_complete.md`
+  - `handover/ai-direct/entries/20260309_054700_holdout_base_matrix_evaluation_complete.md`
 
 ### Project: GCP-LEGACY-STORAGE-CLEANUP
 

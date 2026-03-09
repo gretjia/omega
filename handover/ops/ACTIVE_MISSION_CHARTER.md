@@ -1,60 +1,52 @@
 # OMEGA Active Mission Charter
 
 Status: Completed
-Task Name: V643 GC swarm-optuna pilot implementation and first pilot execution
+Task Name: V643 holdout base-matrix evaluation of the swarm champion
 Owner: Human Owner
 Commander: Codex
 Date: 2026-03-09
 
 Current checkpoint:
 
-- The three required Stage3 artifacts are now complete and isolated:
-  - `base_matrix_train_2023_2024.parquet`
-  - `base_matrix_holdout_2025.parquet`
-  - `base_matrix_holdout_2026_01.parquet`
-- The approved cloud optimization spec remains:
-  - `handover/ai-direct/entries/20260309_012152_gc_swarm_optuna_project_spec.md`
-  - Gemini verdict on the spec:
-    - `PASS`
-- The initial live implementation foundation is now present under `tools/`:
-  - `tools/run_optuna_sweep.py`
-  - `tools/aggregate_vertex_swarm_results.py`
-  - `tools/launch_vertex_swarm_optuna.py`
-- Compatibility glue has been added so the active trainer can consume champion hyperparameters without losing searched knobs.
-- Local validation passed:
-  - `python3 -m py_compile ...`
-  - `uv run --python /usr/bin/python3.11 --with pytest --with polars --with xgboost --with optuna pytest -q tests/test_vertex_swarm_aggregate.py tests/test_vertex_optuna_split.py`
-  - result:
-    - `5 passed`
-- Execution is now complete:
-  - pilot prefix:
-    - `gs://omega_v52_central/omega/staging/swarm_optuna/pilot_20260309_045700`
-  - achieved:
-    - `4` completed workers
-    - `40` completed trials
-    - leaderboard + champion artifacts
-    - deterministic champion retrain
-  - champion selection result:
-    - `best_val_auc=0.7949139136484219`
-    - `worker_id=w01`
-    - `trial_number=1`
-  - retrain result:
-    - `model_uri=gs://omega_v52_central/omega/staging/swarm_optuna/pilot_20260309_045700/champion_retrain/omega_xgb_final.pkl`
-    - `total_training_rows=736163`
-    - `seconds=3.34`
+- The direct holdout evaluator now exists:
+  - `tools/evaluate_xgb_on_base_matrix.py`
+- Regression coverage now includes direct holdout scoring:
+  - `tests/test_vertex_holdout_eval.py`
+  - local result:
+    - `9 passed`
+- The same champion retrain artifact was evaluated against both isolated holdout matrices:
+  - `2025` outer holdout on `windows1-w1`
+  - `2026-01` final canary on `linux1-lx`
+- Both runs validated:
+  - exact date-prefix scope
+  - canonical Stage3 gate overrides from `train_metrics.json`
+  - `stage3_param_contract=canonical_v64_1`
+- Final empirical result:
+  - `2025`:
+    - `auc=0.8235655072013123`
+    - `alpha_top_decile=-0.00011772199576048959`
+    - `alpha_top_quintile=-3.151894696127132e-05`
+  - `2026-01`:
+    - `auc=0.8097376879061562`
+    - `alpha_top_decile=-0.0008295253060950895`
+    - `alpha_top_quintile=-0.0002874404451020619`
+- Mission conclusion:
+  - the champion still separates classes on holdout
+  - but its top-quantile excess-return proxies are negative on both holdouts
+  - therefore the current cloud objective / champion rule is not yet sufficient as a positive future alpha filter
 
 ## 1. Objective
 
-- Convert the approved `gc swarm-optuna` architecture into live active tooling under `tools/`.
-- Launch the first real pilot on Google Cloud against the immutable `2023,2024` training artifact.
-- Preserve strict role isolation:
-  - optimization only on training artifact
-  - no holdout contamination
-- Produce credible pilot evidence:
-  - real concurrent workers
-  - bounded spot-to-on-demand recovery
-  - aggregated leaderboard
-  - champion params that can feed the active trainer
+- Evaluate the completed swarm champion on the isolated downstream artifacts:
+  - `base_matrix_holdout_2025.parquet`
+  - `base_matrix_holdout_2026_01.parquet`
+- Preserve holdout isolation:
+  - no retraining on holdout
+  - no mixing `2025` or `2026-01` back into optimization
+- Use scoring semantics that match the active training / Optuna path:
+  - same feature columns
+  - same `t1_excess_return` label construction
+  - same singularity masking
 
 ## 2. Canonical Spec
 
@@ -62,36 +54,31 @@ Primary task-level authority:
 
 - `handover/ai-direct/entries/20260309_012152_gc_swarm_optuna_project_spec.md`
 - `handover/ai-direct/entries/20260309_014638_gemini_swarm_spec_audit.md`
+- `handover/ai-direct/entries/20260309_024658_three_matrix_partition_for_stage3.md`
 
 Supporting operational context:
 
-- `handover/ai-direct/entries/20260309_024658_three_matrix_partition_for_stage3.md`
 - `handover/ai-direct/entries/20260309_034012_holdout_matrices_dual_host_execution_complete.md`
+- `handover/ai-direct/entries/20260309_050702_gc_swarm_optuna_pilot_and_champion_retrain_complete.md`
 - `handover/ai-direct/LATEST.md`
 
 Conflict rule:
 
-- The frozen canonical Stage3 gate contract overrides any convenience shortcut.
-- If a launcher/runtime choice weakens temporal isolation, worker reproducibility, or champion handoff integrity, reject it.
+- Holdout evaluation must not silently change the label or mask semantics relative to active train/Optuna code.
+- If an evaluation shortcut would force frame-dir backtest semantics or year-only canary broadening, reject it.
 
 ## 3. Business Goal
 
-- Restore the actual cloud advantage defined by the constitution:
-  - wider parallel search coverage than the controller can do locally
-  - spot-aware economics
-  - better intelligence through leaderboard evidence, not just one remote train job
+- Convert the completed cloud pilot into real intelligence evidence:
+  - do not stop at leaderboard AUC inside `2023,2024`
+  - measure whether the chosen champion preserves useful ranking behavior on truly future data
 
 ## 4. Files In Scope
 
 Implementation scope:
 
-- `tools/run_optuna_sweep.py`
-- `tools/aggregate_vertex_swarm_results.py`
-- `tools/launch_vertex_swarm_optuna.py`
-- `tools/submit_vertex_sweep.py`
-- `tools/run_vertex_xgb_train.py`
-- `tests/test_vertex_swarm_aggregate.py`
-- `tests/test_vertex_optuna_split.py`
+- `tools/evaluate_xgb_on_base_matrix.py`
+- `tests/test_vertex_holdout_eval.py`
 
 Handover scope:
 
@@ -104,68 +91,62 @@ Handover scope:
 ## 5. Out of Scope
 
 - changing canonical Stage3 gate semantics
-- re-forging Stage1 / Stage2 / Stage3 artifacts
-- using `2025` or `2026-01` inside Optuna scoring
-- distributed multi-replica XGBoost
-- final production backtest interpretation
+- rerunning Stage1 / Stage2 / Stage3 forge
+- changing the champion parameters during holdout evaluation
+- strategy-level interpretation of these metrics as a full production backtest
 
 ## 6. Required Audits
 
 Implementation audit:
 
-- worker must hard-assert `max(train_date) < min(val_date)`
-- worker must build `dtrain` / `dval` once per worker
-- aggregator must reject canonical fingerprint mismatch
-- champion artifact must include trainer-consumable overrides
+- evaluator must reuse active train/sweep base-matrix semantics
+- evaluator must validate exact date-prefix scope
+- evaluator must support one-class masked holdouts without crashing
+- evaluator should validate gate overrides from retrain `train_metrics.json`
 
 Runtime audit:
 
-- cloud pilot must show real multi-worker fan-out
-- if spot worker ends non-successfully, at most one on-demand retry is allowed
-- leaderboard aggregation must enforce minimum worker/trial completeness
+- `2025` must be evaluated before `2026-01`
+- no fake parallelism over cross-host remote parquet mounts
+- same champion artifact must be used on both holdouts
 
 ## 7. Runtime and Evidence Constraints
 
-- Cloud bucket authority for this mission remains live on:
-  - `gs://omega_v52_central`
-- Controller-side launch currently requires:
-  - `uv run --with google-cloud-aiplatform --with google-cloud-storage python ...`
-- Optimization input is only:
-  - staged immutable `base_matrix_train_2023_2024.parquet`
-- Holdout artifacts remain untouched during the pilot:
+- Holdout artifacts remain separate:
   - `2025`
   - `2026-01`
+- Worker runtimes used for this mission:
+  - `windows1-w1`:
+    - `C:\Python314\python.exe`
+  - `linux1-lx`:
+    - `/home/zepher/work/Omega_vNext/.venv/bin/python`
+- The controller deploy path required manual recovery:
+  - restore missing `linux` / `windows` git remotes
+  - use `ext::ssh ...` for Windows
 
 ## 8. Acceptance Criteria
 
-1. Active tooling exists under `tools/` for worker payload, launcher, and aggregation.
+1. A direct base-matrix holdout evaluator exists in active `tools/`.
 2. Local regression tests cover:
-   - temporal split proof
-   - fingerprint enforcement
-   - champion complexity tie-break
-3. Launcher can submit many single-replica workers and watch them to terminal state.
-4. Launcher can perform at most one on-demand retry for a failed spot attempt.
-5. Aggregation emits:
-   - leaderboard artifact
-   - champion params artifact
-   - trainer-consumable override map
-6. Pilot target:
-   - at least `4` workers
-   - at least `40` completed trials
-7. Handover records exact URIs, worker counts, and verdict.
+   - exact date-prefix scope checks
+   - end-to-end holdout metric writeout
+   - one-class masked holdout tolerance
+3. `2025` outer holdout completes and writes a metrics artifact.
+4. `2026-01` final canary completes and writes a metrics artifact.
+5. Both runs prove canonical override alignment with the champion retrain metrics.
+6. Handover records exact artifact paths, metrics, and verdict.
 
 ## 9. Fail-Fast Conditions
 
-- If launcher falls back to sequential `--sync` submissions for the pilot, stop.
-- If worker training/validation split is not exactly `2023` vs `2024`, stop.
-- If aggregation accepts mixed canonical fingerprints, stop.
-- If champion output cannot feed the active trainer without dropping searched params, stop.
-- If pilot evidence cannot prove real concurrent cloud workers, stop.
+- If holdout evaluation falls back to frame-dir backtest semantics, stop.
+- If `2026-01` scope is widened beyond the explicit January prefix, stop.
+- If the evaluated artifact differs from the recorded champion retrain artifact, stop.
+- If holdout evaluation changes the masking semantics relative to train/Optuna, stop.
 
 ## 10. Definition of Done
 
-- code foundation committed and pushed
-- pilot launched on Google Cloud
-- aggregation completed with `40` completed trials
-- champion retrain completed on the full `2023,2024` training artifact
-- handover updated with exact cloud URIs, worker counts, trial counts, and verdict
+- evaluator committed and pushed
+- workers synced to the new evaluator
+- `2025` metrics recorded
+- `2026-01` metrics recorded
+- handover updated with the final downstream evidence and verdict

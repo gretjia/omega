@@ -45,6 +45,55 @@
 ### Entries
 
 <!-- New session debriefs go here. Most recent on top. -->
+#### [2026-03-09 05:47] Agent: Codex | Session: Holdout Base-Matrix Evaluation Complete
+
+**What I did:**
+- Added a direct base-matrix holdout evaluator at `tools/evaluate_xgb_on_base_matrix.py`.
+- Added regression coverage in `tests/test_vertex_holdout_eval.py`.
+- Repaired the controller-side worker deploy remotes enough to sync the new evaluator to both workers.
+- Evaluated the same swarm champion retrain artifact on:
+  - `2025` outer holdout on `windows1-w1`
+  - `2026-01` final canary on `linux1-lx`
+
+**What I discovered:**
+- The holdout story is now much clearer:
+  - `2025` produced `auc=0.8235655072013123`
+  - `2026-01` produced `auc=0.8097376879061562`
+- But both future holdouts still had negative top-quantile alpha proxies:
+  - `2025`:
+    - `alpha_top_decile=-0.00011772199576048959`
+  - `2026-01`:
+    - `alpha_top_decile=-0.0008295253060950895`
+- That means the current champion is not yet validated as a positive future alpha ranker, even though its AUC is strong.
+- Worker runtime lessons:
+  - Linux could load the serialized champion under `xgboost 1.7.6`, but with the expected old-pickle warning.
+  - Windows needed `C:\Python314\python.exe`; its project `.venv` still lacks the full evaluation stack.
+  - The controller repo was missing worker deploy remotes; Windows deploy additionally needed an `ext::ssh` remote and `protocol.ext.allow=always`.
+
+**What confused me / blocked me:**
+- `tools/deploy.py` is still incomplete for the recovered Windows deploy path:
+  - it does not pass `-c protocol.ext.allow=always`
+  - so the repaired `ext::ssh` remote had to be pushed manually
+- Direct SSH stdin streaming of the binary model to Windows was flaky in this shell stack.
+  - The reliable workaround was a temporary controller-side HTTP server over the Tailscale address for the small `model + train_metrics` artifacts.
+
+**What the next agent should do:**
+- Treat holdout evaluation as complete.
+- Do not claim the current cloud champion has future alpha proof.
+- Open the next mission on cloud objective / champion selection redesign so that a future swarm does not optimize AUC while leaving holdout alpha negative.
+- If you need worker deploys again, preserve the recovered controller remote setup:
+  - `linux` remote to `linux1-lx:/home/zepher/work/Omega_vNext`
+  - `windows` remote to `ext::ssh windows1-w1 %S D:/work/Omega_vNext/.git`
+
+**Files I changed:**
+- `tools/evaluate_xgb_on_base_matrix.py` — added direct holdout scoring with canonical mask/label semantics and optional retrain-override validation.
+- `tests/test_vertex_holdout_eval.py` — added coverage for date-prefix assertions, end-to-end metric output, and one-class masked holdout tolerance.
+- `handover/ai-direct/LATEST.md` — recorded the completed `2025` and `2026-01` holdout evidence and the downstream verdict.
+- `handover/ops/ACTIVE_MISSION_CHARTER.md` — replaced the completed pilot charter with the completed holdout-evaluation charter.
+- `handover/ops/ACTIVE_PROJECTS.md` — added the completed holdout-evaluation project and linked the finding back into the cloud project.
+- `handover/ai-direct/entries/20260309_054700_holdout_base_matrix_evaluation_complete.md` — added the detailed execution record.
+- `handover/BOARD.md` — added this mandatory debrief block.
+
 #### [2026-03-09 05:07] Agent: Codex | Session: GC Swarm-Optuna Pilot And Champion Retrain
 
 **What I did:**

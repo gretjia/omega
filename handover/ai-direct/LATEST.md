@@ -8,6 +8,83 @@
 
 This file is the single source of current operational truth for all agents.
 
+## Update: 2026-03-09 05:47 UTC
+- **The swarm champion has now been evaluated on both isolated holdout Stage3 artifacts, and both runs completed under the frozen canonical gate contract.**
+- New active evaluator:
+  - `tools/evaluate_xgb_on_base_matrix.py`
+  - local regression result:
+    - `9 passed in 2.02s`
+- Execution order followed the locked sequence:
+  - `windows1-w1` first:
+    - outer holdout `2025`
+  - `linux1-lx` second:
+    - final canary `2026-01`
+- Champion artifact used for both runs:
+  - model:
+    - `gs://omega_v52_central/omega/staging/swarm_optuna/pilot_20260309_045700/champion_retrain/omega_xgb_final.pkl`
+  - train metrics:
+    - `gs://omega_v52_central/omega/staging/swarm_optuna/pilot_20260309_045700/champion_retrain/train_metrics.json`
+- `2025` outer holdout result:
+  - output:
+    - `D:\work\Omega_vNext\audit\runtime\holdout_eval_2025_20260309_054300\results\holdout_metrics.json`
+  - scope:
+    - `rows=385674`
+    - `date_min=20250102`
+    - `date_max=20251230`
+    - `positive_rows=13761`
+    - `negative_rows=371913`
+  - metrics:
+    - `auc=0.8235655072013123`
+    - `alpha_top_decile=-0.00011772199576048959`
+    - `alpha_top_quintile=-3.151894696127132e-05`
+- `2026-01` final canary result:
+  - output:
+    - `/home/zepher/work/Omega_vNext/audit/runtime/holdout_eval_2026_01_20260309_054300/results/holdout_metrics.json`
+  - scope:
+    - `rows=26167`
+    - `date_min=20260105`
+    - `date_max=20260129`
+    - `positive_rows=883`
+    - `negative_rows=25284`
+  - metrics:
+    - `auc=0.8097376879061562`
+    - `alpha_top_decile=-0.0008295253060950895`
+    - `alpha_top_quintile=-0.0002874404451020619`
+- Gate and contract proof:
+  - both runs passed exact date-prefix assertions:
+    - `2025`
+    - `202601`
+  - both runs validated the champion retrain overrides:
+    - `signal_epi_threshold=0.5`
+    - `singularity_threshold=0.1`
+    - `srl_resid_sigma_mult=2.0`
+    - `topo_energy_min=2.0`
+    - `stage3_param_contract=canonical_v64_1`
+- Key finding:
+  - holdout classification separability remains high (`AUC > 0.80` on both holdouts)
+  - but the top-quantile excess-return proxies are negative on both holdouts
+  - therefore the current champion is **not yet evidenced as a positive future alpha ranker**, despite strong AUC
+- Runtime lessons from this phase:
+  - controller deploy remotes had to be restored manually before worker rollout:
+    - `linux` remote to `linux1-lx:/home/zepher/work/Omega_vNext`
+    - `windows` remote to `ext::ssh windows1-w1 %S D:/work/Omega_vNext/.git`
+  - `tools/deploy.py` still cannot push the `ext` transport because it does not pass:
+    - `-c protocol.ext.allow=always`
+  - stable worker runtimes for evaluation were:
+    - `windows1-w1`:
+      - `C:\Python314\python.exe`
+      - `xgboost 3.1.3`
+    - `linux1-lx`:
+      - `/home/zepher/work/Omega_vNext/.venv/bin/python`
+      - `xgboost 1.7.6`
+  - the serialized champion pickle loaded successfully on Linux `xgboost 1.7.6`, but with the expected old-pickle compatibility warning
+  - small champion artifacts were handed to workers through a temporary controller-side HTTP server on the Tailscale address, not by copying large holdout parquet files between hosts
+- Mission state:
+  - the holdout evaluation phase is complete
+  - the next logical project is to revisit the optimization objective / champion selection rule so that future sweeps do not optimize AUC while leaving holdout alpha proxies negative
+- Deep dive:
+  - `handover/ai-direct/entries/20260309_054700_holdout_base_matrix_evaluation_complete.md`
+
 ## Update: 2026-03-09 05:07 UTC
 - **The first live `gc swarm-optuna` pilot completed end-to-end and produced a deterministic champion retrain on the `2023,2024` training artifact.**
 - Pilot identity:
