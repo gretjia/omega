@@ -8,6 +8,27 @@
 
 This file is the single source of current operational truth for all agents.
 
+## Update: 2026-03-09 05:52 UTC
+- **A new follow-on mission is now open, seeded by a fresh `gemini -y` spec read over the frozen holdout verdict.**
+- Gemini follow-on entry:
+  - `handover/ai-direct/entries/20260309_055200_gemini_asymmetric_objective_spec.md`
+- Gemini core diagnosis:
+  - the current champion is a strong global classifier
+  - but not a profitable tail selector
+  - root cause is objective mismatch:
+    - cloud swarm optimized `AUC`
+    - future holdout failure appeared in `alpha_top_decile` / `alpha_top_quintile`
+- Gemini-recommended mission:
+  - `V644-GC-SWARM-ASYMMETRIC-OBJECTIVE`
+- Commander interpretation:
+  - accept Gemini's direction
+  - preserve the frozen holdout verdict as immutable baseline
+  - keep `AUC` as a future guardrail even if the new swarm becomes alpha-first
+- Active charter has been switched to the new mission:
+  - `handover/ops/ACTIVE_MISSION_CHARTER.md`
+- Next operational step:
+  - enter AgentOS review flow for the new alpha-first cloud mission
+
 ## Update: 2026-03-09 05:47 UTC
 - **The swarm champion has now been evaluated on both isolated holdout Stage3 artifacts, and both runs completed under the frozen canonical gate contract.**
 - New active evaluator:

@@ -1,152 +1,161 @@
 # OMEGA Active Mission Charter
 
-Status: Completed
-Task Name: V643 holdout base-matrix evaluation of the swarm champion
+Status: In Progress
+Task Name: V644 GC swarm asymmetric-objective follow-on
 Owner: Human Owner
 Commander: Codex
 Date: 2026-03-09
 
-Current checkpoint:
-
-- The direct holdout evaluator now exists:
-  - `tools/evaluate_xgb_on_base_matrix.py`
-- Regression coverage now includes direct holdout scoring:
-  - `tests/test_vertex_holdout_eval.py`
-  - local result:
-    - `9 passed`
-- The same champion retrain artifact was evaluated against both isolated holdout matrices:
-  - `2025` outer holdout on `windows1-w1`
-  - `2026-01` final canary on `linux1-lx`
-- Both runs validated:
-  - exact date-prefix scope
-  - canonical Stage3 gate overrides from `train_metrics.json`
-  - `stage3_param_contract=canonical_v64_1`
-- Final empirical result:
-  - `2025`:
-    - `auc=0.8235655072013123`
-    - `alpha_top_decile=-0.00011772199576048959`
-    - `alpha_top_quintile=-3.151894696127132e-05`
-  - `2026-01`:
-    - `auc=0.8097376879061562`
-    - `alpha_top_decile=-0.0008295253060950895`
-    - `alpha_top_quintile=-0.0002874404451020619`
-- Mission conclusion:
-  - the champion still separates classes on holdout
-  - but its top-quantile excess-return proxies are negative on both holdouts
-  - therefore the current cloud objective / champion rule is not yet sufficient as a positive future alpha filter
-
 ## 1. Objective
 
-- Evaluate the completed swarm champion on the isolated downstream artifacts:
-  - `base_matrix_holdout_2025.parquet`
-  - `base_matrix_holdout_2026_01.parquet`
-- Preserve holdout isolation:
-  - no retraining on holdout
-  - no mixing `2025` or `2026-01` back into optimization
-- Use scoring semantics that match the active training / Optuna path:
-  - same feature columns
-  - same `t1_excess_return` label construction
-  - same singularity masking
+- Open the next cloud mission after the frozen holdout verdict.
+- Realign the swarm optimization target so future champions are selected for tail profitability, not just global classification quality.
+- Preserve the frozen holdout verdict as immutable audit baseline while designing the next cloud-parallel search protocol.
 
 ## 2. Canonical Spec
 
-Primary task-level authority:
+Primary task-level implementation authority:
 
-- `handover/ai-direct/entries/20260309_012152_gc_swarm_optuna_project_spec.md`
-- `handover/ai-direct/entries/20260309_014638_gemini_swarm_spec_audit.md`
-- `handover/ai-direct/entries/20260309_024658_three_matrix_partition_for_stage3.md`
+- `handover/ai-direct/entries/20260309_055200_gemini_asymmetric_objective_spec.md`
+  - exact section:
+    - Gemini diagnosis
+    - Gemini proposed spec
+    - Gemini risks and open questions
 
-Supporting operational context:
+Supporting context:
 
-- `handover/ai-direct/entries/20260309_034012_holdout_matrices_dual_host_execution_complete.md`
+- `handover/ai-direct/entries/20260309_054700_holdout_base_matrix_evaluation_complete.md`
 - `handover/ai-direct/entries/20260309_050702_gc_swarm_optuna_pilot_and_champion_retrain_complete.md`
-- `handover/ai-direct/LATEST.md`
+- `handover/ai-direct/entries/20260309_012152_gc_swarm_optuna_project_spec.md`
+- `OMEGA_CONSTITUTION.md`
 
-Conflict rule:
+If the canonical spec conflicts with `OMEGA_CONSTITUTION.md`, escalate to the Commander.
 
-- Holdout evaluation must not silently change the label or mask semantics relative to active train/Optuna code.
-- If an evaluation shortcut would force frame-dir backtest semantics or year-only canary broadening, reject it.
+## 3. Scope
 
-## 3. Business Goal
+Writable files:
 
-- Convert the completed cloud pilot into real intelligence evidence:
-  - do not stop at leaderboard AUC inside `2023,2024`
-  - measure whether the chosen champion preserves useful ranking behavior on truly future data
-
-## 4. Files In Scope
-
-Implementation scope:
-
-- `tools/evaluate_xgb_on_base_matrix.py`
-- `tests/test_vertex_holdout_eval.py`
-
-Handover scope:
-
+- `tools/run_optuna_sweep.py`
+- `tools/aggregate_vertex_swarm_results.py`
+- `tools/launch_vertex_swarm_optuna.py`
+- `tests/test_vertex_optuna_split.py`
+- `tests/test_vertex_swarm_aggregate.py`
 - `handover/ops/ACTIVE_MISSION_CHARTER.md`
 - `handover/ops/ACTIVE_PROJECTS.md`
 - `handover/ai-direct/LATEST.md`
 - `handover/ai-direct/entries/*`
 - `handover/BOARD.md`
 
-## 5. Out of Scope
+Read-only but relevant files:
 
-- changing canonical Stage3 gate semantics
-- rerunning Stage1 / Stage2 / Stage3 forge
-- changing the champion parameters during holdout evaluation
-- strategy-level interpretation of these metrics as a full production backtest
+- `tools/evaluate_xgb_on_base_matrix.py`
+- `tools/run_vertex_xgb_train.py`
+- `handover/ai-direct/entries/20260309_054700_holdout_base_matrix_evaluation_complete.md`
+- `handover/ai-direct/entries/20260309_050702_gc_swarm_optuna_pilot_and_champion_retrain_complete.md`
+- `handover/ai-direct/entries/20260309_012152_gc_swarm_optuna_project_spec.md`
 
-## 6. Required Audits
+Explicitly out of scope:
 
-Implementation audit:
+- `omega_core/*`
+- Stage1 / Stage2 / Stage3 forge
+- overwriting the frozen holdout baseline outputs
+- using `2025` or `2026-01` inside optimization scoring
 
-- evaluator must reuse active train/sweep base-matrix semantics
-- evaluator must validate exact date-prefix scope
-- evaluator must support one-class masked holdouts without crashing
-- evaluator should validate gate overrides from retrain `train_metrics.json`
+## 4. Roles
 
-Runtime audit:
+Plan Agent:
 
-- `2025` must be evaluated before `2026-01`
-- no fake parallelism over cross-host remote parquet mounts
-- same champion artifact must be used on both holdouts
+- responsibility:
+  - refine the alpha-first mission from Gemini into an executable file-level change map with guardrails
 
-## 7. Runtime and Evidence Constraints
+Coder Agent:
 
-- Holdout artifacts remain separate:
-  - `2025`
-  - `2026-01`
-- Worker runtimes used for this mission:
-  - `windows1-w1`:
-    - `C:\Python314\python.exe`
-  - `linux1-lx`:
-    - `/home/zepher/work/Omega_vNext/.venv/bin/python`
-- The controller deploy path required manual recovery:
-  - restore missing `linux` / `windows` git remotes
-  - use `ext::ssh ...` for Windows
+- writable files only:
+  - `tools/run_optuna_sweep.py`
+  - `tools/aggregate_vertex_swarm_results.py`
+  - `tools/launch_vertex_swarm_optuna.py`
+  - associated tests
 
-## 8. Acceptance Criteria
+Math Auditor:
 
-1. A direct base-matrix holdout evaluator exists in active `tools/`.
-2. Local regression tests cover:
-   - exact date-prefix scope checks
-   - end-to-end holdout metric writeout
-   - one-class masked holdout tolerance
-3. `2025` outer holdout completes and writes a metrics artifact.
-4. `2026-01` final canary completes and writes a metrics artifact.
-5. Both runs prove canonical override alignment with the champion retrain metrics.
-6. Handover records exact artifact paths, metrics, and verdict.
+- audit target:
+  - verify that the new mission stays inside frozen `v64.1` gates and does not silently mutate canonical physics semantics
 
-## 9. Fail-Fast Conditions
+Runtime Auditor:
 
-- If holdout evaluation falls back to frame-dir backtest semantics, stop.
-- If `2026-01` scope is widened beyond the explicit January prefix, stop.
-- If the evaluated artifact differs from the recorded champion retrain artifact, stop.
-- If holdout evaluation changes the masking semantics relative to train/Optuna, stop.
+- audit target:
+  - verify that the new cloud objective, pilot shape, and output isolation remain operationally sound
 
-## 10. Definition of Done
+## 5. Acceptance Criteria
 
-- evaluator committed and pushed
-- workers synced to the new evaluator
-- `2025` metrics recorded
-- `2026-01` metrics recorded
-- handover updated with the final downstream evidence and verdict
+- a concrete alpha-first swarm spec exists and is recorded in handover
+- the frozen baseline rule is explicit:
+  - new runs must use fresh output prefixes
+  - new runs must append evidence, not overwrite old evidence
+- AgentOS plan/runtime/math review packets have been issued
+- the next implementation wave has bounded writable files, guardrails, and pilot gates
+
+## 6. Runtime Preflight
+
+Required before execution:
+
+- target node:
+  - controller + GCP Vertex AI
+- expected commit or branch:
+  - `main`
+- controller-only code freshness requirement (if any):
+  - worker deploy path must remain controller-managed
+- worker deploy path via `tools/deploy.py` (workers never `git pull`):
+  - note current Windows deploy caveat:
+    - `ext::ssh windows1-w1 %S D:/work/Omega_vNext/.git`
+    - controller-side push still requires `protocol.ext.allow=always`
+- launcher mode:
+  - `gcloud` fallback remains the stable controller path until proven otherwise
+- shard assignment:
+  - cloud-parallel workers only
+- thread caps:
+  - keep current worker-local defaults unless the next plan changes them explicitly
+- output root:
+  - must be a fresh swarm prefix, not the frozen pilot prefix
+- host isolation check:
+  - no holdout matrix enters optimization
+
+## 7. Fail-Fast Conditions
+
+- stop if the new mission proposes overwriting the frozen holdout verdict
+- stop if the new mission widens scope into `omega_core/*` without a separate math-governance mission
+- stop if the new mission drops holdout isolation
+- retry allowed only after named root cause and changed condition
+
+## 8. Audits Required
+
+Math audit must verify:
+
+- frozen canonical gates remain unchanged
+- no hidden redefinition of the label or signal-chain semantics
+
+Runtime audit must verify:
+
+- cloud-parallel value remains real and not local-only theater
+- new pilot outputs are isolated from the frozen baseline outputs
+
+## 9. Definition of Done
+
+- Gemini follow-on spec recorded
+- new active mission charter instantiated
+- AgentOS role packets started
+- no blocking ambiguity remains about the next implementation wave
+- handover updated
+
+## 10. Run Manifest
+
+Record after execution:
+
+- commit hash:
+- node:
+- shard set:
+- thread caps:
+- launcher mode:
+- dataset role:
+- math audit verdict:
+- runtime audit verdict:

@@ -10,6 +10,32 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
 
 ## 2. In-Flight Work
 
+### Project: V644-GC-SWARM-ASYMMETRIC-OBJECTIVE
+
+- Status: `MISSION_OPEN`
+- Hosts: `controller`, `GCP Vertex AI`
+- Goal: redesign the cloud swarm objective and champion rule so future sweeps optimize tail profitability, not just global `AUC`, while preserving the frozen holdout baseline as immutable audit evidence
+- Seed authority:
+  - `handover/ai-direct/entries/20260309_055200_gemini_asymmetric_objective_spec.md`
+- Starting diagnosis:
+  - current champion has strong future holdout `AUC`
+  - but negative future holdout top-quantile alpha on both `2025` and `2026-01`
+  - likely cause:
+    - objective mismatch between classification quality and economic ranking quality
+- Locked constraints:
+  - do not overwrite the frozen holdout verdict
+  - do not change `v64.1` gates in this mission
+  - keep `2025` and `2026-01` outside optimization
+- Planned first wave:
+  - AgentOS review on:
+    - exact alpha-first objective
+    - `AUC` guardrail retention
+    - pilot size and accept/reject gates
+    - output prefix isolation
+- Risks:
+  - pure alpha optimization may overfit noisy tails
+  - the inner XGBoost loss still remains binary-logloss unless a later mission changes it explicitly
+
 ### Project: V643-HOLDOUT-BASEMATRIX-EVALUATION
 
 - Status: `COMPLETED`
