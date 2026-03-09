@@ -9,6 +9,7 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from config import FEATURE_COLS
+from tools.launch_vertex_swarm_optuna import _submit_one_worker
 from tools.run_optuna_sweep import _canonical_fingerprint, _prepare_temporal_split, _trial_payload
 
 
@@ -89,3 +90,37 @@ def test_trial_payload_does_not_require_runtime_trial_state() -> None:
     )
     assert payload["trial_number"] == 7
     assert payload["state"] == "COMPLETE"
+
+
+def test_launch_worker_seed_offsets_by_worker_index() -> None:
+    captured = {}
+
+    def fake_submit_job(**kwargs):
+        captured["script_args"] = list(kwargs["script_args"])
+        return {"resource_name": "dummy"}
+
+    args = Namespace(
+        base_matrix_uri="gs://bucket/train.parquet",
+        machine_type="n2-standard-16",
+        n_trials_per_worker=10,
+        train_year="2023",
+        val_year="2024",
+        code_bundle_uri="gs://bucket/code.zip",
+        sync=False,
+        spot=True,
+        force_gcloud_fallback=True,
+        sync_timeout_sec=0,
+        base_seed=42,
+    )
+    attempt = _submit_one_worker(
+        submit_job=fake_submit_job,
+        args=args,
+        script_path="tools/run_optuna_sweep.py",
+        worker_id="w03",
+        output_uri="gs://bucket/results/w03",
+        spot=True,
+    )
+    script_args = captured["script_args"]
+    seed_idx = script_args.index("--seed")
+    assert script_args[seed_idx + 1] == "45"
+    assert attempt["seed"] == 45

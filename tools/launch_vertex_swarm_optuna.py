@@ -40,6 +40,7 @@ def _load_submitters(repo_root: Path):
 
 
 def _submit_one_worker(*, submit_job, args: argparse.Namespace, script_path: str, worker_id: str, output_uri: str, spot: bool) -> dict:
+    worker_seed = int(args.base_seed) + int(worker_id.replace("w", ""))
     submit_result = submit_job(
         script_path=script_path,
         machine_type=str(args.machine_type),
@@ -56,6 +57,8 @@ def _submit_one_worker(*, submit_job, args: argparse.Namespace, script_path: str
             str(args.train_year),
             "--val-year",
             str(args.val_year),
+            "--seed",
+            str(worker_seed),
             "--code-bundle-uri",
             str(args.code_bundle_uri),
         ],
@@ -68,6 +71,7 @@ def _submit_one_worker(*, submit_job, args: argparse.Namespace, script_path: str
     return {
         "submitted_at_utc": int(time.time()),
         "spot": bool(spot),
+        "seed": worker_seed,
         "output_uri": output_uri,
         "submit_result": submit_result,
     }
@@ -128,6 +132,7 @@ def main() -> None:
     ap.add_argument("--submit-spacing-sec", type=float, default=2.0)
     ap.add_argument("--train-year", default="2023")
     ap.add_argument("--val-year", default="2024")
+    ap.add_argument("--base-seed", type=int, default=42)
     ap.add_argument("--manifest-path", default="vertex_swarm_launch_manifest.json")
     ap.add_argument("--watch", action="store_true", help="Poll all submitted jobs to terminal state after async launch.")
     ap.add_argument("--poll-sec", type=float, default=30.0)
@@ -155,6 +160,7 @@ def main() -> None:
                 "machine_type": str(args.machine_type),
                 "requested_spot": bool(args.spot),
                 "n_trials": int(args.n_trials_per_worker),
+                "seed": int(args.base_seed) + idx,
                 "attempts": [
                     _submit_one_worker(
                         submit_job=submit_job,
