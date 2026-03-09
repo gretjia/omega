@@ -45,6 +45,57 @@
 ### Entries
 
 <!-- New session debriefs go here. Most recent on top. -->
+#### [2026-03-09 10:03] Agent: Codex | Session: V646 Path A Second Slice Local Only
+
+**What I did:**
+- Continued V646 under the user rule that slice 1 must remain separately recorded and must not be overwritten.
+- Issued a second AgentOS packet wave for the second bounded Path A slice.
+- Received the Math Auditor packet in time and used it to constrain the second slice to a single midpoint transform.
+- Implemented one new Path A weight mode:
+  - `pow_0p75_abs_excess_return`
+- Added regression coverage for the new weight mode in both:
+  - sweep path
+  - retrain path
+- Ran a fresh local-only `10`-trial micro-sweep under a fresh runtime root.
+- Stopped at local evidence only because the second slice did not beat the frozen first V646 slice.
+
+**What I discovered:**
+- The second slice is real but not promotable.
+- It improved the old V645 local Path A baseline:
+  - from `6.299795037680448e-05`
+  - to `8.786963269826855e-05`
+- But it did not beat the frozen first V646 local slice:
+  - `0.00010345929832144143`
+- The winning params were actually the original V645 local winner, now improved by the `0.75` tempering.
+- So the local tradeoff surface now looks ordered:
+  - `abs` < `pow_0.75` < `sqrt` on local objective
+  - but only the `sqrt` slice has fresh holdout evidence so far
+
+**What confused me / blocked me:**
+- The replacement Plan / Runtime child packets still did not return in time.
+- I therefore executed under the narrower shared constraints from:
+  - active V646 charter
+  - returned Math packet
+  - frozen slice-1 promotion rule
+- Also, direct `/usr/bin/python3.11` launch of the sweep hit the known `No module named pip` bootstrap branch again; `uv run` remained the reliable local path.
+
+**What the next agent should do:**
+- Keep slice 1 frozen as its own holdout-backed evidence block.
+- Keep slice 2 frozen as separate local-only evidence.
+- Do not retrain or rerun holdouts from slice 2.
+- Do not widen into GC.
+- The next AgentOS move should be a third bounded Path A slice, but not another trivial monotone interpolation unless there is a stronger justification.
+
+**Files I changed:**
+- `tools/run_optuna_sweep.py` — added `pow_0p75_abs_excess_return` for the second V646 slice.
+- `tools/run_vertex_xgb_train.py` — added retrain parity for `pow_0p75_abs_excess_return`.
+- `tests/test_vertex_optuna_split.py` — added sweep-side coverage for the second-slice weight mode.
+- `tests/test_vertex_train_weight_mode.py` — added retrain-side coverage for the second-slice weight mode.
+- `handover/ai-direct/entries/20260309_100300_v646_path_a_pow075_second_slice_local_only.md` — recorded the second-slice local-only verdict.
+- `handover/ai-direct/LATEST.md` — updated current runtime truth with the new second-slice evidence.
+- `handover/ops/ACTIVE_PROJECTS.md` — updated V646 status to reflect first and second slices recorded with no new promotion.
+- `handover/BOARD.md` — added this mandatory debrief block.
+
 #### [2026-03-09 09:47] Agent: Codex | Session: V646 Path A Sqrt Refinement Mixed Holdout Verdict
 
 **What I did:**

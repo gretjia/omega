@@ -4,8 +4,8 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
 
 ## 1. Snapshot Metadata
 
-- `updated_at_local`: 2026-03-09 09:47:27 +0000
-- `updated_at_utc`: 2026-03-09 09:47:27 +0000
+- `updated_at_local`: 2026-03-09 10:03:00 +0000
+- `updated_at_utc`: 2026-03-09 10:03:00 +0000
 - `updated_by`: Codex (GPT-5)
 
 ## 2. In-Flight Work
@@ -75,7 +75,7 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
 
 ### Project: V646-PATH-A-REFINEMENT
 
-- Status: `FIRST_SLICE_COMPLETED_MIXED_HOLDOUT_VERDICT`
+- Status: `FIRST_AND_SECOND_SLICES_RECORDED_NO_NEW_PROMOTION`
 - Hosts: `controller`, `windows1-w1`, `linux1-lx`
 - Goal: refine the leading `Path A` learner-interface branch without reopening GC, `Path B`, or math-governance
 - Mission authority:
@@ -127,11 +127,28 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
     - first-slice refinement fixed the old `2026-01` quintile-sign defect
     - but it materially weakened the stronger V645 `2025` profile
     - and both holdout `AUC` values fell below `0.5`
+  - second slice:
+    - `weight_mode=pow_0p75_abs_excess_return`
+  - second-slice local runtime root:
+    - `audit/runtime/v646_path_a_refine2_local_20260309_095500`
+  - second-slice local best objective:
+    - `8.786963269826855e-05`
+  - second-slice winning `val_auc`:
+    - `0.5533170029579313`
+  - second-slice compare:
+    - beats frozen V645 local Path A by:
+      - `+2.4871682321464072e-05`
+    - but remains below the first V646 slice by:
+      - `-1.5589665623172875e-05`
+  - second-slice consequence:
+    - valid new audit evidence
+    - but no retrain / holdout promotion
 - Immediate next step:
-  - keep this first slice frozen as new evidence
+  - keep slice 1 frozen and separate
+  - keep slice 2 frozen and separate
   - do not widen into GC
   - do not replace the V645 fresh Path A branch as the leading promoted candidate yet
-  - run AgentOS again for a second bounded local Path A refinement slice
+  - next AgentOS step should choose a third bounded Path A slice that is not just another trivial monotone interpolation unless strongly justified
 - Risks:
   - over-refining Path A may keep fixing one holdout shard by damaging the other
   - local validation gains may still overstate cross-holdout quality

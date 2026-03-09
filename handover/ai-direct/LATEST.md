@@ -8,6 +8,38 @@
 
 This file is the single source of current operational truth for all agents.
 
+## Update: 2026-03-09 10:03 UTC
+- **The second bounded V646 Path A slice is now complete, and it is local-only evidence with no promotion.**
+- New execution record:
+  - `handover/ai-direct/entries/20260309_100300_v646_path_a_pow075_second_slice_local_only.md`
+- Slice identity:
+  - `weight_mode=pow_0p75_abs_excess_return`
+  - exact transform:
+    - `abs(t1_excess_return) ** 0.75`
+- Local runtime root:
+  - `audit/runtime/v646_path_a_refine2_local_20260309_095500`
+- Local result:
+  - `n_completed=10`
+  - `n_auc_guardrail_passed=4`
+  - `best_value=8.786963269826855e-05`
+  - winning `val_auc=0.5533170029579313`
+- Direct compare:
+  - versus frozen V645 local Path A:
+    - improves from `6.299795037680448e-05`
+    - to `8.786963269826855e-05`
+  - versus frozen first V646 slice:
+    - below `0.00010345929832144143`
+- Meaning:
+  - the second slice is valid new audit evidence
+  - but it does not beat the first V646 slice locally
+  - so it does **not** earn retrain or fresh holdout promotion
+- Operational decision:
+  - keep slice 1 frozen and separate
+  - keep slice 2 frozen and separate
+  - do not overwrite either
+  - do not run retrain / holdout from slice 2
+  - keep GC paused
+
 ## Update: 2026-03-09 09:47 UTC
 - **The first live V646 Path A refinement slice is now complete, and the holdout verdict is mixed.**
 - New execution record:
