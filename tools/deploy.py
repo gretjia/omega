@@ -210,11 +210,14 @@ def step3_verify_node(name: str, target: dict, branch: str, dry_run: bool) -> bo
         ok(f"[DRY RUN] Would reset {name} to {branch} and verify env")
         return True
 
-    # Reset to the pushed branch
+    # Reset to the pushed branch.
+    # Workers are read-only and may not have external network reachability, so
+    # step 2's `git push <remote> HEAD:<branch>` is the only sync authority here.
+    # Do not `git fetch --all` on workers; it can hang against unreachable origin.
     if is_windows:
-        reset_cmd = f'cd /d {repo} && git fetch --all && git reset --hard {branch}'
+        reset_cmd = f'cd /d {repo} && git reset --hard {branch}'
     else:
-        reset_cmd = f'cd {repo} && git fetch --all && git reset --hard {branch}'
+        reset_cmd = f'cd {repo} && git reset --hard {branch}'
 
     rc, out, err = _ssh(alias, reset_cmd, timeout=RESET_TIMEOUT)
     if rc != 0:
