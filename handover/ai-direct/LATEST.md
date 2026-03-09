@@ -8,6 +8,34 @@
 
 This file is the single source of current operational truth for all agents.
 
+## Update: 2026-03-09 18:24 UTC
+- **The first bounded Linux V653 forge probe failed on a confirmed Polars alias-resolution bug, and the controller fix is now landed.**
+- New execution record:
+  - `handover/ai-direct/entries/20260309_182426_v653_first_linux_probe_alias_bug_fixed.md`
+- Failed runtime root:
+  - `audit/runtime/v653_probe_linux_20260309_180719`
+- Failure evidence:
+  - `audit/runtime/v653_probe_linux_20260309_180719/forge.out`
+- Confirmed error:
+  - `polars.exceptions.ColumnNotFoundError`
+  - missing alias:
+    - `Omega_5d`
+- Controller-side fixes now landed:
+  - inline `Psi = S * Omega` equivalent expression in `tools/forge_campaign_state.py`
+  - new forge observability / duplicate-key / zero-pulse guards
+  - date-neutral event-study aggregation in `tools/run_campaign_event_study.py`
+- Verification:
+  - `python3 -m py_compile` passed
+  - `uv run --with pytest --with polars --with numpy pytest tests/test_campaign_state_contract.py tests/test_campaign_event_study.py -q`
+    - `6 passed in 0.45s`
+  - `gemini -p`
+    - verdict:
+      - `PASS`
+- Current next step:
+  - commit + push the V653 runtime fixes
+  - deploy to `linux1-lx`
+  - relaunch the same bounded forge probe under a fresh isolated runtime root
+
 ## Update: 2026-03-09 17:55 UTC
 - **V653 Phase-1 readiness has converged, and the first tooling wave is now landed.**
 - New execution record:

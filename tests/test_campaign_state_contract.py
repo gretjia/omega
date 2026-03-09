@@ -71,3 +71,14 @@ def test_build_campaign_state_frame_zero_fills_no_signal_days() -> None:
     assert "Psi_2d" in out.columns
     assert "excess_ret_t1_to_2d" in out.columns
     assert "barrier_2d" in out.columns
+
+
+def test_assert_unique_symbol_date_rejects_duplicates() -> None:
+    df = pl.DataFrame(
+        [
+            {"symbol": "AAA", "pure_date": "20240102", "open": 1.0},
+            {"symbol": "AAA", "pure_date": "20240102", "open": 2.0},
+        ]
+    )
+    with pytest.raises(ValueError):
+        campaign_state._assert_unique_symbol_date(df, frame_name="daily_spine")

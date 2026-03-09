@@ -7,6 +7,7 @@ import json
 import math
 import os
 import re
+import time
 from pathlib import Path
 from typing import Iterable
 
@@ -25,6 +26,10 @@ os.environ.setdefault("POLARS_MAX_THREADS", str(max(1, (os.cpu_count() or 2) // 
 DATE_HASH_PARQUET_RE = re.compile(r"^(?P<date>\d{8})_[0-9a-f]{7}\.parquet$")
 DEFAULT_HORIZONS = (5, 10, 20)
 DEFAULT_EPS = 1e-12
+
+
+def _log(msg: str) -> None:
+    print(f"[V653] {msg}", flush=True)
 
 
 def _parse_years(raw: str | None) -> set[str] | None:
@@ -60,6 +65,18 @@ def _half_life_alpha(tau: int) -> float:
     if tau <= 0:
         raise ValueError(f"half-life must be positive, got {tau}")
     return float(1.0 - math.exp(-math.log(2.0) / float(tau)))
+
+
+def _assert_unique_symbol_date(df: pl.DataFrame, frame_name: str) -> None:
+    if df.height <= 0:
+        return
+    dupes = (
+        df.group_by(["symbol", "pure_date"])
+        .len()
+        .filter(pl.col("len") > 1)
+    )
+    if dupes.height > 0:
+        raise ValueError(f"{frame_name} contains duplicate symbol/pure_date rows: {dupes.height}")
 
 
 def _collect_daily_spine_from_l1(l1_files: list[str]) -> pl.DataFrame:
@@ -282,7 +299,12 @@ def build_campaign_state_frame(
         omega_exprs.append(
             (pl.col(f"S_{tau}d").abs() / (pl.col(f"V_{tau}d") + float(eps))).alias(f"Omega_{tau}d")
         )
-        psi_exprs.append((pl.col(f"S_{tau}d") * pl.col(f"Omega_{tau}d")).alias(f"Psi_{tau}d"))
+        psi_exprs.append(
+            (
+                pl.col(f"S_{tau}d")
+                * (pl.col(f"S_{tau}d").abs() / (pl.col(f"V_{tau}d") + float(eps)))
+            ).alias(f"Psi_{tau}d")
+        )
 
     df = df.with_columns(omega_exprs + psi_exprs + raw_label_exprs)
 
@@ -365,6 +387,7 @@ def forge_campaign_state(
     horizons: Iterable[int],
     eps: float,
 ) -> dict:
+    started = time.monotonic()
     l1_files = _expand_patterns(l1_patterns, years=years)
     l2_files = _expand_patterns(l2_patterns, years=years)
     if not l1_files:
@@ -372,21 +395,37 @@ def forge_campaign_state(
     if not l2_files:
         raise FileNotFoundError("no L2 pulse-source files matched the supplied patterns")
 
+    _log(f"matched L1 files={len(l1_files)} L2 files={len(l2_files)} horizons={list(horizons)}")
+    _log("phase 1/4 collecting daily spine from L1")
     daily_spine = _collect_daily_spine_from_l1(l1_files)
+    _assert_unique_symbol_date(daily_spine, frame_name="daily_spine")
+    _log(f"phase 1/4 done rows={daily_spine.height} symbols={daily_spine.select(pl.col('symbol').n_unique()).item() if daily_spine.height > 0 else 0}")
+
+    _log("phase 2/4 collecting daily events from L2")
     daily_events = _collect_daily_events_from_l2(l2_files)
+    _assert_unique_symbol_date(daily_events, frame_name="daily_events")
+    total_events = int(daily_events["N_events"].sum()) if daily_events.height > 0 and "N_events" in daily_events.columns else 0
+    if total_events <= 0:
+        raise ValueError("daily_events contains zero usable pulse mass; refusing to forge a structurally dead campaign matrix")
+    _log(f"phase 2/4 done rows={daily_events.height} total_events={total_events}")
+
+    _log("phase 3/4 building campaign-state frame")
     campaign_df = build_campaign_state_frame(daily_spine=daily_spine, daily_events=daily_events, horizons=horizons, eps=eps)
+    _log(f"phase 3/4 done rows={campaign_df.height} cols={len(campaign_df.columns)}")
 
     out_path = Path(output_path)
     out_path.parent.mkdir(parents=True, exist_ok=True)
     tmp_path = out_path.with_suffix(out_path.suffix + ".tmp")
     if tmp_path.exists():
         tmp_path.unlink()
+    _log(f"phase 4/4 writing parquet tmp={tmp_path.name}")
     campaign_df.write_parquet(tmp_path, compression="zstd")
     tmp_path.replace(out_path)
 
     meta = _build_meta(out_path=out_path, l1_files=l1_files, l2_files=l2_files, df=campaign_df, horizons=horizons)
     meta_path = out_path.with_suffix(out_path.suffix + ".meta.json")
     meta_path.write_text(json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8")
+    _log(f"complete seconds={time.monotonic() - started:.1f} output={out_path}")
     return meta
 
 

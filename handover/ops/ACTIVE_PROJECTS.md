@@ -12,7 +12,7 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
 
 ### Project: V653-FRACTAL-CAMPAIGN-AWAKENING
 
-- Status: `PHASE1_TOOLING_LANDED_PENDING_RUNTIME_PROBE`
+- Status: `FIRST_LINUX_PROBE_FAILED_FIX_READY_FOR_REDEPLOY`
 - Hosts: `controller`, `windows1-w1`, `linux1-lx`
 - Goal: replace sparse pseudo-time downstream logic with a real daily temporal spine plus recursive campaign-state compression, then prove monotonic event-study edge before reopening ML
 - Audit authority:
@@ -60,7 +60,16 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
   - first tooling wave is landed:
     - `tools/forge_campaign_state.py`
     - `tools/run_campaign_event_study.py`
-  - next step is a bounded runtime probe on a node with `polars`
+  - first bounded Linux forge probe failed on a confirmed Polars alias-resolution bug:
+    - `audit/runtime/v653_probe_linux_20260309_180719/forge.out`
+  - controller fixes are now ready:
+    - inline `Psi` expression
+    - forge observability / duplicate-key / zero-pulse guards
+    - date-neutral event-study aggregation
+  - next step is:
+    - commit + push
+    - deploy to `linux1-lx`
+    - relaunch the bounded forge probe
 
 ### Project: V648-PATH-B-CONTINUOUS-LABEL-PIVOT
 
