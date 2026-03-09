@@ -42,6 +42,10 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
   - holdout AUC remains high on both future shards
   - but top-quantile alpha proxies are negative on both shards
   - the current champion therefore does not yet have positive future alpha evidence
+- Freeze rule:
+  - this project's outputs are immutable audit baselines
+  - later missions must write new evaluation outputs under fresh runtime roots and fresh handover entries
+  - they must not overwrite the two recorded `holdout_metrics.json` artifacts from this project
 - Runtime lessons:
   - controller deploy remotes had to be repaired manually
   - Windows worker deploy required:

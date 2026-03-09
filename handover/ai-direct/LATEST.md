@@ -64,6 +64,13 @@ This file is the single source of current operational truth for all agents.
   - holdout classification separability remains high (`AUC > 0.80` on both holdouts)
   - but the top-quantile excess-return proxies are negative on both holdouts
   - therefore the current champion is **not yet evidenced as a positive future alpha ranker**, despite strong AUC
+- Freeze rule:
+  - this holdout verdict is now a fixed baseline for later overall audit
+  - future missions must write new metrics under new runtime prefixes and new handover entries
+  - they must not overwrite:
+    - `D:\work\Omega_vNext\audit\runtime\holdout_eval_2025_20260309_054300\results\holdout_metrics.json`
+    - `/home/zepher/work/Omega_vNext/audit/runtime/holdout_eval_2026_01_20260309_054300/results/holdout_metrics.json`
+  - they must not treat this verdict as superseded; only append new evidence beside it
 - Runtime lessons from this phase:
   - controller deploy remotes had to be restored manually before worker rollout:
     - `linux` remote to `linux1-lx:/home/zepher/work/Omega_vNext`

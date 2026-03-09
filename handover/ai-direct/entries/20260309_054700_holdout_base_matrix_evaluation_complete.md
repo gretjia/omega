@@ -191,3 +191,6 @@ Therefore:
 - the current champion is **not yet validated as a positive future alpha ranker**
 - the next logical mission is **not** more holdout evaluation
 - the next logical mission is to revise the cloud optimization objective / champion selection rule so that future sweeps do not optimize AUC while leaving future alpha negative
+- this result is now frozen as an audit baseline:
+  - later missions may add new evidence
+  - they may not overwrite these recorded output paths or reinterpret them away
