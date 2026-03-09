@@ -4,8 +4,8 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
 
 ## 1. Snapshot Metadata
 
-- `updated_at_local`: 2026-03-09 01:21:52 +0000
-- `updated_at_utc`: 2026-03-09 01:21:52 +0000
+- `updated_at_local`: 2026-03-09 01:46:38 +0000
+- `updated_at_utc`: 2026-03-09 01:46:38 +0000
 - `updated_by`: Codex (GPT-5)
 
 ## 2. In-Flight Work
@@ -87,12 +87,19 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
   - many independent single-replica Vertex jobs, spot-preferred with explicit one-shot on-demand retry
   - temporal validation inside the train set; no random `xgb.cv` across mixed dates
   - leaderboard aggregation plus final deterministic retrain of the chosen params
+- Gemini review deltas now merged into the spec:
+  - worker-level `2023` train / `2024` validation hard assertion
+  - one-time `dtrain` / `dval` construction outside the trial loop
+  - aggregator verification of identical frozen canonical-gate fingerprints across workers
+  - explicit complexity tie-breaker for champion selection when score deltas are negligible
+  - per-trial alpha / excess-return proxy diagnostics in addition to AUC
 - Immediate blockers:
   - bucket authority is inconsistent: active supervisor points at absent `gs://omega_central/...`, while the live successful path still used `gs://omega_v52_central/...`
   - no active `tools/run_optuna_sweep.py` / swarm orchestrator currently exists
   - current backtest entrypoints cannot directly express `2026-01`
 - Spec source:
   - `handover/ai-direct/entries/20260309_012152_gc_swarm_optuna_project_spec.md`
+  - `handover/ai-direct/entries/20260309_014638_gemini_swarm_spec_audit.md`
 
 ### Project: GCP-LEGACY-STORAGE-CLEANUP
 

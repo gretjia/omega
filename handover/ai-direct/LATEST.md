@@ -8,6 +8,22 @@
 
 This file is the single source of current operational truth for all agents.
 
+## Update: 2026-03-09 01:46 UTC
+- **Gemini has audited the new `gc swarm-optuna` spec and returned `PASS`, with several hardening deltas now folded into the spec.**
+- Gemini-agreed strengths:
+  - the spec correctly distinguishes real cloud-parallel optimization from single remote training
+  - it correctly freezes canonical Stage3 physics gates and limits the search space to XGBoost hyperparameters
+  - it correctly keeps `2025` and `2026-01` outside all optimization logic
+- Gemini-driven hardening now added to the spec:
+  - each worker must materialize the `2023` train / `2024` validation split once and assert `max(train_date) < min(val_date)`
+  - each worker must build `dtrain` / `dval` exactly once outside the Optuna trial loop and reuse them across trials
+  - the aggregator must verify identical frozen canonical-gate fingerprints across workers
+  - champion selection must use an explicit complexity tie-breaker when validation AUC deltas are negligible
+  - trial artifacts must include alpha / excess-return proxy diagnostics, not only AUC
+- Deep dive:
+  - `handover/ai-direct/entries/20260309_014638_gemini_swarm_spec_audit.md`
+  - `handover/ai-direct/entries/20260309_012152_gc_swarm_optuna_project_spec.md`
+
 ## Update: 2026-03-09 01:21 UTC
 - **Baseline Vertex train is confirmed complete, and a new cloud-parallel `swarm-optuna` project spec is now proposed for the next stage.**
 - AgentOS historical audit conclusion:

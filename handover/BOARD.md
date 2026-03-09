@@ -45,6 +45,38 @@
 ### Entries
 
 <!-- New session debriefs go here. Most recent on top. -->
+#### [2026-03-09 01:46] Agent: Codex | Session: Gemini Audit Of GC Swarm-Optuna Spec
+
+**What I did:**
+- Ran an external `gemini -y` review against the new `gc swarm-optuna` spec with current active Stage3 cloud code and the baseline-train evidence as context.
+- Captured Gemini’s verdict on whether the spec truly uses Google Cloud to increase project intelligence rather than just offloading compute.
+- Folded the accepted hardening deltas back into the spec.
+
+**What I discovered:**
+- Gemini returned `PASS`, not `BLOCK`.
+- The strongest confirmation was that the spec already correctly separates cloud-parallel optimization from single remote training and keeps canonical Stage3 physics gates frozen.
+- The most important missing hard constraints were operational, not conceptual:
+  - build `dtrain` / `dval` once per worker and reuse them across Optuna trials
+  - enforce a hard temporal split assertion `max(train_date) < min(val_date)`
+  - verify frozen-gate fingerprints match across all workers
+  - add a complexity tie-breaker for champion selection
+  - emit alpha / excess-return proxy diagnostics, not just AUC
+
+**What confused me / blocked me:**
+- Gemini’s first pass could not read `archive/tools/*` because of its ignore patterns, so I reran the review with the historical swarm facts embedded directly into the prompt.
+
+**What the next agent should do:**
+- Treat the spec as externally reviewed and now hardened enough to implement.
+- Build the active swarm launcher/payload around the new mandatory constraints, especially DMatrix reuse and temporal isolation assertions.
+- Do not let implementation quietly slip back to per-trial data rebuild or AUC-only champion selection.
+
+**Files I changed:**
+- `handover/ai-direct/entries/20260309_012152_gc_swarm_optuna_project_spec.md` — merged Gemini-driven hardening constraints into the spec itself.
+- `handover/ai-direct/LATEST.md` — recorded Gemini `PASS` verdict and the new hardening deltas.
+- `handover/ops/ACTIVE_PROJECTS.md` — updated the project board to reflect the post-Gemini strengthened spec.
+- `handover/ai-direct/entries/20260309_014638_gemini_swarm_spec_audit.md` — added the Gemini audit record.
+- `handover/BOARD.md` — added this mandatory debrief block.
+
 #### [2026-03-09 01:21] Agent: Codex | Session: GC Swarm-Optuna Spec Refresh After Baseline Train
 
 **What I did:**

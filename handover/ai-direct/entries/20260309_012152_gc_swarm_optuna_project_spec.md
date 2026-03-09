@@ -153,11 +153,19 @@ Responsibilities:
 - download the run-pinned code bundle
 - download the immutable base matrix
 - load it into RAM once
+- materialize the temporal split exactly once:
+  - train rows = `2023`
+  - validation rows = `2024`
+- hard-assert temporal separation in code before any trial starts:
+  - `max(train_date) < min(val_date)`
+- build `xgb.DMatrix` objects exactly once outside the Optuna trial loop and reuse them across all trials on that worker
 - run `n_trials_per_worker` Optuna trials locally
 - score with temporal validation only
 - emit:
   - `study_summary.json`
   - `trials.jsonl` or `trials.parquet`
+  - frozen canonical-gate fingerprint for that worker
+  - validation metrics including AUC plus alpha/excess-return proxy diagnostics
   - optional diagnostic metrics JSON
 
 ### 6.3 Aggregation
@@ -169,7 +177,11 @@ Add a lightweight aggregator, for example:
 Responsibilities:
 
 - merge per-worker trial tables
+- verify all workers used the same frozen canonical-gate contract
 - rank by objective and tie-breakers
+- if validation AUC delta between candidates is below a fixed epsilon threshold, prefer the simpler model:
+  - lower `max_depth`
+  - lower `num_boost_round`
 - enforce minimum trial completeness
 - emit a single leaderboard manifest and champion params JSON
 
@@ -195,6 +207,8 @@ Required Phase-1 scoring plan:
   - all rows from `2023`
 - validation split:
   - all rows from `2024`
+- mandatory runtime assertion:
+  - `max(train_date) < min(val_date)`
 
 Allowed Phase-2 enhancement:
 
@@ -209,6 +223,8 @@ Recommended objective:
   - no collapsed sample set
   - required signal-chain columns present
   - deterministic artifact logging for every trial
+  - validation alpha / excess-return proxy diagnostics logged for every trial
+  - explicit champion tie-breaker that penalizes unnecessary model complexity when score deltas are negligible
 
 ## 8. Runtime Policy
 
@@ -292,6 +308,10 @@ Until `omega_central` actually exists, the live implementable authority is:
 4. Aggregate completed trials are non-trivial:
    - at least `40` completed trials across workers
 5. Leaderboard artifact exists and ranks trials deterministically.
+6. Every worker proves temporal isolation in code:
+   - emitted metadata confirms `max(train_date) < min(val_date)`
+7. Every worker proves fixed-matrix reuse:
+   - `dtrain` / `dval` are constructed once per worker, not once per trial
 
 ### Full project acceptance
 
@@ -302,7 +322,12 @@ Until `omega_central` actually exists, the live implementable authority is:
 3. Champion params are exported as a stable JSON artifact.
 4. Final deterministic retrain on full `2023,2024` completes successfully.
 5. No train/holdout contamination is introduced.
-6. Handover records exact:
+6. Aggregation proves all completed workers used an identical frozen canonical-gate fingerprint.
+7. Leaderboard includes:
+   - validation AUC
+   - alpha / excess-return proxy diagnostics
+   - explicit complexity tie-break metadata
+8. Handover records exact:
    - bucket paths
    - worker counts
    - spot/on-demand outcomes
@@ -315,6 +340,9 @@ Until `omega_central` actually exists, the live implementable authority is:
 - Any design that uploads raw L2 to cloud: reject.
 - Any design that reintroduces physics-gate search without explicit Owner approval: reject.
 - Any design that uses non-temporal mixed-date CV as the authoritative score: reject.
+- Any worker implementation that rebuilds train/validation `DMatrix` inside each Optuna trial: reject.
+- Any worker implementation that lacks a hard temporal split assertion `max(train_date) < min(val_date)`: reject.
+- Any aggregation result that mixes workers with inconsistent frozen canonical-gate fingerprints: reject.
 - Any design that assumes `gs://omega_central/...` works without verifying bucket existence: reject.
 - Any design that cannot prove real concurrent Vertex workers: reject.
 
