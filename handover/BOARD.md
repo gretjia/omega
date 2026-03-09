@@ -45,6 +45,43 @@
 ### Entries
 
 <!-- New session debriefs go here. Most recent on top. -->
+#### [2026-03-09 13:48] Agent: Codex | Session: V650 Evidence-Only Auditor Packet
+
+**What I did:**
+- Wrote a new evidence-only external-auditor packet:
+  - `handover/ai-direct/entries/20260309_134820_external_ai_auditor_prompt_v650_evidence_only.md`
+- Organized the packet in two layers:
+  - current round first:
+    - V650
+  - then the full V645 -> V650 evidence chain
+- Grouped all cited material by repo-relative directory:
+  - `audit/`
+  - `handover/ai-direct/entries/`
+  - `audit/runtime/`
+  - `tools/`
+  - `tests/`
+  - canonical V64 math context
+
+**What I discovered:**
+- The repo now has a clean, continuous evidence chain from:
+  - V644 pre-Path-A failure
+  - through V645 / V646 / V647 / V648 / V649
+  - into the new V650 robust-loss kill result
+- The current round and the historical chain can be handed to an external auditor without needing any extra narrative layer.
+
+**What confused me / blocked me:**
+- Nothing blocked packet creation.
+- The only care point was path hygiene:
+  - all citations had to remain repo-relative and cross-checked against the current tree.
+
+**What the next agent should do:**
+- If an external auditor is used next, send this new packet first.
+- Keep using this packet as the evidence index unless a newer mission adds fresh committed evidence.
+
+**Files I changed:**
+- `handover/ai-direct/entries/20260309_134820_external_ai_auditor_prompt_v650_evidence_only.md` — added the new evidence-only audit packet.
+- `handover/ai-direct/LATEST.md` — recorded the new packet in live state.
+- `handover/BOARD.md` — added this debrief.
 #### [2026-03-09 13:36] Agent: Codex | Session: V650 Robust-Loss Wave Killed
 
 **What I did:**

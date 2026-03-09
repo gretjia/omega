@@ -8,6 +8,23 @@
 
 This file is the single source of current operational truth for all agents.
 
+## Update: 2026-03-09 13:48 UTC
+- **A new evidence-only external-auditor packet is landed for the full V645 -> V650 chain.**
+- New packet:
+  - `handover/ai-direct/entries/20260309_134820_external_ai_auditor_prompt_v650_evidence_only.md`
+- Packet shape:
+  - current round first:
+    - V650 local robust-loss wave
+  - then full Path A onward evidence chain
+  - grouped by directory and repo-relative path
+  - no embedded questions or owner hypotheses
+- Included path groups:
+  - `audit/`
+  - `handover/ai-direct/entries/`
+  - `audit/runtime/`
+  - active code / tests
+  - canonical V64 math / physics context
+
 ## Update: 2026-03-09 13:36 UTC
 - **V650 wave 1 is complete, and the kill condition was triggered.**
 - New execution verdict:
