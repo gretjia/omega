@@ -8,6 +8,48 @@
 
 This file is the single source of current operational truth for all agents.
 
+## Update: 2026-03-09 12:28 UTC
+- **The new recursive Path A collapse verdict is landed, and the V648 spec draft has now passed `gemini -p`.**
+- New audit authority:
+  - `audit/v648_path_a_collapse_anti_classifier_paradox.md`
+- New mission draft:
+  - `handover/ai-direct/entries/20260309_122200_v648_path_b_continuous_label_pivot_spec_draft.md`
+- Gemini audit:
+  - `handover/ai-direct/entries/20260309_122800_v648_spec_draft_gemini_pass.md`
+  - verdict:
+    - `PASS`
+- AgentOS read-only convergence used in the draft:
+  - Plan:
+    - Path A is closed
+    - Path B is the only justified next pivot
+    - local regression-side structural gate must be proven before cloud or holdouts
+  - Runtime:
+    - do not spend GCP before local smoke passes
+    - do not consume holdouts before retrain parity exists
+- Draft core:
+  - learner mode pivots to:
+    - `reg_squarederror_excess_return`
+  - label pivots to:
+    - raw `t1_excess_return`
+  - sample weights are removed for Path B
+  - V647 structural-tail shape is kept, but the structural metric becomes:
+    - `Spearman IC`
+  - structural floor:
+    - `val_spearman_ic > 0`
+  - promotion gate on both holdouts:
+    - `spearman_ic > 0`
+    - `alpha_top_decile > alpha_top_quintile`
+    - `alpha_top_quintile > 0`
+- Current state:
+  - draft is externally audited
+  - active charter has **not** been switched yet
+  - no V648 execution has started yet
+- Next step:
+  - ask owner for final confirmation
+  - only after that:
+    - switch the active charter
+    - open V648 under AgentOS
+
 ## Update: 2026-03-09 11:32 UTC
 - **V647 now has a full live verdict, and it failed the real promotion gate.**
 - New execution verdict:

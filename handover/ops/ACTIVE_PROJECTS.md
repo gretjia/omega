@@ -10,6 +10,64 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
 
 ## 2. In-Flight Work
 
+### Project: V648-PATH-B-CONTINUOUS-LABEL-PIVOT
+
+- Status: `DRAFT_PENDING_OWNER_CONFIRMATION`
+- Hosts: `controller`, optional `GCP Vertex AI` after local gate only
+- Goal: replace the structurally exhausted Path A weighted binary classifier with a continuous-label Path B contract that can test whether frozen V64 physics can survive translation into a structurally valid economic ranker
+- Seed authority:
+  - `audit/v648_path_a_collapse_anti_classifier_paradox.md`
+- Draft spec:
+  - `handover/ai-direct/entries/20260309_122200_v648_path_b_continuous_label_pivot_spec_draft.md`
+- Gemini review:
+  - `handover/ai-direct/entries/20260309_122800_v648_spec_draft_gemini_pass.md`
+  - verdict:
+    - `PASS`
+- Locked constraints:
+  - keep `omega_core/*` frozen
+  - keep `canonical_v64_1` Stage3 gates frozen
+  - keep temporal split frozen:
+    - train `2023`
+    - validation `2024`
+  - keep holdout isolation frozen:
+    - `2025`
+    - `2026-01`
+  - keep all frozen V645 / V646 / V647 evidence immutable
+  - do not reopen Path A
+  - do not use sample weights in Path B
+- Proposed exact pivot:
+  - learner mode:
+    - `reg_squarederror_excess_return`
+  - label:
+    - raw `t1_excess_return`
+  - validation structural metric:
+    - `Spearman IC`
+  - keep V647 structural-tail shape:
+    - hard losing penalty when `val_spearman_ic <= 0`
+    - hard losing penalty when `alpha_top_decile < alpha_top_quintile`
+    - score:
+      - `(alpha_top_decile + alpha_top_quintile) / 2`
+- Proposed execution shape:
+  - local-first
+  - contract/tests wave first
+  - one local `10`-trial Path B smoke
+  - no GCP before the local smoke proves at least one structurally valid Path B trial
+  - no holdout use before retrain parity exists
+- Proposed promotion gate:
+  - champion must satisfy on both `2025` and `2026-01`:
+    - `spearman_ic > 0`
+    - `alpha_top_decile > alpha_top_quintile`
+    - `alpha_top_quintile > 0`
+- Current state:
+  - draft exists
+  - draft is Gemini-audited
+  - active charter has not been switched
+  - awaiting owner confirmation only
+- Risks:
+  - Path B local signal may still be too weak to clear even the local smoke gate
+  - a single-year `2023 -> 2024` optimization surface can still overfit even under regression if the local gate is set too softly
+  - holdout metrics will require retrain parity before any live promotion decision is meaningful
+
 ### Project: V645-GC-ASYMMETRIC-LABEL-PIVOT
 
 - Status: `FOLLOW_ON_MISSION_SPLIT_TO_V646_PATH_A_REFINEMENT`

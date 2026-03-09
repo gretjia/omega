@@ -14,6 +14,7 @@ For the V64 line, read in this order:
 6. [v644_mediocristan_label_bottleneck.md](/home/zephryj/projects/omega/audit/v644_mediocristan_label_bottleneck.md)
 7. [v646_path_a_power_family_surface.md](/home/zephryj/projects/omega/audit/v646_path_a_power_family_surface.md)
 8. [v647_anti_classifier_paradox.md](/home/zephryj/projects/omega/audit/v647_anti_classifier_paradox.md)
+9. [v648_path_a_collapse_anti_classifier_paradox.md](/home/zephryj/projects/omega/audit/v648_path_a_collapse_anti_classifier_paradox.md)
 
 ## Purpose of each file
 
@@ -25,3 +26,4 @@ For the V64 line, read in this order:
 - [v644_mediocristan_label_bottleneck.md](/home/zephryj/projects/omega/audit/v644_mediocristan_label_bottleneck.md): external post-pilot verdict that the current bottleneck is the ML label/objective interface, not the frozen V64 math core
 - [v646_path_a_power_family_surface.md](/home/zephryj/projects/omega/audit/v646_path_a_power_family_surface.md): frozen summary of the full bounded Path A monotone power-family scan across `abs`, `0.875`, `0.75`, `0.625`, and `sqrt`
 - [v647_anti_classifier_paradox.md](/home/zephryj/projects/omega/audit/v647_anti_classifier_paradox.md): recursive audit verdict that closes the monotone power family, refuses both V645/V646 for promotion, and recommends the Structural Tail-Monotonicity Gate mission
+- [v648_path_a_collapse_anti_classifier_paradox.md](/home/zephryj/projects/omega/audit/v648_path_a_collapse_anti_classifier_paradox.md): recursive audit verdict that freezes V647 as a failed promotion, declares Path A structurally exhausted, and recommends the Path B continuous-label pivot with Spearman-based structural ranking
