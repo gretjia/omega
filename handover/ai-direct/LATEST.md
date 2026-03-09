@@ -8,6 +8,48 @@
 
 This file is the single source of current operational truth for all agents.
 
+## Update: 2026-03-09 10:09 UTC
+- **The bounded V646 Path A monotone power-family scan is now complete enough for external audit.**
+- New standalone slice records:
+  - `handover/ai-direct/entries/20260309_100830_v646_path_a_pow0875_third_slice_local_only.md`
+  - `handover/ai-direct/entries/20260309_100901_v646_path_a_pow0625_fourth_slice_local_only.md`
+- New frozen family summary:
+  - `audit/v646_path_a_power_family_surface.md`
+- Completed local slice ladder now covers:
+  - `abs`
+  - `pow_0.875`
+  - `pow_0.75`
+  - `pow_0.625`
+  - `sqrt`
+- New quarter-step local results:
+  - `pow_0.875`:
+    - runtime root:
+      - `audit/runtime/v646_path_a_refine3_local_20260309_100600`
+    - `best_value=8.216041648343417e-05`
+    - `val_auc=0.5351796685110878`
+  - `pow_0.625`:
+    - runtime root:
+      - `audit/runtime/v646_path_a_refine4_local_20260309_100700`
+    - `best_value=8.109984294116173e-05`
+    - `val_auc=0.5497136622521415`
+- Final family ordering by local objective:
+  - `sqrt`:
+    - `0.00010345929832144143`
+  - `pow_0.75`:
+    - `8.786963269826855e-05`
+  - `pow_0.875`:
+    - `8.216041648343417e-05`
+  - `pow_0.625`:
+    - `8.109984294116173e-05`
+  - `abs`:
+    - `6.299795037680448e-05`
+- Operational conclusion:
+  - slice 1 remains the strongest local slice
+  - slice 0 remains stronger on `2025` holdout quintile alpha
+  - no non-sqrt intermediate slice beat slice 1 locally
+  - therefore no slice beyond slice 1 earned fresh retrain / holdout promotion
+  - this power family is now closed for audit
+
 ## Update: 2026-03-09 10:03 UTC
 - **The second bounded V646 Path A slice is now complete, and it is local-only evidence with no promotion.**
 - New execution record:

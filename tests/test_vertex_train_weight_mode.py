@@ -44,3 +44,21 @@ def test_select_training_weights_uses_pow_0p75_abs_excess_return() -> None:
         excess_returns=np.array([0.04, -0.09, 0.0]),
     )
     assert np.allclose(weights, np.array([0.08944272, 0.16431677, 0.0], dtype=np.float64))
+
+
+def test_select_training_weights_uses_pow_0p875_abs_excess_return() -> None:
+    weights = _select_training_weights(
+        mode="pow_0p875_abs_excess_return",
+        singularity=np.array([0.25, -0.5, 0.1]),
+        excess_returns=np.array([0.04, -0.09, 0.0]),
+    )
+    assert np.allclose(weights, np.array([0.05981395, 0.12160801, 0.0], dtype=np.float64))
+
+
+def test_select_training_weights_uses_pow_0p625_abs_excess_return() -> None:
+    weights = _select_training_weights(
+        mode="pow_0p625_abs_excess_return",
+        singularity=np.array([0.25, -0.5, 0.1]),
+        excess_returns=np.array([0.04, -0.09, 0.0]),
+    )
+    assert np.allclose(weights, np.array([0.13374806, 0.2220241, 0.0], dtype=np.float64))

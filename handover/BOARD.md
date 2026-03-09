@@ -45,6 +45,72 @@
 ### Entries
 
 <!-- New session debriefs go here. Most recent on top. -->
+#### [2026-03-09 10:09] Agent: Codex | Session: V646 Path A Power-Family Closure
+
+**What I did:**
+- Continued V646 until the bounded monotone power-family slices were exhausted.
+- Added two quarter-step Path A weight modes:
+  - `pow_0p875_abs_excess_return`
+  - `pow_0p625_abs_excess_return`
+- Added sweep/retrain parity and regression coverage for both.
+- Ran two fresh local-only `10`-trial micro-sweeps:
+  - slice 3: `pow_0.875`
+  - slice 4: `pow_0.625`
+- Recorded each slice separately.
+- Wrote a frozen family summary for external audit in:
+  - `audit/v646_path_a_power_family_surface.md`
+
+**What I discovered:**
+- The bounded Path A power family is now sufficiently mapped:
+  - `abs`
+  - `pow_0.875`
+  - `pow_0.75`
+  - `pow_0.625`
+  - `sqrt`
+- Final local ordering is:
+  - `sqrt`:
+    - `0.00010345929832144143`
+  - `pow_0.75`:
+    - `8.786963269826855e-05`
+  - `pow_0.875`:
+    - `8.216041648343417e-05`
+  - `pow_0.625`:
+    - `8.109984294116173e-05`
+  - `abs`:
+    - `6.299795037680448e-05`
+- None of the non-sqrt intermediate slices beat slice 1 locally.
+- Therefore none of them earned retrain / holdout promotion.
+- The tradeoff split remains:
+  - V645 `abs` is still stronger on `2025` holdout quintile alpha
+  - V646 `sqrt` is still the only promoted slice that fixed the `2026-01` quintile sign
+
+**What confused me / blocked me:**
+- The Plan / Runtime child packets for the second-wave slice planning still did not return in time.
+- I finished the family using the narrower Commander rule:
+  - same charter
+  - same runtime shape
+  - no promotion unless local objective beats slice 1
+- That was enough to close the monotone power family safely.
+
+**What the next agent should do:**
+- Treat the V646 monotone power family as closed for audit.
+- Use `audit/v646_path_a_power_family_surface.md` as the audit front door.
+- Do not run more simple power-exponent slices unless a future auditor explicitly reopens that family.
+- Any next mission should search a different Path A axis.
+
+**Files I changed:**
+- `tools/run_optuna_sweep.py` — added `pow_0p875_abs_excess_return` and `pow_0p625_abs_excess_return`.
+- `tools/run_vertex_xgb_train.py` — added retrain parity for the new quarter-step weight modes.
+- `tests/test_vertex_optuna_split.py` — added sweep-side coverage for both new quarter-step modes.
+- `tests/test_vertex_train_weight_mode.py` — added retrain-side coverage for both new quarter-step modes.
+- `handover/ai-direct/entries/20260309_100830_v646_path_a_pow0875_third_slice_local_only.md` — recorded slice 3.
+- `handover/ai-direct/entries/20260309_100901_v646_path_a_pow0625_fourth_slice_local_only.md` — recorded slice 4.
+- `audit/v646_path_a_power_family_surface.md` — wrote the frozen family summary for external audit.
+- `audit/README.md` — indexed the new audit summary.
+- `handover/ai-direct/LATEST.md` — updated live runtime truth to the closed family state.
+- `handover/ops/ACTIVE_PROJECTS.md` — marked V646 power family as closed and awaiting external audit.
+- `handover/BOARD.md` — added this mandatory debrief block.
+
 #### [2026-03-09 10:03] Agent: Codex | Session: V646 Path A Second Slice Local Only
 
 **What I did:**

@@ -4,8 +4,8 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
 
 ## 1. Snapshot Metadata
 
-- `updated_at_local`: 2026-03-09 10:03:00 +0000
-- `updated_at_utc`: 2026-03-09 10:03:00 +0000
+- `updated_at_local`: 2026-03-09 10:09:01 +0000
+- `updated_at_utc`: 2026-03-09 10:09:01 +0000
 - `updated_by`: Codex (GPT-5)
 
 ## 2. In-Flight Work
@@ -75,7 +75,7 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
 
 ### Project: V646-PATH-A-REFINEMENT
 
-- Status: `FIRST_AND_SECOND_SLICES_RECORDED_NO_NEW_PROMOTION`
+- Status: `POWER_FAMILY_CLOSED_AWAITING_EXTERNAL_AUDIT`
 - Hosts: `controller`, `windows1-w1`, `linux1-lx`
 - Goal: refine the leading `Path A` learner-interface branch without reopening GC, `Path B`, or math-governance
 - Mission authority:
@@ -143,12 +143,32 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
   - second-slice consequence:
     - valid new audit evidence
     - but no retrain / holdout promotion
+  - third slice:
+    - `weight_mode=pow_0p875_abs_excess_return`
+    - local best:
+      - `8.216041648343417e-05`
+    - no promotion
+  - fourth slice:
+    - `weight_mode=pow_0p625_abs_excess_return`
+    - local best:
+      - `8.109984294116173e-05`
+    - no promotion
+  - full family conclusion:
+    - local ordering is now frozen across:
+      - `abs`
+      - `pow_0.875`
+      - `pow_0.75`
+      - `pow_0.625`
+      - `sqrt`
+    - no intermediate non-sqrt slice beat the first V646 slice locally
+    - therefore no additional monotone power slice earned retrain / holdout promotion
 - Immediate next step:
-  - keep slice 1 frozen and separate
-  - keep slice 2 frozen and separate
+  - keep all V646 slices frozen and separate
+  - prepare external audit using:
+    - `audit/v646_path_a_power_family_surface.md`
   - do not widen into GC
   - do not replace the V645 fresh Path A branch as the leading promoted candidate yet
-  - next AgentOS step should choose a third bounded Path A slice that is not just another trivial monotone interpolation unless strongly justified
+  - any next mission should move to a different Path A axis, not another simple power interpolation, unless a future auditor explicitly reopens it
 - Risks:
   - over-refining Path A may keep fixing one holdout shard by damaging the other
   - local validation gains may still overstate cross-holdout quality

@@ -23,8 +23,10 @@ from importlib.util import find_spec
 WEIGHT_MODES = {
     "physics_abs_singularity",
     "abs_excess_return",
-    "sqrt_abs_excess_return",
+    "pow_0p875_abs_excess_return",
     "pow_0p75_abs_excess_return",
+    "pow_0p625_abs_excess_return",
+    "sqrt_abs_excess_return",
 }
 
 
@@ -130,9 +132,15 @@ def _select_training_weights(*, mode: str, singularity: "np.ndarray", excess_ret
         return np.abs(singularity)
     if resolved == "abs_excess_return":
         return np.abs(excess_returns)
+    if resolved == "pow_0p875_abs_excess_return":
+        return np.power(np.abs(excess_returns), 0.875)
+    if resolved == "pow_0p75_abs_excess_return":
+        return np.power(np.abs(excess_returns), 0.75)
+    if resolved == "pow_0p625_abs_excess_return":
+        return np.power(np.abs(excess_returns), 0.625)
     if resolved == "sqrt_abs_excess_return":
         return np.sqrt(np.abs(excess_returns))
-    return np.power(np.abs(excess_returns), 0.75)
+    raise RuntimeError(f"unhandled_weight_mode: {resolved}")
 
 
 def _audit_training_base_matrix_contract(df, *, singularity_threshold: float) -> dict:

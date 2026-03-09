@@ -161,6 +161,66 @@ def test_prepare_temporal_split_supports_pow_0p75_abs_excess_return_weights(tmp_
     assert datasets["summary"]["val_weight_sum"] > 0.0
 
 
+def test_prepare_temporal_split_supports_pow_0p875_abs_excess_return_weights(tmp_path: Path) -> None:
+    matrix_path = tmp_path / "base_matrix_train_2023_2024.parquet"
+    df = pl.DataFrame(
+        [
+            _row("20230105", 1, 0.09, 0.0),
+            _row("20230105", 1, -0.01, 0.5),
+            _row("20240108", 1, 0.16, 1.0),
+            _row("20240108", 1, -0.04, 1.5),
+        ]
+    )
+    df.write_parquet(matrix_path)
+
+    args = Namespace(
+        base_matrix_uri=str(matrix_path),
+        train_year="2023",
+        val_year="2024",
+        singularity_threshold=0.10,
+        signal_epi_threshold=0.5,
+        srl_resid_sigma_mult=2.0,
+        topo_energy_min=2.0,
+        weight_mode="pow_0p875_abs_excess_return",
+        learner_mode="binary_logistic_sign",
+    )
+    datasets = _prepare_temporal_split(args)
+
+    assert datasets["summary"]["weight_mode"] == "pow_0p875_abs_excess_return"
+    assert datasets["summary"]["train_weight_sum"] > 0.0
+    assert datasets["summary"]["val_weight_sum"] > 0.0
+
+
+def test_prepare_temporal_split_supports_pow_0p625_abs_excess_return_weights(tmp_path: Path) -> None:
+    matrix_path = tmp_path / "base_matrix_train_2023_2024.parquet"
+    df = pl.DataFrame(
+        [
+            _row("20230105", 1, 0.09, 0.0),
+            _row("20230105", 1, -0.01, 0.5),
+            _row("20240108", 1, 0.16, 1.0),
+            _row("20240108", 1, -0.04, 1.5),
+        ]
+    )
+    df.write_parquet(matrix_path)
+
+    args = Namespace(
+        base_matrix_uri=str(matrix_path),
+        train_year="2023",
+        val_year="2024",
+        singularity_threshold=0.10,
+        signal_epi_threshold=0.5,
+        srl_resid_sigma_mult=2.0,
+        topo_energy_min=2.0,
+        weight_mode="pow_0p625_abs_excess_return",
+        learner_mode="binary_logistic_sign",
+    )
+    datasets = _prepare_temporal_split(args)
+
+    assert datasets["summary"]["weight_mode"] == "pow_0p625_abs_excess_return"
+    assert datasets["summary"]["train_weight_sum"] > 0.0
+    assert datasets["summary"]["val_weight_sum"] > 0.0
+
+
 def test_prepare_temporal_split_supports_path_b_regression_labels(tmp_path: Path) -> None:
     matrix_path = tmp_path / "base_matrix_train_2023_2024.parquet"
     df = pl.DataFrame(

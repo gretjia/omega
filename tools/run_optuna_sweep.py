@@ -24,8 +24,10 @@ OBJECTIVE_METRICS = {"val_auc", "alpha_top_decile", "alpha_top_quintile"}
 WEIGHT_MODES = {
     "physics_abs_singularity",
     "abs_excess_return",
-    "sqrt_abs_excess_return",
+    "pow_0p875_abs_excess_return",
     "pow_0p75_abs_excess_return",
+    "pow_0p625_abs_excess_return",
+    "sqrt_abs_excess_return",
 }
 LEARNER_MODES = {"binary_logistic_sign", "reg_squarederror_excess_return"}
 HARD_LOSING_OBJECTIVE_VALUE = -1.0e9
@@ -392,10 +394,16 @@ def _prepare_temporal_split(args: argparse.Namespace) -> dict:
         selected_weights_clean = physics_weights_clean
     elif weight_mode == "abs_excess_return":
         selected_weights_clean = np.abs(excess_clean)
+    elif weight_mode == "pow_0p875_abs_excess_return":
+        selected_weights_clean = np.power(np.abs(excess_clean), 0.875)
+    elif weight_mode == "pow_0p75_abs_excess_return":
+        selected_weights_clean = np.power(np.abs(excess_clean), 0.75)
+    elif weight_mode == "pow_0p625_abs_excess_return":
+        selected_weights_clean = np.power(np.abs(excess_clean), 0.625)
     elif weight_mode == "sqrt_abs_excess_return":
         selected_weights_clean = np.sqrt(np.abs(excess_clean))
     else:
-        selected_weights_clean = np.power(np.abs(excess_clean), 0.75)
+        raise RuntimeError(f"unhandled_weight_mode: {weight_mode}")
 
     train_weights = selected_weights_clean[train_mask]
     val_weights = selected_weights_clean[val_mask]
