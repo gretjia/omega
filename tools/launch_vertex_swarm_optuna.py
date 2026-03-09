@@ -14,9 +14,12 @@ from pathlib import Path
 
 
 STRUCTURAL_TAIL_OBJECTIVE = "structural_tail_monotonicity_gate"
-STRUCTURAL_TAIL_REQUIRED_WEIGHT_MODE = "sqrt_abs_excess_return"
-STRUCTURAL_TAIL_REQUIRED_LEARNER_MODE = "binary_logistic_sign"
+STRUCTURAL_TAIL_REQUIRED_BINARY_WEIGHT_MODE = "sqrt_abs_excess_return"
+STRUCTURAL_TAIL_REQUIRED_BINARY_LEARNER_MODE = "binary_logistic_sign"
+STRUCTURAL_TAIL_REQUIRED_REGRESSION_WEIGHT_MODE = "none"
+STRUCTURAL_TAIL_REQUIRED_REGRESSION_LEARNER_MODE = "reg_squarederror_excess_return"
 STRUCTURAL_TAIL_MIN_AUC_FLOOR = 0.505
+STRUCTURAL_TAIL_MIN_SPEARMAN_FLOOR = 0.0
 
 
 def _write_manifest(path: Path, payload: dict) -> None:
@@ -103,6 +106,8 @@ def _submit_one_worker(*, submit_job, args: argparse.Namespace, script_path: str
             str(args.objective_metric),
             "--min-val-auc",
             str(args.min_val_auc),
+            "--min-val-spearman-ic",
+            str(args.min_val_spearman_ic),
             "--weight-mode",
             str(args.weight_mode),
             "--learner-mode",
@@ -159,6 +164,8 @@ def _aggregate_results(*, repo_root: Path, args: argparse.Namespace) -> None:
         str(args.objective_metric),
         "--min-val-auc",
         str(args.min_val_auc),
+        "--min-val-spearman-ic",
+        str(args.min_val_spearman_ic),
         "--min-workers",
         str(args.min_workers),
         "--min-completed-trials",
@@ -171,21 +178,37 @@ def _aggregate_results(*, repo_root: Path, args: argparse.Namespace) -> None:
 
 def _validate_launch_contract(args: argparse.Namespace) -> None:
     if str(args.objective_metric) == STRUCTURAL_TAIL_OBJECTIVE:
-        if str(args.weight_mode) != STRUCTURAL_TAIL_REQUIRED_WEIGHT_MODE:
-            raise RuntimeError(
-                "structural_tail_objective_requires_weight_mode:"
-                f"{STRUCTURAL_TAIL_REQUIRED_WEIGHT_MODE}"
-            )
-        if str(args.learner_mode) != STRUCTURAL_TAIL_REQUIRED_LEARNER_MODE:
-            raise RuntimeError(
-                "structural_tail_objective_requires_learner_mode:"
-                f"{STRUCTURAL_TAIL_REQUIRED_LEARNER_MODE}"
-            )
-        if float(args.min_val_auc) < STRUCTURAL_TAIL_MIN_AUC_FLOOR:
-            raise RuntimeError(
-                "structural_tail_objective_requires_min_val_auc_at_least:"
-                f"{STRUCTURAL_TAIL_MIN_AUC_FLOOR}"
-            )
+        if str(args.learner_mode) == STRUCTURAL_TAIL_REQUIRED_BINARY_LEARNER_MODE:
+            if str(args.weight_mode) != STRUCTURAL_TAIL_REQUIRED_BINARY_WEIGHT_MODE:
+                raise RuntimeError(
+                    "structural_tail_objective_requires_weight_mode:"
+                    f"{STRUCTURAL_TAIL_REQUIRED_BINARY_WEIGHT_MODE}"
+                )
+            if float(args.min_val_auc) < STRUCTURAL_TAIL_MIN_AUC_FLOOR:
+                raise RuntimeError(
+                    "structural_tail_objective_requires_min_val_auc_at_least:"
+                    f"{STRUCTURAL_TAIL_MIN_AUC_FLOOR}"
+                )
+            return
+        if str(args.learner_mode) == STRUCTURAL_TAIL_REQUIRED_REGRESSION_LEARNER_MODE:
+            if str(args.weight_mode) != STRUCTURAL_TAIL_REQUIRED_REGRESSION_WEIGHT_MODE:
+                raise RuntimeError(
+                    "structural_tail_objective_requires_weight_mode:"
+                    f"{STRUCTURAL_TAIL_REQUIRED_REGRESSION_WEIGHT_MODE}"
+                )
+            if float(args.min_val_auc) > 0.0:
+                raise RuntimeError("path_b_structural_tail_does_not_use_auc_floor")
+            if float(args.min_val_spearman_ic) < STRUCTURAL_TAIL_MIN_SPEARMAN_FLOOR:
+                raise RuntimeError(
+                    "structural_tail_objective_requires_min_val_spearman_ic_at_least:"
+                    f"{STRUCTURAL_TAIL_MIN_SPEARMAN_FLOOR}"
+                )
+            return
+        raise RuntimeError(
+            "structural_tail_objective_requires_learner_mode:"
+            f"{STRUCTURAL_TAIL_REQUIRED_BINARY_LEARNER_MODE}"
+            f"|{STRUCTURAL_TAIL_REQUIRED_REGRESSION_LEARNER_MODE}"
+        )
 
 
 def main() -> None:
@@ -212,6 +235,7 @@ def main() -> None:
     ap.add_argument("--min-completed-trials", type=int, default=1)
     ap.add_argument("--objective-metric", default="val_auc")
     ap.add_argument("--min-val-auc", type=float, default=0.0)
+    ap.add_argument("--min-val-spearman-ic", type=float, default=0.0)
     ap.add_argument("--objective-epsilon", type=float, default=None)
     ap.add_argument("--weight-mode", default="physics_abs_singularity")
     ap.add_argument("--learner-mode", default="binary_logistic_sign")
@@ -220,7 +244,7 @@ def main() -> None:
     args = ap.parse_args()
     if bool(args.sync) and bool(args.watch):
         raise RuntimeError("--sync and --watch are mutually exclusive. Use async submit + --watch for real fan-out.")
-    if str(args.objective_metric) != "val_auc" and float(args.min_val_auc) <= 0.0:
+    if str(args.objective_metric) not in {"val_auc", STRUCTURAL_TAIL_OBJECTIVE} and float(args.min_val_auc) <= 0.0:
         raise RuntimeError("alpha_first_requires_positive_min_val_auc")
     if bool(args.require_empty_results_prefix):
         _assert_empty_output_uri(str(args.results_prefix_uri), label="results_prefix_uri")

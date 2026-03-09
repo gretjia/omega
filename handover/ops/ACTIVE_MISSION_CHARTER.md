@@ -1,35 +1,37 @@
 # OMEGA Active Mission Charter
 
 Status: In Progress
-Task Name: V647 Structural Tail-Monotonicity Gate
+Task Name: V648 Path B Continuous-Label Pivot
 Owner: Human Owner
 Commander: Codex
 Date: 2026-03-09
 
 ## 1. Objective
 
-- Accept the recursive architect verdict that the monotone `Path A` weight family is closed.
-- Refuse both V645 and V646 promoted branches as globally insufficient.
-- Keep V64 math, Stage3 gates, and the Path A label contract frozen.
-- Fix the downstream outer-loop selection rule so local winners preserve:
-  - structural validity
-  - tail monotonicity
-  - positive tail alpha
+- Accept the recursive architect verdict that Path A is structurally exhausted.
+- Keep V64 math, Stage3 gates, temporal splits, and holdout isolation frozen.
+- Pivot the learner interface from weighted binary classification to Path B continuous-label regression.
+- Test whether the frozen physical signal can survive translation into:
+  - positive structural ranking
+  - monotonic positive tail alpha
+  - future-holdout stability
 
 ## 2. Canonical Spec
 
 Primary task-level implementation authority:
 
-- `audit/v647_anti_classifier_paradox.md`
-- `handover/ai-direct/entries/20260309_105249_v647_structural_tail_monotonicity_gate_spec_draft.md`
-- `handover/ai-direct/entries/20260309_105540_v647_spec_draft_gemini_pass.md`
-- `handover/ai-direct/entries/20260309_110100_v647_structural_tail_monotonicity_gate_mission_open.md`
+- `audit/v648_path_a_collapse_anti_classifier_paradox.md`
+- `handover/ai-direct/entries/20260309_122200_v648_path_b_continuous_label_pivot_spec_draft.md`
+- `handover/ai-direct/entries/20260309_122800_v648_spec_draft_gemini_pass.md`
+- `handover/ai-direct/entries/20260309_122827_v648_path_b_continuous_label_pivot_mission_open.md`
 
 Supporting context:
 
-- `audit/v646_path_a_power_family_surface.md`
-- `handover/ai-direct/entries/20260309_084315_v645_path_a_retrain_and_fresh_holdout_partial_pass.md`
-- `handover/ai-direct/entries/20260309_094727_v646_path_a_sqrt_refinement_mixed_holdout_verdict.md`
+- `audit/v647_anti_classifier_paradox.md`
+- `handover/ai-direct/entries/20260309_112400_v647_gcp_swarm_and_holdout_gate_failed.md`
+- `tools/run_optuna_sweep.py`
+- `tools/run_vertex_xgb_train.py`
+- `tools/evaluate_xgb_on_base_matrix.py`
 - `OMEGA_CONSTITUTION.md`
 
 If the canonical spec conflicts with `OMEGA_CONSTITUTION.md`, escalate to the Commander.
@@ -41,8 +43,12 @@ Writable files:
 - `tools/run_optuna_sweep.py`
 - `tools/aggregate_vertex_swarm_results.py`
 - `tools/launch_vertex_swarm_optuna.py`
+- `tools/run_vertex_xgb_train.py`
+- `tools/evaluate_xgb_on_base_matrix.py`
 - `tests/test_vertex_optuna_split.py`
 - `tests/test_vertex_swarm_aggregate.py`
+- `tests/test_vertex_train_weight_mode.py`
+- `tests/test_vertex_holdout_eval.py`
 - `handover/ops/ACTIVE_MISSION_CHARTER.md`
 - `handover/ops/ACTIVE_PROJECTS.md`
 - `handover/ai-direct/LATEST.md`
@@ -51,29 +57,27 @@ Writable files:
 
 Read-only but relevant files:
 
-- `tools/run_vertex_xgb_train.py`
-- `tools/evaluate_xgb_on_base_matrix.py`
+- `audit/v648_path_a_collapse_anti_classifier_paradox.md`
 - `audit/v647_anti_classifier_paradox.md`
-- `audit/v646_path_a_power_family_surface.md`
-- `handover/ai-direct/entries/20260309_084315_v645_path_a_retrain_and_fresh_holdout_partial_pass.md`
-- `handover/ai-direct/entries/20260309_094727_v646_path_a_sqrt_refinement_mixed_holdout_verdict.md`
+- all frozen V645 / V646 / V647 mission records
+- `omega_core/*`
 
 Explicitly out of scope:
 
 - `omega_core/*`
 - Stage1 / Stage2 / Stage3 forge
-- Path B
-- new weight-family search
-- changing label semantics
+- any base-matrix rebuild
+- any Path A weighting or label experiments
 - widening to GCP before the first local smoke gate passes
-- overwriting any frozen V645 / V646 evidence
+- touching `2025` or `2026-01` holdouts before retrain parity exists
+- overwriting any frozen V645 / V646 / V647 evidence
 
 ## 4. Roles
 
 Plan Agent:
 
 - responsibility:
-  - choose the minimum decisive first implementation wave inside the objective/aggregator axis only
+  - validate that the first wave is the minimum decisive Path B contract/test implementation
 
 Coder Agent:
 
@@ -81,36 +85,42 @@ Coder Agent:
   - `tools/run_optuna_sweep.py`
   - `tools/aggregate_vertex_swarm_results.py`
   - `tools/launch_vertex_swarm_optuna.py`
+  - `tools/run_vertex_xgb_train.py`
+  - `tools/evaluate_xgb_on_base_matrix.py`
   - `tests/test_vertex_optuna_split.py`
   - `tests/test_vertex_swarm_aggregate.py`
+  - `tests/test_vertex_train_weight_mode.py`
+  - `tests/test_vertex_holdout_eval.py`
 
 Math Auditor:
 
 - audit target:
-  - verify that V647 stays inside Path A and preserves frozen V64 math, labels, splits, and gates
+  - verify that V648 preserves frozen V64 math and the continuous-label pivot does not reopen Path A or math-governance
 
 Runtime Auditor:
 
 - audit target:
-  - verify that the first wave stays local-first and only escalates to GCP after the local smoke gate passes
+  - verify that the first wave stays local-first, keeps holdouts untouched, and does not widen to GCP before the local smoke gate passes
 
 ## 5. Acceptance Criteria
 
-- a concrete V647 mission-open authority exists in handover
+- a concrete V648 mission-open authority exists in handover
 - the active charter explicitly freezes:
   - `omega_core/*`
   - Stage3 gates
-  - Path A label
   - temporal split
   - holdout isolation
-  - `weight_mode=sqrt_abs_excess_return`
-- AgentOS plan/math/runtime packets have been issued for the first V647 wave
+  - Path A closure
+- AgentOS plan/math/runtime packets have been issued for the first V648 wave
 - the first wave implements:
-  - `val_auc < 0.505` hard penalty / prune
+  - `learner_mode=reg_squarederror_excess_return`
+  - label = raw `t1_excess_return`
+  - no sample weights in Path B
+  - `val_spearman_ic <= 0` hard losing penalty / prune
   - composite score `(alpha_top_decile + alpha_top_quintile) / 2`
   - hard penalty when `alpha_top_decile < alpha_top_quintile`
 - local tests pass
-- one local smoke sweep passes the escalation gate before any GCP swarm is launched
+- one local smoke sweep proves or disproves the V648 local gate before any GCP swarm is launched
 
 ## 6. Runtime Preflight
 
@@ -123,25 +133,25 @@ Required before execution:
 - launcher mode:
   - local-first only for the first wave
 - output root:
-  - must be a fresh V647 prefix
+  - must be a fresh V648 prefix
 - host isolation check:
   - no holdout matrix enters optimization
-- weight mode:
-  - must be `sqrt_abs_excess_return`
 - learner mode:
-  - must be `binary_logistic_sign`
+  - must be `reg_squarederror_excess_return`
+- weight contract:
+  - no sample weights for Path B
 
 ## 7. Fail-Fast Conditions
 
 - stop if the implementation changes:
   - `omega_core/*`
   - Stage3 gates
-  - label semantics
   - temporal split
   - holdout isolation
-- stop if V647 runs can still silently use a non-`sqrt_abs_excess_return` weight mode
-- stop if worker and aggregator encode different composite/penalty logic
+- stop if V648 can still silently use Path A sample weights in regression mode
+- stop if worker and aggregator encode different structural-floor or tail-monotonicity logic
 - stop if anyone proposes GCP before the first local smoke gate passes
+- stop if holdout evaluation is attempted before retrain parity exists
 - retry allowed only after named root cause and changed condition
 
 ## 8. Audits Required
@@ -149,21 +159,22 @@ Required before execution:
 Math audit must verify:
 
 - frozen canonical math remains unchanged
-- V647 stays inside Path A
-- weight mode remains locked to `sqrt_abs_excess_return`
+- Path B uses continuous labels without reopening Path A
+- the structural metric for Path B is Spearman-based, not AUC-based
 
 Runtime audit must verify:
 
 - first wave stays local-first
 - the escalation gate to GCP is explicit
 - no frozen evidence is overwritten
+- holdouts remain untouched until replay parity exists
 
 ## 9. Definition of Done
 
-- V647 mission is active in handover
+- V648 mission is active in handover
 - the first bounded code wave is implemented
 - local regression tests pass
-- one local smoke sweep validates the new contract
+- one local smoke sweep validates the new Path B contract
 - either:
   - the escalation gate to GCP is earned
   - or the mission records why local validation blocked further escalation
@@ -180,9 +191,11 @@ Record after execution:
 - dataset role:
 - math audit verdict:
 - runtime audit verdict:
-- objective metric:
-  - `structural_tail_monotonicity_gate`
-- weight mode:
-  - `sqrt_abs_excess_return`
+- learner mode:
+  - `reg_squarederror_excess_return`
+- structural metric:
+  - `val_spearman_ic`
+- weight contract:
+  - `none`
 - fresh prefix check:
   - `passed`

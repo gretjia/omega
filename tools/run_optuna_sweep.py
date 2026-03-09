@@ -27,6 +27,7 @@ OBJECTIVE_METRICS = {
     "structural_tail_monotonicity_gate",
 }
 WEIGHT_MODES = {
+    "none",
     "physics_abs_singularity",
     "abs_excess_return",
     "pow_0p875_abs_excess_return",
@@ -37,9 +38,12 @@ WEIGHT_MODES = {
 LEARNER_MODES = {"binary_logistic_sign", "reg_squarederror_excess_return"}
 HARD_LOSING_OBJECTIVE_VALUE = -1.0e9
 STRUCTURAL_TAIL_OBJECTIVE = "structural_tail_monotonicity_gate"
-STRUCTURAL_TAIL_REQUIRED_WEIGHT_MODE = "sqrt_abs_excess_return"
-STRUCTURAL_TAIL_REQUIRED_LEARNER_MODE = "binary_logistic_sign"
+STRUCTURAL_TAIL_REQUIRED_BINARY_WEIGHT_MODE = "sqrt_abs_excess_return"
+STRUCTURAL_TAIL_REQUIRED_BINARY_LEARNER_MODE = "binary_logistic_sign"
+STRUCTURAL_TAIL_REQUIRED_REGRESSION_WEIGHT_MODE = "none"
+STRUCTURAL_TAIL_REQUIRED_REGRESSION_LEARNER_MODE = "reg_squarederror_excess_return"
 STRUCTURAL_TAIL_MIN_AUC_FLOOR = 0.505
+STRUCTURAL_TAIL_MIN_SPEARMAN_FLOOR = 0.0
 
 
 def _install_dependencies() -> None:
@@ -199,6 +203,45 @@ def _top_quantile_alpha(preds, excess_returns, q: float) -> float:
     return float(np.mean(excess_returns[mask]))
 
 
+def _average_ranks(values):
+    import numpy as np
+
+    arr = np.asarray(values, dtype=np.float64)
+    if arr.size <= 0:
+        return np.asarray([], dtype=np.float64)
+    order = np.argsort(arr, kind="mergesort")
+    sorted_vals = arr[order]
+    ranks = np.empty(arr.size, dtype=np.float64)
+    i = 0
+    while i < arr.size:
+        j = i + 1
+        while j < arr.size and sorted_vals[j] == sorted_vals[i]:
+            j += 1
+        avg_rank = ((i + 1) + j) / 2.0
+        ranks[order[i:j]] = avg_rank
+        i = j
+    return ranks
+
+
+def _spearman_rank_ic(preds, actuals) -> float:
+    import numpy as np
+
+    pred_arr = np.asarray(preds, dtype=np.float64)
+    actual_arr = np.asarray(actuals, dtype=np.float64)
+    mask = np.isfinite(pred_arr) & np.isfinite(actual_arr)
+    pred_arr = pred_arr[mask]
+    actual_arr = actual_arr[mask]
+    if pred_arr.size <= 1:
+        return 0.0
+    pred_rank = _average_ranks(pred_arr)
+    actual_rank = _average_ranks(actual_arr)
+    pred_std = float(np.std(pred_rank))
+    actual_std = float(np.std(actual_rank))
+    if pred_std <= 0.0 or actual_std <= 0.0:
+        return 0.0
+    return float(np.corrcoef(pred_rank, actual_rank)[0, 1])
+
+
 def _resolve_objective_metric(metric: str) -> str:
     clean = str(metric or "").strip()
     if clean not in OBJECTIVE_METRICS:
@@ -240,32 +283,53 @@ def _raw_objective_value(
 def _objective_contract(
     objective_metric: str,
     *,
-    auc: float,
+    auc: float | None,
+    val_spearman_ic: float,
     alpha_top_decile: float,
     alpha_top_quintile: float,
     min_val_auc: float,
+    min_val_spearman_ic: float,
+    learner_mode: str,
 ) -> dict:
     metric = _resolve_objective_metric(objective_metric)
     raw_objective_value = _raw_objective_value(
         metric,
-        auc=auc,
+        auc=float(auc or 0.0),
         alpha_top_decile=alpha_top_decile,
         alpha_top_quintile=alpha_top_quintile,
     )
     auc_guardrail_min = float(min_val_auc)
+    spearman_guardrail_min = float(min_val_spearman_ic)
     auc_guardrail_enabled = metric != "val_auc" and auc_guardrail_min > 0.0
-    auc_guardrail_passed = float(auc) >= auc_guardrail_min if auc_guardrail_enabled else True
+    spearman_guardrail_enabled = False
+    structural_metric_name = "val_auc"
+    if metric == STRUCTURAL_TAIL_OBJECTIVE and learner_mode == STRUCTURAL_TAIL_REQUIRED_REGRESSION_LEARNER_MODE:
+        auc_guardrail_enabled = False
+        spearman_guardrail_enabled = True
+        structural_metric_name = "val_spearman_ic"
+    auc_guardrail_passed = float(auc or 0.0) >= auc_guardrail_min if auc_guardrail_enabled else True
+    spearman_guardrail_passed = (
+        float(val_spearman_ic) > spearman_guardrail_min if spearman_guardrail_enabled else True
+    )
     tail_monotonicity_enabled = metric == STRUCTURAL_TAIL_OBJECTIVE
     tail_monotonicity_passed = float(alpha_top_decile) >= float(alpha_top_quintile) if tail_monotonicity_enabled else True
-    structural_guardrail_passed = bool(auc_guardrail_passed and tail_monotonicity_passed)
+    structural_guardrail_passed = bool(
+        auc_guardrail_passed and spearman_guardrail_passed and tail_monotonicity_passed
+    )
     objective_value = raw_objective_value if structural_guardrail_passed else HARD_LOSING_OBJECTIVE_VALUE
     return {
         "objective_metric": metric,
         "objective_value": float(objective_value),
         "raw_objective_value": float(raw_objective_value),
+        "val_auc": None if auc is None else float(auc),
+        "val_spearman_ic": float(val_spearman_ic),
+        "structural_metric_name": str(structural_metric_name),
         "auc_guardrail_min": auc_guardrail_min,
         "auc_guardrail_enabled": bool(auc_guardrail_enabled),
         "auc_guardrail_passed": bool(auc_guardrail_passed),
+        "spearman_guardrail_min": spearman_guardrail_min,
+        "spearman_guardrail_enabled": bool(spearman_guardrail_enabled),
+        "spearman_guardrail_passed": bool(spearman_guardrail_passed),
         "tail_monotonicity_enabled": bool(tail_monotonicity_enabled),
         "tail_monotonicity_passed": bool(tail_monotonicity_passed),
         "structural_guardrail_passed": bool(structural_guardrail_passed),
@@ -275,21 +339,37 @@ def _objective_contract(
 def _validate_objective_runtime_contract(args: argparse.Namespace) -> None:
     if args.objective_metric != STRUCTURAL_TAIL_OBJECTIVE:
         return
-    if args.weight_mode != STRUCTURAL_TAIL_REQUIRED_WEIGHT_MODE:
-        raise RuntimeError(
-            "structural_tail_objective_requires_weight_mode:"
-            f"{STRUCTURAL_TAIL_REQUIRED_WEIGHT_MODE}"
-        )
-    if args.learner_mode != STRUCTURAL_TAIL_REQUIRED_LEARNER_MODE:
-        raise RuntimeError(
-            "structural_tail_objective_requires_learner_mode:"
-            f"{STRUCTURAL_TAIL_REQUIRED_LEARNER_MODE}"
-        )
-    if float(args.min_val_auc) < STRUCTURAL_TAIL_MIN_AUC_FLOOR:
-        raise RuntimeError(
-            "structural_tail_objective_requires_min_val_auc_at_least:"
-            f"{STRUCTURAL_TAIL_MIN_AUC_FLOOR}"
-        )
+    if args.learner_mode == STRUCTURAL_TAIL_REQUIRED_BINARY_LEARNER_MODE:
+        if args.weight_mode != STRUCTURAL_TAIL_REQUIRED_BINARY_WEIGHT_MODE:
+            raise RuntimeError(
+                "structural_tail_objective_requires_weight_mode:"
+                f"{STRUCTURAL_TAIL_REQUIRED_BINARY_WEIGHT_MODE}"
+            )
+        if float(args.min_val_auc) < STRUCTURAL_TAIL_MIN_AUC_FLOOR:
+            raise RuntimeError(
+                "structural_tail_objective_requires_min_val_auc_at_least:"
+                f"{STRUCTURAL_TAIL_MIN_AUC_FLOOR}"
+            )
+        return
+    if args.learner_mode == STRUCTURAL_TAIL_REQUIRED_REGRESSION_LEARNER_MODE:
+        if args.weight_mode != STRUCTURAL_TAIL_REQUIRED_REGRESSION_WEIGHT_MODE:
+            raise RuntimeError(
+                "structural_tail_objective_requires_weight_mode:"
+                f"{STRUCTURAL_TAIL_REQUIRED_REGRESSION_WEIGHT_MODE}"
+            )
+        if float(args.min_val_auc) > 0.0:
+            raise RuntimeError("path_b_structural_tail_does_not_use_auc_floor")
+        if float(args.min_val_spearman_ic) < STRUCTURAL_TAIL_MIN_SPEARMAN_FLOOR:
+            raise RuntimeError(
+                "structural_tail_objective_requires_min_val_spearman_ic_at_least:"
+                f"{STRUCTURAL_TAIL_MIN_SPEARMAN_FLOOR}"
+            )
+        return
+    raise RuntimeError(
+        "structural_tail_objective_requires_learner_mode:"
+        f"{STRUCTURAL_TAIL_REQUIRED_BINARY_LEARNER_MODE}"
+        f"|{STRUCTURAL_TAIL_REQUIRED_REGRESSION_LEARNER_MODE}"
+    )
 
 
 def _prepare_temporal_split(args: argparse.Namespace) -> dict:
@@ -403,20 +483,22 @@ def _prepare_temporal_split(args: argparse.Namespace) -> dict:
     train_mask = _year_mask(date_clean, str(args.train_year))
     val_mask = _year_mask(date_clean, str(args.val_year))
 
+    learner_mode = _resolve_learner_mode(args.learner_mode)
     train_rows = int(np.sum(train_mask))
     val_rows = int(np.sum(val_mask))
     if train_rows <= 0 or val_rows <= 0:
         raise RuntimeError(f"temporal_split_empty: train_rows={train_rows} val_rows={val_rows}")
     train_positive_rows = int(np.sum(y_sign_clean[train_mask]))
     val_positive_rows = int(np.sum(y_sign_clean[val_mask]))
-    if train_positive_rows <= 0 or train_positive_rows >= train_rows:
-        raise RuntimeError(
-            f"temporal_split_train_one_class: train_rows={train_rows} train_positive_rows={train_positive_rows}"
-        )
-    if val_positive_rows <= 0 or val_positive_rows >= val_rows:
-        raise RuntimeError(
-            f"temporal_split_val_one_class: val_rows={val_rows} val_positive_rows={val_positive_rows}"
-        )
+    if learner_mode == "binary_logistic_sign":
+        if train_positive_rows <= 0 or train_positive_rows >= train_rows:
+            raise RuntimeError(
+                f"temporal_split_train_one_class: train_rows={train_rows} train_positive_rows={train_positive_rows}"
+            )
+        if val_positive_rows <= 0 or val_positive_rows >= val_rows:
+            raise RuntimeError(
+                f"temporal_split_val_one_class: val_rows={val_rows} val_positive_rows={val_positive_rows}"
+            )
 
     train_dates = date_clean[train_mask]
     val_dates = date_clean[val_mask]
@@ -428,7 +510,12 @@ def _prepare_temporal_split(args: argparse.Namespace) -> dict:
         )
 
     weight_mode = _resolve_weight_mode(args.weight_mode)
-    if weight_mode == "physics_abs_singularity":
+    selected_weights_clean = None
+    if learner_mode == STRUCTURAL_TAIL_REQUIRED_REGRESSION_LEARNER_MODE and weight_mode != "none":
+        raise RuntimeError("regression_learner_requires_weight_mode:none")
+    if weight_mode == "none":
+        selected_weights_clean = None
+    elif weight_mode == "physics_abs_singularity":
         selected_weights_clean = physics_weights_clean
     elif weight_mode == "abs_excess_return":
         selected_weights_clean = np.abs(excess_clean)
@@ -443,18 +530,20 @@ def _prepare_temporal_split(args: argparse.Namespace) -> dict:
     else:
         raise RuntimeError(f"unhandled_weight_mode: {weight_mode}")
 
-    train_weights = selected_weights_clean[train_mask]
-    val_weights = selected_weights_clean[val_mask]
-    if not np.all(np.isfinite(train_weights)):
-        raise RuntimeError("temporal_split_train_weights_non_finite")
-    if not np.all(np.isfinite(val_weights)):
-        raise RuntimeError("temporal_split_val_weights_non_finite")
-    if float(np.sum(train_weights)) <= 0.0:
-        raise RuntimeError("temporal_split_train_weights_non_positive")
-    if float(np.sum(val_weights)) <= 0.0:
-        raise RuntimeError("temporal_split_val_weights_non_positive")
+    train_weights = None
+    val_weights = None
+    if selected_weights_clean is not None:
+        train_weights = selected_weights_clean[train_mask]
+        val_weights = selected_weights_clean[val_mask]
+        if not np.all(np.isfinite(train_weights)):
+            raise RuntimeError("temporal_split_train_weights_non_finite")
+        if not np.all(np.isfinite(val_weights)):
+            raise RuntimeError("temporal_split_val_weights_non_finite")
+        if float(np.sum(train_weights)) <= 0.0:
+            raise RuntimeError("temporal_split_train_weights_non_positive")
+        if float(np.sum(val_weights)) <= 0.0:
+            raise RuntimeError("temporal_split_val_weights_non_positive")
 
-    learner_mode = _resolve_learner_mode(args.learner_mode)
     if learner_mode == "binary_logistic_sign":
         y_train = y_sign_clean[train_mask]
         y_val = y_sign_clean[val_mask]
@@ -462,18 +551,23 @@ def _prepare_temporal_split(args: argparse.Namespace) -> dict:
         y_train = excess_clean[train_mask]
         y_val = excess_clean[val_mask]
 
-    dtrain = xgb.DMatrix(
-        X_clean[train_mask],
-        label=y_train,
-        weight=train_weights,
-        feature_names=list(FEATURE_COLS),
-    )
-    dval = xgb.DMatrix(
-        X_clean[val_mask],
-        label=y_val,
-        weight=val_weights,
-        feature_names=list(FEATURE_COLS),
-    )
+    dtrain_kwargs = {
+        "data": X_clean[train_mask],
+        "label": y_train,
+        "feature_names": list(FEATURE_COLS),
+    }
+    dval_kwargs = {
+        "data": X_clean[val_mask],
+        "label": y_val,
+        "feature_names": list(FEATURE_COLS),
+    }
+    if train_weights is not None:
+        dtrain_kwargs["weight"] = train_weights
+    if val_weights is not None:
+        dval_kwargs["weight"] = val_weights
+
+    dtrain = xgb.DMatrix(**dtrain_kwargs)
+    dval = xgb.DMatrix(**dval_kwargs)
 
     summary = {
         "base_matrix_uri": base_uri,
@@ -490,8 +584,9 @@ def _prepare_temporal_split(args: argparse.Namespace) -> dict:
         "dval_build_count": 1,
         "learner_mode": learner_mode,
         "weight_mode": weight_mode,
-        "train_weight_sum": float(np.sum(train_weights)),
-        "val_weight_sum": float(np.sum(val_weights)),
+        "weighting_enabled": bool(train_weights is not None),
+        "train_weight_sum": None if train_weights is None else float(np.sum(train_weights)),
+        "val_weight_sum": None if val_weights is None else float(np.sum(val_weights)),
         "contract_diag": contract_diag,
         "feature_cols": list(FEATURE_COLS),
     }
@@ -510,18 +605,21 @@ def _prepare_temporal_split(args: argparse.Namespace) -> dict:
 def _trial_payload(
     trial,
     params: dict,
-    auc: float,
+    auc: float | None,
+    val_spearman_ic: float,
     alpha_top_decile: float,
     alpha_top_quintile: float,
     *,
     objective_metric: str = "val_auc",
     min_val_auc: float = 0.0,
+    min_val_spearman_ic: float = 0.0,
     learner_mode: str = "binary_logistic_sign",
 ) -> dict:
     payload = {
         "trial_number": int(trial.number),
         "state": "COMPLETE",
-        "val_auc": float(auc),
+        "val_auc": None if auc is None else float(auc),
+        "val_spearman_ic": float(val_spearman_ic),
         "alpha_top_decile": float(alpha_top_decile),
         "alpha_top_quintile": float(alpha_top_quintile),
         "learner_mode": _resolve_learner_mode(learner_mode),
@@ -533,9 +631,12 @@ def _trial_payload(
         _objective_contract(
             objective_metric,
             auc=auc,
+            val_spearman_ic=val_spearman_ic,
             alpha_top_decile=alpha_top_decile,
             alpha_top_quintile=alpha_top_quintile,
             min_val_auc=float(min_val_auc),
+            min_val_spearman_ic=float(min_val_spearman_ic),
+            learner_mode=_resolve_learner_mode(learner_mode),
         )
     )
     return payload
@@ -570,6 +671,7 @@ def main() -> None:
     ap.add_argument("--topo-energy-min", type=float, default=2.0)
     ap.add_argument("--objective-metric", default="val_auc")
     ap.add_argument("--min-val-auc", type=float, default=0.0)
+    ap.add_argument("--min-val-spearman-ic", type=float, default=0.0)
     ap.add_argument("--weight-mode", default="physics_abs_singularity")
     ap.add_argument("--learner-mode", default="binary_logistic_sign")
 
@@ -638,7 +740,9 @@ def main() -> None:
             preds = booster.predict(dval)
         else:
             preds = booster.predict(dval, iteration_range=(0, int(best_iteration) + 1))
-        auc = float(roc_auc_score(y_val_sign, preds))
+        val_spearman_ic = _spearman_rank_ic(preds, excess_val)
+        auc_defined = len(np.unique(y_val_sign)) > 1
+        auc = float(roc_auc_score(y_val_sign, preds)) if auc_defined else None
         alpha_top_decile = _top_quantile_alpha(preds, excess_val, 0.90)
         alpha_top_quintile = _top_quantile_alpha(preds, excess_val, 0.80)
 
@@ -656,15 +760,18 @@ def main() -> None:
                 "num_boost_round": int(num_boost_round),
             },
             auc=auc,
+            val_spearman_ic=val_spearman_ic,
             alpha_top_decile=alpha_top_decile,
             alpha_top_quintile=alpha_top_quintile,
             objective_metric=str(args.objective_metric),
             min_val_auc=float(args.min_val_auc),
+            min_val_spearman_ic=float(args.min_val_spearman_ic),
             learner_mode=str(args.learner_mode),
         )
         trial_rows.append(payload)
         trial.set_user_attr("alpha_top_decile", alpha_top_decile)
         trial.set_user_attr("alpha_top_quintile", alpha_top_quintile)
+        trial.set_user_attr("val_spearman_ic", float(payload["val_spearman_ic"]))
         trial.set_user_attr("learner_mode", str(args.learner_mode))
         trial.set_user_attr("objective_metric", str(payload["objective_metric"]))
         trial.set_user_attr("objective_value", float(payload["objective_value"]))
@@ -672,6 +779,9 @@ def main() -> None:
         trial.set_user_attr("auc_guardrail_min", float(payload["auc_guardrail_min"]))
         trial.set_user_attr("auc_guardrail_enabled", bool(payload["auc_guardrail_enabled"]))
         trial.set_user_attr("auc_guardrail_passed", bool(payload["auc_guardrail_passed"]))
+        trial.set_user_attr("spearman_guardrail_min", float(payload["spearman_guardrail_min"]))
+        trial.set_user_attr("spearman_guardrail_enabled", bool(payload["spearman_guardrail_enabled"]))
+        trial.set_user_attr("spearman_guardrail_passed", bool(payload["spearman_guardrail_passed"]))
         trial.set_user_attr("tail_monotonicity_enabled", bool(payload["tail_monotonicity_enabled"]))
         trial.set_user_attr("tail_monotonicity_passed", bool(payload["tail_monotonicity_passed"]))
         trial.set_user_attr("structural_guardrail_passed", bool(payload["structural_guardrail_passed"]))
@@ -682,6 +792,8 @@ def main() -> None:
 
     completed = [t for t in study.trials if t.state == TrialState.COMPLETE]
     eligible_rows = [row for row in trial_rows if bool(row.get("structural_guardrail_passed", False))]
+    auc_guardrail_rows = [row for row in trial_rows if bool(row.get("auc_guardrail_passed", False))]
+    spearman_guardrail_rows = [row for row in trial_rows if bool(row.get("spearman_guardrail_passed", False))]
     best_value = float(study.best_value) if completed else None
     best_params = dict(study.best_params) if completed else {}
 
@@ -696,11 +808,19 @@ def main() -> None:
         "best_params": best_params,
         "n_trials": int(len(study.trials)),
         "n_completed": int(len(completed)),
-        "n_auc_guardrail_passed": int(len(eligible_rows)),
+        "n_auc_guardrail_passed": int(len(auc_guardrail_rows)),
+        "n_structural_guardrail_passed": int(len(eligible_rows)),
+        "n_auc_floor_passed": int(len(auc_guardrail_rows)),
+        "n_spearman_floor_passed": int(len(spearman_guardrail_rows)),
         "seconds": round(time.time() - t0, 2),
         "objective_metric": str(args.objective_metric),
         "auc_guardrail_min": float(args.min_val_auc),
+        "spearman_guardrail_min": float(args.min_val_spearman_ic),
         "auc_guardrail_enabled": bool(float(args.min_val_auc) > 0.0 and str(args.objective_metric) != "val_auc"),
+        "spearman_guardrail_enabled": bool(
+            str(args.objective_metric) == STRUCTURAL_TAIL_OBJECTIVE
+            and str(args.learner_mode) == STRUCTURAL_TAIL_REQUIRED_REGRESSION_LEARNER_MODE
+        ),
         "tail_monotonicity_required": bool(str(args.objective_metric) == STRUCTURAL_TAIL_OBJECTIVE),
         "learner_mode": str(args.learner_mode),
         "weight_mode": str(args.weight_mode),

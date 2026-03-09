@@ -12,7 +12,7 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
 
 ### Project: V648-PATH-B-CONTINUOUS-LABEL-PIVOT
 
-- Status: `DRAFT_PENDING_OWNER_CONFIRMATION`
+- Status: `LOCAL_SMOKE_GATE_FAILED_NO_CLOUD_ESCALATION`
 - Hosts: `controller`, optional `GCP Vertex AI` after local gate only
 - Goal: replace the structurally exhausted Path A weighted binary classifier with a continuous-label Path B contract that can test whether frozen V64 physics can survive translation into a structurally valid economic ranker
 - Seed authority:
@@ -59,14 +59,41 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
     - `alpha_top_decile > alpha_top_quintile`
     - `alpha_top_quintile > 0`
 - Current state:
-  - draft exists
-  - draft is Gemini-audited
-  - active charter has not been switched
-  - awaiting owner confirmation only
+  - mission is active
+  - active charter has been switched
+  - first wave implementation landed
+  - first local smoke gate failed
+- Latest result:
+  - execution record:
+    - `handover/ai-direct/entries/20260309_124249_v648_local_contract_and_smoke_blocked.md`
+  - local regression:
+    - `36 passed in 7.92s`
+    - `py_compile` passed
+  - local smoke root:
+    - `audit/runtime/v648_local_smoke_20260309_123500/workers/w00`
+  - local smoke summary:
+    - `n_trials=10`
+    - `n_completed=10`
+    - `n_structural_guardrail_passed=0`
+    - `n_spearman_floor_passed=0`
+    - `best_value=-1000000000.0`
+  - strongest observed local values:
+    - `max_val_spearman_ic=0.0`
+    - `max_alpha_top_decile=1.244533029128729e-20`
+    - `max_alpha_top_quintile=1.244533029128729e-20`
+  - key conclusion:
+    - the first Path B regression contract is now mechanically implemented
+    - but it degenerates into a flat local predictor on the frozen `2023 -> 2024` smoke
+    - therefore the explicit escalation gate to GCP is not earned
+    - therefore holdouts remain untouched
 - Risks:
-  - Path B local signal may still be too weak to clear even the local smoke gate
-  - a single-year `2023 -> 2024` optimization surface can still overfit even under regression if the local gate is set too softly
-  - holdout metrics will require retrain parity before any live promotion decision is meaningful
+  - the current unweighted `reg:squarederror` contract may be collapsing into a trivial mean predictor under the frozen train/validation split
+  - any immediate cloud expansion would only search a sterile local surface more expensively
+  - holdout metrics remain intentionally unavailable because the local gate failed
+- Immediate next step:
+  - do not open GCP
+  - do not touch holdouts
+  - prepare a new bounded spec for the next learner-interface adjustment
 
 ### Project: V645-GC-ASYMMETRIC-LABEL-PIVOT
 

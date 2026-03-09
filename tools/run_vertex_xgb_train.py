@@ -21,6 +21,7 @@ from importlib.util import find_spec
 
 
 WEIGHT_MODES = {
+    "none",
     "physics_abs_singularity",
     "abs_excess_return",
     "pow_0p875_abs_excess_return",
@@ -28,6 +29,7 @@ WEIGHT_MODES = {
     "pow_0p625_abs_excess_return",
     "sqrt_abs_excess_return",
 }
+LEARNER_MODES = {"binary_logistic_sign", "reg_squarederror_excess_return"}
 
 
 def _install_dependencies() -> None:
@@ -124,10 +126,19 @@ def _resolve_weight_mode(mode: str) -> str:
     return clean
 
 
+def _resolve_learner_mode(mode: str) -> str:
+    clean = str(mode or "").strip()
+    if clean not in LEARNER_MODES:
+        raise RuntimeError(f"unsupported_learner_mode: {clean}")
+    return clean
+
+
 def _select_training_weights(*, mode: str, singularity: "np.ndarray", excess_returns: "np.ndarray"):
     import numpy as np
 
     resolved = _resolve_weight_mode(mode)
+    if resolved == "none":
+        return None
     if resolved == "physics_abs_singularity":
         return np.abs(singularity)
     if resolved == "abs_excess_return":
@@ -278,6 +289,7 @@ def run_global_training(args: argparse.Namespace) -> None:
     
     # Use Excess Return for label
     excess_all = df.get_column("t1_excess_return").to_numpy()
+    learner_mode = _resolve_learner_mode(args.learner_mode)
     y_all = (excess_all > 0).astype(int)
 
     print(
@@ -291,42 +303,45 @@ def run_global_training(args: argparse.Namespace) -> None:
 
     mask_rows = int(np.sum(physics_mask))
     X_clean = X_all[physics_mask]
-    y_clean = y_all[physics_mask]
+    y_clean = y_all[physics_mask] if learner_mode == "binary_logistic_sign" else excess_all[physics_mask]
     excess_clean = excess_all[physics_mask]
     singularity_clean = singularity[physics_mask]
+    if learner_mode == "reg_squarederror_excess_return" and str(args.weight_mode) != "none":
+        raise RuntimeError("regression_learner_requires_weight_mode:none")
     weights_clean = _select_training_weights(
         mode=str(args.weight_mode),
         singularity=singularity_clean,
         excess_returns=excess_clean,
     )
 
-    finite = np.isfinite(weights_clean)
-    X_clean = X_clean[finite]
-    y_clean = y_clean[finite]
-    weights_clean = weights_clean[finite]
-    excess_clean = excess_clean[finite]
+    if weights_clean is not None:
+        finite = np.isfinite(weights_clean)
+        X_clean = X_clean[finite]
+        y_clean = y_clean[finite]
+        weights_clean = weights_clean[finite]
+        excess_clean = excess_clean[finite]
 
     base_rows = int(df.height)
     train_rows = int(len(y_clean))
     print(f"[*] Sliced rows for training: {train_rows} / {base_rows} (mask_rows={mask_rows})", flush=True)
     if train_rows <= 0:
         raise RuntimeError("Physics gates removed all rows; cannot train.")
-    if float(np.sum(weights_clean)) <= 0.0:
+    if weights_clean is not None and float(np.sum(weights_clean)) <= 0.0:
         raise RuntimeError("training_weights_non_positive")
 
-    del df, singularity, X_all, y_all, excess_all, physics_mask, finite, excess_clean, singularity_clean
+    del df, singularity, X_all, y_all, excess_all, physics_mask, excess_clean, singularity_clean
     gc.collect()
 
-    dtrain = xgb.DMatrix(
-        X_clean,
-        label=y_clean,
-        weight=weights_clean,
-        feature_names=list(FEATURE_COLS),
-    )
+    dtrain_kwargs = {
+        "data": X_clean,
+        "label": y_clean,
+        "feature_names": list(FEATURE_COLS),
+    }
+    if weights_clean is not None:
+        dtrain_kwargs["weight"] = weights_clean
+    dtrain = xgb.DMatrix(**dtrain_kwargs)
 
     params = {
-        "objective": "binary:logistic",
-        "eval_metric": "auc",
         "max_depth": int(args.xgb_max_depth),
         "eta": float(args.xgb_learning_rate),
         "subsample": float(args.xgb_subsample),
@@ -339,6 +354,12 @@ def run_global_training(args: argparse.Namespace) -> None:
         "n_jobs": int(args.n_jobs),
         "seed": int(args.seed),
     }
+    if learner_mode == "binary_logistic_sign":
+        params["objective"] = "binary:logistic"
+        params["eval_metric"] = "auc"
+    else:
+        params["objective"] = "reg:squarederror"
+        params["eval_metric"] = "rmse"
     rounds = int(max(1, args.num_boost_round))
     print("[*] Running one-shot global xgb.train()...", flush=True)
     model = xgb.train(params=params, dtrain=dtrain, num_boost_round=rounds)
@@ -347,6 +368,7 @@ def run_global_training(args: argparse.Namespace) -> None:
         "model": model,
         "scaler": None,
         "feature_cols": list(FEATURE_COLS),
+        "learner_mode": learner_mode,
     }
     model_name = "omega_xgb_final.pkl"
     with open(model_name, "wb") as f:
@@ -389,6 +411,7 @@ def run_global_training(args: argparse.Namespace) -> None:
             "num_boost_round": rounds,
             "seed": int(args.seed),
             "stage3_param_contract": "canonical_v64_1",
+            "learner_mode": str(learner_mode),
             "weight_mode": str(args.weight_mode),
         },
     }
@@ -439,6 +462,7 @@ def main() -> None:
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--n-jobs", type=int, default=-1)
     ap.add_argument("--weight-mode", default="physics_abs_singularity")
+    ap.add_argument("--learner-mode", default="binary_logistic_sign")
 
     # Legacy args kept for compatibility with old submitters.
     ap.add_argument("--code-bundle-uri", default="", help="Run-pinned code bundle URI.")
@@ -453,6 +477,7 @@ def main() -> None:
     if str(args.train_years).strip():
         raise RuntimeError("`--train-years` is forbidden for this training payload. Use prebuilt base_matrix scope.")
     args.weight_mode = _resolve_weight_mode(args.weight_mode)
+    args.learner_mode = _resolve_learner_mode(args.learner_mode)
     _install_dependencies()
     if str(args.code_bundle_uri).strip():
         _bootstrap_codebase(args.code_bundle_uri)

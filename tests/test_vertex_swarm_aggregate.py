@@ -610,3 +610,114 @@ def test_aggregate_structural_tail_metric_rejects_subfloor_auc(
     assert champion["worker_id"] == "w01"
     assert leaderboard["eligible_trials"] == 1
     assert leaderboard["leaderboard"][0]["auc_guardrail_passed"] is True
+
+
+def test_aggregate_structural_tail_metric_supports_path_b_spearman_floor(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    results_root = tmp_path / "results"
+    output_root = tmp_path / "output"
+    fingerprint = {"stage3_param_contract": "canonical_v64_1", "sha256": "spearman123"}
+    _write_worker(
+        results_root,
+        "w00",
+        fingerprint,
+        [
+            {
+                "trial_number": 0,
+                "val_auc": 0.48,
+                "val_spearman_ic": -0.01,
+                "alpha_top_decile": 0.00020,
+                "alpha_top_quintile": 0.00010,
+                "objective_metric": "structural_tail_monotonicity_gate",
+                "objective_value": -1.0e9,
+                "raw_objective_value": 0.00015,
+                "learner_mode": "reg_squarederror_excess_return",
+                "spearman_guardrail_min": 0.0,
+                "spearman_guardrail_passed": False,
+                "tail_monotonicity_passed": True,
+                "structural_guardrail_passed": False,
+                "max_depth": 3,
+                "num_boost_round": 90,
+                "params": {
+                    "max_depth": 3,
+                    "learning_rate": 0.05,
+                    "subsample": 0.9,
+                    "colsample_bytree": 0.8,
+                    "min_child_weight": 1.0,
+                    "gamma": 0.0,
+                    "reg_lambda": 1.0,
+                    "reg_alpha": 0.0,
+                    "num_boost_round": 90,
+                },
+            }
+        ],
+    )
+    _write_worker(
+        results_root,
+        "w01",
+        fingerprint,
+        [
+            {
+                "trial_number": 0,
+                "val_auc": 0.49,
+                "val_spearman_ic": 0.03,
+                "alpha_top_decile": 0.00016,
+                "alpha_top_quintile": 0.00008,
+                "objective_metric": "structural_tail_monotonicity_gate",
+                "objective_value": 0.00012,
+                "raw_objective_value": 0.00012,
+                "learner_mode": "reg_squarederror_excess_return",
+                "spearman_guardrail_min": 0.0,
+                "spearman_guardrail_passed": True,
+                "tail_monotonicity_passed": True,
+                "structural_guardrail_passed": True,
+                "max_depth": 4,
+                "num_boost_round": 110,
+                "params": {
+                    "max_depth": 4,
+                    "learning_rate": 0.03,
+                    "subsample": 0.85,
+                    "colsample_bytree": 0.75,
+                    "min_child_weight": 1.5,
+                    "gamma": 0.0,
+                    "reg_lambda": 1.1,
+                    "reg_alpha": 0.001,
+                    "num_boost_round": 110,
+                },
+            }
+        ],
+    )
+
+    monkeypatch.setattr(
+        "sys.argv",
+        [
+            "aggregate_vertex_swarm_results.py",
+            "--results-prefix-uri",
+            str(results_root),
+            "--output-uri",
+            str(output_root),
+            "--objective-metric",
+            "structural_tail_monotonicity_gate",
+            "--min-val-auc",
+            "0.0",
+            "--min-val-spearman-ic",
+            "0.0",
+            "--objective-epsilon",
+            "0.00001",
+            "--min-workers",
+            "2",
+            "--min-completed-trials",
+            "2",
+        ],
+    )
+    aggregate.main()
+
+    champion = json.loads((output_root / "champion_params.json").read_text(encoding="utf-8"))
+    leaderboard = json.loads((output_root / "swarm_leaderboard.json").read_text(encoding="utf-8"))
+    assert champion["worker_id"] == "w01"
+    assert champion["spearman_guardrail_passed"] is True
+    assert champion["val_spearman_ic"] == pytest.approx(0.03)
+    assert leaderboard["eligible_trials"] == 1
+    assert leaderboard["leaderboard"][0]["spearman_guardrail_passed"] is True

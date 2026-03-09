@@ -35,7 +35,13 @@ def _row(date: str, time_value: int, t1_fwd_return: float, offset: float) -> dic
     return row
 
 
-def _write_eval_payload(path: Path, matrix_path: Path, *, expected_date_prefix: str) -> None:
+def _write_eval_payload(
+    path: Path,
+    matrix_path: Path,
+    *,
+    expected_date_prefix: str,
+    learner_mode: str = "binary_logistic_sign",
+) -> None:
     args = Namespace(
         base_matrix_uri=str(matrix_path),
         expected_date_prefix=str(expected_date_prefix),
@@ -49,8 +55,8 @@ def _write_eval_payload(path: Path, matrix_path: Path, *, expected_date_prefix: 
     dtrain = datasets["dholdout"]
     booster = xgb.train(
         params={
-            "objective": "binary:logistic",
-            "eval_metric": "auc",
+            "objective": "binary:logistic" if learner_mode == "binary_logistic_sign" else "reg:squarederror",
+            "eval_metric": "auc" if learner_mode == "binary_logistic_sign" else "rmse",
             "tree_method": "hist",
             "max_depth": 3,
             "eta": 0.2,
@@ -60,7 +66,15 @@ def _write_eval_payload(path: Path, matrix_path: Path, *, expected_date_prefix: 
         num_boost_round=6,
     )
     with path.open("wb") as f:
-        pickle.dump({"model": booster, "scaler": None, "feature_cols": list(FEATURE_COLS)}, f)
+        pickle.dump(
+            {
+                "model": booster,
+                "scaler": None,
+                "feature_cols": list(FEATURE_COLS),
+                "learner_mode": learner_mode,
+            },
+            f,
+        )
 
 
 def test_prepare_holdout_dataset_asserts_date_prefix(tmp_path: Path) -> None:
@@ -158,6 +172,7 @@ def test_evaluate_holdout_writes_metrics(tmp_path: Path, monkeypatch: pytest.Mon
     assert metrics["dataset_role"] == "outer_holdout"
     assert metrics["dataset_summary"]["eval_rows"] == 6
     assert metrics["dataset_summary"]["scope_diag"]["date_prefix_assertion_passed"] is True
+    assert "spearman_ic" in metrics
     assert metrics["auc_defined"] is True
     assert 0.0 <= metrics["auc"] <= 1.0
 
@@ -208,3 +223,4 @@ def test_evaluate_holdout_allows_one_class_auc_null(tmp_path: Path) -> None:
     assert metrics["dataset_summary"]["negative_rows"] == 0
     assert metrics["auc_defined"] is False
     assert metrics["auc"] is None
+    assert isinstance(metrics["spearman_ic"], float)

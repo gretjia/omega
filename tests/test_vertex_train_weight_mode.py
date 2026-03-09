@@ -10,6 +10,15 @@ if str(REPO_ROOT) not in sys.path:
 from tools.run_vertex_xgb_train import _select_training_weights
 
 
+def test_select_training_weights_supports_none_mode() -> None:
+    weights = _select_training_weights(
+        mode="none",
+        singularity=np.array([0.25, -0.5, 0.1]),
+        excess_returns=np.array([0.01, -0.02, 0.03]),
+    )
+    assert weights is None
+
+
 def test_select_training_weights_uses_physics_abs_singularity() -> None:
     weights = _select_training_weights(
         mode="physics_abs_singularity",

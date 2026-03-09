@@ -45,6 +45,75 @@
 ### Entries
 
 <!-- New session debriefs go here. Most recent on top. -->
+#### [2026-03-09 12:42] Agent: Codex | Session: V648 Local Path B First Wave Blocked
+
+**What I did:**
+- Switched the active mission from V647 to V648.
+- Added mission-open authority:
+  - `handover/ai-direct/entries/20260309_122827_v648_path_b_continuous_label_pivot_mission_open.md`
+- Sent fresh AgentOS packets to:
+  - Plan
+  - Math
+  - Runtime
+- Implemented the first bounded V648 Path B contract wave in:
+  - `tools/run_optuna_sweep.py`
+  - `tools/aggregate_vertex_swarm_results.py`
+  - `tools/launch_vertex_swarm_optuna.py`
+  - `tools/run_vertex_xgb_train.py`
+  - `tools/evaluate_xgb_on_base_matrix.py`
+- Added and updated regression-side tests.
+- Ran local regression:
+  - `36 passed in 7.92s`
+- Ran one fresh local smoke:
+  - `audit/runtime/v648_local_smoke_20260309_123500/workers/w00`
+- Recorded the blocked-wave result in:
+  - `handover/ai-direct/entries/20260309_124249_v648_local_contract_and_smoke_blocked.md`
+
+**What I discovered:**
+- The new Path B contract is now mechanically implemented:
+  - continuous label
+  - no sample weights
+  - Spearman-based structural floor
+- But the first frozen local smoke did not produce even one structurally valid trial.
+- The whole `10`-trial smoke collapsed to effectively flat predictions:
+  - `max_val_spearman_ic=0.0`
+  - `max_alpha_top_decile=1.244533029128729e-20`
+  - `max_alpha_top_quintile=1.244533029128729e-20`
+- So the failure is not “Path B code crashed.”
+- The failure is:
+  - Path B current contract is too weak / too flat to clear the first local gate
+
+**What confused me / blocked me:**
+- The first direct smoke attempt with `/usr/bin/python3` failed before model execution because that system Python has no `pip`.
+- Re-running the exact same smoke under `uv` solved the environment issue and exposed the real model behavior.
+- The Plan Agent recommended keeping wave 1 narrower than I implemented; I still added retrain/eval parity early because the active V648 charter explicitly included those files and I wanted one coherent Path B contract across sweep/retrain/eval. No holdouts were touched.
+
+**What the next agent should do:**
+- Treat V648 wave 1 as blocked at the local smoke gate.
+- Do not open GCP.
+- Do not touch `2025` or `2026-01`.
+- Use:
+  - `handover/ai-direct/entries/20260309_124249_v648_local_contract_and_smoke_blocked.md`
+  as the frozen evidence packet for the next spec decision.
+- The next mission/spec should explain why unweighted `reg:squarederror` is collapsing into a flat predictor on the frozen `2023 -> 2024` split.
+
+**Files I changed:**
+- `handover/ops/ACTIVE_MISSION_CHARTER.md` — switched active mission to V648.
+- `handover/ai-direct/entries/20260309_122827_v648_path_b_continuous_label_pivot_mission_open.md` — opened V648.
+- `tools/run_optuna_sweep.py` — added Path B structural Spearman gating and no-weight regression path.
+- `tools/aggregate_vertex_swarm_results.py` — added Path B structural aggregation parity.
+- `tools/launch_vertex_swarm_optuna.py` — added Path B launch/aggregate contract parity.
+- `tools/run_vertex_xgb_train.py` — added Path B regression retrain parity with `weight_mode=none`.
+- `tools/evaluate_xgb_on_base_matrix.py` — added `spearman_ic` evaluation output.
+- `tests/test_vertex_optuna_split.py` — added Path B contract tests.
+- `tests/test_vertex_train_weight_mode.py` — added `weight_mode=none` coverage.
+- `tests/test_vertex_holdout_eval.py` — added `spearman_ic` output assertions.
+- `tests/test_vertex_swarm_aggregate.py` — added Path B structural aggregation coverage.
+- `handover/ai-direct/entries/20260309_124249_v648_local_contract_and_smoke_blocked.md` — recorded the blocked local-smoke verdict.
+- `handover/ai-direct/LATEST.md` — updated runtime truth for V648 blocked state.
+- `handover/ops/ACTIVE_PROJECTS.md` — updated V648 project status to blocked-at-local-gate.
+- `handover/BOARD.md` — added this debrief block.
+
 #### [2026-03-09 12:28] Agent: Codex | Session: V648 Draft And Gemini PASS
 
 **What I did:**

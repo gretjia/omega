@@ -21,6 +21,9 @@ OBJECTIVE_METRICS = {
 HARD_LOSING_OBJECTIVE_VALUE = -1.0e9
 STRUCTURAL_TAIL_OBJECTIVE = "structural_tail_monotonicity_gate"
 STRUCTURAL_TAIL_MIN_AUC_FLOOR = 0.505
+STRUCTURAL_TAIL_MIN_SPEARMAN_FLOOR = 0.0
+STRUCTURAL_TAIL_BINARY_LEARNER_MODE = "binary_logistic_sign"
+STRUCTURAL_TAIL_REGRESSION_LEARNER_MODE = "reg_squarederror_excess_return"
 
 
 def _parse_gcs_uri(uri: str) -> tuple[str, str]:
@@ -163,14 +166,17 @@ def _row_metric_value(row: dict, metric: str) -> float:
 def _objective_contract(
     objective_metric: str,
     *,
-    auc: float,
+    auc: float | None,
+    val_spearman_ic: float,
     alpha_top_decile: float,
     alpha_top_quintile: float,
     min_val_auc: float,
+    min_val_spearman_ic: float,
+    learner_mode: str,
 ) -> dict:
     metric = _resolve_objective_metric(objective_metric)
     if metric == "val_auc":
-        raw_objective_value = float(auc)
+        raw_objective_value = float(auc or 0.0)
     elif metric == "alpha_top_decile":
         raw_objective_value = float(alpha_top_decile)
     elif metric == "alpha_top_quintile":
@@ -178,34 +184,55 @@ def _objective_contract(
     else:
         raw_objective_value = float((float(alpha_top_decile) + float(alpha_top_quintile)) / 2.0)
     auc_guardrail_min = float(min_val_auc)
+    spearman_guardrail_min = float(min_val_spearman_ic)
     auc_guardrail_enabled = metric != "val_auc" and auc_guardrail_min > 0.0
-    auc_guardrail_passed = float(auc) >= auc_guardrail_min if auc_guardrail_enabled else True
+    spearman_guardrail_enabled = False
+    structural_metric_name = "val_auc"
+    if metric == STRUCTURAL_TAIL_OBJECTIVE and learner_mode == STRUCTURAL_TAIL_REGRESSION_LEARNER_MODE:
+        auc_guardrail_enabled = False
+        spearman_guardrail_enabled = True
+        structural_metric_name = "val_spearman_ic"
+    auc_guardrail_passed = float(auc or 0.0) >= auc_guardrail_min if auc_guardrail_enabled else True
+    spearman_guardrail_passed = (
+        float(val_spearman_ic) > spearman_guardrail_min if spearman_guardrail_enabled else True
+    )
     tail_monotonicity_enabled = metric == STRUCTURAL_TAIL_OBJECTIVE
     tail_monotonicity_passed = float(alpha_top_decile) >= float(alpha_top_quintile) if tail_monotonicity_enabled else True
-    structural_guardrail_passed = bool(auc_guardrail_passed and tail_monotonicity_passed)
+    structural_guardrail_passed = bool(
+        auc_guardrail_passed and spearman_guardrail_passed and tail_monotonicity_passed
+    )
     objective_value = raw_objective_value if structural_guardrail_passed else HARD_LOSING_OBJECTIVE_VALUE
     return {
         "objective_metric": metric,
         "raw_objective_value": float(raw_objective_value),
         "objective_value": float(objective_value),
+        "val_auc": None if auc is None else float(auc),
+        "val_spearman_ic": float(val_spearman_ic),
+        "structural_metric_name": str(structural_metric_name),
         "auc_guardrail_min": auc_guardrail_min,
         "auc_guardrail_enabled": bool(auc_guardrail_enabled),
         "auc_guardrail_passed": bool(auc_guardrail_passed),
+        "spearman_guardrail_min": spearman_guardrail_min,
+        "spearman_guardrail_enabled": bool(spearman_guardrail_enabled),
+        "spearman_guardrail_passed": bool(spearman_guardrail_passed),
         "tail_monotonicity_enabled": bool(tail_monotonicity_enabled),
         "tail_monotonicity_passed": bool(tail_monotonicity_passed),
         "structural_guardrail_passed": bool(structural_guardrail_passed),
     }
 
 
-def _decorate_row(row: dict, *, objective_metric: str, min_val_auc: float) -> dict:
+def _decorate_row(row: dict, *, objective_metric: str, min_val_auc: float, min_val_spearman_ic: float) -> dict:
     clean = dict(row)
     clean.update(
         _objective_contract(
             objective_metric,
             auc=_row_metric_value(clean, "val_auc"),
+            val_spearman_ic=_row_metric_value(clean, "val_spearman_ic"),
             alpha_top_decile=_row_metric_value(clean, "alpha_top_decile"),
             alpha_top_quintile=_row_metric_value(clean, "alpha_top_quintile"),
             min_val_auc=float(min_val_auc),
+            min_val_spearman_ic=float(min_val_spearman_ic),
+            learner_mode=str(clean.get("learner_mode", STRUCTURAL_TAIL_BINARY_LEARNER_MODE)),
         )
     )
     return clean
@@ -217,19 +244,15 @@ def main() -> None:
     ap.add_argument("--output-uri", required=True, help="Prefix for leaderboard/champion outputs")
     ap.add_argument("--objective-metric", default="val_auc")
     ap.add_argument("--min-val-auc", type=float, default=0.0)
+    ap.add_argument("--min-val-spearman-ic", type=float, default=0.0)
     ap.add_argument("--objective-epsilon", type=float, default=None)
     ap.add_argument("--simplicity-epsilon", type=float, default=None)
     ap.add_argument("--min-workers", type=int, default=1)
     ap.add_argument("--min-completed-trials", type=int, default=1)
     args = ap.parse_args()
     objective_metric = _resolve_objective_metric(args.objective_metric)
-    if objective_metric != "val_auc" and float(args.min_val_auc) <= 0.0:
+    if objective_metric not in {"val_auc", STRUCTURAL_TAIL_OBJECTIVE} and float(args.min_val_auc) <= 0.0:
         raise RuntimeError("alpha_first_requires_positive_min_val_auc")
-    if objective_metric == STRUCTURAL_TAIL_OBJECTIVE and float(args.min_val_auc) < STRUCTURAL_TAIL_MIN_AUC_FLOOR:
-        raise RuntimeError(
-            "structural_tail_objective_requires_min_val_auc_at_least:"
-            f"{STRUCTURAL_TAIL_MIN_AUC_FLOOR}"
-        )
 
     trial_uris = _list_trial_uris(str(args.results_prefix_uri))
     if not trial_uris:
@@ -258,7 +281,7 @@ def main() -> None:
 
     if len(fingerprints) != 1:
         raise RuntimeError(f"canonical_fingerprint_mismatch: count={len(fingerprints)}")
-    completed_rows = [r for r in all_rows if r.get("val_auc") is not None]
+    completed_rows = [r for r in all_rows if r.get("state", "COMPLETE") == "COMPLETE"]
     if not completed_rows:
         raise RuntimeError("No completed trial rows available for aggregation.")
     if len(completed_rows) < int(args.min_completed_trials):
@@ -266,8 +289,28 @@ def main() -> None:
             "insufficient_completed_trials: "
             f"found={len(completed_rows)} min_completed_trials={int(args.min_completed_trials)}"
         )
+    learner_modes_present = {str(row.get("learner_mode", STRUCTURAL_TAIL_BINARY_LEARNER_MODE)) for row in completed_rows}
+    if objective_metric == STRUCTURAL_TAIL_OBJECTIVE:
+        if (
+            STRUCTURAL_TAIL_BINARY_LEARNER_MODE in learner_modes_present
+            and float(args.min_val_auc) < STRUCTURAL_TAIL_MIN_AUC_FLOOR
+        ):
+            raise RuntimeError(
+                "structural_tail_objective_requires_min_val_auc_at_least:"
+                f"{STRUCTURAL_TAIL_MIN_AUC_FLOOR}"
+            )
+        if float(args.min_val_spearman_ic) < STRUCTURAL_TAIL_MIN_SPEARMAN_FLOOR:
+            raise RuntimeError(
+                "structural_tail_objective_requires_min_val_spearman_ic_at_least:"
+                f"{STRUCTURAL_TAIL_MIN_SPEARMAN_FLOOR}"
+            )
     decorated_rows = [
-        _decorate_row(row, objective_metric=objective_metric, min_val_auc=float(args.min_val_auc))
+        _decorate_row(
+            row,
+            objective_metric=objective_metric,
+            min_val_auc=float(args.min_val_auc),
+            min_val_spearman_ic=float(args.min_val_spearman_ic),
+        )
         for row in completed_rows
     ]
     eligible_rows = [row for row in decorated_rows if bool(row.get("structural_guardrail_passed"))]
@@ -294,7 +337,7 @@ def main() -> None:
         key=lambda r: (
             int(r.get("max_depth", 10**9)),
             int(r.get("num_boost_round", 10**9)),
-            -float(r["val_auc"]),
+            -_row_metric_value(r, "val_auc"),
             int(r.get("trial_number", 10**9)),
         )
     )
@@ -326,6 +369,7 @@ def main() -> None:
         "objective_best_value": best_objective_value,
         "objective_epsilon": epsilon,
         "auc_guardrail_min": float(args.min_val_auc),
+        "spearman_guardrail_min": float(args.min_val_spearman_ic),
         "tail_monotonicity_required": bool(objective_metric == STRUCTURAL_TAIL_OBJECTIVE),
         "canonical_fingerprint": champion["canonical_fingerprint"],
         "worker_summaries": worker_summaries,
@@ -334,7 +378,7 @@ def main() -> None:
     }
     champion_params = {
         "status": "completed",
-        "best_val_auc": float(champion["val_auc"]),
+        "best_val_auc": _row_metric_value(champion, "val_auc"),
         "objective_metric": str(champion["objective_metric"]),
         "objective_value": float(champion["objective_value"]),
         "raw_objective_value": float(champion["raw_objective_value"]),
@@ -343,10 +387,13 @@ def main() -> None:
         "objective_epsilon": epsilon,
         "auc_guardrail_min": float(champion["auc_guardrail_min"]),
         "auc_guardrail_passed": bool(champion["auc_guardrail_passed"]),
+        "spearman_guardrail_min": float(champion.get("spearman_guardrail_min", 0.0)),
+        "spearman_guardrail_passed": bool(champion.get("spearman_guardrail_passed", True)),
         "tail_monotonicity_enabled": bool(champion.get("tail_monotonicity_enabled", False)),
         "tail_monotonicity_passed": bool(champion.get("tail_monotonicity_passed", True)),
         "structural_guardrail_passed": bool(champion.get("structural_guardrail_passed", False)),
         "canonical_fingerprint": champion["canonical_fingerprint"],
+        "val_spearman_ic": float(champion.get("val_spearman_ic", 0.0)),
         "alpha_top_decile": float(champion.get("alpha_top_decile", 0.0)),
         "alpha_top_quintile": float(champion.get("alpha_top_quintile", 0.0)),
         "worker_id": champion.get("worker_id", ""),

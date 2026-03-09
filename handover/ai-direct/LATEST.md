@@ -50,6 +50,66 @@ This file is the single source of current operational truth for all agents.
     - switch the active charter
     - open V648 under AgentOS
 
+## Update: 2026-03-09 12:29 UTC
+- **V648 is now the active mission.**
+- New mission-open authority:
+  - `handover/ai-direct/entries/20260309_122827_v648_path_b_continuous_label_pivot_mission_open.md`
+- Active charter has been switched to:
+  - `handover/ops/ACTIVE_MISSION_CHARTER.md`
+- Active branch decision:
+  - Path A is closed
+  - Path B is now the only justified learner-interface branch
+- First-wave execution shape:
+  - local-first
+  - contract/tests first
+  - no holdout use before retrain parity exists
+  - no GCP before the local smoke gate passes
+- Immediate next step:
+  - issue fresh AgentOS packets for the first V648 wave
+  - implement the bounded local Path B contract/test wave
+
+## Update: 2026-03-09 12:42 UTC
+- **V648 first wave completed its local contract/test implementation, but the local smoke gate failed.**
+- New execution record:
+  - `handover/ai-direct/entries/20260309_124249_v648_local_contract_and_smoke_blocked.md`
+- AgentOS convergence used during execution:
+  - Plan:
+    - local-first Path B contract/test wave is the minimum decisive wave
+  - Math:
+    - `PASS WITH FIXES`
+  - Runtime:
+    - `PASS WITH FIXES`
+- First-wave local code contract now exists in:
+  - `tools/run_optuna_sweep.py`
+  - `tools/aggregate_vertex_swarm_results.py`
+  - `tools/launch_vertex_swarm_optuna.py`
+  - `tools/run_vertex_xgb_train.py`
+  - `tools/evaluate_xgb_on_base_matrix.py`
+- Regression validation:
+  - `36 passed in 7.92s`
+  - `py_compile` passed
+- Local smoke root:
+  - `audit/runtime/v648_local_smoke_20260309_123500/workers/w00`
+- Local smoke summary:
+  - `n_trials=10`
+  - `n_completed=10`
+  - `n_structural_guardrail_passed=0`
+  - `n_spearman_floor_passed=0`
+  - `best_value=-1000000000.0`
+  - `seconds=17.34`
+- Strongest observed local signal:
+  - `max_val_spearman_ic=0.0`
+  - `max_alpha_top_decile=1.244533029128729e-20`
+  - `max_alpha_top_quintile=1.244533029128729e-20`
+- Operational verdict:
+  - Path B contract implementation succeeded
+  - Path B local smoke gate failed
+  - no GCP escalation is authorized
+  - no holdout consumption is authorized
+- Next step:
+  - freeze this blocked local result
+  - diagnose the flat-predictor collapse before opening any next wave
+
 ## Update: 2026-03-09 11:32 UTC
 - **V647 now has a full live verdict, and it failed the real promotion gate.**
 - New execution verdict:

@@ -28,6 +28,7 @@ from tools.run_optuna_sweep import (
     _canonical_fingerprint,
     _download_file,
     _resolved_version,
+    _spearman_rank_ic,
     _top_quantile_alpha,
     _upload_file,
 )
@@ -200,13 +201,10 @@ def _prepare_holdout_dataset(args: argparse.Namespace, *, feature_cols: list[str
     excess_all = df.get_column("t1_excess_return").to_numpy()
 
     physics_mask = np.abs(singularity) > float(args.singularity_threshold)
-    weights_all = np.abs(singularity)
-    finite = np.isfinite(weights_all) & (weights_all > 1e-8)
-    full_mask = physics_mask & finite
+    full_mask = physics_mask
 
     X_eval = X_all[full_mask]
     y_eval = y_all[full_mask]
-    weights_eval = weights_all[full_mask]
     excess_eval = excess_all[full_mask]
 
     eval_rows = int(y_eval.size)
@@ -218,7 +216,6 @@ def _prepare_holdout_dataset(args: argparse.Namespace, *, feature_cols: list[str
     dholdout = xgb.DMatrix(
         X_eval,
         label=y_eval,
-        weight=weights_eval,
         feature_names=feature_cols,
     )
     summary = {
@@ -298,6 +295,7 @@ def evaluate_holdout(args: argparse.Namespace) -> dict:
     auc_defined = positive_rows > 0 and negative_rows > 0
     if auc_defined:
         auc = float(roc_auc_score(datasets["y_eval"], preds))
+    spearman_ic = _spearman_rank_ic(preds, datasets["excess_eval"])
     alpha_top_decile = _top_quantile_alpha(preds, datasets["excess_eval"], 0.90)
     alpha_top_quintile = _top_quantile_alpha(preds, datasets["excess_eval"], 0.80)
 
@@ -308,10 +306,12 @@ def evaluate_holdout(args: argparse.Namespace) -> dict:
         "model_uri": str(args.model_uri),
         "auc": auc,
         "auc_defined": bool(auc_defined),
+        "spearman_ic": float(spearman_ic),
         "alpha_top_decile": float(alpha_top_decile),
         "alpha_top_quintile": float(alpha_top_quintile),
         "pred_mean": float(np.mean(preds)),
         "pred_std": float(np.std(preds)),
+        "learner_mode": str(payload.get("learner_mode", "unknown")),
         "canonical_fingerprint": datasets["canonical_fingerprint"],
         "validated_training_overrides": validated_overrides,
         "dataset_summary": datasets["summary"],
