@@ -8,6 +8,21 @@
 
 This file is the single source of current operational truth for all agents.
 
+## Update: 2026-03-09 13:02 UTC
+- **The V649 audit packet is now prepared for external review.**
+- New frozen audit summary:
+  - `audit/v649_path_b_flat_predictor_diagnosis.md`
+- New external-auditor prompt:
+  - `handover/ai-direct/entries/20260309_130238_external_ai_auditor_prompt_v649_flat_predictor.md`
+- Packet purpose:
+  - summarize the V648 blocked Path B smoke
+  - summarize the V649 zero-mass / constant-predictor diagnosis
+  - request a bounded recommendation for the next Path B mission
+- Current Commander recommendation remains:
+  - do not reopen GCP
+  - do not consume `2025` / `2026-01`
+  - keep next step inside local-only Path B variance-recovery / degeneracy-avoidance
+
 ## Update: 2026-03-09 12:28 UTC
 - **The new recursive Path A collapse verdict is landed, and the V648 spec draft has now passed `gemini -p`.**
 - New audit authority:

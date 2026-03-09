@@ -45,6 +45,42 @@
 ### Entries
 
 <!-- New session debriefs go here. Most recent on top. -->
+#### [2026-03-09 13:02] Agent: Codex | Session: V649 Audit Packet Prepared
+
+**What I did:**
+- Wrote the frozen V649 audit summary:
+  - `audit/v649_path_b_flat_predictor_diagnosis.md`
+- Wrote the external auditor prompt:
+  - `handover/ai-direct/entries/20260309_130238_external_ai_auditor_prompt_v649_flat_predictor.md`
+- Updated the audit index and current-state docs so the next reviewer can enter from the right place.
+
+**What I discovered:**
+- The repo now has a clean V649 handoff chain:
+  - blocked V648 smoke
+  - V649 diagnosis
+  - V649 audit summary
+  - V649 external-auditor prompt
+- No code changes were needed for this packet.
+
+**What confused me / blocked me:**
+- Nothing blocked this packet.
+- The only non-committed evidence remains runtime-local:
+  - `audit/runtime/v648_local_smoke_20260309_123500/`
+  - `audit/runtime/v649_flat_diag_20260309_130000/`
+
+**What the next agent should do:**
+- Use the new prompt to obtain the next external audit verdict.
+- Do not commit runtime temp artifacts.
+- Keep the next mission local-only unless the external audit explicitly changes that.
+
+**Files I changed:**
+- `audit/v649_path_b_flat_predictor_diagnosis.md` — froze the V649 diagnosis into the audit canon.
+- `audit/README.md` — indexed the new V649 audit record.
+- `handover/ai-direct/entries/20260309_130238_external_ai_auditor_prompt_v649_flat_predictor.md` — prepared the external audit prompt and evidence map.
+- `handover/ai-direct/LATEST.md` — recorded that the V649 audit packet is ready.
+- `handover/ops/ACTIVE_PROJECTS.md` — marked V649 as diagnosis complete with audit packet prepared.
+- `handover/BOARD.md` — added this debrief.
+
 #### [2026-03-09 12:55] Agent: Codex | Session: V649 Flat-Predictor Diagnosis Complete
 
 **What I did:**

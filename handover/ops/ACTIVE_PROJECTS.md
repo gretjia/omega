@@ -97,7 +97,7 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
 
 ### Project: V649-PATH-B-FLAT-PREDICTOR-DIAGNOSIS
 
-- Status: `ACTIVE_LOCAL_DIAGNOSIS`
+- Status: `DIAGNOSIS_COMPLETE_AUDIT_PACKET_PREPARED`
 - Hosts: `controller` only
 - Goal: explain why the V648 Path B regression contract collapses into a near-flat predictor on the frozen `2023 -> 2024` split before any further learner redesign
 - Seed authority:
@@ -124,6 +124,10 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
 - Latest result:
   - diagnosis record:
     - `handover/ai-direct/entries/20260309_125538_v649_flat_predictor_diagnosis_complete.md`
+  - frozen audit summary:
+    - `audit/v649_path_b_flat_predictor_diagnosis.md`
+  - external auditor prompt:
+    - `handover/ai-direct/entries/20260309_130238_external_ai_auditor_prompt_v649_flat_predictor.md`
   - key conclusion:
     - V648 collapsed into a true constant predictor under its search regime
     - Path B is not inherently forced to remain constant
