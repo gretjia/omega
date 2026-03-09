@@ -19,8 +19,31 @@ def _signal_to_label_columns(signal_col: str) -> tuple[str, str]:
     return f"excess_ret_t1_to_{horizon}", f"barrier_{horizon}"
 
 
-def _assign_cross_sectional_deciles(df: pl.DataFrame, signal_col: str) -> pl.DataFrame:
-    work = df.filter(pl.col(signal_col).is_not_null())
+def _stable_sort_keys(df: pl.DataFrame, signal_col: str) -> list[str]:
+    keys = ["pure_date", signal_col]
+    if "symbol" in df.columns:
+        keys.append("symbol")
+    return keys
+
+
+def _assign_cross_sectional_deciles(df: pl.DataFrame, signal_col: str) -> tuple[pl.DataFrame, dict[str, float | int]]:
+    work = df.filter(pl.col(signal_col).is_not_null()).sort(_stable_sort_keys(df, signal_col=signal_col))
+    date_stats = (
+        work.group_by("pure_date")
+        .agg(
+            [
+                pl.len().alias("n_names"),
+                pl.col(signal_col).n_unique().alias("n_unique_signal"),
+            ]
+        )
+        .sort("pure_date")
+    )
+    n_dates_input = int(date_stats.height)
+    date_frac_lt10 = float(date_stats.select((pl.col("n_names") < 10).mean()).item() or 0.0) if n_dates_input > 0 else 0.0
+    date_frac_flat_signal = (
+        float(date_stats.select((pl.col("n_unique_signal") <= 1).mean()).item() or 0.0) if n_dates_input > 0 else 0.0
+    )
+
     work = work.with_columns(
         [
             pl.len().over("pure_date").alias("__n"),
@@ -37,7 +60,12 @@ def _assign_cross_sectional_deciles(df: pl.DataFrame, signal_col: str) -> pl.Dat
             + 1
         ).alias("decile")
     )
-    return work.drop(["__n", "__rank"])
+    return work.drop(["__n", "__rank"]), {
+        "n_dates_input": n_dates_input,
+        "n_dates_scored": int(work.select(pl.col("pure_date").n_unique()).item()) if work.height > 0 else 0,
+        "date_frac_lt10": date_frac_lt10,
+        "date_frac_flat_signal": date_frac_flat_signal,
+    }
 
 
 def compute_event_study_for_signal(df: pl.DataFrame, signal_col: str) -> dict[str, object]:
@@ -48,17 +76,32 @@ def compute_event_study_for_signal(df: pl.DataFrame, signal_col: str) -> dict[st
         raise ValueError(f"missing required columns for event study: {sorted(missing)}")
 
     work = df.filter(pl.col(excess_col).is_not_null())
-    work = _assign_cross_sectional_deciles(work, signal_col=signal_col)
+    work, coverage = _assign_cross_sectional_deciles(work, signal_col=signal_col)
 
-    deciles = (
-        work.group_by("decile")
+    per_date = (
+        work.group_by(["pure_date", "decile"])
         .agg(
             [
                 pl.len().alias("n_obs"),
-                pl.col(excess_col).mean().alias("mean_excess_return"),
-                (pl.col(barrier_col) == 1).mean().alias("barrier_win_rate"),
-                (pl.col(barrier_col) == -1).mean().alias("barrier_loss_rate"),
-                pl.col(signal_col).mean().alias("mean_signal"),
+                pl.col(excess_col).mean().alias("date_mean_excess_return"),
+                (pl.col(barrier_col) == 1).mean().alias("date_barrier_win_rate"),
+                (pl.col(barrier_col) == -1).mean().alias("date_barrier_loss_rate"),
+                pl.col(signal_col).mean().alias("date_mean_signal"),
+            ]
+        )
+        .sort(["pure_date", "decile"])
+    )
+
+    deciles = (
+        per_date.group_by("decile")
+        .agg(
+            [
+                pl.len().alias("n_dates"),
+                pl.col("n_obs").sum().alias("n_obs"),
+                pl.col("date_mean_excess_return").mean().alias("mean_excess_return"),
+                pl.col("date_barrier_win_rate").mean().alias("barrier_win_rate"),
+                pl.col("date_barrier_loss_rate").mean().alias("barrier_loss_rate"),
+                pl.col("date_mean_signal").mean().alias("mean_signal"),
             ]
         )
         .sort("decile")
@@ -82,6 +125,11 @@ def compute_event_study_for_signal(df: pl.DataFrame, signal_col: str) -> dict[st
         "barrier_col": barrier_col,
         "n_rows_input": int(df.height),
         "n_rows_scored": int(work.height),
+        "n_dates_input": int(coverage["n_dates_input"]),
+        "n_dates_scored": int(coverage["n_dates_scored"]),
+        "date_frac_lt10": float(coverage["date_frac_lt10"]),
+        "date_frac_flat_signal": float(coverage["date_frac_flat_signal"]),
+        "date_neutral_aggregation": True,
         "deciles": decile_rows,
         "d10_mean_excess_return": float(d10.get("mean_excess_return", 0.0) or 0.0),
         "d1_mean_excess_return": float(d1.get("mean_excess_return", 0.0) or 0.0),
