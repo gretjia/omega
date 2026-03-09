@@ -8,6 +8,54 @@
 
 This file is the single source of current operational truth for all agents.
 
+## Update: 2026-03-09 05:07 UTC
+- **The first live `gc swarm-optuna` pilot completed end-to-end and produced a deterministic champion retrain on the `2023,2024` training artifact.**
+- Pilot identity:
+  - results prefix:
+    - `gs://omega_v52_central/omega/staging/swarm_optuna/pilot_20260309_045700`
+  - aggregate output:
+    - `gs://omega_v52_central/omega/staging/swarm_optuna/pilot_20260309_045700/aggregate`
+- Pilot outcome:
+  - `4` completed workers
+  - `40` completed trials
+  - all worker summaries proved:
+    - `train_year=2023`
+    - `val_year=2024`
+    - `train_rows=379331`
+    - `val_rows=356832`
+    - `dtrain_build_count=1`
+    - `dval_build_count=1`
+  - aggregate contract:
+    - canonical fingerprint matched across all workers
+    - `champion_pool_size=3`
+    - `best_val_auc=0.7955525583877963`
+  - selected champion under the configured simplicity tie-break:
+    - `best_val_auc=0.7949139136484219`
+    - `worker_id=w01`
+    - `trial_number=1`
+    - `xgb_max_depth=7`
+    - `num_boost_round=160`
+- Deterministic champion retrain:
+  - output prefix:
+    - `gs://omega_v52_central/omega/staging/swarm_optuna/pilot_20260309_045700/champion_retrain`
+  - model:
+    - `gs://omega_v52_central/omega/staging/swarm_optuna/pilot_20260309_045700/champion_retrain/omega_xgb_final.pkl`
+  - metrics:
+    - `base_rows=736163`
+    - `mask_rows=736163`
+    - `total_training_rows=736163`
+    - `seconds=3.34`
+- Important runtime lessons from live execution:
+  - `Vertex SDK from_local_script()` was not the stable controller path in the transient `uv` environment because local packaging expected `setuptools`; the reliable live path was `--force-gcloud-fallback`
+  - worker payload initially failed because `Trial` does not expose `.state` inside the objective path; fixed in `main` by commit `3647d9c`
+  - cloud breadth was initially wasted because all workers shared the same seed; fixed by per-worker seed offsets in commit `6a31f5a`
+  - fallback retrain requires `--code-bundle-uri` to be forwarded explicitly inside payload args
+- Mission state:
+  - the first cloud-parallel pilot goal is complete
+  - next logical phase is outer-holdout evaluation on the separate `2025` artifact, then final canary on `2026-01`
+- Deep dive:
+  - `handover/ai-direct/entries/20260309_050702_gc_swarm_optuna_pilot_and_champion_retrain_complete.md`
+
 ## Update: 2026-03-09 04:34 UTC
 - **The GC swarm-optuna implementation foundation now exists in active `tools/`, and local pilot prerequisites are no longer blocked on missing code paths.**
 - New active cloud tooling:

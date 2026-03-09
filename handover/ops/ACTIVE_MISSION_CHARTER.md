@@ -1,6 +1,6 @@
 # OMEGA Active Mission Charter
 
-Status: Active
+Status: Completed
 Task Name: V643 GC swarm-optuna pilot implementation and first pilot execution
 Owner: Human Owner
 Commander: Codex
@@ -25,7 +25,23 @@ Current checkpoint:
   - `python3 -m py_compile ...`
   - `uv run --python /usr/bin/python3.11 --with pytest --with polars --with xgboost --with optuna pytest -q tests/test_vertex_swarm_aggregate.py tests/test_vertex_optuna_split.py`
   - result:
-    - `3 passed`
+    - `5 passed`
+- Execution is now complete:
+  - pilot prefix:
+    - `gs://omega_v52_central/omega/staging/swarm_optuna/pilot_20260309_045700`
+  - achieved:
+    - `4` completed workers
+    - `40` completed trials
+    - leaderboard + champion artifacts
+    - deterministic champion retrain
+  - champion selection result:
+    - `best_val_auc=0.7949139136484219`
+    - `worker_id=w01`
+    - `trial_number=1`
+  - retrain result:
+    - `model_uri=gs://omega_v52_central/omega/staging/swarm_optuna/pilot_20260309_045700/champion_retrain/omega_xgb_final.pkl`
+    - `total_training_rows=736163`
+    - `seconds=3.34`
 
 ## 1. Objective
 
@@ -150,5 +166,6 @@ Runtime audit:
 
 - code foundation committed and pushed
 - pilot launched on Google Cloud
-- aggregation completes or a concrete blocking fault is recorded
+- aggregation completed with `40` completed trials
+- champion retrain completed on the full `2023,2024` training artifact
 - handover updated with exact cloud URIs, worker counts, trial counts, and verdict

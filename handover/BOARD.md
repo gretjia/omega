@@ -45,6 +45,67 @@
 ### Entries
 
 <!-- New session debriefs go here. Most recent on top. -->
+#### [2026-03-09 05:07] Agent: Codex | Session: GC Swarm-Optuna Pilot And Champion Retrain
+
+**What I did:**
+- Implemented the active cloud swarm toolchain under `tools/`:
+  - `run_optuna_sweep.py`
+  - `aggregate_vertex_swarm_results.py`
+  - `launch_vertex_swarm_optuna.py`
+- Extended the active trainer so champion params from the swarm can be consumed without dropping searched knobs.
+- Ran the first live `4 worker x 10 trial` swarm pilot on GCP, aggregated the leaderboard, selected a champion, and executed a deterministic retrain on the full `2023,2024` training artifact.
+
+**What I discovered:**
+- The stable controller path for this session was `--force-gcloud-fallback`; Vertex SDK `from_local_script()` was not reliable in the transient `uv` environment because local packaging expected `setuptools`.
+- The first live pilot exposed a real payload bug:
+  - `Trial` does not expose `.state` inside the objective path
+  - fixed in commit `3647d9c`
+- The second live pilot exposed a real exploration-quality bug:
+  - identical worker seeds produced duplicate search trajectories
+  - fixed in commit `6a31f5a`
+- Final successful pilot result:
+  - `4` completed workers
+  - `40` completed trials
+  - aggregate prefix:
+    - `gs://omega_v52_central/omega/staging/swarm_optuna/pilot_20260309_045700/aggregate`
+  - chosen champion:
+    - `worker_id=w01`
+    - `trial_number=1`
+    - `best_val_auc=0.7949139136484219`
+- Final successful retrain result:
+  - model:
+    - `gs://omega_v52_central/omega/staging/swarm_optuna/pilot_20260309_045700/champion_retrain/omega_xgb_final.pkl`
+
+**What confused me / blocked me:**
+- Retrain initially failed twice for operational reasons, not math:
+  - default `c2-standard-60` machine hit Vertex quota
+  - fallback payload failed until `--code-bundle-uri` was forwarded explicitly into the trainer args
+
+**What the next agent should do:**
+- Treat the implementation-bootstrap phase as complete.
+- Use the successful pilot artifacts as the new cloud baseline.
+- Open the next mission on downstream evaluation:
+  - outer holdout over `base_matrix_holdout_2025.parquet`
+  - final canary over `base_matrix_holdout_2026_01.parquet`
+- Preserve the now-proven execution lessons:
+  - use per-worker seed offsets
+  - prefer `gcloud` fallback submit on this controller
+  - keep retrain on quota-safe `n2-standard-16`
+
+**Files I changed:**
+- `tools/run_optuna_sweep.py` — added active worker payload, then fixed invalid `trial.state` access.
+- `tools/aggregate_vertex_swarm_results.py` — added canonical aggregation, minimum completeness gates, and trainer override export.
+- `tools/launch_vertex_swarm_optuna.py` — added active swarm launcher, watch mode, bounded retry, and per-worker seed offsets.
+- `tools/run_vertex_xgb_train.py` — expanded trainer CLI to accept the full searched XGBoost knob set.
+- `tools/submit_vertex_sweep.py` — returned submission metadata so the launcher could monitor live resources.
+- `tests/test_vertex_swarm_aggregate.py` — regression coverage for fingerprint enforcement and complexity tie-break.
+- `tests/test_vertex_optuna_split.py` — regression coverage for temporal split proof, payload shape, and seed offsets.
+- `handover/ai-direct/LATEST.md` — recorded the completed pilot and retrain verdict.
+- `handover/ops/ACTIVE_PROJECTS.md` — advanced the cloud swarm project to pilot complete.
+- `handover/ops/ACTIVE_MISSION_CHARTER.md` — marked the pilot implementation mission complete.
+- `handover/ai-direct/entries/20260309_050702_gc_swarm_optuna_pilot_and_champion_retrain_complete.md` — recorded the full cloud execution evidence.
+- `handover/BOARD.md` — added this mandatory debrief block.
+
 #### [2026-03-09 03:40] Agent: Codex | Session: Holdout Matrices Execution Complete
 
 **What I did:**

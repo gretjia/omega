@@ -4,8 +4,8 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
 
 ## 1. Snapshot Metadata
 
-- `updated_at_local`: 2026-03-09 04:34:29 +0000
-- `updated_at_utc`: 2026-03-09 04:34:29 +0000
+- `updated_at_local`: 2026-03-09 05:07:02 +0000
+- `updated_at_utc`: 2026-03-09 05:07:02 +0000
 - `updated_by`: Codex (GPT-5)
 
 ## 2. In-Flight Work
@@ -95,7 +95,7 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
 
 ### Project: V643-GC-SWARM-OPTUNA-REVIVAL
 
-- Status: `IMPLEMENTATION_FOUNDATION_READY`
+- Status: `PILOT_COMPLETE`
 - Hosts: `controller`, `GCP Vertex AI`, `linux1-lx`
 - Goal: restore the original cloud value proposition by replacing single-job train offload with real cloud-parallel Optuna/XGBoost optimization over the completed `2023,2024` training base matrix
 - Historical evidence locked:
@@ -129,7 +129,6 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
   - per-trial alpha / excess-return proxy diagnostics in addition to AUC
 - Immediate blockers:
   - bucket authority is inconsistent in older supervisor code: active supervisor points at absent `gs://omega_central/...`, while the live successful path still uses `gs://omega_v52_central/...`
-  - controller launch still depends on `uv run` for Vertex/GCS dependencies
   - current backtest entrypoints cannot directly express `2026-01`
 - Holdout artifact status:
   - the two missing holdout artifacts are now built and date-clean
@@ -151,9 +150,30 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
     - post-run aggregation hook
   - local validation passed:
     - `python3 -m py_compile` on changed tooling
-    - `3 passed` on:
+    - `5 passed` on:
       - `tests/test_vertex_swarm_aggregate.py`
       - `tests/test_vertex_optuna_split.py`
+- Pilot result:
+  - results prefix:
+    - `gs://omega_v52_central/omega/staging/swarm_optuna/pilot_20260309_045700`
+  - aggregate output:
+    - `gs://omega_v52_central/omega/staging/swarm_optuna/pilot_20260309_045700/aggregate`
+  - completed workers:
+    - `4 / 4`
+  - completed trials:
+    - `40 / 40`
+  - champion:
+    - `best_val_auc=0.7949139136484219`
+    - `worker_id=w01`
+    - `trial_number=1`
+  - deterministic retrain:
+    - `model_uri=gs://omega_v52_central/omega/staging/swarm_optuna/pilot_20260309_045700/champion_retrain/omega_xgb_final.pkl`
+    - `total_training_rows=736163`
+- Runtime lessons:
+  - controller-side Vertex SDK `from_local_script()` was not reliable in the transient `uv` environment because local packaging expected `setuptools`; the stable path was `--force-gcloud-fallback`
+  - worker payload initially used `trial.state` inside the objective path; that bug was fixed and regression-covered
+  - identical worker seeds destroyed cloud search breadth; launcher now offsets seed by worker index
+  - fallback retrain must pass `--code-bundle-uri` explicitly inside payload args
 - Spec source:
   - `handover/ai-direct/entries/20260309_012152_gc_swarm_optuna_project_spec.md`
   - `handover/ai-direct/entries/20260309_014638_gemini_swarm_spec_audit.md`
@@ -162,6 +182,7 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
   - `handover/ai-direct/entries/20260309_030257_gemini_holdout_dual_host_spec_audit.md`
   - `handover/ai-direct/entries/20260309_034012_holdout_matrices_dual_host_execution_complete.md`
   - `handover/ai-direct/entries/20260309_043429_gc_swarm_optuna_foundation_local_pass.md`
+  - `handover/ai-direct/entries/20260309_050702_gc_swarm_optuna_pilot_and_champion_retrain_complete.md`
 
 ### Project: GCP-LEGACY-STORAGE-CLEANUP
 
