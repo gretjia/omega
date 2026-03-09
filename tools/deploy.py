@@ -57,6 +57,8 @@ DEPLOY_TARGETS = {
 }
 
 SSH_TIMEOUT = 15
+RESET_TIMEOUT = 180
+VERIFY_TIMEOUT = 120
 
 
 def _run(cmd: str | list, cwd: str = None, timeout: int = 30, check: bool = True) -> subprocess.CompletedProcess:
@@ -214,10 +216,22 @@ def step3_verify_node(name: str, target: dict, branch: str, dry_run: bool) -> bo
     else:
         reset_cmd = f'cd {repo} && git fetch --all && git reset --hard {branch}'
 
-    rc, out, err = _ssh(alias, reset_cmd, timeout=30)
+    rc, out, err = _ssh(alias, reset_cmd, timeout=RESET_TIMEOUT)
     if rc != 0:
-        fail(f"git reset failed on {name}: {err[:200]}")
-        return False
+        local_head = _run("git rev-parse --short HEAD").stdout.strip()
+        if is_windows:
+            hash_cmd = f'cd /d {repo} && git rev-parse --short HEAD'
+        else:
+            hash_cmd = f'cd {repo} && git rev-parse --short HEAD'
+        rc_hash, remote_head_after_reset, _ = _ssh(alias, hash_cmd)
+        if rc_hash == 0 and remote_head_after_reset == local_head:
+            warn(
+                f"git reset on {name} returned rc={rc} ({err[:120]}), "
+                f"but remote HEAD already matches {local_head}; continuing to env verify"
+            )
+        else:
+            fail(f"git reset failed on {name}: {err[:200]}")
+            return False
 
     # Verify HEAD matches
     if is_windows:
@@ -239,7 +253,7 @@ def step3_verify_node(name: str, target: dict, branch: str, dry_run: bool) -> bo
     else:
         verify_cmd = f'cd {repo} && python3 tools/env_verify.py --strict'
 
-    rc, out, err = _ssh(alias, verify_cmd, timeout=30)
+    rc, out, err = _ssh(alias, verify_cmd, timeout=VERIFY_TIMEOUT)
     if rc == 0:
         ok(f"Environment verified on {name}")
     else:
