@@ -10,17 +10,25 @@ Date: 2026-03-09
 
 - Open the next cloud mission after the frozen holdout verdict.
 - Realign the swarm optimization target so future champions are selected for tail profitability, not just global classification quality.
-- Preserve the frozen holdout verdict as immutable audit baseline while designing the next cloud-parallel search protocol.
+- Keep `v64.3 / v643` math frozen and use this mission as the clean test of whether the remaining failure is selector-level or math-level.
+- Preserve the frozen holdout verdict as immutable audit baseline while executing the next cloud-parallel search protocol.
 
 ## 2. Canonical Spec
 
 Primary task-level implementation authority:
 
-- `handover/ai-direct/entries/20260309_055200_gemini_asymmetric_objective_spec.md`
+- `handover/ai-direct/entries/20260309_070752_v644_agentos_final_execution_spec.md`
   - exact section:
-    - Gemini diagnosis
-    - Gemini proposed spec
-    - Gemini risks and open questions
+    - canonical objective for V644
+    - hard guardrails
+    - code-level contract
+    - pilot shape
+    - acceptance gates
+
+Seed authority that led to the final spec:
+
+- `handover/ai-direct/entries/20260309_055200_gemini_asymmetric_objective_spec.md`
+- `handover/ai-direct/entries/20260309_060200_gemini_v643_alignment_on_asymmetric_mission.md`
 
 Supporting context:
 
@@ -89,11 +97,21 @@ Runtime Auditor:
 ## 5. Acceptance Criteria
 
 - a concrete alpha-first swarm spec exists and is recorded in handover
+- the canonical V644 objective is fixed to:
+  - `alpha_top_quintile`
+- alpha-first mode keeps:
+  - `val_auc` as a hard eligibility gate
 - the frozen baseline rule is explicit:
   - new runs must use fresh output prefixes
   - new runs must append evidence, not overwrite old evidence
-- AgentOS plan/runtime/math review packets have been issued
+- AgentOS plan/runtime/math review packets have been issued and integrated
 - the next implementation wave has bounded writable files, guardrails, and pilot gates
+- the first live pilot shape is fixed to:
+  - `2` workers
+  - `n2-standard-16`
+  - `spot`
+  - `train_year=2023`
+  - `val_year=2024`
 
 ## 6. Runtime Preflight
 
@@ -116,7 +134,7 @@ Required before execution:
 - thread caps:
   - keep current worker-local defaults unless the next plan changes them explicitly
 - output root:
-  - must be a fresh swarm prefix, not the frozen pilot prefix
+  - must be a fresh V644 swarm prefix, not the frozen pilot prefix
 - host isolation check:
   - no holdout matrix enters optimization
 
@@ -125,6 +143,8 @@ Required before execution:
 - stop if the new mission proposes overwriting the frozen holdout verdict
 - stop if the new mission widens scope into `omega_core/*` without a separate math-governance mission
 - stop if the new mission drops holdout isolation
+- stop if the mission redefines the label contract or the frozen `canonical_v64_1` gate contract
+- stop if alpha-first mode runs without an explicit `val_auc` guardrail
 - retry allowed only after named root cause and changed condition
 
 ## 8. Audits Required
@@ -143,8 +163,12 @@ Runtime audit must verify:
 
 - Gemini follow-on spec recorded
 - new active mission charter instantiated
-- AgentOS role packets started
-- no blocking ambiguity remains about the next implementation wave
+- AgentOS role packets started and integrated
+- no blocking ambiguity remains about:
+  - canonical objective
+  - AUC guardrail
+  - first pilot shape
+  - fresh-prefix isolation
 - handover updated
 
 ## 10. Run Manifest
@@ -159,3 +183,6 @@ Record after execution:
 - dataset role:
 - math audit verdict:
 - runtime audit verdict:
+- objective metric:
+- auc guardrail:
+- fresh prefix check:

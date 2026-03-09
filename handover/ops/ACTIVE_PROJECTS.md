@@ -4,15 +4,15 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
 
 ## 1. Snapshot Metadata
 
-- `updated_at_local`: 2026-03-09 05:07:02 +0000
-- `updated_at_utc`: 2026-03-09 05:47:00 +0000
+- `updated_at_local`: 2026-03-09 07:07:52 +0000
+- `updated_at_utc`: 2026-03-09 07:07:52 +0000
 - `updated_by`: Codex (GPT-5)
 
 ## 2. In-Flight Work
 
 ### Project: V644-GC-SWARM-ASYMMETRIC-OBJECTIVE
 
-- Status: `MISSION_OPEN`
+- Status: `LOCAL_IMPL_PASS_PENDING_PILOT`
 - Hosts: `controller`, `GCP Vertex AI`
 - Goal: redesign the cloud swarm objective and champion rule so future sweeps optimize tail profitability, not just global `AUC`, while preserving the frozen holdout baseline as immutable audit evidence
 - Seed authority:
@@ -27,14 +27,29 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
   - do not change `v64.1` gates in this mission
   - keep `2025` and `2026-01` outside optimization
 - Planned first wave:
-  - AgentOS review on:
-    - exact alpha-first objective
-    - `AUC` guardrail retention
-    - pilot size and accept/reject gates
-    - output prefix isolation
+  - local implementation is complete on:
+    - `tools/run_optuna_sweep.py`
+    - `tools/aggregate_vertex_swarm_results.py`
+    - `tools/launch_vertex_swarm_optuna.py`
+    - `tests/test_vertex_optuna_split.py`
+    - `tests/test_vertex_swarm_aggregate.py`
+  - local proof:
+    - swarm regressions `9 passed`
+    - holdout evaluator compatibility `4 passed`
+  - fixed objective:
+    - `alpha_top_quintile`
+  - fixed guardrail:
+    - `min_val_auc=0.75` for the first alpha-first pilot
+  - next live pilot:
+    - `2` workers on `n2-standard-16`
+    - `spot`
+    - `2023 -> 2024`
+    - `objective_epsilon=1e-05`
+    - fresh output prefixes only
 - Risks:
   - pure alpha optimization may overfit noisy tails
   - the inner XGBoost loss still remains binary-logloss unless a later mission changes it explicitly
+  - if alpha-first fails again on frozen holdouts, the next mission boundary is likely math-governance, not more leaderboard tweaking
 
 ### Project: V643-HOLDOUT-BASEMATRIX-EVALUATION
 

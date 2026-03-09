@@ -39,6 +39,40 @@ def _load_submitters(repo_root: Path):
     return submit_job, zip_and_upload_code
 
 
+def _uri_has_existing_outputs(uri: str) -> bool:
+    clean = str(uri or "").strip().rstrip("/")
+    if not clean:
+        return False
+    if not clean.startswith("gs://"):
+        path = Path(clean)
+        if not path.exists():
+            return False
+        if path.is_file():
+            return True
+        return any(path.iterdir())
+    listing = subprocess.run(
+        ["gsutil", "ls", f"{clean}/**"],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if listing.returncode == 0 and bool((listing.stdout or "").strip()):
+        return True
+    try:
+        from google.cloud import storage
+
+        bucket_name, prefix = clean.replace("gs://", "", 1).split("/", 1)
+        blobs = storage.Client().bucket(bucket_name).list_blobs(prefix=prefix.rstrip("/") + "/", max_results=1)
+        return any(True for _ in blobs)
+    except Exception:
+        return False
+
+
+def _assert_empty_output_uri(uri: str, *, label: str) -> None:
+    if _uri_has_existing_outputs(uri):
+        raise RuntimeError(f"{label}_not_empty: {uri}")
+
+
 def _submit_one_worker(*, submit_job, args: argparse.Namespace, script_path: str, worker_id: str, output_uri: str, spot: bool) -> dict:
     worker_seed = int(args.base_seed) + int(worker_id.replace("w", ""))
     submit_result = submit_job(
@@ -59,6 +93,10 @@ def _submit_one_worker(*, submit_job, args: argparse.Namespace, script_path: str
             str(args.val_year),
             "--seed",
             str(worker_seed),
+            "--objective-metric",
+            str(args.objective_metric),
+            "--min-val-auc",
+            str(args.min_val_auc),
             "--code-bundle-uri",
             str(args.code_bundle_uri),
         ],
@@ -107,13 +145,17 @@ def _aggregate_results(*, repo_root: Path, args: argparse.Namespace) -> None:
         str(args.results_prefix_uri),
         "--output-uri",
         str(args.aggregate_output_uri),
-        "--simplicity-epsilon",
-        str(args.simplicity_epsilon),
+        "--objective-metric",
+        str(args.objective_metric),
+        "--min-val-auc",
+        str(args.min_val_auc),
         "--min-workers",
         str(args.min_workers),
         "--min-completed-trials",
         str(args.min_completed_trials),
     ]
+    if args.objective_epsilon is not None:
+        cmd.extend(["--objective-epsilon", str(args.objective_epsilon)])
     subprocess.run(cmd, check=True)
 
 
@@ -139,10 +181,20 @@ def main() -> None:
     ap.add_argument("--aggregate-output-uri", default="", help="When set with --watch, run aggregation after polling.")
     ap.add_argument("--min-workers", type=int, default=1)
     ap.add_argument("--min-completed-trials", type=int, default=1)
-    ap.add_argument("--simplicity-epsilon", type=float, default=0.001)
+    ap.add_argument("--objective-metric", default="val_auc")
+    ap.add_argument("--min-val-auc", type=float, default=0.0)
+    ap.add_argument("--objective-epsilon", type=float, default=None)
+    ap.add_argument("--require-empty-results-prefix", action="store_true")
+    ap.add_argument("--require-empty-aggregate-output-uri", action="store_true")
     args = ap.parse_args()
     if bool(args.sync) and bool(args.watch):
         raise RuntimeError("--sync and --watch are mutually exclusive. Use async submit + --watch for real fan-out.")
+    if str(args.objective_metric) != "val_auc" and float(args.min_val_auc) <= 0.0:
+        raise RuntimeError("alpha_first_requires_positive_min_val_auc")
+    if bool(args.require_empty_results_prefix):
+        _assert_empty_output_uri(str(args.results_prefix_uri), label="results_prefix_uri")
+    if bool(args.require_empty_aggregate_output_uri) and str(args.aggregate_output_uri).strip():
+        _assert_empty_output_uri(str(args.aggregate_output_uri), label="aggregate_output_uri")
 
     repo_root = Path(__file__).resolve().parent.parent
     submit_job, zip_and_upload_code = _load_submitters(repo_root)

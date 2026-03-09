@@ -8,6 +8,75 @@
 
 This file is the single source of current operational truth for all agents.
 
+## Update: 2026-03-09 07:14 UTC
+- **The bounded V644 alpha-first implementation wave is now complete locally and regression-covered.**
+- New execution record:
+  - `handover/ai-direct/entries/20260309_071432_v644_alpha_first_local_implementation_pass.md`
+- Implemented files:
+  - `tools/run_optuna_sweep.py`
+  - `tools/aggregate_vertex_swarm_results.py`
+  - `tools/launch_vertex_swarm_optuna.py`
+  - `tests/test_vertex_optuna_split.py`
+  - `tests/test_vertex_swarm_aggregate.py`
+- New live capabilities:
+  - explicit `--objective-metric`
+  - explicit `--min-val-auc`
+  - alpha-first payload metadata:
+    - `objective_value`
+    - `raw_objective_value`
+    - `auc_guardrail_passed`
+  - fresh-prefix rejection on launcher side
+- Local proof:
+  - swarm regression suite:
+    - `9 passed in 1.28s`
+  - holdout evaluator compatibility:
+    - `4 passed in 2.25s`
+- Immediate next step:
+  - run the first V644 cloud pilot with:
+    - `2` workers
+    - `n2-standard-16`
+    - `spot`
+    - `objective_metric=alpha_top_quintile`
+    - `min_val_auc=0.75`
+    - `objective_epsilon=1e-05`
+    - `--force-gcloud-fallback`
+    - `--watch`
+    - fresh output prefixes only
+
+## Update: 2026-03-09 07:07 UTC
+- **AgentOS plan/runtime/math review has now been integrated into a final executable V644 spec.**
+- New final-spec authority:
+  - `handover/ai-direct/entries/20260309_070752_v644_agentos_final_execution_spec.md`
+- Canonical V644 objective is now fixed:
+  - `objective_metric=alpha_top_quintile`
+- Hard constraints merged from AgentOS:
+  - `AUC` remains a hard eligibility gate
+  - `omega_core/*` stays out of scope
+  - label contract stays unchanged
+  - frozen `canonical_v64_1` gates stay unchanged
+  - frozen holdout verdict remains immutable
+- First live pilot shape is now fixed:
+  - `2` workers
+  - `n2-standard-16`
+  - `spot`
+  - `train_year=2023`
+  - `val_year=2024`
+  - fresh output prefixes only
+  - stable controller path remains:
+    - `--force-gcloud-fallback`
+- Meaning of this mission, now sharpened:
+  - if alpha-first selection improves frozen-holdout alpha without changing math, the strongest diagnosis is:
+    - current `v64.3 / v643` math was already broadly usable
+    - the old failure was primarily cloud objective mismatch
+  - if alpha-first still fails on frozen holdouts, then the next version likely needs a real math-governance mission
+- Next operational step:
+  - implement the bounded V644 code wave on:
+    - `tools/run_optuna_sweep.py`
+    - `tools/aggregate_vertex_swarm_results.py`
+    - `tools/launch_vertex_swarm_optuna.py`
+    - `tests/test_vertex_optuna_split.py`
+    - `tests/test_vertex_swarm_aggregate.py`
+
 ## Update: 2026-03-09 05:52 UTC
 - **A new follow-on mission is now open, seeded by a fresh `gemini -y` spec read over the frozen holdout verdict.**
 - Gemini follow-on entry:

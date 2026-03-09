@@ -12,6 +12,9 @@ import subprocess
 from pathlib import Path
 
 
+OBJECTIVE_METRICS = {"val_auc", "alpha_top_decile", "alpha_top_quintile"}
+
+
 def _parse_gcs_uri(uri: str) -> tuple[str, str]:
     clean = uri.replace("gs://", "", 1)
     bucket, blob = clean.split("/", 1)
@@ -123,14 +126,63 @@ def _champion_trainer_overrides(champion: dict) -> dict:
     }
 
 
+def _resolve_objective_metric(metric: str) -> str:
+    clean = str(metric or "").strip()
+    if clean not in OBJECTIVE_METRICS:
+        raise RuntimeError(f"unsupported_objective_metric: {clean}")
+    return clean
+
+
+def _effective_objective_epsilon(
+    *,
+    objective_metric: str,
+    objective_epsilon: float | None,
+    simplicity_epsilon: float | None,
+) -> float:
+    if objective_epsilon is not None:
+        return float(objective_epsilon)
+    if simplicity_epsilon is not None:
+        return float(simplicity_epsilon)
+    if objective_metric == "val_auc":
+        return 0.001
+    return 1.0e-5
+
+
+def _row_metric_value(row: dict, metric: str) -> float:
+    return float(row.get(metric, 0.0) or 0.0)
+
+
+def _auc_guardrail_passed(row: dict, min_val_auc: float) -> bool:
+    if "auc_guardrail_passed" in row:
+        return bool(row.get("auc_guardrail_passed"))
+    return _row_metric_value(row, "val_auc") >= float(min_val_auc)
+
+
+def _decorate_row(row: dict, *, objective_metric: str, min_val_auc: float) -> dict:
+    clean = dict(row)
+    raw_objective_value = _row_metric_value(clean, objective_metric)
+    clean["objective_metric"] = str(objective_metric)
+    clean["raw_objective_value"] = float(clean.get("raw_objective_value", raw_objective_value) or raw_objective_value)
+    clean["auc_guardrail_min"] = float(clean.get("auc_guardrail_min", min_val_auc) or min_val_auc)
+    clean["auc_guardrail_passed"] = bool(_auc_guardrail_passed(clean, min_val_auc))
+    clean["objective_value"] = float(clean["raw_objective_value"])
+    return clean
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description="Aggregate Vertex swarm Optuna results")
     ap.add_argument("--results-prefix-uri", required=True)
     ap.add_argument("--output-uri", required=True, help="Prefix for leaderboard/champion outputs")
-    ap.add_argument("--simplicity-epsilon", type=float, default=0.001)
+    ap.add_argument("--objective-metric", default="val_auc")
+    ap.add_argument("--min-val-auc", type=float, default=0.0)
+    ap.add_argument("--objective-epsilon", type=float, default=None)
+    ap.add_argument("--simplicity-epsilon", type=float, default=None)
     ap.add_argument("--min-workers", type=int, default=1)
     ap.add_argument("--min-completed-trials", type=int, default=1)
     args = ap.parse_args()
+    objective_metric = _resolve_objective_metric(args.objective_metric)
+    if objective_metric != "val_auc" and float(args.min_val_auc) <= 0.0:
+        raise RuntimeError("alpha_first_requires_positive_min_val_auc")
 
     trial_uris = _list_trial_uris(str(args.results_prefix_uri))
     if not trial_uris:
@@ -167,18 +219,30 @@ def main() -> None:
             "insufficient_completed_trials: "
             f"found={len(completed_rows)} min_completed_trials={int(args.min_completed_trials)}"
         )
+    decorated_rows = [
+        _decorate_row(row, objective_metric=objective_metric, min_val_auc=float(args.min_val_auc))
+        for row in completed_rows
+    ]
+    eligible_rows = [row for row in decorated_rows if bool(row.get("auc_guardrail_passed"))]
+    if not eligible_rows:
+        raise RuntimeError("no_auc_eligible_trials")
 
-    completed_rows.sort(
+    eligible_rows.sort(
         key=lambda r: (
-            -float(r["val_auc"]),
+            -float(r["objective_value"]),
             int(r.get("max_depth", 10**9)),
             int(r.get("num_boost_round", 10**9)),
+            -float(r.get("val_auc", 0.0)),
             int(r.get("trial_number", 10**9)),
         )
     )
-    best_auc = float(completed_rows[0]["val_auc"])
-    epsilon = float(args.simplicity_epsilon)
-    champion_pool = [r for r in completed_rows if float(r["val_auc"]) >= best_auc - epsilon]
+    best_objective_value = float(eligible_rows[0]["objective_value"])
+    epsilon = _effective_objective_epsilon(
+        objective_metric=objective_metric,
+        objective_epsilon=args.objective_epsilon,
+        simplicity_epsilon=args.simplicity_epsilon,
+    )
+    champion_pool = [r for r in eligible_rows if float(r["objective_value"]) >= best_objective_value - epsilon]
     champion_pool.sort(
         key=lambda r: (
             int(r.get("max_depth", 10**9)),
@@ -208,20 +272,29 @@ def main() -> None:
         "total_workers": int(len(summaries)),
         "total_trials": int(len(all_rows)),
         "completed_trials": int(len(completed_rows)),
+        "eligible_trials": int(len(eligible_rows)),
         "champion_pool_size": int(len(champion_pool)),
-        "best_val_auc": best_auc,
-        "simplicity_epsilon": epsilon,
+        "best_val_auc": float(max(_row_metric_value(row, "val_auc") for row in decorated_rows)),
+        "objective_metric": objective_metric,
+        "objective_best_value": best_objective_value,
+        "objective_epsilon": epsilon,
+        "auc_guardrail_min": float(args.min_val_auc),
         "canonical_fingerprint": champion["canonical_fingerprint"],
         "worker_summaries": worker_summaries,
-        "leaderboard": completed_rows,
+        "leaderboard": eligible_rows,
         "champion": champion,
     }
     champion_params = {
         "status": "completed",
         "best_val_auc": float(champion["val_auc"]),
+        "objective_metric": str(champion["objective_metric"]),
+        "objective_value": float(champion["objective_value"]),
+        "raw_objective_value": float(champion["raw_objective_value"]),
         "champion_params": dict(champion["params"]),
         "trainer_overrides": _champion_trainer_overrides(champion),
-        "complexity_tie_break_epsilon": epsilon,
+        "objective_epsilon": epsilon,
+        "auc_guardrail_min": float(champion["auc_guardrail_min"]),
+        "auc_guardrail_passed": bool(champion["auc_guardrail_passed"]),
         "canonical_fingerprint": champion["canonical_fingerprint"],
         "alpha_top_decile": float(champion.get("alpha_top_decile", 0.0)),
         "alpha_top_quintile": float(champion.get("alpha_top_quintile", 0.0)),

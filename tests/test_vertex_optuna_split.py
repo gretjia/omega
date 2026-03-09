@@ -9,7 +9,7 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from config import FEATURE_COLS
-from tools.launch_vertex_swarm_optuna import _submit_one_worker
+from tools.launch_vertex_swarm_optuna import _assert_empty_output_uri, _submit_one_worker
 from tools.run_optuna_sweep import _canonical_fingerprint, _prepare_temporal_split, _trial_payload
 
 
@@ -90,6 +90,37 @@ def test_trial_payload_does_not_require_runtime_trial_state() -> None:
     )
     assert payload["trial_number"] == 7
     assert payload["state"] == "COMPLETE"
+    assert payload["objective_metric"] == "val_auc"
+    assert payload["auc_guardrail_passed"] is True
+
+
+def test_trial_payload_alpha_objective_respects_auc_guardrail() -> None:
+    class DummyTrial:
+        number = 8
+
+    payload = _trial_payload(
+        DummyTrial(),
+        params={
+            "max_depth": 4,
+            "learning_rate": 0.03,
+            "subsample": 0.9,
+            "colsample_bytree": 0.8,
+            "min_child_weight": 1.0,
+            "gamma": 0.0,
+            "reg_lambda": 1.0,
+            "reg_alpha": 0.0,
+            "num_boost_round": 120,
+        },
+        auc=0.71,
+        alpha_top_decile=0.02,
+        alpha_top_quintile=0.01,
+        objective_metric="alpha_top_quintile",
+        min_val_auc=0.75,
+    )
+    assert payload["objective_metric"] == "alpha_top_quintile"
+    assert payload["raw_objective_value"] == 0.01
+    assert payload["auc_guardrail_passed"] is False
+    assert payload["objective_value"] < 0.0
 
 
 def test_launch_worker_seed_offsets_by_worker_index() -> None:
@@ -105,6 +136,8 @@ def test_launch_worker_seed_offsets_by_worker_index() -> None:
         n_trials_per_worker=10,
         train_year="2023",
         val_year="2024",
+        objective_metric="alpha_top_quintile",
+        min_val_auc=0.75,
         code_bundle_uri="gs://bucket/code.zip",
         sync=False,
         spot=True,
@@ -123,4 +156,20 @@ def test_launch_worker_seed_offsets_by_worker_index() -> None:
     script_args = captured["script_args"]
     seed_idx = script_args.index("--seed")
     assert script_args[seed_idx + 1] == "45"
+    objective_idx = script_args.index("--objective-metric")
+    auc_idx = script_args.index("--min-val-auc")
+    assert script_args[objective_idx + 1] == "alpha_top_quintile"
+    assert script_args[auc_idx + 1] == "0.75"
     assert attempt["seed"] == 45
+
+
+def test_assert_empty_output_uri_rejects_nonempty_local_prefix(tmp_path: Path) -> None:
+    output_root = tmp_path / "existing"
+    output_root.mkdir()
+    (output_root / "marker.json").write_text("{}", encoding="utf-8")
+    try:
+        _assert_empty_output_uri(str(output_root), label="results_prefix_uri")
+    except RuntimeError as exc:
+        assert "results_prefix_uri_not_empty" in str(exc)
+    else:
+        raise AssertionError("expected non-empty prefix rejection")

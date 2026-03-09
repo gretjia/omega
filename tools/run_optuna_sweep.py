@@ -19,6 +19,10 @@ from pathlib import Path
 from importlib.metadata import version as pkg_version
 
 
+OBJECTIVE_METRICS = {"val_auc", "alpha_top_decile", "alpha_top_quintile"}
+HARD_LOSING_OBJECTIVE_VALUE = -1.0e9
+
+
 def _install_dependencies() -> None:
     subprocess.check_call(
         [
@@ -160,6 +164,54 @@ def _top_quantile_alpha(preds, excess_returns, q: float) -> float:
     if int(np.sum(mask)) <= 0:
         return 0.0
     return float(np.mean(excess_returns[mask]))
+
+
+def _resolve_objective_metric(metric: str) -> str:
+    clean = str(metric or "").strip()
+    if clean not in OBJECTIVE_METRICS:
+        raise RuntimeError(f"unsupported_objective_metric: {clean}")
+    return clean
+
+
+def _raw_objective_value(
+    objective_metric: str,
+    *,
+    auc: float,
+    alpha_top_decile: float,
+    alpha_top_quintile: float,
+) -> float:
+    metric = _resolve_objective_metric(objective_metric)
+    if metric == "val_auc":
+        return float(auc)
+    if metric == "alpha_top_decile":
+        return float(alpha_top_decile)
+    return float(alpha_top_quintile)
+
+
+def _objective_contract(
+    objective_metric: str,
+    *,
+    auc: float,
+    alpha_top_decile: float,
+    alpha_top_quintile: float,
+    min_val_auc: float,
+) -> dict:
+    raw_objective_value = _raw_objective_value(
+        objective_metric,
+        auc=auc,
+        alpha_top_decile=alpha_top_decile,
+        alpha_top_quintile=alpha_top_quintile,
+    )
+    auc_guardrail_min = float(min_val_auc)
+    auc_guardrail_passed = float(auc) >= auc_guardrail_min
+    objective_value = raw_objective_value if auc_guardrail_passed else HARD_LOSING_OBJECTIVE_VALUE
+    return {
+        "objective_metric": _resolve_objective_metric(objective_metric),
+        "objective_value": float(objective_value),
+        "raw_objective_value": float(raw_objective_value),
+        "auc_guardrail_min": auc_guardrail_min,
+        "auc_guardrail_passed": bool(auc_guardrail_passed),
+    }
 
 
 def _prepare_temporal_split(args: argparse.Namespace) -> dict:
@@ -338,8 +390,17 @@ def _prepare_temporal_split(args: argparse.Namespace) -> dict:
     }
 
 
-def _trial_payload(trial, params: dict, auc: float, alpha_top_decile: float, alpha_top_quintile: float) -> dict:
-    return {
+def _trial_payload(
+    trial,
+    params: dict,
+    auc: float,
+    alpha_top_decile: float,
+    alpha_top_quintile: float,
+    *,
+    objective_metric: str = "val_auc",
+    min_val_auc: float = 0.0,
+) -> dict:
+    payload = {
         "trial_number": int(trial.number),
         "state": "COMPLETE",
         "val_auc": float(auc),
@@ -349,6 +410,16 @@ def _trial_payload(trial, params: dict, auc: float, alpha_top_decile: float, alp
         "num_boost_round": int(params["num_boost_round"]),
         "params": dict(params),
     }
+    payload.update(
+        _objective_contract(
+            objective_metric,
+            auc=auc,
+            alpha_top_decile=alpha_top_decile,
+            alpha_top_quintile=alpha_top_quintile,
+            min_val_auc=float(min_val_auc),
+        )
+    )
+    return payload
 
 
 def _write_json(path: Path, payload: dict) -> None:
@@ -378,9 +449,14 @@ def main() -> None:
     ap.add_argument("--signal-epi-threshold", type=float, default=0.5)
     ap.add_argument("--srl-resid-sigma-mult", type=float, default=2.0)
     ap.add_argument("--topo-energy-min", type=float, default=2.0)
+    ap.add_argument("--objective-metric", default="val_auc")
+    ap.add_argument("--min-val-auc", type=float, default=0.0)
 
     ap.add_argument("--code-bundle-uri", required=True)
     args, _ = ap.parse_known_args()
+    args.objective_metric = _resolve_objective_metric(args.objective_metric)
+    if args.objective_metric != "val_auc" and float(args.min_val_auc) <= 0.0:
+        raise RuntimeError("alpha_first_requires_positive_min_val_auc")
 
     _install_dependencies()
     _bootstrap_codebase(args.code_bundle_uri)
@@ -455,16 +531,24 @@ def main() -> None:
             auc=auc,
             alpha_top_decile=alpha_top_decile,
             alpha_top_quintile=alpha_top_quintile,
+            objective_metric=str(args.objective_metric),
+            min_val_auc=float(args.min_val_auc),
         )
         trial_rows.append(payload)
         trial.set_user_attr("alpha_top_decile", alpha_top_decile)
         trial.set_user_attr("alpha_top_quintile", alpha_top_quintile)
-        return auc
+        trial.set_user_attr("objective_metric", str(payload["objective_metric"]))
+        trial.set_user_attr("objective_value", float(payload["objective_value"]))
+        trial.set_user_attr("raw_objective_value", float(payload["raw_objective_value"]))
+        trial.set_user_attr("auc_guardrail_min", float(payload["auc_guardrail_min"]))
+        trial.set_user_attr("auc_guardrail_passed", bool(payload["auc_guardrail_passed"]))
+        return float(payload["objective_value"])
 
     study = optuna.create_study(direction="maximize", sampler=TPESampler(seed=int(args.seed)))
     study.optimize(objective, n_trials=int(args.n_trials))
 
     completed = [t for t in study.trials if t.state == TrialState.COMPLETE]
+    eligible_rows = [row for row in trial_rows if bool(row.get("auc_guardrail_passed", False))]
     best_value = float(study.best_value) if completed else None
     best_params = dict(study.best_params) if completed else {}
 
@@ -479,7 +563,10 @@ def main() -> None:
         "best_params": best_params,
         "n_trials": int(len(study.trials)),
         "n_completed": int(len(completed)),
+        "n_auc_guardrail_passed": int(len(eligible_rows)),
         "seconds": round(time.time() - t0, 2),
+        "objective_metric": str(args.objective_metric),
+        "auc_guardrail_min": float(args.min_val_auc),
         "split_summary": split_summary,
         "canonical_fingerprint": canonical_fingerprint,
         "runtime_versions": {
