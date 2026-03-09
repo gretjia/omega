@@ -8,6 +8,53 @@
 
 This file is the single source of current operational truth for all agents.
 
+## Update: 2026-03-09 03:40 UTC
+- **The two missing holdout Stage3 artifacts are now fully built, audited, and copied into clean evaluation roots.**
+- Actual execution mode used:
+  - `windows1-w1` forged `2025`
+  - `linux1-lx` copied the January subset locally and forged `2026-01`
+- `2025` result:
+  - output root:
+    - `D:\Omega_frames\stage3_holdout_2025_20260309_031430`
+  - clean eval root:
+    - `D:\Omega_frames\stage3_holdout_2025_eval_20260309_031430`
+  - metrics:
+    - `base_rows=385674`
+    - `input_file_count=239`
+    - `batch_count=44`
+    - `worker_count=2`
+    - `seconds=999.62`
+  - scope audit:
+    - `year_min=2025`
+    - `year_max=2025`
+    - `year_count=1`
+    - `date_min=20250102`
+    - `date_max=20251230`
+- `2026-01` result:
+  - output root:
+    - `/omega_pool/parquet_data/stage3_holdout_2026_01_linux_20260309_031248`
+  - clean eval root:
+    - `/omega_pool/parquet_data/stage3_holdout_2026_01_eval_20260309_031248`
+  - metrics:
+    - `base_rows=26167`
+    - `input_file_count=19`
+    - `batch_count=38`
+    - `worker_count=1`
+    - `seconds=1281.99`
+  - scope audit:
+    - `year_min=2026`
+    - `year_max=2026`
+    - `year_count=1`
+    - `date_min=20260105`
+    - `date_max=20260129`
+- Important runtime lessons captured:
+  - Windows Stage3 forge could not use the project `.venv` because it lacked `PyYAML`
+  - Windows manifest generation must use UTF-8 without BOM, otherwise the first input path is corrupted
+- Resulting governance change:
+  - the cloud-parallel project is no longer blocked on missing holdout matrices
+- Deep dive:
+  - `handover/ai-direct/entries/20260309_034012_holdout_matrices_dual_host_execution_complete.md`
+
 ## Update: 2026-03-09 03:02 UTC
 - **Gemini has now audited the holdout base-matrix dual-host execution spec and returned `PASS`.**
 - Verified live capacity at audit time:

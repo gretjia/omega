@@ -1,6 +1,6 @@
 # OMEGA Active Mission Charter
 
-Status: Active
+Status: Completed
 Task Name: V643 Stage3 holdout base-matrix build and evaluation-isolation proof
 Owner: Human Owner
 Commander: Codex
@@ -16,6 +16,10 @@ Current checkpoint:
 - `linux1-lx` does not own that corpus locally.
 - Prior runtime evidence showed Windows faster than Linux on the repaired path.
 - Gemini externally audited the holdout execution spec and returned `PASS`.
+- Execution is now complete:
+  - `windows1-w1` forged `2025`
+  - `linux1-lx` forged `2026-01` after Linux-local January copy
+  - both clean evaluation roots were created
 
 ## 1. Objective
 
@@ -147,3 +151,16 @@ Recorded starting facts:
 - live capacity sample at audit time:
   - `linux1-lx`: no active Stage2 / Stage3 / train process; about `24 GiB` available memory
   - `windows1-w1`: no active `python` compute process; about `86.7 / 95.8 GiB` free/total memory
+- final execution verdict:
+  - `2025` holdout:
+    - `base_rows=385674`
+    - `date_min=20250102`
+    - `date_max=20251230`
+    - clean eval root:
+      - `D:\Omega_frames\stage3_holdout_2025_eval_20260309_031430`
+  - `2026-01` canary:
+    - `base_rows=26167`
+    - `date_min=20260105`
+    - `date_max=20260129`
+    - clean eval root:
+      - `/omega_pool/parquet_data/stage3_holdout_2026_01_eval_20260309_031248`

@@ -45,6 +45,39 @@
 ### Entries
 
 <!-- New session debriefs go here. Most recent on top. -->
+#### [2026-03-09 03:40] Agent: Codex | Session: Holdout Matrices Execution Complete
+
+**What I did:**
+- Executed the audited Stage3 holdout-matrix plan instead of leaving it at the spec layer.
+- Forged `2025` on `windows1-w1` and forged `2026-01` on `linux1-lx` after copying the January subset into Linux-local storage.
+- Audited both finished artifacts for exact date scope and created shard-free clean evaluation roots.
+
+**What I discovered:**
+- The optimized dual-host mode was worth using in practice because the January subset was only `19` files and about `0.824 GiB`.
+- Windows Stage3 forge could not use the project `.venv` because it was missing `PyYAML`; the working interpreter was `C:\\Python314\\python.exe`.
+- Windows manifest generation must be BOM-free; PowerShell `Set-Content -Encoding utf8` corrupted the first input path.
+- Final outputs:
+  - `2025`: `base_rows=385674`, `date_min=20250102`, `date_max=20251230`
+  - `2026-01`: `base_rows=26167`, `date_min=20260105`, `date_max=20260129`
+
+**What confused me / blocked me:**
+- Windows `Start-Process` over SSH was not reliable for detached Stage3 launch, so I switched to persistent controller-managed exec sessions.
+
+**What the next agent should do:**
+- Treat the Stage3 artifact partition as complete:
+  - train `2023,2024`
+  - holdout `2025`
+  - canary `2026-01`
+- Use the clean evaluation roots, not the forge workspaces with shards.
+- Before the next Windows Stage3 run, either repair the project `.venv` or keep using the validated system Python path explicitly.
+
+**Files I changed:**
+- `handover/ai-direct/entries/20260309_034012_holdout_matrices_dual_host_execution_complete.md` — recorded the full execution evidence, runtime lessons, and final artifact paths.
+- `handover/ai-direct/LATEST.md` — marked both holdout artifacts as complete and audited.
+- `handover/ops/ACTIVE_PROJECTS.md` — advanced the holdout-matrix project to completed and removed the swarm blocker on missing holdout artifacts.
+- `handover/ops/ACTIVE_MISSION_CHARTER.md` — marked the holdout mission complete and recorded the final verdict.
+- `handover/BOARD.md` — added this mandatory debrief block.
+
 #### [2026-03-09 03:02] Agent: Codex | Session: Holdout Dual-Host Spec Gemini PASS
 
 **What I did:**

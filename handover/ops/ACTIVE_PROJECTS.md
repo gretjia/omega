@@ -12,36 +12,32 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
 
 ### Project: V643-STAGE3-HOLDOUT-MATRIX-BUILD
 
-- Status: `SPEC_AUDITED_READY`
+- Status: `COMPLETED`
 - Hosts: `controller`, `windows1-w1`, `linux1-lx`
 - Goal: build the two missing holdout Stage3 artifacts using the fastest safe host allocation:
   - `base_matrix_holdout_2025.parquet`
   - `base_matrix_holdout_2026_01.parquet`
 - Last signals:
   - Gemini audited the execution spec and returned `PASS`
-  - live capacity check at audit time:
-    - `linux1-lx` had no active Stage2 / Stage3 / train process and about `24 GiB` available memory
-    - `windows1-w1` had no active `python` compute process and about `86.7 / 95.8 GiB` free/total memory
-  - Windows remains the preferred forge node because:
-    - it owns the relevant `2025*` and `202601*` Stage2 corpus locally
-    - prior runtime evidence showed it faster than Linux on the repaired path
-  - externally audited default mode:
-    - Windows forges `2025`
-    - Windows then forges `2026-01`
-    - Linux runs validation / audit / cloud-controller work in parallel
-  - externally audited optimized mode:
-    - Linux may forge `2026-01` only after a Linux-local copy of the `202601*.parquet` subset is created and re-asserted locally
-- Active gates:
-  - generate Windows-local manifests for `2025` and `202601`
-  - keep holdout evaluation roots clean and shard-free
-  - execute the actual forge runs
-- Risks:
-  - `2026-01` must be defined by explicit manifest, not `--years 2026` alone
-  - evaluation tooling can misbehave if pointed at directories that still contain shard parquet files
-  - Linux must not do remote-mounted Windows parquet forge work
+  - final execution used the optimized audited mode:
+    - `windows1-w1` forged `2025`
+    - `linux1-lx` copied the January subset locally and forged `2026-01`
+  - completed outputs:
+    - `D:\Omega_frames\stage3_holdout_2025_20260309_031430\base_matrix_holdout_2025.parquet`
+    - `/omega_pool/parquet_data/stage3_holdout_2026_01_linux_20260309_031248/base_matrix_holdout_2026_01.parquet`
+  - clean eval roots:
+    - `D:\Omega_frames\stage3_holdout_2025_eval_20260309_031430`
+    - `/omega_pool/parquet_data/stage3_holdout_2026_01_eval_20260309_031248`
+  - audited scopes:
+    - `2025`: `date_min=20250102`, `date_max=20251230`, `base_rows=385674`
+    - `2026-01`: `date_min=20260105`, `date_max=20260129`, `base_rows=26167`
+- Residual risks:
+  - Windows Stage3 runtime still depends on `C:\Python314\python.exe` because the project `.venv` lacks `PyYAML`
+  - Windows manifest generation must stay BOM-free
 - Spec source:
   - `handover/ai-direct/entries/20260309_025500_holdout_basematrix_dual_host_execution_spec.md`
   - `handover/ai-direct/entries/20260309_030257_gemini_holdout_dual_host_spec_audit.md`
+  - `handover/ai-direct/entries/20260309_034012_holdout_matrices_dual_host_execution_complete.md`
 
 ### Project: V643-STAGE2-PATHO-EMPTY-FRAME-REMEDIATION
 
@@ -135,13 +131,15 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
   - bucket authority is inconsistent: active supervisor points at absent `gs://omega_central/...`, while the live successful path still used `gs://omega_v52_central/...`
   - no active `tools/run_optuna_sweep.py` / swarm orchestrator currently exists
   - current backtest entrypoints cannot directly express `2026-01`
-  - the two holdout artifacts still need to be forged separately with clean date scoping, but the execution spec for that phase is now externally audited and ready
+- Holdout artifact status:
+  - the two missing holdout artifacts are now built and date-clean
 - Spec source:
   - `handover/ai-direct/entries/20260309_012152_gc_swarm_optuna_project_spec.md`
   - `handover/ai-direct/entries/20260309_014638_gemini_swarm_spec_audit.md`
   - `handover/ai-direct/entries/20260309_024658_three_matrix_partition_for_stage3.md`
   - `handover/ai-direct/entries/20260309_025500_holdout_basematrix_dual_host_execution_spec.md`
   - `handover/ai-direct/entries/20260309_030257_gemini_holdout_dual_host_spec_audit.md`
+  - `handover/ai-direct/entries/20260309_034012_holdout_matrices_dual_host_execution_complete.md`
 
 ### Project: GCP-LEGACY-STORAGE-CLEANUP
 
