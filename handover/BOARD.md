@@ -45,6 +45,42 @@
 ### Entries
 
 <!-- New session debriefs go here. Most recent on top. -->
+#### [2026-03-09 03:02] Agent: Codex | Session: Holdout Dual-Host Spec Gemini PASS
+
+**What I did:**
+- Finished the Stage3 holdout base-matrix execution spec for the missing `2025` and `2026-01` artifacts.
+- Re-ran `gemini -y` against the patched spec until it returned a hard `PASS`.
+- Re-checked live host availability on both workers so the final allocation recommendation reflects current capacity, not stale assumptions.
+- Updated `/handover` to mark the spec as externally audited and execution-ready.
+
+**What I discovered:**
+- The revised spec passed only after locking three operational details:
+  - `omega-vm` is the only controller
+  - manifest generation for Windows-local files must be invoked as Windows-side commands
+  - evaluation directories must be physically isolated from forge shard trees
+- At audit time both workers were effectively idle for this mission:
+  - `linux1-lx` had no active Stage2 / Stage3 / train process
+  - `windows1-w1` had no active `python` compute process
+- The best default allocation is asymmetric:
+  - Windows forges both holdout matrices
+  - Linux handles validation / audit / cloud-controller work in parallel
+
+**What confused me / blocked me:**
+- Windows remote quoting was mildly annoying when probing memory and active processes over SSH, but the signal was still clear once simplified.
+
+**What the next agent should do:**
+- Treat the holdout dual-host spec as canonical and start real execution from it.
+- Generate the Windows-local manifests for `2025` and `202601` first.
+- Run the default mode unless the January subset can be copied cleanly into Linux-local storage with low overhead.
+- Do not point any downstream evaluation at a forge workspace root that still contains shard parquet files.
+
+**Files I changed:**
+- `handover/ai-direct/entries/20260309_025500_holdout_basematrix_dual_host_execution_spec.md` — promoted the spec from proposed to externally audited and added Gemini audit status.
+- `handover/ai-direct/entries/20260309_030257_gemini_holdout_dual_host_spec_audit.md` — recorded the Gemini verdict and the locked execution interpretation.
+- `handover/ai-direct/LATEST.md` — added the new audited execution recommendation and live idle-host verification.
+- `handover/ops/ACTIVE_PROJECTS.md` — added the dedicated holdout matrix build project and linked the new audited spec.
+- `handover/BOARD.md` — added this mandatory debrief block.
+
 #### [2026-03-09 02:46] Agent: Codex | Session: Stage3 Three-Matrix Partition Lock
 
 **What I did:**

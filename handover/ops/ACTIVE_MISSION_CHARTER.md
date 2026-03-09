@@ -1,173 +1,149 @@
 # OMEGA Active Mission Charter
 
 Status: Active
-Task Name: V643 Stage2 pathological empty-frame remediation and Stage3 forge consumption proof
+Task Name: V643 Stage3 holdout base-matrix build and evaluation-isolation proof
 Owner: Human Owner
 Commander: Codex
-Date: 2026-03-08
+Date: 2026-03-09
 
 Current checkpoint:
 
-- `windows1-w1` main Stage2 run originally produced six failures; four are already resolved by replacing complete files from Linux and rerunning.
-- A direct Linux rerun on the normal current `v643` Stage2 path reproduced the same failure pattern on all three unresolved files:
-  - `[GUARDRAIL] Proactively dropping pathological symbol ...`
-  - immediate `CRITICAL Error: index out of bounds`
-- The mission was then executed with the Stage2 control-flow hardening patch at commit `23fd229`.
-- `windows1-w1` isolated normal-path validation passed for all three previously unresolved files:
-  - `20231219_b07c2229.parquet` -> `252844` rows in `86.5s`
-  - `20241128_b07c2229.parquet` -> `253227` rows in `128.1s`
-  - `20250908_fbd5c8b.parquet` -> `254884` rows in `169.6s`
-- `windows1-w1` isolated Stage3 forge proof also passed on the three-file set using explicit `--input-file-list` and `--years 2023,2024,2025`:
-  - forge input contract: `rows=760955`, `physics_valid_rows=760955`, `epi_pos_rows=716`, `topo_energy_pos_rows=4404`, `signal_gate_rows=3897`
-  - forge output: `base_rows=3074`
-- `linux1-lx` post-patch mirror validation could not be run in this window because `ssh linux1-lx` timed out from the controller.
-- The user-required Stage3 whole-set consumption proof is satisfied; any remaining Linux rerun is now a follow-up decision, not an evidence gap on whole-set usability.
+- The training artifact `base_matrix_train_2023_2024.parquet` is already complete and verified to contain only `2023` and `2024`.
+- The optimal Stage3 allocation now requires two additional independent holdout artifacts:
+  - `base_matrix_holdout_2025.parquet`
+  - `base_matrix_holdout_2026_01.parquet`
+- `windows1-w1` owns the relevant late-date Stage2 full-run corpus locally, including `2025*` and `202601*`.
+- `linux1-lx` does not own that corpus locally.
+- Prior runtime evidence showed Windows faster than Linux on the repaired path.
+- Gemini externally audited the holdout execution spec and returned `PASS`.
 
 ## 1. Objective
 
-- Fix the Stage2 normal symbol-stream path so proactive pathological-symbol drops do not crash unresolved files.
-- Preserve the approved `v643` math, feature schema, and normal execution path.
-- Prove the repaired three-file set can be consumed together by Stage3 forge as one coherent input set.
+- Build the two missing Stage3 holdout artifacts with exact date scoping and clean downstream evaluation boundaries.
+- Use idle cluster capacity efficiently without violating data locality or the canonical train/holdout split.
+- Prove the resulting holdout artifacts are safe for downstream evaluation because they live outside shard workspaces and preserve exact date scope.
 
 ## 2. Canonical Spec
 
-Primary task-level implementation authority:
+Primary task-level authority:
 
-- `tools/stage2_physics_compute.py`
-  - `_iter_complete_symbol_frames_from_parquet(...)`
-  - `_filter_pathological(...)`
-  - `process_chunk(...)`
+- `handover/ai-direct/entries/20260309_025500_holdout_basematrix_dual_host_execution_spec.md`
+- `handover/ai-direct/entries/20260309_030257_gemini_holdout_dual_host_spec_audit.md`
 - `tools/forge_base_matrix.py`
-  - `_audit_forge_l2_contract(...)`
-  - CLI year filtering and `--input-file-list` handling
 
 Supporting context:
 
-- `tests/test_stage2_pathological_symbol_skip.py`
-- `handover/ai-direct/entries/20260226_154217_windows_stage2_pathological_symbol_debug_fix.md`
+- `handover/ai-direct/entries/20260309_012152_gc_swarm_optuna_project_spec.md`
+- `handover/ai-direct/entries/20260309_024658_three_matrix_partition_for_stage3.md`
 - `handover/ai-direct/LATEST.md`
 
 Conflict rule:
 
-- This mission may harden Stage2 control flow and test coverage.
-- It must not silently change `omega_core/` math or Stage3 gating semantics.
-- If a proposed fix requires changing canonical math or downstream contract definitions, escalate to the Commander.
+- Date-scope isolation, clean evaluation roots, and controller authority override any convenience shortcut.
+- If a proposed runtime shortcut requires Linux to read Windows parquet remotely for forge, reject it and fall back to the audited default mode.
 
 ## 3. Business Goal
 
-- Remove the deterministic blocker preventing the last unresolved Stage2 files from completing on the normal `v643` path.
-- Avoid wasting time on the slow fallback/pathology-discovery route.
-- Unblock downstream base-matrix generation by proving the repaired outputs are consumable together, not merely individually written.
+- Complete the Stage3 artifact partition required for the cloud-parallel optimization roadmap:
+  - train `2023,2024`
+  - holdout `2025`
+  - canary `2026-01`
+- Do so in a way that preserves credible downstream evidence and avoids wasting wall-clock time on the slower host for the critical path.
 
 ## 4. Files In Scope
 
-Primary implementation scope:
-
-- `tools/stage2_physics_compute.py`
-- `tests/test_stage2_pathological_symbol_skip.py`
-- `tests/test_stage2_pathological_empty_frame.py` (new, if needed)
-
-Operational and evidence scope:
+Operational scope:
 
 - `tools/forge_base_matrix.py`
-- `handover/ops/ACTIVE_PROJECTS.md`
 - `handover/ops/ACTIVE_MISSION_CHARTER.md`
+- `handover/ops/ACTIVE_PROJECTS.md`
 - `handover/ai-direct/LATEST.md`
 - `handover/BOARD.md`
-- `handover/ai-direct/entries/20260308_085506_stage2_pathological_empty_frame_mission_spec.md`
+- `handover/ai-direct/entries/20260309_025500_holdout_basematrix_dual_host_execution_spec.md`
+- `handover/ai-direct/entries/20260309_030257_gemini_holdout_dual_host_spec_audit.md`
+
+Runtime evidence scope:
+
+- Windows-local manifests for `2025` and `202601`
+- isolated holdout forge output roots
+- isolated evaluation directories containing only final parquet + meta
 
 ## 5. Out of Scope
 
-- `omega_core/*` mathematical formulas or canonical V64.3 semantics
-- `tools/stage2_targeted_resume.py` timeout tuning
-- `OMEGA_STAGE2_FORCE_SCAN_FALLBACK` / slow pathology-discovery flow
-- Stage1 rebuilds or input parquet reconstruction
-- full-queue Stage2 relaunches on either worker
-- Stage3 training or backtest validation beyond forge/base-matrix consumption proof
+- changing canonical Stage3 gate semantics
+- rebuilding the completed training artifact
+- reviving cloud Optuna implementation itself
+- full backtest interpretation beyond artifact and path proof
+- any remote-mounted Windows parquet forge on Linux
 
 ## 6. Required Audits
 
-Math audit:
-
-- confirm no `omega_core/` math or downstream canonical gate semantics were changed
-- confirm the fix is pure Stage2 control-flow hardening
-
 Runtime audit:
 
-- confirm the three unresolved files pass on the normal Stage2 path without forced scan fallback
-- confirm the repaired three-file L2 set passes `forge_base_matrix.py` input contract as one input set
-- confirm Stage3 forge validation explicitly uses `--years 2023,2024,2025` so the 2025 file is not silently excluded
+- confirm the `2025` manifest contains only `2025*.parquet`
+- confirm the `2026-01` manifest contains only `202601*.parquet`
+- confirm each holdout forge input contract passes
+- confirm each final artifact is non-empty
+- confirm each evaluation directory is shard-free and date-clean
+
+Topology audit:
+
+- confirm `omega-vm` remains the controller
+- confirm Windows-side manifest generation is invoked against Windows-local files
+- confirm Linux performs only audit/controller work unless January files are copied into Linux-local storage first
 
 ## 7. Runtime and Evidence Constraints
 
-- Validation node: `linux1-lx` first, then `windows1-w1` for the two Windows-owned files only if Linux validation passes
-- Use the current normal `v643` Stage2 path; do not enable forced scan fallback
-- Use isolated output roots for reruns and forge validation; do not pollute authoritative `latest_feature_l2`
-- Before any worker validation, respect the controller-managed deploy path and code-freshness rules
-- Stage3 validation must use `tools/forge_base_matrix.py --input-file-list ... --years 2023,2024,2025`
-- Mission completion requires one isolated forge/base-matrix proof for the repaired three-file set
+- Default execution mode is canonical:
+  - `windows1-w1` forges `2025`
+  - `windows1-w1` then forges `2026-01`
+  - `linux1-lx` runs validation / audit / cloud-controller work in parallel
+- Optimized dual-host mode is allowed only if:
+  - `202601*.parquet` is copied into Linux-local storage first
+  - the copied subset is re-asserted locally before forge
+- `2026-01` scope must be defined by explicit manifest, not by `--years 2026` alone
+- Downstream evaluation must never point at a forge workspace that still contains shard parquet files
 
 ## 8. Acceptance Criteria
 
-1. Stage2 no longer fails with `index out of bounds` immediately after the pathological guardrail on the three unresolved files.
-2. New or updated regression coverage proves proactively dropped empty symbol frames do not crash the normal non-fallback path.
-3. Existing pathological crash-skip coverage still passes.
-4. The repaired three-file L2 set is forged together through `tools/forge_base_matrix.py` in an isolated workspace.
-5. Forge input contract passes for that three-file set:
-   - required columns present
-   - non-empty L2 input set
-   - positive `physics_valid_rows`
-   - positive `epi_pos_rows`
-   - positive `topo_energy_pos_rows`
-   - positive `signal_gate_rows`
-6. A non-empty `base_matrix.parquet` and matching meta artifact are produced from the repaired three-file set.
-7. Handover is updated with exact artifacts, commands, and verdicts.
+1. `base_matrix_holdout_2025.parquet` is forged successfully and contains only `2025`.
+2. `base_matrix_holdout_2026_01.parquet` is forged successfully and contains only `202601`.
+3. Each holdout artifact lives in a separate clean evaluation directory with only final parquet + meta.
+4. No holdout evaluation reads from the training artifact.
+5. Default mode uses Windows as the primary forge node for both artifacts unless a named blocking reason forces a deviation.
+6. If Linux forges January in optimized mode, the January subset was copied locally and re-asserted before forge.
+7. Handover records exact manifests, paths, row counts, host assignments, and verdicts.
 
 ## 9. Fail-Fast Conditions
 
-- If the fix requires changing `omega_core/*` math, stop and escalate.
-- If Linux normal-path rerun still crashes for the same reason after the control-flow hardening patch, stop and capture exact new evidence before widening scope.
-- If forge validation fails because one or more repaired files are structurally unusable as a set, keep the mission open; do not declare success based only on Stage2 completion.
-- Retry is allowed only after a named root cause and a changed condition.
+- If `2025` forge is moved to Linux while Windows is healthy and idle without a named blocker, stop.
+- If Linux attempts forge from remotely mounted Windows parquet, stop.
+- If `2026-01` artifact scope depends only on `--years 2026`, stop.
+- If evaluation roots contain shard parquet or mixed-year files, stop.
+- If any holdout artifact includes out-of-scope dates, stop.
 
 ## 10. Definition of Done
 
-- canonical Stage2 control-flow defect is repaired
-- regression coverage is in place and passes
-- Linux normal-path rerun passes for the three unresolved files
-- Windows normal-path rerun passes for the two Windows-owned files if still needed
-- isolated forge/base-matrix validation passes on the repaired three-file set
-- handover updated
-- Commander-only integration decision completed
+- both holdout artifacts are built
+- both artifact scopes are exact
+- both evaluation roots are clean
+- audited host allocation was followed or any deviation was explicitly justified
+- handover updated with commands, paths, and verdicts
 
 ## 11. Run Manifest
 
-Recorded execution:
+Recorded starting facts:
 
-- commit hash: `23fd229`
-- deploy path used:
-  - controller push to `origin`: PASS
-  - controller `tools/deploy.py --skip-commit --nodes windows`: unavailable locally because worker deploy remotes were missing
-  - Windows validation host was therefore aligned manually to `23fd229` from its `github` remote for this isolated runtime proof
-- linux validation workspace:
-  - blocked; `ssh linux1-lx` timed out from the controller during this session
-- windows validation workspace:
-  - `D:\Omega_frames\stage2_patho_fix_validate_20260308_091554\l2`
-  - runtime logs:
-    - `D:\work\Omega_vNext\audit\runtime\stage2_patho_fix_validate_20260308_091554\runner.log`
-    - `D:\work\Omega_vNext\audit\runtime\stage2_patho_fix_validate_20260308_20231219\runner.log`
-- forge validation workspace:
-  - `D:\Omega_frames\stage3_patho_fix_forge_20260308_1728`
-  - input list:
-    - `D:\work\Omega_vNext\audit\runtime\stage3_patho_fix_forge_20260308_1728\input_files.txt`
-- unresolved file set:
-  - `20231219_b07c2229.parquet`
-  - `20241128_b07c2229.parquet`
-  - `20250908_fbd5c8b.parquet`
-- Stage2 verdict:
-  - PASS on `windows1-w1` normal path for all three unresolved files
-  - no forced scan fallback used
-- forge verdict:
-  - PASS on `windows1-w1`
-  - explicit `--years 2023,2024,2025` used
-  - non-empty `base_matrix.parquet` produced with `base_rows=3074`
+- controller:
+  - `omega-vm`
+- primary forge node:
+  - `windows1-w1`
+- secondary audit/controller node:
+  - `linux1-lx`
+- active training artifact already complete:
+  - `/omega_pool/parquet_data/stage3_base_matrix_train_20260308_095850/base_matrix_train_2023_2024.parquet`
+- holdout build spec verdict:
+  - Gemini `PASS`
+- live capacity sample at audit time:
+  - `linux1-lx`: no active Stage2 / Stage3 / train process; about `24 GiB` available memory
+  - `windows1-w1`: no active `python` compute process; about `86.7 / 95.8 GiB` free/total memory

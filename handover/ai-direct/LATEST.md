@@ -8,6 +8,27 @@
 
 This file is the single source of current operational truth for all agents.
 
+## Update: 2026-03-09 03:02 UTC
+- **Gemini has now audited the holdout base-matrix dual-host execution spec and returned `PASS`.**
+- Verified live capacity at audit time:
+  - `linux1-lx` had no active Stage2 / Stage3 / training process and about `24 GiB` available memory
+  - `windows1-w1` had no active `python` compute process and about `86.7 / 95.8 GiB` free/total memory
+- Locked execution recommendation:
+  - default mode:
+    - `windows1-w1` forges `base_matrix_holdout_2025.parquet`
+    - then `windows1-w1` forges `base_matrix_holdout_2026_01.parquet`
+    - `linux1-lx` runs validation / audit / cloud-controller work in parallel
+  - optimized mode:
+    - `linux1-lx` may forge `2026-01` only after the `202601*.parquet` subset is copied into Linux-local storage and re-asserted locally
+- Why this is now canonical:
+  - Windows owns the relevant late-date Stage2 corpus
+  - Windows was already observed faster than Linux on the repaired path
+  - the spec now explicitly forbids fake parallelism from Linux reading Windows parquet remotely
+  - holdout evaluation directories must be clean and shard-free
+- Deep dive:
+  - `handover/ai-direct/entries/20260309_025500_holdout_basematrix_dual_host_execution_spec.md`
+  - `handover/ai-direct/entries/20260309_030257_gemini_holdout_dual_host_spec_audit.md`
+
 ## Update: 2026-03-09 02:46 UTC
 - **The cloud optimization spec now explicitly requires three separate Stage3 base-matrix artifacts, not one mixed matrix.**
 - Verified current state:
