@@ -45,6 +45,36 @@
 ### Entries
 
 <!-- New session debriefs go here. Most recent on top. -->
+#### [2026-03-09 07:29] Agent: Codex | Session: External Auditor Packet For Last Two GCP Runs
+
+**What I did:**
+- Wrote a GitHub-shareable prompt packet for an external AI auditor at `handover/ai-direct/entries/20260309_072941_external_ai_auditor_prompt_gc_runs.md`.
+- Included both recent GCP swarm snapshots:
+  - the older AUC-first run plus frozen holdout verdict
+  - the new V644 alpha-first pilot stop-gate result
+- Included the storage authorities for the actual train/holdout base-matrix artifacts.
+- Updated `handover/ai-direct/LATEST.md` so the next agent can find the packet quickly.
+
+**What I discovered:**
+- The right committed evidence set is already sufficient for an auditor to reason about the issue without committing transient `audit/runtime/*` trees.
+- The most important thing to make explicit for the auditor was the current uncertainty boundary:
+  - not enough search coverage
+  - versus deeper feature/label/math mismatch
+
+**What confused me / blocked me:**
+- The raw parquet artifacts themselves are not in git, so I had to separate:
+  - committed repo evidence
+  - non-git storage authorities
+
+**What the next agent should do:**
+- Send the auditor the new prompt packet or its GitHub link.
+- Do not commit the whole transient `audit/runtime/` tree unless a later audit explicitly requires a specific artifact from it.
+
+**Files I changed:**
+- `handover/ai-direct/entries/20260309_072941_external_ai_auditor_prompt_gc_runs.md` — added the external-auditor prompt with run snapshots, path map, and question list.
+- `handover/ai-direct/LATEST.md` — recorded the existence and purpose of the new auditor packet.
+- `handover/BOARD.md` — added this mandatory debrief block.
+
 #### [2026-03-09 07:22] Agent: Codex | Session: V644 Alpha-First Pilot 1 Stop Gate
 
 **What I did:**

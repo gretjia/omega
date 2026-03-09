@@ -8,6 +8,20 @@
 
 This file is the single source of current operational truth for all agents.
 
+## Update: 2026-03-09 07:29 UTC
+- **A GitHub-shareable external-auditor prompt packet has now been prepared for the last two GCP swarm runs.**
+- Prompt packet:
+  - `handover/ai-direct/entries/20260309_072941_external_ai_auditor_prompt_gc_runs.md`
+- What it contains:
+  - snapshot of the previous AUC-first GCP swarm run
+  - snapshot of the new V644 alpha-first pilot
+  - committed evidence read-order
+  - non-git storage authorities for the train and holdout base matrices
+  - explicit question list and current doubts for the auditor
+- Use case:
+  - send this packet or its GitHub link directly to the AI auditor
+  - the auditor can read committed evidence without relying on local transient runtime files
+
 ## Update: 2026-03-09 07:22 UTC
 - **The first live V644 alpha-first pilot completed and triggered the spec stop gate.**
 - New runtime record:
