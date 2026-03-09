@@ -9,7 +9,7 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from config import FEATURE_COLS
-from tools.run_optuna_sweep import _canonical_fingerprint, _prepare_temporal_split
+from tools.run_optuna_sweep import _canonical_fingerprint, _prepare_temporal_split, _trial_payload
 
 
 def _row(date: str, time_value: int, t1_fwd_return: float, offset: float) -> dict:
@@ -64,3 +64,28 @@ def test_prepare_temporal_split_builds_train_val_once(tmp_path: Path) -> None:
     assert datasets["summary"]["train_max_date"] == "20230105"
     assert datasets["summary"]["val_min_date"] == "20240108"
     assert datasets["canonical_fingerprint"] == _canonical_fingerprint(args)
+
+
+def test_trial_payload_does_not_require_runtime_trial_state() -> None:
+    class DummyTrial:
+        number = 7
+
+    payload = _trial_payload(
+        DummyTrial(),
+        params={
+            "max_depth": 4,
+            "learning_rate": 0.03,
+            "subsample": 0.9,
+            "colsample_bytree": 0.8,
+            "min_child_weight": 1.0,
+            "gamma": 0.0,
+            "reg_lambda": 1.0,
+            "reg_alpha": 0.0,
+            "num_boost_round": 120,
+        },
+        auc=0.71,
+        alpha_top_decile=0.02,
+        alpha_top_quintile=0.01,
+    )
+    assert payload["trial_number"] == 7
+    assert payload["state"] == "COMPLETE"

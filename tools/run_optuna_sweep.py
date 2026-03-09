@@ -341,7 +341,7 @@ def _prepare_temporal_split(args: argparse.Namespace) -> dict:
 def _trial_payload(trial, params: dict, auc: float, alpha_top_decile: float, alpha_top_quintile: float) -> dict:
     return {
         "trial_number": int(trial.number),
-        "state": str(trial.state),
+        "state": "COMPLETE",
         "val_auc": float(auc),
         "alpha_top_decile": float(alpha_top_decile),
         "alpha_top_quintile": float(alpha_top_quintile),
