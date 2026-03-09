@@ -45,6 +45,78 @@
 ### Entries
 
 <!-- New session debriefs go here. Most recent on top. -->
+#### [2026-03-09 13:36] Agent: Codex | Session: V650 Robust-Loss Wave Killed
+
+**What I did:**
+- Implemented the bounded V650 code wave in:
+  - `tools/run_optuna_sweep.py`
+  - `tests/test_vertex_optuna_split.py`
+- Added:
+  - `reg_pseudohuber_excess_return`
+  - explicit non-degeneracy guardrail
+- Ran local validation:
+  - `21 passed in 2.93s`
+  - `py_compile` passed
+- Ran the local V650 sweep:
+  - `audit/runtime/v650_local_sweep_20260309_133400/worker_local`
+- Closed the mission with:
+  - `handover/ai-direct/entries/20260309_133613_v650_local_robust_loss_kill_condition_triggered.md`
+
+**What I discovered:**
+- `reg:pseudohubererror` did not rescue Path B.
+- All `10/10` trials still collapsed into flat predictors:
+  - `val_pred_std ~ 0`
+  - rounded unique predictions:
+    - `1`
+  - feature importance count:
+    - `0`
+- So the zero-mass gravity well is not just an L2-loss problem.
+
+**What confused me / blocked me:**
+- Nothing operational blocked the mission.
+- The blocker is now conceptual:
+  - the frozen raw `t1_excess_return` target itself appears exhausted.
+
+**What the next agent should do:**
+- Do not expand this branch to retrain, holdouts, or GCP.
+- Treat V650 as a completed diagnostic kill.
+- The next mission should be target transformation.
+
+**Files I changed:**
+- `tools/run_optuna_sweep.py` — added the robust-loss learner mode and explicit non-degeneracy guardrail.
+- `tests/test_vertex_optuna_split.py` — added regression-mode and non-degeneracy coverage.
+- `handover/ai-direct/entries/20260309_133613_v650_local_robust_loss_kill_condition_triggered.md` — recorded the final V650 verdict.
+- `handover/ops/ACTIVE_MISSION_CHARTER.md` — marked the mission as completed.
+- `handover/ai-direct/LATEST.md` — updated current operational truth with the V650 result.
+- `handover/ops/ACTIVE_PROJECTS.md` — marked V650 as completed with kill condition triggered.
+- `handover/BOARD.md` — added this debrief.
+#### [2026-03-09 13:28] Agent: Codex | Session: V650 Mission Open
+
+**What I did:**
+- Opened V650 formally:
+  - `handover/ai-direct/entries/20260309_132836_v650_zero_mass_gravity_well_mission_open.md`
+- Switched the active charter to V650.
+- Updated current-state docs to reflect that V650 wave 1 is now active.
+
+**What I discovered:**
+- The live codebase already confirms a key subtlety:
+  - the `60` trace length belongs to the physics window
+  - while the current training target is effectively built off `T+1` day close logic
+- So V650 is still a learner-interface rescue mission, not yet a target-horizon redesign.
+
+**What confused me / blocked me:**
+- Nothing blocked mission activation.
+
+**What the next agent should do:**
+- Keep wave 1 local-only and sweep-only.
+- Do not run retrain or holdout under V650 wave 1.
+
+**Files I changed:**
+- `handover/ai-direct/entries/20260309_132836_v650_zero_mass_gravity_well_mission_open.md` — opened V650.
+- `handover/ops/ACTIVE_MISSION_CHARTER.md` — switched active authority to V650.
+- `handover/ai-direct/LATEST.md` — updated live state to active V650.
+- `handover/ops/ACTIVE_PROJECTS.md` — marked V650 active.
+- `handover/BOARD.md` — added this debrief.
 #### [2026-03-09 13:17] Agent: Codex | Session: V650 Draft Prepared And Gemini-Passed
 
 **What I did:**

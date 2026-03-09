@@ -35,15 +35,27 @@ WEIGHT_MODES = {
     "pow_0p625_abs_excess_return",
     "sqrt_abs_excess_return",
 }
-LEARNER_MODES = {"binary_logistic_sign", "reg_squarederror_excess_return"}
+LEARNER_MODES = {
+    "binary_logistic_sign",
+    "reg_squarederror_excess_return",
+    "reg_pseudohuber_excess_return",
+}
 HARD_LOSING_OBJECTIVE_VALUE = -1.0e9
 STRUCTURAL_TAIL_OBJECTIVE = "structural_tail_monotonicity_gate"
 STRUCTURAL_TAIL_REQUIRED_BINARY_WEIGHT_MODE = "sqrt_abs_excess_return"
 STRUCTURAL_TAIL_REQUIRED_BINARY_LEARNER_MODE = "binary_logistic_sign"
 STRUCTURAL_TAIL_REQUIRED_REGRESSION_WEIGHT_MODE = "none"
-STRUCTURAL_TAIL_REQUIRED_REGRESSION_LEARNER_MODE = "reg_squarederror_excess_return"
+STRUCTURAL_TAIL_REQUIRED_REGRESSION_LEARNER_MODES = {
+    "reg_squarederror_excess_return",
+    "reg_pseudohuber_excess_return",
+}
 STRUCTURAL_TAIL_MIN_AUC_FLOOR = 0.505
 STRUCTURAL_TAIL_MIN_SPEARMAN_FLOOR = 0.0
+NON_DEGENERACY_PRED_STD_MIN = 1.0e-6
+
+
+def _is_regression_learner_mode(mode: str) -> bool:
+    return _resolve_learner_mode(mode) in STRUCTURAL_TAIL_REQUIRED_REGRESSION_LEARNER_MODES
 
 
 def _install_dependencies() -> None:
@@ -303,7 +315,7 @@ def _objective_contract(
     auc_guardrail_enabled = metric != "val_auc" and auc_guardrail_min > 0.0
     spearman_guardrail_enabled = False
     structural_metric_name = "val_auc"
-    if metric == STRUCTURAL_TAIL_OBJECTIVE and learner_mode == STRUCTURAL_TAIL_REQUIRED_REGRESSION_LEARNER_MODE:
+    if metric == STRUCTURAL_TAIL_OBJECTIVE and _is_regression_learner_mode(learner_mode):
         auc_guardrail_enabled = False
         spearman_guardrail_enabled = True
         structural_metric_name = "val_spearman_ic"
@@ -351,7 +363,7 @@ def _validate_objective_runtime_contract(args: argparse.Namespace) -> None:
                 f"{STRUCTURAL_TAIL_MIN_AUC_FLOOR}"
             )
         return
-    if args.learner_mode == STRUCTURAL_TAIL_REQUIRED_REGRESSION_LEARNER_MODE:
+    if _is_regression_learner_mode(args.learner_mode):
         if args.weight_mode != STRUCTURAL_TAIL_REQUIRED_REGRESSION_WEIGHT_MODE:
             raise RuntimeError(
                 "structural_tail_objective_requires_weight_mode:"
@@ -368,7 +380,7 @@ def _validate_objective_runtime_contract(args: argparse.Namespace) -> None:
     raise RuntimeError(
         "structural_tail_objective_requires_learner_mode:"
         f"{STRUCTURAL_TAIL_REQUIRED_BINARY_LEARNER_MODE}"
-        f"|{STRUCTURAL_TAIL_REQUIRED_REGRESSION_LEARNER_MODE}"
+        f"|{'|'.join(sorted(STRUCTURAL_TAIL_REQUIRED_REGRESSION_LEARNER_MODES))}"
     )
 
 
@@ -511,7 +523,7 @@ def _prepare_temporal_split(args: argparse.Namespace) -> dict:
 
     weight_mode = _resolve_weight_mode(args.weight_mode)
     selected_weights_clean = None
-    if learner_mode == STRUCTURAL_TAIL_REQUIRED_REGRESSION_LEARNER_MODE and weight_mode != "none":
+    if _is_regression_learner_mode(learner_mode) and weight_mode != "none":
         raise RuntimeError("regression_learner_requires_weight_mode:none")
     if weight_mode == "none":
         selected_weights_clean = None
@@ -614,7 +626,16 @@ def _trial_payload(
     min_val_auc: float = 0.0,
     min_val_spearman_ic: float = 0.0,
     learner_mode: str = "binary_logistic_sign",
+    val_pred_std: float = 0.0,
+    rounded_unique_predictions: int = 0,
+    non_zero_feature_importance_count: int = 0,
+    enforce_non_degeneracy_gate: bool = False,
 ) -> dict:
+    non_degeneracy_passed = bool(
+        float(val_pred_std) >= NON_DEGENERACY_PRED_STD_MIN
+        and int(rounded_unique_predictions) > 1
+        and int(non_zero_feature_importance_count) > 0
+    )
     payload = {
         "trial_number": int(trial.number),
         "state": "COMPLETE",
@@ -622,23 +643,30 @@ def _trial_payload(
         "val_spearman_ic": float(val_spearman_ic),
         "alpha_top_decile": float(alpha_top_decile),
         "alpha_top_quintile": float(alpha_top_quintile),
+        "val_pred_std": float(val_pred_std),
+        "rounded_unique_predictions": int(rounded_unique_predictions),
+        "non_zero_feature_importance_count": int(non_zero_feature_importance_count),
+        "non_degeneracy_gate_enabled": bool(enforce_non_degeneracy_gate),
+        "non_degeneracy_passed": bool(non_degeneracy_passed),
         "learner_mode": _resolve_learner_mode(learner_mode),
         "max_depth": int(params["max_depth"]),
         "num_boost_round": int(params["num_boost_round"]),
         "params": dict(params),
     }
-    payload.update(
-        _objective_contract(
-            objective_metric,
-            auc=auc,
-            val_spearman_ic=val_spearman_ic,
-            alpha_top_decile=alpha_top_decile,
-            alpha_top_quintile=alpha_top_quintile,
-            min_val_auc=float(min_val_auc),
-            min_val_spearman_ic=float(min_val_spearman_ic),
-            learner_mode=_resolve_learner_mode(learner_mode),
-        )
+    contract = _objective_contract(
+        objective_metric,
+        auc=auc,
+        val_spearman_ic=val_spearman_ic,
+        alpha_top_decile=alpha_top_decile,
+        alpha_top_quintile=alpha_top_quintile,
+        min_val_auc=float(min_val_auc),
+        min_val_spearman_ic=float(min_val_spearman_ic),
+        learner_mode=_resolve_learner_mode(learner_mode),
     )
+    if bool(enforce_non_degeneracy_gate) and not non_degeneracy_passed:
+        contract["structural_guardrail_passed"] = False
+        contract["objective_value"] = float(HARD_LOSING_OBJECTIVE_VALUE)
+    payload.update(contract)
     return payload
 
 
@@ -721,6 +749,9 @@ def main() -> None:
         if args.learner_mode == "binary_logistic_sign":
             params["objective"] = "binary:logistic"
             params["eval_metric"] = "auc"
+        elif args.learner_mode == "reg_pseudohuber_excess_return":
+            params["objective"] = "reg:pseudohubererror"
+            params["eval_metric"] = "mae"
         else:
             params["objective"] = "reg:squarederror"
             params["eval_metric"] = "rmse"
@@ -740,6 +771,10 @@ def main() -> None:
             preds = booster.predict(dval)
         else:
             preds = booster.predict(dval, iteration_range=(0, int(best_iteration) + 1))
+        val_pred_std = float(np.std(preds)) if preds.size > 0 else 0.0
+        rounded_unique_predictions = int(np.unique(np.round(preds, 12)).size) if preds.size > 0 else 0
+        feature_gain = booster.get_score(importance_type="gain")
+        non_zero_feature_importance_count = int(len(feature_gain))
         val_spearman_ic = _spearman_rank_ic(preds, excess_val)
         auc_defined = len(np.unique(y_val_sign)) > 1
         auc = float(roc_auc_score(y_val_sign, preds)) if auc_defined else None
@@ -767,11 +802,21 @@ def main() -> None:
             min_val_auc=float(args.min_val_auc),
             min_val_spearman_ic=float(args.min_val_spearman_ic),
             learner_mode=str(args.learner_mode),
+            val_pred_std=val_pred_std,
+            rounded_unique_predictions=rounded_unique_predictions,
+            non_zero_feature_importance_count=non_zero_feature_importance_count,
+            enforce_non_degeneracy_gate=_is_regression_learner_mode(str(args.learner_mode)),
         )
         trial_rows.append(payload)
         trial.set_user_attr("alpha_top_decile", alpha_top_decile)
         trial.set_user_attr("alpha_top_quintile", alpha_top_quintile)
         trial.set_user_attr("val_spearman_ic", float(payload["val_spearman_ic"]))
+        trial.set_user_attr("val_pred_std", float(payload["val_pred_std"]))
+        trial.set_user_attr("rounded_unique_predictions", int(payload["rounded_unique_predictions"]))
+        trial.set_user_attr(
+            "non_zero_feature_importance_count",
+            int(payload["non_zero_feature_importance_count"]),
+        )
         trial.set_user_attr("learner_mode", str(args.learner_mode))
         trial.set_user_attr("objective_metric", str(payload["objective_metric"]))
         trial.set_user_attr("objective_value", float(payload["objective_value"]))
@@ -784,6 +829,8 @@ def main() -> None:
         trial.set_user_attr("spearman_guardrail_passed", bool(payload["spearman_guardrail_passed"]))
         trial.set_user_attr("tail_monotonicity_enabled", bool(payload["tail_monotonicity_enabled"]))
         trial.set_user_attr("tail_monotonicity_passed", bool(payload["tail_monotonicity_passed"]))
+        trial.set_user_attr("non_degeneracy_gate_enabled", bool(payload["non_degeneracy_gate_enabled"]))
+        trial.set_user_attr("non_degeneracy_passed", bool(payload["non_degeneracy_passed"]))
         trial.set_user_attr("structural_guardrail_passed", bool(payload["structural_guardrail_passed"]))
         return float(payload["objective_value"])
 
@@ -794,6 +841,14 @@ def main() -> None:
     eligible_rows = [row for row in trial_rows if bool(row.get("structural_guardrail_passed", False))]
     auc_guardrail_rows = [row for row in trial_rows if bool(row.get("auc_guardrail_passed", False))]
     spearman_guardrail_rows = [row for row in trial_rows if bool(row.get("spearman_guardrail_passed", False))]
+    non_degeneracy_rows = [row for row in trial_rows if bool(row.get("non_degeneracy_passed", False))]
+    continuation_rows = [
+        row
+        for row in trial_rows
+        if bool(row.get("structural_guardrail_passed", False))
+        and bool(row.get("non_degeneracy_passed", False))
+        and float(row.get("val_auc") or 0.0) > STRUCTURAL_TAIL_MIN_AUC_FLOOR
+    ]
     best_value = float(study.best_value) if completed else None
     best_params = dict(study.best_params) if completed else {}
 
@@ -812,6 +867,8 @@ def main() -> None:
         "n_structural_guardrail_passed": int(len(eligible_rows)),
         "n_auc_floor_passed": int(len(auc_guardrail_rows)),
         "n_spearman_floor_passed": int(len(spearman_guardrail_rows)),
+        "n_non_degeneracy_passed": int(len(non_degeneracy_rows)),
+        "n_local_continuation_passed": int(len(continuation_rows)),
         "seconds": round(time.time() - t0, 2),
         "objective_metric": str(args.objective_metric),
         "auc_guardrail_min": float(args.min_val_auc),
@@ -819,8 +876,9 @@ def main() -> None:
         "auc_guardrail_enabled": bool(float(args.min_val_auc) > 0.0 and str(args.objective_metric) != "val_auc"),
         "spearman_guardrail_enabled": bool(
             str(args.objective_metric) == STRUCTURAL_TAIL_OBJECTIVE
-            and str(args.learner_mode) == STRUCTURAL_TAIL_REQUIRED_REGRESSION_LEARNER_MODE
+            and _is_regression_learner_mode(str(args.learner_mode))
         ),
+        "non_degeneracy_gate_enabled": bool(_is_regression_learner_mode(str(args.learner_mode))),
         "tail_monotonicity_required": bool(str(args.objective_metric) == STRUCTURAL_TAIL_OBJECTIVE),
         "learner_mode": str(args.learner_mode),
         "weight_mode": str(args.weight_mode),

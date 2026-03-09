@@ -8,6 +8,60 @@
 
 This file is the single source of current operational truth for all agents.
 
+## Update: 2026-03-09 13:36 UTC
+- **V650 wave 1 is complete, and the kill condition was triggered.**
+- New execution verdict:
+  - `handover/ai-direct/entries/20260309_133613_v650_local_robust_loss_kill_condition_triggered.md`
+- Code wave:
+  - `tools/run_optuna_sweep.py`
+  - `tests/test_vertex_optuna_split.py`
+- Local validation:
+  - `21 passed in 2.93s`
+  - `py_compile` passed
+- Local runtime root:
+  - `audit/runtime/v650_local_sweep_20260309_133400/worker_local`
+- Study summary:
+  - `n_trials=10`
+  - `n_completed=10`
+  - `n_non_degeneracy_passed=0`
+  - `n_local_continuation_passed=0`
+  - `n_structural_guardrail_passed=0`
+- Trial pattern:
+  - all trials remained flat
+  - `val_pred_std ~ 0`
+  - rounded unique predictions:
+    - `1`
+  - non-zero feature-importance count:
+    - `0`
+  - `val_spearman_ic=0.0`
+  - `val_auc=0.5`
+- Final audits:
+  - runtime:
+    - `PASS`
+  - `gemini -p`:
+    - implementation fidelity:
+      - `PASS`
+    - result verdict:
+      - `KILL CONDITION TRIGGERED`
+- Operational conclusion:
+  - do not escalate this branch to retrain, holdouts, or cloud
+  - next justified mission must move to target transformation
+
+## Update: 2026-03-09 13:28 UTC
+- **V650 is now the active mission.**
+- New mission-open authority:
+  - `handover/ai-direct/entries/20260309_132836_v650_zero_mass_gravity_well_mission_open.md`
+- Active charter has been switched to:
+  - `handover/ops/ACTIVE_MISSION_CHARTER.md`
+- Active branch decision:
+  - Path B remains the leading branch
+  - raw `t1_excess_return` remains frozen
+  - wave 1 is local-only and sweep-only
+- Immediate next step:
+  - implement the bounded robust-loss Path B wave
+  - run local tests
+  - run one local V650 sweep
+
 ## Update: 2026-03-09 13:17 UTC
 - **The new Zero-Mass Gravity Well verdict is landed, and the V650 spec draft has now passed `gemini -p`.**
 - New audit authority:

@@ -137,7 +137,7 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
 
 ### Project: V650-ZERO-MASS-GRAVITY-WELL
 
-- Status: `DRAFT_PENDING_OWNER_CONFIRMATION`
+- Status: `COMPLETED_KILL_CONDITION_TRIGGERED`
 - Hosts: `controller` only for first wave
 - Goal: keep Path B as the leading branch, but test whether a robust regression loss plus an explicit non-degeneracy gate can escape the zero-mass collapse while keeping the raw `t1_excess_return` label frozen
 - Audit authority:
@@ -174,9 +174,21 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
   - non-zero feature-importance count:
     - `> 0`
 - Current state:
-  - draft only
-  - waiting for owner confirmation
-  - active charter not yet switched
+  - wave 1 executed
+  - local tests passed
+  - kill condition triggered
+  - no further expansion authorized
+- Latest result:
+  - execution verdict:
+    - `handover/ai-direct/entries/20260309_133613_v650_local_robust_loss_kill_condition_triggered.md`
+  - summary:
+    - `10/10` trials completed
+    - `0/10` passed non-degeneracy
+    - `0/10` passed local continuation
+    - all trials remained flat predictors
+- Next justified mission:
+  - target transformation
+  - not retrain / holdout / cloud on this raw `t1_excess_return` branch
 
 ### Project: V645-GC-ASYMMETRIC-LABEL-PIVOT
 

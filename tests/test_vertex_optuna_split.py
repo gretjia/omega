@@ -260,6 +260,38 @@ def test_prepare_temporal_split_supports_path_b_regression_labels(tmp_path: Path
     assert datasets["dval"].num_row() == 2
 
 
+def test_prepare_temporal_split_supports_path_b_pseudohuber_labels(tmp_path: Path) -> None:
+    matrix_path = tmp_path / "base_matrix_train_2023_2024.parquet"
+    df = pl.DataFrame(
+        [
+            _row("20230105", 1, 0.06, 0.0),
+            _row("20230105", 1, -0.01, 0.5),
+            _row("20240108", 1, 0.09, 1.0),
+            _row("20240108", 1, -0.02, 1.5),
+        ]
+    )
+    df.write_parquet(matrix_path)
+
+    args = Namespace(
+        base_matrix_uri=str(matrix_path),
+        train_year="2023",
+        val_year="2024",
+        singularity_threshold=0.10,
+        signal_epi_threshold=0.5,
+        srl_resid_sigma_mult=2.0,
+        topo_energy_min=2.0,
+        weight_mode="none",
+        learner_mode="reg_pseudohuber_excess_return",
+    )
+    datasets = _prepare_temporal_split(args)
+
+    assert datasets["summary"]["learner_mode"] == "reg_pseudohuber_excess_return"
+    assert datasets["summary"]["weight_mode"] == "none"
+    assert datasets["summary"]["weighting_enabled"] is False
+    assert datasets["dtrain"].num_row() == 2
+    assert datasets["dval"].num_row() == 2
+
+
 def test_trial_payload_does_not_require_runtime_trial_state() -> None:
     class DummyTrial:
         number = 7
@@ -486,6 +518,78 @@ def test_trial_payload_structural_tail_metric_uses_spearman_for_path_b() -> None
     assert payload["objective_value"] == 0.02
 
 
+def test_trial_payload_regression_non_degeneracy_gate_penalizes_flat_predictions() -> None:
+    class DummyTrial:
+        number = 14
+
+    payload = _trial_payload(
+        DummyTrial(),
+        params={
+            "max_depth": 4,
+            "learning_rate": 0.03,
+            "subsample": 0.9,
+            "colsample_bytree": 0.8,
+            "min_child_weight": 1.0,
+            "gamma": 0.0,
+            "reg_lambda": 1.0,
+            "reg_alpha": 0.0,
+            "num_boost_round": 120,
+        },
+        auc=0.52,
+        val_spearman_ic=0.03,
+        alpha_top_decile=0.03,
+        alpha_top_quintile=0.01,
+        objective_metric="structural_tail_monotonicity_gate",
+        min_val_auc=0.0,
+        min_val_spearman_ic=0.02,
+        learner_mode="reg_pseudohuber_excess_return",
+        val_pred_std=0.0,
+        rounded_unique_predictions=1,
+        non_zero_feature_importance_count=0,
+        enforce_non_degeneracy_gate=True,
+    )
+    assert payload["non_degeneracy_gate_enabled"] is True
+    assert payload["non_degeneracy_passed"] is False
+    assert payload["structural_guardrail_passed"] is False
+    assert payload["objective_value"] < 0.0
+
+
+def test_trial_payload_regression_non_degeneracy_gate_allows_live_predictions() -> None:
+    class DummyTrial:
+        number = 15
+
+    payload = _trial_payload(
+        DummyTrial(),
+        params={
+            "max_depth": 4,
+            "learning_rate": 0.03,
+            "subsample": 0.9,
+            "colsample_bytree": 0.8,
+            "min_child_weight": 1.0,
+            "gamma": 0.0,
+            "reg_lambda": 1.0,
+            "reg_alpha": 0.0,
+            "num_boost_round": 120,
+        },
+        auc=0.52,
+        val_spearman_ic=0.03,
+        alpha_top_decile=0.03,
+        alpha_top_quintile=0.01,
+        objective_metric="structural_tail_monotonicity_gate",
+        min_val_auc=0.0,
+        min_val_spearman_ic=0.02,
+        learner_mode="reg_pseudohuber_excess_return",
+        val_pred_std=0.01,
+        rounded_unique_predictions=7,
+        non_zero_feature_importance_count=5,
+        enforce_non_degeneracy_gate=True,
+    )
+    assert payload["non_degeneracy_gate_enabled"] is True
+    assert payload["non_degeneracy_passed"] is True
+    assert payload["structural_guardrail_passed"] is True
+    assert payload["objective_value"] == 0.02
+
+
 def test_validate_objective_runtime_contract_supports_v647_binary_and_v648_path_b() -> None:
     args = Namespace(
         objective_metric="structural_tail_monotonicity_gate",
@@ -504,6 +608,15 @@ def test_validate_objective_runtime_contract_supports_v647_binary_and_v648_path_
         learner_mode="reg_squarederror_excess_return",
     )
     _validate_objective_runtime_contract(path_b)
+
+    path_b_huber = Namespace(
+        objective_metric="structural_tail_monotonicity_gate",
+        min_val_auc=0.0,
+        min_val_spearman_ic=0.0,
+        weight_mode="none",
+        learner_mode="reg_pseudohuber_excess_return",
+    )
+    _validate_objective_runtime_contract(path_b_huber)
 
     bad_weight = Namespace(
         objective_metric="structural_tail_monotonicity_gate",
