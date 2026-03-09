@@ -8,6 +8,79 @@
 
 This file is the single source of current operational truth for all agents.
 
+## Update: 2026-03-09 01:21 UTC
+- **Baseline Vertex train is confirmed complete, and a new cloud-parallel `swarm-optuna` project spec is now proposed for the next stage.**
+- AgentOS historical audit conclusion:
+  - past GCP/Vertex value was real swarm-style parallel optimization, not single remote training
+  - strongest authorities:
+    - `OMEGA_CONSTITUTION.md` locks cloud to XGBoost swarm optimization on compressed base-matrix parquet
+    - `v60` / `v62` handovers explicitly describe swarm optimize as a distinct stage with Optuna-style trials
+    - archived `submit_swarm_optuna.py` launched many independent Vertex jobs, while archived `swarm_xgb.py` ran in-memory Optuna studies per worker
+- Current active-code conclusion:
+  - live `tools/run_vertex_xgb_train.py` is only a one-shot single-model trainer
+  - live `tools/submit_vertex_sweep.py` submits a single `replicaCount=1` custom job, with `--spot` affecting cost only, not multiplicity
+  - live `tools/stage3_full_supervisor.py` still wires only the single-train path and still points to absent `gs://omega_central/...`
+- New proposed project:
+  - `V643-GC-SWARM-OPTUNA-REVIVAL`
+  - purpose: restore genuine cloud advantage by launching many independent single-replica Vertex workers over one immutable train-only base matrix
+  - compatibility decision:
+    - keep the old swarm shape
+    - do **not** revive the old joint search over physics gates
+    - under current v643/canonical rules, `signal_epi_threshold`, `singularity_threshold`, `srl_resid_sigma_mult`, and `topo_energy_min` remain frozen
+    - search space is XGBoost hyperparameters only
+- Dataset boundaries locked for the proposed project:
+  - optimization + final retrain use only `2023,2024`
+  - `2025` and `2026-01` remain strict downstream holdout only
+  - because current active backtest entrypoints are year-only, `2026-01` still requires a later explicit file-list or date-prefix wrapper
+- Deep dive:
+  - `handover/ai-direct/entries/20260309_012152_gc_swarm_optuna_project_spec.md`
+
+## Update: 2026-03-09 01:10 UTC
+- **Linux 2023-2024 training base matrix is complete, validated, and a baseline Vertex train has completed successfully.**
+- Base-matrix completion:
+  - output parquet:
+    - `/omega_pool/parquet_data/stage3_base_matrix_train_20260308_095850/base_matrix_train_2023_2024.parquet`
+  - output meta:
+    - `/omega_pool/parquet_data/stage3_base_matrix_train_20260308_095850/base_matrix_train_2023_2024.parquet.meta.json`
+  - forge terminal evidence:
+    - `status=ok`
+    - `base_rows=736163`
+    - `input_file_count=484`
+    - `symbols_total=7708`
+    - `batch_count=155`
+    - `worker_count=1`
+    - `seconds=50691.92`
+- Downstream contract checks:
+  - base matrix contains only `2023` and `2024`
+  - required training columns were present
+  - training gate diagnostics were non-degenerate:
+    - `rows=736163`
+    - `epi_pos_rows=96955`
+    - `topo_energy_pos_rows=736163`
+    - `signal_gate_rows=736163` at `singularity_threshold=0.10`
+- Baseline Vertex training:
+  - staged base matrix:
+    - `gs://omega_v52_central/omega/staging/base_matrix/latest/stage3_train_2023_2024_20260309_005839/base_matrix_train_2023_2024.parquet`
+  - model output:
+    - `gs://omega_v52_central/omega/staging/models/latest/stage3_train_2023_2024_20260309_005839/omega_xgb_final.pkl`
+  - metrics:
+    - `gs://omega_v52_central/omega/staging/models/latest/stage3_train_2023_2024_20260309_005839/train_metrics.json`
+  - Vertex job:
+    - `projects/269018079180/locations/us-central1/customJobs/5549661916156133376`
+    - `displayName=omega-v60-run_vertex_xgb_train-20260309-010052`
+    - `state=JOB_STATE_SUCCEEDED`
+  - training metrics:
+    - `base_rows=736163`
+    - `mask_rows=736163`
+    - `total_training_rows=736163`
+    - payload `seconds=2.82`
+- Important architectural conclusion:
+  - current active cloud train path is still single-job, single-replica offload
+  - it does **not** yet restore the earlier cloud-parallel swarm/Optuna value proposition
+  - `tools/stage3_full_supervisor.py` points at `gs://omega_central/...`, but that bucket is currently absent; successful staging/training in this session used `gs://omega_v52_central/...`
+- Deep dive:
+  - `handover/ai-direct/entries/20260309_011000_train_basematrix_complete_and_vertex_baseline_success.md`
+
 ## Update: 2026-03-08 15:44 UTC
 - **Linux training base-matrix run remains healthy and is still progressing.**
 - Connectivity:

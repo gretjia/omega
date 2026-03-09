@@ -4,8 +4,8 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
 
 ## 1. Snapshot Metadata
 
-- `updated_at_local`: 2026-03-08 15:44:39 +0000
-- `updated_at_utc`: 2026-03-08 15:44:39 +0000
+- `updated_at_local`: 2026-03-09 01:21:52 +0000
+- `updated_at_utc`: 2026-03-09 01:21:52 +0000
 - `updated_by`: Codex (GPT-5)
 
 ## 2. In-Flight Work
@@ -39,34 +39,60 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
 
 ### Project: V643-STAGE3-TRAIN-BASEMATRIX-2023-2024
 
-- Status: `RUNNING`
+- Status: `BASELINE_TRAIN_COMPLETE`
 - Hosts: `linux1-lx`, `windows1-w1`, `controller`
 - Goal: generate the Linux-side training base matrix for `2023,2024` from the repaired Stage2 corpus without relying on empty `latest_feature_l2/host=linux1`
 - Last signals:
-  - Linux SSH recovered after a transient timeout and is reachable again
-  - Linux repo is on `699818f`
-  - Linux mounted Windows `D:` via `sshfs` at `/home/zepher/windows_d_sshfs`
-  - explicit training manifest built at:
-    - `/home/zepher/work/Omega_vNext/audit/runtime/stage3_base_matrix_train_20260308_095850/input_files_train_2023_2024.txt`
-  - manifest count:
-    - `484`
-  - forge launched on Linux:
-    - PID `1474539`
-    - output root `/omega_pool/parquet_data/stage3_base_matrix_train_20260308_095850`
-  - latest runtime sample at `2026-03-08 15:37 UTC`:
-    - `62 / 155` batches complete
-    - latest shard: `base_matrix_batch_00061.parquet`
-    - shard freshness: about `2.1` minutes
-    - process sample: `CPU=62.7%`, `MEM=3.0%`
-    - host sample: `available_mem≈22 GiB`, `/omega_pool use=4%`
-  - current ETA:
-    - linear: `8.44h`
-    - recent-batch: `8.51h`
-    - practical finish window: `2026-03-09 00:00 - 00:15 UTC`
+  - Linux training base matrix completed at:
+    - `/omega_pool/parquet_data/stage3_base_matrix_train_20260308_095850/base_matrix_train_2023_2024.parquet`
+  - meta evidence:
+    - `base_rows=736163`
+    - `input_file_count=484`
+    - `batch_count=155`
+    - `status=ok`
+  - downstream preflight confirmed:
+    - year scope is strictly `2023,2024`
+    - required training schema is complete
+    - training gate diagnostics are non-degenerate
+  - baseline Vertex train completed successfully:
+    - custom job `5549661916156133376`
+    - output prefix `gs://omega_v52_central/omega/staging/models/latest/stage3_train_2023_2024_20260309_005839`
+    - `total_training_rows=736163`
 - Risks:
-  - current log file is still quiet early in the run because launch used buffered stdout
-  - dynamic worker cap is still forcing single-worker execution, so throughput remains bounded
+  - current active cloud train path is still a single-job offload path, not true cloud-parallel optimization
+  - `tools/stage3_full_supervisor.py` currently points to absent bucket `gs://omega_central/...`, while successful live staging still used `gs://omega_v52_central/...`
   - current backtest entrypoints only support year-level filtering, so `2026-01` holdout needs a later explicit file-list or wrapper
+
+### Project: V643-GC-SWARM-OPTUNA-REVIVAL
+
+- Status: `PROPOSED_SPEC_READY`
+- Hosts: `controller`, `GCP Vertex AI`, `linux1-lx`
+- Goal: restore the original cloud value proposition by replacing single-job train offload with real cloud-parallel Optuna/XGBoost optimization over the completed `2023,2024` training base matrix
+- Historical evidence locked:
+  - constitution: cloud is reserved for XGBoost swarm optimization over compressed parquet, not raw ETL
+  - `v60` / `v62` handover history explicitly treated swarm optimize as a separate stage
+  - archived `submit_swarm_optuna.py` + `swarm_xgb.py` prove the old pattern was many independent jobs, each running its own in-memory study
+- Compatibility decisions for v643:
+  - raw L2 stays on edge; cloud consumes only a train-only base matrix artifact
+  - canonical Stage3 gates remain frozen:
+    - `signal_epi_threshold`
+    - `singularity_threshold`
+    - `srl_resid_sigma_mult`
+    - `topo_energy_min`
+  - the revived swarm may search XGBoost hyperparameters only unless the Owner explicitly opens a separate math-governance mission
+  - optimization and champion retrain must stay strictly inside `2023,2024`
+  - `2025 + 2026-01` remains holdout only and is not part of the optimization objective
+- Required implementation shape:
+  - new active Optuna payload in `tools/`, not archive-only
+  - many independent single-replica Vertex jobs, spot-preferred with explicit one-shot on-demand retry
+  - temporal validation inside the train set; no random `xgb.cv` across mixed dates
+  - leaderboard aggregation plus final deterministic retrain of the chosen params
+- Immediate blockers:
+  - bucket authority is inconsistent: active supervisor points at absent `gs://omega_central/...`, while the live successful path still used `gs://omega_v52_central/...`
+  - no active `tools/run_optuna_sweep.py` / swarm orchestrator currently exists
+  - current backtest entrypoints cannot directly express `2026-01`
+- Spec source:
+  - `handover/ai-direct/entries/20260309_012152_gc_swarm_optuna_project_spec.md`
 
 ### Project: GCP-LEGACY-STORAGE-CLEANUP
 

@@ -45,6 +45,73 @@
 ### Entries
 
 <!-- New session debriefs go here. Most recent on top. -->
+#### [2026-03-09 01:21] Agent: Codex | Session: GC Swarm-Optuna Spec Refresh After Baseline Train
+
+**What I did:**
+- Confirmed the Linux `2023,2024` training base matrix had fully completed and that the baseline Vertex train closed successfully.
+- Used AgentOS explorers plus local code audit to reconstruct the old cloud-parallel optimization model from constitution, handover, and archived tools.
+- Rewrote that history into a new `v643`-compatible project spec for restoring real cloud swarm/Optuna behavior.
+
+**What I discovered:**
+- Historical cloud value was genuinely parallel optimization:
+  - the constitution reserves cloud for XGBoost swarm optimization over compressed parquet
+  - `v60` / `v62` handovers treat swarm optimize as a first-class separate stage
+  - archived swarm tooling launched many independent Vertex jobs
+- Current active cloud path is materially weaker:
+  - `run_vertex_xgb_train.py` is a one-shot single-model trainer
+  - `submit_vertex_sweep.py` still submits one `replicaCount=1` job
+  - `stage3_full_supervisor.py` wires only that single-train path
+- The old archived behavior cannot be revived verbatim:
+  - archived swarm searched physics gates jointly with XGBoost params
+  - under current v643/canonical governance, those gates are frozen and must not become ML hyperparameters again
+
+**What confused me / blocked me:**
+- Bucket authority is currently inconsistent:
+  - successful live training still used `gs://omega_v52_central/...`
+  - active supervisor still points to absent `gs://omega_central/...`
+- Current backtest entrypoints still cannot directly express the required holdout shape `2025 + 2026-01`.
+
+**What the next agent should do:**
+- Treat `V643-GC-SWARM-OPTUNA-REVIVAL` as the next cloud project candidate.
+- Implement an active Optuna payload and swarm launcher in `tools/`, using many single-replica Vertex jobs with spot-preferred scheduling and explicit on-demand retry.
+- Keep optimization and final retrain strictly inside `2023,2024`.
+- Do not revive archived joint search over canonical physics gates.
+- Add a later explicit date-scoped holdout wrapper or manifest path before trying to score `2025 + 2026-01`.
+
+**Files I changed:**
+- `handover/ai-direct/LATEST.md` — recorded the baseline-train conclusion and the new swarm-optuna spec direction.
+- `handover/ops/ACTIVE_PROJECTS.md` — added the proposed cloud swarm-optuna project entry.
+- `handover/ai-direct/entries/20260309_012152_gc_swarm_optuna_project_spec.md` — new detailed project spec.
+- `handover/BOARD.md` — added this mandatory debrief block.
+
+#### [2026-03-09 01:10] Agent: Codex | Session: Train Base-Matrix Completion And Vertex Baseline Train
+
+**What I did:**
+- Verified the Linux `2023,2024` training base matrix completed and validated its final parquet/meta outputs.
+- Ran downstream training-contract checks on the finished base matrix to confirm year scope, required schema, and non-degenerate training gates.
+- Staged the finished base matrix to GCS and launched a baseline Vertex training job, then monitored it to terminal success.
+- Confirmed the resulting model and `train_metrics.json` were written to GCS.
+
+**What I discovered:**
+- The completed training base matrix is materially healthier than the earlier v63 q1-q9 case: `base_rows=736163` and `total_training_rows=736163`, with no sample collapse.
+- The current active cloud train path is still architectural single-job offload, not genuine cloud-parallel swarm optimization.
+- `tools/stage3_full_supervisor.py` currently targets `gs://omega_central/...`, but that bucket is absent; the live successful path in this session used `gs://omega_v52_central/...`.
+
+**What confused me / blocked me:**
+- Controller `python3` lacked `google-cloud-aiplatform`, so the first submit attempt failed locally with `ModuleNotFoundError: No module named 'google'`.
+- I worked around that by using `uv run --with google-cloud-aiplatform --with google-cloud-storage ...` for the submission step.
+
+**What the next agent should do:**
+- Treat this Vertex job as a baseline proof only, not as proof that cloud advantages are being fully exploited.
+- If the Owner wants meaningful cloud leverage, define and restore an active swarm/Optuna path that fans out many single-trial jobs on spot/on-demand fallback from the same immutable base matrix.
+- Normalize bucket authority before reviving Stage3 supervisor-managed cloud runs.
+
+**Files I changed:**
+- `handover/ai-direct/LATEST.md` — recorded base-matrix completion, downstream checks, and successful baseline Vertex train.
+- `handover/ops/ACTIVE_PROJECTS.md` — advanced the Stage3 training project from running to baseline-train-complete.
+- `handover/BOARD.md` — added this debrief block.
+- `handover/ai-direct/entries/20260309_011000_train_basematrix_complete_and_vertex_baseline_success.md` — added the detailed runtime evidence.
+
 #### [2026-03-08 15:44] Agent: Codex | Session: Linux Stage3 Base-Matrix Progress Refresh
 
 **What I did:**
