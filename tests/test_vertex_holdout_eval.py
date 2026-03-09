@@ -35,10 +35,10 @@ def _row(date: str, time_value: int, t1_fwd_return: float, offset: float) -> dic
     return row
 
 
-def _write_eval_payload(path: Path, matrix_path: Path) -> None:
+def _write_eval_payload(path: Path, matrix_path: Path, *, expected_date_prefix: str) -> None:
     args = Namespace(
         base_matrix_uri=str(matrix_path),
-        expected_date_prefix="2025",
+        expected_date_prefix=str(expected_date_prefix),
         singularity_threshold=0.10,
         signal_epi_threshold=0.5,
         srl_resid_sigma_mult=2.0,
@@ -133,7 +133,7 @@ def test_evaluate_holdout_writes_metrics(tmp_path: Path, monkeypatch: pytest.Mon
         ]
     )
     df.write_parquet(matrix_path)
-    _write_eval_payload(model_path, matrix_path)
+    _write_eval_payload(model_path, matrix_path, expected_date_prefix="2025")
 
     monkeypatch.setattr(
         "sys.argv",
@@ -158,4 +158,53 @@ def test_evaluate_holdout_writes_metrics(tmp_path: Path, monkeypatch: pytest.Mon
     assert metrics["dataset_role"] == "outer_holdout"
     assert metrics["dataset_summary"]["eval_rows"] == 6
     assert metrics["dataset_summary"]["scope_diag"]["date_prefix_assertion_passed"] is True
+    assert metrics["auc_defined"] is True
     assert 0.0 <= metrics["auc"] <= 1.0
+
+
+def test_evaluate_holdout_allows_one_class_auc_null(tmp_path: Path) -> None:
+    train_matrix_path = tmp_path / "base_matrix_train_stub.parquet"
+    matrix_path = tmp_path / "base_matrix_holdout_2026_01.parquet"
+    model_path = tmp_path / "omega_xgb_final.pkl"
+    train_df = pl.DataFrame(
+        [
+            _row("20250102", 1, 0.02, 0.0),
+            _row("20250102", 1, -0.01, 0.5),
+            _row("20250103", 1, 0.03, 1.0),
+            _row("20250103", 1, -0.02, 1.5),
+        ]
+    )
+    train_df.write_parquet(train_matrix_path)
+    _write_eval_payload(model_path, train_matrix_path, expected_date_prefix="2025")
+
+    rows = [
+        _row("20260105", 1, 0.03, 0.0),
+        _row("20260105", 1, -0.02, 0.5),
+        _row("20260106", 1, 0.04, 1.0),
+        _row("20260106", 1, -0.01, 1.5),
+    ]
+    rows[1]["singularity_vector"] = 0.01
+    rows[3]["singularity_vector"] = 0.01
+    df = pl.DataFrame(rows)
+    df.write_parquet(matrix_path)
+
+    metrics = holdout_eval.evaluate_holdout(
+        Namespace(
+            base_matrix_uri=str(matrix_path),
+            model_uri=str(model_path),
+            dataset_role="final_canary",
+            expected_date_prefix="202601",
+            train_metrics_uri="",
+            singularity_threshold=0.10,
+            signal_epi_threshold=0.5,
+            srl_resid_sigma_mult=2.0,
+            topo_energy_min=2.0,
+        )
+    )
+
+    assert metrics["status"] == "completed"
+    assert metrics["dataset_role"] == "final_canary"
+    assert metrics["dataset_summary"]["positive_rows"] == 2
+    assert metrics["dataset_summary"]["negative_rows"] == 0
+    assert metrics["auc_defined"] is False
+    assert metrics["auc"] is None

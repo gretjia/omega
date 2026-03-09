@@ -45,6 +45,15 @@ def _load_model_payload(model_uri: str) -> dict:
     return payload
 
 
+def _load_optional_json_artifact(uri: str) -> dict | None:
+    clean = str(uri or "").strip()
+    if not clean:
+        return None
+    local_path = Path("optional_metrics.json")
+    _download_file(clean, local_path)
+    return json.loads(local_path.read_text(encoding="utf-8"))
+
+
 def _audit_holdout_scope(df: pl.DataFrame, *, expected_date_prefix: str = "") -> dict:
     date_expr = pl.col("date").cast(pl.Utf8, strict=False)
     diag = (
@@ -205,10 +214,6 @@ def _prepare_holdout_dataset(args: argparse.Namespace, *, feature_cols: list[str
     negative_rows = int(eval_rows - positive_rows)
     if eval_rows <= 0:
         raise RuntimeError("holdout_eval_empty_after_physics_mask")
-    if positive_rows <= 0 or negative_rows <= 0:
-        raise RuntimeError(
-            f"holdout_eval_one_class: eval_rows={eval_rows} positive_rows={positive_rows} negative_rows={negative_rows}"
-        )
 
     dholdout = xgb.DMatrix(
         X_eval,
@@ -254,12 +259,45 @@ def _predict_payload(payload: dict, dholdout: xgb.DMatrix) -> np.ndarray:
     raise RuntimeError(f"unsupported_model_type_for_holdout_eval:{type(model).__name__}")
 
 
+def _validate_training_overrides(args: argparse.Namespace, train_metrics: dict | None) -> dict | None:
+    if not train_metrics:
+        return None
+    overrides = dict(train_metrics.get("overrides") or {})
+    if not overrides:
+        raise RuntimeError("train_metrics_missing_overrides")
+    expected = {
+        "signal_epi_threshold": float(args.signal_epi_threshold),
+        "singularity_threshold": float(args.singularity_threshold),
+        "srl_resid_sigma_mult": float(args.srl_resid_sigma_mult),
+        "topo_energy_min": float(args.topo_energy_min),
+        "stage3_param_contract": "canonical_v64_1",
+    }
+    mismatches = {}
+    for key, expected_value in expected.items():
+        actual_value = overrides.get(key)
+        if actual_value != expected_value:
+            mismatches[key] = {"expected": expected_value, "actual": actual_value}
+    if mismatches:
+        raise RuntimeError(
+            "train_metrics_override_mismatch:"
+            + json.dumps(mismatches, ensure_ascii=False, sort_keys=True)
+        )
+    return overrides
+
+
 def evaluate_holdout(args: argparse.Namespace) -> dict:
     payload = _load_model_payload(args.model_uri)
+    train_metrics = _load_optional_json_artifact(args.train_metrics_uri)
+    validated_overrides = _validate_training_overrides(args, train_metrics)
     feature_cols = list(payload.get("feature_cols") or payload.get("features") or FEATURE_COLS)
     datasets = _prepare_holdout_dataset(args, feature_cols=feature_cols)
     preds = _predict_payload(payload, datasets["dholdout"])
-    auc = float(roc_auc_score(datasets["y_eval"], preds))
+    positive_rows = int(datasets["summary"]["positive_rows"])
+    negative_rows = int(datasets["summary"]["negative_rows"])
+    auc = None
+    auc_defined = positive_rows > 0 and negative_rows > 0
+    if auc_defined:
+        auc = float(roc_auc_score(datasets["y_eval"], preds))
     alpha_top_decile = _top_quantile_alpha(preds, datasets["excess_eval"], 0.90)
     alpha_top_quintile = _top_quantile_alpha(preds, datasets["excess_eval"], 0.80)
 
@@ -269,11 +307,13 @@ def evaluate_holdout(args: argparse.Namespace) -> dict:
         "base_matrix_uri": str(args.base_matrix_uri),
         "model_uri": str(args.model_uri),
         "auc": auc,
+        "auc_defined": bool(auc_defined),
         "alpha_top_decile": float(alpha_top_decile),
         "alpha_top_quintile": float(alpha_top_quintile),
         "pred_mean": float(np.mean(preds)),
         "pred_std": float(np.std(preds)),
         "canonical_fingerprint": datasets["canonical_fingerprint"],
+        "validated_training_overrides": validated_overrides,
         "dataset_summary": datasets["summary"],
         "runtime_versions": {
             "python": sys.version.split()[0],
@@ -293,6 +333,7 @@ def main() -> None:
     ap.add_argument("--output-uri", required=True, help="GCS or local prefix for metrics output")
     ap.add_argument("--dataset-role", default="holdout")
     ap.add_argument("--expected-date-prefix", default="")
+    ap.add_argument("--train-metrics-uri", default="")
     ap.add_argument(
         "--singularity-threshold",
         "--peace-threshold",
