@@ -8,6 +8,41 @@
 
 This file is the single source of current operational truth for all agents.
 
+## Update: 2026-03-09 16:19 UTC
+- **A higher-level architect override has superseded the narrower V651 framing, and a V652 large-upgrade draft is now prepared.**
+- New audit authority:
+  - `audit/v652_campaign_state_revelation.md`
+- New mission draft:
+  - `handover/ai-direct/entries/20260309_161916_v652_campaign_state_revelation_spec_draft.md`
+- Gemini draft audit:
+  - `handover/ai-direct/entries/20260309_162348_v652_spec_draft_gemini_pass.md`
+  - verdict:
+    - `PASS`
+- Draft core:
+  - freeze the architect campaign-state formulas exactly
+  - formulas are frozen; necessary `omega_core/*` implementation changes are allowed
+  - postpone ML behind a pure event-study gate
+  - early phases are:
+    - campaign-ready train matrix bridge
+    - `forge_campaign_matrix.py`
+    - `run_campaign_event_study.py`
+  - initial horizons:
+    - `5d`
+    - `10d`
+    - `20d`
+- Team expansion drafted:
+  - Formula Integrity Auditor
+  - Campaign Forge Engineer
+  - Data Contract Auditor
+  - Distribution Auditor
+  - Event Study Auditor
+  - Runtime Orchestrator
+  - ML Readiness Gatekeeper
+- Current state:
+  - V650 remains the completed active charter
+  - V651 draft is superseded before execution
+  - V652 draft is now ready for owner confirmation
+
 ## Update: 2026-03-09 15:31 UTC
 - **The new Target Timescale Disconnect verdict is landed, and a V651 draft is now ready for owner review.**
 - New audit authority:

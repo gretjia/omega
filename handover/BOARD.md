@@ -45,6 +45,61 @@
 ### Entries
 
 <!-- New session debriefs go here. Most recent on top. -->
+#### [2026-03-09 16:23] Agent: Codex | Session: V652 Gemini Draft Pass
+
+**What I did:**
+- Audited the V652 draft with:
+  - `gemini -p`
+- Landed the audit record:
+  - `handover/ai-direct/entries/20260309_162348_v652_spec_draft_gemini_pass.md`
+
+**What I discovered:**
+- Gemini passed the draft without requiring any fixes.
+- It explicitly accepted the widened rule:
+  - `omega_core/*` may be changed if necessary
+  - but only as implementation translation under frozen formulas
+
+**What confused me / blocked me:**
+- No blocker remained once `gemini 3.1 pro preview` returned capacity.
+
+**What the next agent should do:**
+- Ask the owner to confirm the V652 draft.
+- Do not switch the active charter until owner confirmation arrives.
+
+**Files I changed:**
+- `handover/ai-direct/entries/20260309_162348_v652_spec_draft_gemini_pass.md` — recorded the Gemini PASS.
+- `handover/ai-direct/LATEST.md` — updated current state to draft-ready-for-confirmation.
+- `handover/BOARD.md` — added this debrief.
+#### [2026-03-09 16:19] Agent: Codex | Session: V652 Campaign-State Draft Prepared
+
+**What I did:**
+- Landed the new architect override:
+  - `audit/v652_campaign_state_revelation.md`
+- Drafted the new large-upgrade mission:
+  - `handover/ai-direct/entries/20260309_161916_v652_campaign_state_revelation_spec_draft.md`
+- Expanded the planned AgentOS team structure inside the draft.
+
+**What I discovered:**
+- The architect pseudocode assumes a richer matrix contract than the current live base matrix exposes.
+- The formulas can still be implemented without touching `omega_core/*` by using a campaign-ready bridge and a new local forge layer.
+- This upgrade is cleaner if ML is deferred behind an event-study gate rather than opened immediately.
+
+**What confused me / blocked me:**
+- No blocker yet.
+- The remaining required gate is:
+  - `gemini -p` audit on the V652 draft
+
+**What the next agent should do:**
+- Audit the V652 draft with `gemini -p`.
+- Fold any math/scope fixes back into the spec.
+- Only then ask the owner to confirm the draft and switch the active charter.
+
+**Files I changed:**
+- `audit/v652_campaign_state_revelation.md` — landed the architect override.
+- `handover/ai-direct/entries/20260309_161916_v652_campaign_state_revelation_spec_draft.md` — drafted the large-upgrade mission.
+- `audit/README.md` — indexed the new architect authority.
+- `handover/ai-direct/LATEST.md` — recorded the new superseding draft state.
+- `handover/BOARD.md` — added this debrief.
 #### [2026-03-09 15:41] Agent: Codex | Session: V651 Gemini Draft Pass
 
 **What I did:**

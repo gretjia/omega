@@ -18,6 +18,7 @@ For the V64 line, read in this order:
 10. [v649_path_b_flat_predictor_diagnosis.md](/home/zephryj/projects/omega/audit/v649_path_b_flat_predictor_diagnosis.md)
 11. [v650_zero_mass_gravity_well.md](/home/zephryj/projects/omega/audit/v650_zero_mass_gravity_well.md)
 12. [v651_target_timescale_disconnect.md](/home/zephryj/projects/omega/audit/v651_target_timescale_disconnect.md)
+13. [v652_campaign_state_revelation.md](/home/zephryj/projects/omega/audit/v652_campaign_state_revelation.md)
 
 ## Purpose of each file
 
@@ -33,3 +34,4 @@ For the V64 line, read in this order:
 - [v649_path_b_flat_predictor_diagnosis.md](/home/zephryj/projects/omega/audit/v649_path_b_flat_predictor_diagnosis.md): frozen diagnostic audit showing that the first Path B regime collapsed into a true constant predictor under a zero-dominated target, while low-regularization variance recovery still failed the structural-tail contract
 - [v650_zero_mass_gravity_well.md](/home/zephryj/projects/omega/audit/v650_zero_mass_gravity_well.md): recursive audit verdict that keeps Path B alive, identifies the zero-mass gravity well as the immediate blocker, and recommends a robust-loss plus non-degeneracy local mission before any cloud or holdout use
 - [v651_target_timescale_disconnect.md](/home/zephryj/projects/omega/audit/v651_target_timescale_disconnect.md): recursive audit verdict that declares the one-step target horizon the next blocker, freezes the learner geometry, and recommends a bounded `t5/t10/t20` target-timescale alignment mission
+- [v652_campaign_state_revelation.md](/home/zephryj/projects/omega/audit/v652_campaign_state_revelation.md): architect absolute override that freezes the campaign-state formulas, reframes OMEGA as a multi-week campaign-state machine, and mandates campaign forge plus event study before any ML escalation
