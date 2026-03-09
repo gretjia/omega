@@ -8,6 +8,31 @@
 
 This file is the single source of current operational truth for all agents.
 
+## Update: 2026-03-09 02:46 UTC
+- **The cloud optimization spec now explicitly requires three separate Stage3 base-matrix artifacts, not one mixed matrix.**
+- Verified current state:
+  - existing finished training artifact contains only `2023` and `2024`
+  - direct Linux parquet/meta checks confirmed:
+    - `years=['2023', '2024']`
+    - `year_min=2023`
+    - `year_max=2024`
+    - `year_count=2`
+- New required artifact partition for the optimal allocation scheme:
+  - `base_matrix_train_2023_2024.parquet`
+  - `base_matrix_holdout_2025.parquet`
+  - `base_matrix_holdout_2026_01.parquet`
+- Governance rule:
+  - Optuna and champion selection may read only the first artifact
+  - `2025` holdout must remain a separate outer-evaluation artifact
+  - `2026-01` must remain a separate final canary artifact
+  - if `2025` evidence is used to retune the system, it is no longer holdout evidence and the evaluation protocol must be re-declared explicitly
+- Implementation consequence:
+  - the project is not blocked on training data
+  - it is now blocked on forging the two missing holdout artifacts with clean date scoping, especially `2026-01`
+- Deep dive:
+  - `handover/ai-direct/entries/20260309_024658_three_matrix_partition_for_stage3.md`
+  - `handover/ai-direct/entries/20260309_012152_gc_swarm_optuna_project_spec.md`
+
 ## Update: 2026-03-09 01:46 UTC
 - **Gemini has audited the new `gc swarm-optuna` spec and returned `PASS`, with several hardening deltas now folded into the spec.**
 - Gemini-agreed strengths:

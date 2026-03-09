@@ -17,6 +17,9 @@ status: proposed
   - genuine cloud-parallel XGBoost optimization
   - not just single remote training offload
 - Consume one immutable train-only base matrix for `2023,2024`.
+- Define two separate holdout base-matrix artifacts:
+  - one for `2025`
+  - one for `2026-01`
 - Produce a ranked Optuna leaderboard and a final deterministic champion retrain.
 - Preserve strict holdout isolation:
   - training/optimization: `2023,2024`
@@ -115,12 +118,44 @@ Optional later knobs:
   - same `2023,2024` base matrix
 - holdout:
   - `2025` and `2026-01` are excluded from all Optuna scoring and champion selection
+- these holdout periods must be forged as separate Stage3 artifacts, not appended into the training base matrix
 
 Important current limitation:
 
 - active backtest entrypoints are year-only
 - `2026-01` cannot be expressed through current `--backtest-years`
 - any later holdout evaluation must use an explicit date-scoped manifest or prefix wrapper
+
+### 5.4 Required Stage3 artifact partition
+
+The project must maintain three distinct Stage3 artifacts:
+
+1. Training artifact:
+   - `base_matrix_train_2023_2024.parquet`
+2. Outer holdout artifact:
+   - `base_matrix_holdout_2025.parquet`
+3. Final canary artifact:
+   - `base_matrix_holdout_2026_01.parquet`
+
+Rules:
+
+- Optuna and champion selection may read only artifact 1
+- artifact 2 may be used only for outer holdout evaluation after champion selection
+- artifact 3 may be used only for the final release-canary check
+- if artifact 2 is used to revise search space or champion logic, then it ceases to be holdout evidence and the protocol must be re-declared explicitly
+- artifact 3 must remain the last untouched evaluation slice
+
+### 5.5 Generation order
+
+Required sequence:
+
+1. Build or confirm `base_matrix_train_2023_2024.parquet`
+2. Build `base_matrix_holdout_2025.parquet`
+3. Build `base_matrix_holdout_2026_01.parquet` through explicit date-scoped file selection
+4. Run cloud optimization only on artifact 1
+5. Run outer holdout evaluation on artifact 2
+6. If artifact 2 is accepted, retrain the champion on the chosen final training horizon
+7. Run the last untouched canary check on artifact 3
 
 ## 6. Proposed Architecture
 
@@ -312,6 +347,10 @@ Until `omega_central` actually exists, the live implementable authority is:
    - emitted metadata confirms `max(train_date) < min(val_date)`
 7. Every worker proves fixed-matrix reuse:
    - `dtrain` / `dval` are constructed once per worker, not once per trial
+8. The project has distinct materialized Stage3 artifacts for:
+   - `2023,2024`
+   - `2025`
+   - `2026-01`
 
 ### Full project acceptance
 
@@ -327,7 +366,9 @@ Until `omega_central` actually exists, the live implementable authority is:
    - validation AUC
    - alpha / excess-return proxy diagnostics
    - explicit complexity tie-break metadata
-8. Handover records exact:
+8. Outer holdout evaluation is run only against `base_matrix_holdout_2025.parquet`.
+9. Final canary evaluation is run only against `base_matrix_holdout_2026_01.parquet`.
+10. Handover records exact:
    - bucket paths
    - worker counts
    - spot/on-demand outcomes
@@ -343,6 +384,7 @@ Until `omega_central` actually exists, the live implementable authority is:
 - Any worker implementation that rebuilds train/validation `DMatrix` inside each Optuna trial: reject.
 - Any worker implementation that lacks a hard temporal split assertion `max(train_date) < min(val_date)`: reject.
 - Any aggregation result that mixes workers with inconsistent frozen canonical-gate fingerprints: reject.
+- Any design that evaluates `2025` or `2026-01` from the training base matrix instead of separate holdout artifacts: reject.
 - Any design that assumes `gs://omega_central/...` works without verifying bucket existence: reject.
 - Any design that cannot prove real concurrent Vertex workers: reject.
 
@@ -354,8 +396,10 @@ Until `omega_central` actually exists, the live implementable authority is:
 4. Add result aggregation and champion export.
 5. Run a small pilot swarm.
 6. Scale to full swarm.
-7. Retrain champion on full `2023,2024`.
-8. Leave `2025 + 2026-01` backtest to the next date-scoped holdout mission.
+7. Build and verify `base_matrix_holdout_2025.parquet`.
+8. Build and verify `base_matrix_holdout_2026_01.parquet`.
+9. Retrain champion on the approved final training horizon.
+10. Run outer holdout and final canary in that order.
 
 ## 14. Final Verdict
 

@@ -4,8 +4,8 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
 
 ## 1. Snapshot Metadata
 
-- `updated_at_local`: 2026-03-09 01:46:38 +0000
-- `updated_at_utc`: 2026-03-09 01:46:38 +0000
+- `updated_at_local`: 2026-03-09 02:46:58 +0000
+- `updated_at_utc`: 2026-03-09 02:46:58 +0000
 - `updated_by`: Codex (GPT-5)
 
 ## 2. In-Flight Work
@@ -62,6 +62,7 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
   - current active cloud train path is still a single-job offload path, not true cloud-parallel optimization
   - `tools/stage3_full_supervisor.py` currently points to absent bucket `gs://omega_central/...`, while successful live staging still used `gs://omega_v52_central/...`
   - current backtest entrypoints only support year-level filtering, so `2026-01` holdout needs a later explicit file-list or wrapper
+  - this artifact is only the training shard of the optimal allocation scheme; separate `2025` and `2026-01` holdout base matrices are still missing
 
 ### Project: V643-GC-SWARM-OPTUNA-REVIVAL
 
@@ -82,6 +83,10 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
   - the revived swarm may search XGBoost hyperparameters only unless the Owner explicitly opens a separate math-governance mission
   - optimization and champion retrain must stay strictly inside `2023,2024`
   - `2025 + 2026-01` remains holdout only and is not part of the optimization objective
+- Required Stage3 artifact partition:
+  - `base_matrix_train_2023_2024.parquet`
+  - `base_matrix_holdout_2025.parquet`
+  - `base_matrix_holdout_2026_01.parquet`
 - Required implementation shape:
   - new active Optuna payload in `tools/`, not archive-only
   - many independent single-replica Vertex jobs, spot-preferred with explicit one-shot on-demand retry
@@ -97,9 +102,11 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
   - bucket authority is inconsistent: active supervisor points at absent `gs://omega_central/...`, while the live successful path still used `gs://omega_v52_central/...`
   - no active `tools/run_optuna_sweep.py` / swarm orchestrator currently exists
   - current backtest entrypoints cannot directly express `2026-01`
+  - the two holdout artifacts still need to be forged separately with clean date scoping
 - Spec source:
   - `handover/ai-direct/entries/20260309_012152_gc_swarm_optuna_project_spec.md`
   - `handover/ai-direct/entries/20260309_014638_gemini_swarm_spec_audit.md`
+  - `handover/ai-direct/entries/20260309_024658_three_matrix_partition_for_stage3.md`
 
 ### Project: GCP-LEGACY-STORAGE-CLEANUP
 

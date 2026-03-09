@@ -45,6 +45,39 @@
 ### Entries
 
 <!-- New session debriefs go here. Most recent on top. -->
+#### [2026-03-09 02:46] Agent: Codex | Session: Stage3 Three-Matrix Partition Lock
+
+**What I did:**
+- Verified from the actual Linux parquet/meta outputs that the finished Stage3 training base matrix contains only `2023` and `2024`.
+- Converted the earlier abstract holdout rule into an explicit three-artifact Stage3 partition inside the cloud optimization spec.
+- Recorded the required artifact names, allowed uses, and generation order in handover.
+
+**What I discovered:**
+- The current finished artifact is exactly what it should be for the training domain:
+  - `base_matrix_train_2023_2024.parquet`
+- But the optimal allocation scheme is incomplete until two additional holdout artifacts exist:
+  - `base_matrix_holdout_2025.parquet`
+  - `base_matrix_holdout_2026_01.parquet`
+- The biggest practical blocker is still `2026-01` scoping, because current entrypoints are year-only and cannot express January-only holdout directly.
+
+**What confused me / blocked me:**
+- Nothing new in code; the blocker is operational design:
+  - the repo already proves the train artifact
+  - it still lacks a clean active path for the January-only holdout artifact
+
+**What the next agent should do:**
+- Treat the training base matrix as complete and reusable.
+- Next, forge `2025` as a separate holdout base matrix.
+- Then forge `2026-01` as a separate date-scoped canary base matrix using an explicit manifest or wrapper.
+- Do not allow any implementation to evaluate holdout years from the training artifact.
+
+**Files I changed:**
+- `handover/ai-direct/entries/20260309_012152_gc_swarm_optuna_project_spec.md` — added explicit three-artifact Stage3 partition rules, acceptance criteria, and fail-fast conditions.
+- `handover/ai-direct/LATEST.md` — recorded the verified year scope of the current artifact and the new three-matrix requirement.
+- `handover/ops/ACTIVE_PROJECTS.md` — updated project state to mark the two holdout artifacts as missing work items.
+- `handover/ai-direct/entries/20260309_024658_three_matrix_partition_for_stage3.md` — added the detailed partition note.
+- `handover/BOARD.md` — added this mandatory debrief block.
+
 #### [2026-03-09 01:46] Agent: Codex | Session: Gemini Audit Of GC Swarm-Optuna Spec
 
 **What I did:**
