@@ -37,6 +37,8 @@ def test_event_study_detects_positive_decile_spread() -> None:
     assert summary["n_dates_input"] == 2
     assert summary["n_dates_scored"] == 2
     assert summary["date_frac_lt10"] == 0.0
+    assert summary["n_rows_before_signal_filter"] == 20
+    assert summary["n_rows_after_signal_filter"] == 20
 
 
 def test_event_study_rejects_missing_columns() -> None:
@@ -75,3 +77,35 @@ def test_event_study_aggregates_date_neutrally() -> None:
     assert summary["n_dates_scored"] == 2
     assert summary["d10_mean_excess_return"] == pytest.approx(0.05)
     assert summary["d10_barrier_win_rate"] == pytest.approx(0.5)
+
+
+def test_event_study_filters_zero_signal_rows_before_deciling() -> None:
+    rows = []
+    for pure_date in ["20240102", "20240103"]:
+        for decile in range(1, 11):
+            rows.append(
+                {
+                    "pure_date": pure_date,
+                    "symbol": f"{pure_date}_{decile:02d}",
+                    "Psi_10d": float(decile),
+                    "excess_ret_t1_to_10d": float(decile) / 100.0,
+                    "barrier_10d": 1 if decile >= 8 else 0,
+                }
+            )
+        for zero_idx in range(5):
+            rows.append(
+                {
+                    "pure_date": pure_date,
+                    "symbol": f"{pure_date}_Z{zero_idx}",
+                    "Psi_10d": 0.0,
+                    "excess_ret_t1_to_10d": -1.0,
+                    "barrier_10d": -1,
+                }
+            )
+
+    summary = event_study.compute_event_study_for_signal(pl.DataFrame(rows), "Psi_10d")
+
+    assert summary["n_rows_before_signal_filter"] == 30
+    assert summary["n_rows_after_signal_filter"] == 20
+    assert summary["n_rows_scored"] == 20
+    assert summary["d10_mean_excess_return"] > 0.0

@@ -26,8 +26,14 @@ def _stable_sort_keys(df: pl.DataFrame, signal_col: str) -> list[str]:
     return keys
 
 
-def _assign_cross_sectional_deciles(df: pl.DataFrame, signal_col: str) -> tuple[pl.DataFrame, dict[str, float | int]]:
-    work = df.filter(pl.col(signal_col).is_not_null()).sort(_stable_sort_keys(df, signal_col=signal_col))
+def _assign_cross_sectional_deciles(
+    df: pl.DataFrame,
+    signal_col: str,
+    signal_floor: float,
+) -> tuple[pl.DataFrame, dict[str, float | int]]:
+    work = df.filter(pl.col(signal_col).is_not_null())
+    n_rows_before_filter = int(work.height)
+    work = work.filter(pl.col(signal_col).abs() > float(signal_floor)).sort(_stable_sort_keys(df, signal_col=signal_col))
     date_stats = (
         work.group_by("pure_date")
         .agg(
@@ -63,12 +69,14 @@ def _assign_cross_sectional_deciles(df: pl.DataFrame, signal_col: str) -> tuple[
     return work.drop(["__n", "__rank"]), {
         "n_dates_input": n_dates_input,
         "n_dates_scored": int(work.select(pl.col("pure_date").n_unique()).item()) if work.height > 0 else 0,
+        "n_rows_before_signal_filter": n_rows_before_filter,
+        "n_rows_after_signal_filter": int(work.height),
         "date_frac_lt10": date_frac_lt10,
         "date_frac_flat_signal": date_frac_flat_signal,
     }
 
 
-def compute_event_study_for_signal(df: pl.DataFrame, signal_col: str) -> dict[str, object]:
+def compute_event_study_for_signal(df: pl.DataFrame, signal_col: str, signal_floor: float = 1e-12) -> dict[str, object]:
     excess_col, barrier_col = _signal_to_label_columns(signal_col)
     required = {"pure_date", signal_col, excess_col, barrier_col}
     missing = required.difference(df.columns)
@@ -76,7 +84,7 @@ def compute_event_study_for_signal(df: pl.DataFrame, signal_col: str) -> dict[st
         raise ValueError(f"missing required columns for event study: {sorted(missing)}")
 
     work = df.filter(pl.col(excess_col).is_not_null())
-    work, coverage = _assign_cross_sectional_deciles(work, signal_col=signal_col)
+    work, coverage = _assign_cross_sectional_deciles(work, signal_col=signal_col, signal_floor=signal_floor)
 
     per_date = (
         work.group_by(["pure_date", "decile"])
@@ -125,6 +133,9 @@ def compute_event_study_for_signal(df: pl.DataFrame, signal_col: str) -> dict[st
         "barrier_col": barrier_col,
         "n_rows_input": int(df.height),
         "n_rows_scored": int(work.height),
+        "signal_floor": float(signal_floor),
+        "n_rows_before_signal_filter": int(coverage["n_rows_before_signal_filter"]),
+        "n_rows_after_signal_filter": int(coverage["n_rows_after_signal_filter"]),
         "n_dates_input": int(coverage["n_dates_input"]),
         "n_dates_scored": int(coverage["n_dates_scored"]),
         "date_frac_lt10": float(coverage["date_frac_lt10"]),
@@ -143,12 +154,13 @@ def compute_event_study_for_signal(df: pl.DataFrame, signal_col: str) -> dict[st
     return summary
 
 
-def run_event_study(campaign_path: str, signal_cols: Iterable[str]) -> dict[str, object]:
+def run_event_study(campaign_path: str, signal_cols: Iterable[str], signal_floor: float = 1e-12) -> dict[str, object]:
     df = pl.read_parquet(campaign_path)
-    results = [compute_event_study_for_signal(df, signal_col=signal_col) for signal_col in signal_cols]
+    results = [compute_event_study_for_signal(df, signal_col=signal_col, signal_floor=signal_floor) for signal_col in signal_cols]
     return {
         "campaign_path": str(campaign_path),
         "signal_cols": list(signal_cols),
+        "signal_floor": float(signal_floor),
         "results": results,
     }
 
@@ -163,12 +175,13 @@ def _parse_args() -> argparse.Namespace:
         help="Signal column(s) to test, for example Psi_10d and Psi_20d.",
     )
     ap.add_argument("--output-json", default="", help="Optional JSON output path.")
+    ap.add_argument("--signal-floor", type=float, default=1e-12, help="Absolute signal floor; rows at or below this are dropped before deciling.")
     return ap.parse_args()
 
 
 def main() -> None:
     args = _parse_args()
-    result = run_event_study(campaign_path=args.campaign_path, signal_cols=args.signal_col)
+    result = run_event_study(campaign_path=args.campaign_path, signal_cols=args.signal_col, signal_floor=float(args.signal_floor))
     if args.output_json:
         out = Path(args.output_json)
         out.parent.mkdir(parents=True, exist_ok=True)
