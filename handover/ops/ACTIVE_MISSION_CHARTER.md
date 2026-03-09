@@ -1,45 +1,43 @@
 # OMEGA Active Mission Charter
 
 Status: In Progress
-Task Name: V645 GC asymmetric-label pivot
+Task Name: V646 Path A refinement
 Owner: Human Owner
 Commander: Codex
 Date: 2026-03-09
 
 ## 1. Objective
 
-- Accept the external architect verdict that the bottleneck now sits at the ML label / objective interface.
-- Run the minimum decisive pivot experiment without reopening math-governance.
-- Keep `v64.3 / v643` math frozen while testing whether magnitude-aware learning flips validation tail alpha positive.
-- Preserve the frozen holdout verdict as immutable audit baseline while executing the new pivot experiment.
-- First-wave path is now resolved:
-  - Path A first
-  - local-first
-  - micro-sweep before retrain or fresh holdout evaluation
+- Accept that `Path A` is now the leading learner-interface branch.
+- Refine `Path A` without reopening math-governance, `Path B`, or GC fan-out.
+- Preserve all previously recorded baselines as immutable audit evidence.
+- Improve the current `Path A` tradeoff:
+  - keep the economic gains already achieved
+  - reduce the remaining `2026-01` weakness
+  - avoid drifting into a branch that only improves alpha by destroying all ranking stability
 
 ## 2. Canonical Spec
 
 Primary task-level implementation authority:
 
-- `handover/ai-direct/entries/20260309_074955_asymmetric_label_pivot_mission_open.md`
+- `handover/ai-direct/entries/20260309_091728_v646_path_a_refinement_mission_open.md`
   - exact section:
+    - why the mission now splits
     - new canonical diagnosis
-    - allowed experiment family
-    - execution rule
+    - allowed refinement family
     - required runtime shape
-    - success gate
+    - frozen reference baselines
 
 Seed authority that led to the final spec:
 
 - `audit/v644_mediocristan_label_bottleneck.md`
-- `handover/ai-direct/entries/20260309_072256_v644_alpha_first_pilot_stop_gate.md`
-- `handover/ai-direct/entries/20260309_072941_external_ai_auditor_prompt_gc_runs.md`
+- `handover/ai-direct/entries/20260309_080141_v645_path_a_local_micro_sweep_positive.md`
+- `handover/ai-direct/entries/20260309_084315_v645_path_a_retrain_and_fresh_holdout_partial_pass.md`
+- `handover/ai-direct/entries/20260309_090713_v645_path_b_local_compare_weaker_than_path_a.md`
 
 Supporting context:
 
 - `handover/ai-direct/entries/20260309_054700_holdout_base_matrix_evaluation_complete.md`
-- `handover/ai-direct/entries/20260309_050702_gc_swarm_optuna_pilot_and_champion_retrain_complete.md`
-- `handover/ai-direct/entries/20260309_012152_gc_swarm_optuna_project_spec.md`
 - `OMEGA_CONSTITUTION.md`
 
 If the canonical spec conflicts with `OMEGA_CONSTITUTION.md`, escalate to the Commander.
@@ -49,14 +47,11 @@ If the canonical spec conflicts with `OMEGA_CONSTITUTION.md`, escalate to the Co
 Writable files:
 
 - `tools/run_optuna_sweep.py`
+- `tools/run_vertex_xgb_train.py`
 - `tools/evaluate_xgb_on_base_matrix.py`
-- `tools/aggregate_vertex_swarm_results.py`
-- `tools/launch_vertex_swarm_optuna.py`
 - `tests/test_vertex_optuna_split.py`
-- `tests/test_vertex_swarm_aggregate.py`
+- `tests/test_vertex_train_weight_mode.py`
 - `tests/test_vertex_holdout_eval.py`
-- `audit/README.md`
-- `audit/v644_mediocristan_label_bottleneck.md`
 - `handover/ops/ACTIVE_MISSION_CHARTER.md`
 - `handover/ops/ACTIVE_PROJECTS.md`
 - `handover/ai-direct/LATEST.md`
@@ -65,71 +60,71 @@ Writable files:
 
 Read-only but relevant files:
 
-- `tools/run_vertex_xgb_train.py`
+- `tools/aggregate_vertex_swarm_results.py`
+- `tools/launch_vertex_swarm_optuna.py`
 - `handover/ai-direct/entries/20260309_054700_holdout_base_matrix_evaluation_complete.md`
-- `handover/ai-direct/entries/20260309_050702_gc_swarm_optuna_pilot_and_champion_retrain_complete.md`
-- `handover/ai-direct/entries/20260309_070752_v644_agentos_final_execution_spec.md`
-- `audit/v643.md`
-- `audit/v643_auditor_pass.md`
+- `handover/ai-direct/entries/20260309_084315_v645_path_a_retrain_and_fresh_holdout_partial_pass.md`
+- `handover/ai-direct/entries/20260309_090713_v645_path_b_local_compare_weaker_than_path_a.md`
+- `audit/v644_mediocristan_label_bottleneck.md`
 
 Explicitly out of scope:
 
 - `omega_core/*`
 - Stage1 / Stage2 / Stage3 forge
-- overwriting the frozen holdout baseline outputs
-- using `2025` or `2026-01` inside optimization scoring
+- widening back into GC by default
+- promoting `Path B` above `Path A` without new evidence
+- overwriting any frozen old or new holdout outputs
+- using `2025` or `2026-01` inside optimization scoring or local sweep selection
 
 ## 4. Roles
 
 Plan Agent:
 
 - responsibility:
-  - choose the minimum decisive pivot path and map it to a bounded file-level implementation plan
+  - choose the minimum decisive `Path A` refinement and map it to a bounded file-level implementation plan
 
 Coder Agent:
 
 - writable files only:
   - `tools/run_optuna_sweep.py`
-  - `tools/launch_vertex_swarm_optuna.py`
+  - `tools/run_vertex_xgb_train.py`
   - `tests/test_vertex_optuna_split.py`
+  - `tests/test_vertex_train_weight_mode.py`
 
 Math Auditor:
 
 - audit target:
-  - verify that the pivot stays outside `omega_core/*`, preserves frozen gates, and does not silently mutate canonical physics semantics beyond the allowed learner interface pivot
+  - verify that the refinement stays inside `Path A`, outside `omega_core/*`, and preserves frozen gates
 
 Runtime Auditor:
 
 - audit target:
-  - verify that the pivot experiment is operationally minimal, fresh-prefix isolated, and does not waste cloud budget before the interface hypothesis is tested
+  - verify that the refinement remains local-first, fresh-prefix isolated, and does not reopen GC prematurely
 
 ## 5. Acceptance Criteria
 
-- the external architect verdict is recorded in `audit/`
-- a concrete pivot mission spec exists and is recorded in handover
-- the first implementation wave is bounded to the learner interface
-- AgentOS has resolved the minimum decisive first path to:
-  - `Path A`
-  - `weight_mode=abs_excess_return`
-  - `min_val_auc=0.501`
-  - local `10`-trial micro-sweep
-- the frozen baseline rule is explicit:
-  - new runs must use fresh output prefixes
-  - new runs must append evidence, not overwrite old evidence
-- AgentOS plan/runtime/math review packets have been issued for the pivot mission
-- the first live experiment is constrained to:
-  - `10-20` trials
-  - local or `1`-worker GCP
+- a concrete `Path A refinement` mission spec exists and is recorded in handover
+- the frozen-baseline rule is explicit for:
+  - old holdout baseline
+  - fresh Path A holdout branch
+  - fresh Path B local compare
+- AgentOS plan/runtime/math review packets have been issued for the refinement mission
+- the next live work is constrained to:
+  - local-first
   - fresh output prefix only
-- the first live experiment has now completed with:
-  - positive validation `alpha_top_quintile`
+  - bounded `Path A` refinement only
+- no ambiguity remains about:
+  - GC staying paused
+  - `Path B` staying secondary
+  - math and Stage3 gates remaining frozen
 
 ## 6. Runtime Preflight
 
 Required before execution:
 
 - target node:
-  - controller + GCP Vertex AI
+  - controller first
+  - dual-host only after a refined local candidate earns promotion
 - expected commit or branch:
   - `main`
 - controller-only code freshness requirement (if any):
@@ -139,24 +134,24 @@ Required before execution:
     - `ext::ssh windows1-w1 %S D:/work/Omega_vNext/.git`
     - controller-side push still requires `protocol.ext.allow=always`
 - launcher mode:
-  - `gcloud` fallback remains the stable controller path until proven otherwise
+  - no GC launcher by default for this mission
 - shard assignment:
-  - cloud-parallel workers only
+  - local-first refinement only
 - thread caps:
   - keep current worker-local defaults unless the next plan changes them explicitly
 - output root:
-  - must be a fresh pivot-experiment prefix, not the frozen V644 prefixes
+  - must be a fresh refinement prefix, not any frozen prior prefix
 - host isolation check:
   - no holdout matrix enters optimization
 
 ## 7. Fail-Fast Conditions
 
-- stop if the new mission proposes overwriting the frozen holdout verdict
+- stop if the new mission proposes overwriting any frozen baseline
 - stop if the new mission widens scope into `omega_core/*` without a separate math-governance mission
 - stop if the new mission drops holdout isolation
 - stop if the mission mutates Stage3 gates or `omega_core/*`
-- stop if the mission widens into multi-worker cloud search before the interface pivot is validated
-- stop if anyone reopens Path B before exploiting the now-positive Path A signal on retrain + fresh holdout evaluation
+- stop if the mission widens into GC before a refined local `Path A` candidate is proven
+- stop if anyone reopens `Path B` as the leading branch without new evidence
 - retry allowed only after named root cause and changed condition
 
 ## 8. Audits Required
@@ -164,24 +159,23 @@ Required before execution:
 Math audit must verify:
 
 - frozen canonical gates remain unchanged
-- no hidden mutation of physics semantics outside the explicitly allowed learner interface pivot
+- no hidden mutation of physics semantics outside the explicitly allowed `Path A` refinement
 
 Runtime audit must verify:
 
-- the first pivot experiment is operationally minimal
-- new outputs are isolated from the frozen baseline outputs
+- the refinement stays local-first
+- new outputs are isolated from all frozen baseline outputs
 
 ## 9. Definition of Done
 
-- external architect verdict recorded
 - new active mission charter instantiated
-- AgentOS role packets started for the pivot mission
-- AgentOS convergence achieved on the first path
+- AgentOS role packets started for the refinement mission
+- AgentOS convergence achieved on the first refinement slice
 - no blocking ambiguity remains about:
-  - allowed pivot family
+  - allowed refinement family
   - out-of-scope math boundary
-  - first micro-sweep shape
-  - fresh-prefix isolation
+  - GC pause
+  - fresh-prefix isolation across all frozen baselines
 - handover updated
 
 ## 10. Run Manifest
@@ -196,11 +190,10 @@ Record after execution:
 - dataset role:
 - math audit verdict:
 - runtime audit verdict:
-- pivot path:
+- refinement branch:
   - `Path A`
 - learner objective:
   - `binary:logistic`
-- weighting mode:
-  - `abs_excess_return`
+- weight shaping:
 - fresh prefix check:
   - `passed`

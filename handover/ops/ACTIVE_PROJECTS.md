@@ -4,15 +4,15 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
 
 ## 1. Snapshot Metadata
 
-- `updated_at_local`: 2026-03-09 08:01:41 +0000
-- `updated_at_utc`: 2026-03-09 08:01:41 +0000
+- `updated_at_local`: 2026-03-09 09:17:28 +0000
+- `updated_at_utc`: 2026-03-09 09:17:28 +0000
 - `updated_by`: Codex (GPT-5)
 
 ## 2. In-Flight Work
 
 ### Project: V645-GC-ASYMMETRIC-LABEL-PIVOT
 
-- Status: `PATH_A_LEADS_AFTER_PATH_B_COMPARE`
+- Status: `FOLLOW_ON_MISSION_SPLIT_TO_V646_PATH_A_REFINEMENT`
 - Hosts: `controller`, `GCP Vertex AI`
 - Goal: test the external architect verdict that the live bottleneck is now the XGBoost label / objective interface, not the frozen `v64.3 / v643` math core
 - Seed authority:
@@ -62,14 +62,47 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
     - but it is materially weaker than Path A on the same local micro-sweep shape
     - Path A remains the leading branch
 - Immediate next step:
-  - keep GC paused
-  - continue local / dual-host only
-  - refine Path A before any Path B promotion
+  - completed:
+    - Path A is now the leading branch
+    - Path B remains secondary
+  - follow-on mission is now open:
+    - `V646 Path A refinement`
 - Risks:
   - the new weighting mode may be trading away too much global ranking signal for tail alpha
   - the remaining `2026-01` negative quintile alpha means the new interface is still not fully stable
   - Path B's tiny near-flat objective levels suggest a weak ranking signal under the first regression compare
   - cross-runtime XGBoost version skew continues to emit old-pickle warnings even though evaluation succeeds
+
+### Project: V646-PATH-A-REFINEMENT
+
+- Status: `MISSION_OPEN`
+- Hosts: `controller`, `windows1-w1`, `linux1-lx`
+- Goal: refine the leading `Path A` learner-interface branch without reopening GC, `Path B`, or math-governance
+- Mission authority:
+  - `handover/ai-direct/entries/20260309_091728_v646_path_a_refinement_mission_open.md`
+- Locked constraints:
+  - keep `omega_core/*` frozen
+  - keep `canonical_v64_1` Stage3 gates frozen
+  - keep GC paused
+  - keep frozen outputs immutable:
+    - old holdout baseline
+    - fresh Path A holdout branch
+    - fresh Path B local compare
+- Starting diagnosis:
+  - Path A is the best branch so far
+  - but `2026-01` `alpha_top_quintile` is still negative
+  - and holdout `AUC` has collapsed toward near coin-flip
+- Required first live shape:
+  - local-first
+  - fresh prefix only
+  - bounded Path A refinement only
+  - no fresh holdout rerun until a refined local Path A candidate clearly beats the current Path A reference
+- Immediate next step:
+  - AgentOS plan/runtime/math packets issued
+  - waiting on convergence for the first refinement slice
+- Risks:
+  - over-refining Path A may destroy the only holdout alpha that currently exists
+  - under-refining Path A may leave the current `2026-01` quintile defect untouched
 
 ### Project: V644-GC-SWARM-ASYMMETRIC-OBJECTIVE
 

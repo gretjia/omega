@@ -8,6 +8,29 @@
 
 This file is the single source of current operational truth for all agents.
 
+## Update: 2026-03-09 09:17 UTC
+- **`Path A refinement` is now the next formal AgentOS mission.**
+- New mission-open authority:
+  - `handover/ai-direct/entries/20260309_091728_v646_path_a_refinement_mission_open.md`
+- Mission shift:
+  - `Path A` remains the leading branch
+  - `Path B` remains frozen as a weaker comparison branch
+  - GC remains paused
+- New mission objective:
+  - refine the current `Path A` tradeoff surface
+  - preserve the economic gains already achieved
+  - target the remaining `2026-01` quintile weakness
+  - avoid collapsing all ranking stability
+- Active charter has been switched to:
+  - `handover/ops/ACTIVE_MISSION_CHARTER.md`
+- AgentOS packets have now been issued for:
+  - Plan
+  - Math audit
+  - Runtime audit
+- Immediate next step:
+  - wait for AgentOS convergence on the first refinement slice
+  - keep that slice local-first
+
 ## Update: 2026-03-09 09:07 UTC
 - **The first local Path B compare is now complete, and it is weaker than Path A.**
 - New execution record:

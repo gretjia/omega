@@ -45,6 +45,44 @@
 ### Entries
 
 <!-- New session debriefs go here. Most recent on top. -->
+#### [2026-03-09 09:17] Agent: Codex | Session: V646 Path A Refinement Mission Open
+
+**What I did:**
+- Opened the next formal AgentOS mission:
+  - `V646 Path A refinement`
+- Wrote the new mission authority entry.
+- Switched the active mission charter from generic V645 pivoting to the narrower Path A refinement mission.
+- Updated the live runtime snapshot and active projects board so the next work is unambiguous:
+  - Path A is the leading branch
+  - Path B stays frozen as a weaker comparison branch
+  - GC stays paused
+
+**What I discovered:**
+- The repo no longer needs a generic “Path A or Path B?” mission.
+- The next useful problem is narrower:
+  - preserve Path A's economic gains
+  - fix the remaining `2026-01` quintile weakness
+  - avoid destroying ranking stability
+
+**What confused me / blocked me:**
+- Nothing operationally blocked the mission split.
+- The only open item is the exact first refinement slice, which is what the next AgentOS packets are for.
+
+**What the next agent should do:**
+- Treat `V646 Path A refinement` as the active mission.
+- Issue fresh AgentOS packets for:
+  - Plan
+  - Math audit
+  - Runtime audit
+- Keep the first refinement slice local-first and fresh-prefix isolated.
+
+**Files I changed:**
+- `handover/ai-direct/entries/20260309_091728_v646_path_a_refinement_mission_open.md` — opened the new mission authority.
+- `handover/ops/ACTIVE_MISSION_CHARTER.md` — switched the active mission to V646 Path A refinement.
+- `handover/ai-direct/LATEST.md` — recorded the mission shift and next immediate step.
+- `handover/ops/ACTIVE_PROJECTS.md` — split V646 into its own in-flight project and marked V645 as a completed precursor branch.
+- `handover/BOARD.md` — added this mandatory debrief block.
+
 #### [2026-03-09 09:07] Agent: Codex | Session: V645 Path B Local Compare
 
 **What I did:**
