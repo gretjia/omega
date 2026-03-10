@@ -8,6 +8,27 @@
 
 This file is the single source of current operational truth for all agents.
 
+## Update: 2026-03-10 11:18 UTC
+- **V659 draft is ready for owner confirmation. Active execution remains blocked at V658 until confirmation.**
+- New authority:
+  - `audit/v659_fixed_contract_replication_audit.md`
+- New spec:
+  - `handover/ai-direct/entries/20260310_111517_v659_fixed_contract_replication_audit_spec_draft.md`
+- Gemini spec audit:
+  - `handover/ai-direct/entries/20260310_111755_v659_spec_gemini_pass.md`
+  - verdict:
+    - `PASS`
+- Key narrowing:
+  - single allowed change axis:
+    - replication sample only
+  - fixed contract remains:
+    - `dPsiAmpE_10d`
+    - `negative`
+    - thresholds `90/95/97.5`
+- Operational consequence:
+  - V658 runtime result remains frozen and blocked
+  - active mission should not switch until owner confirms V659 execution
+
 ## Update: 2026-03-10 09:59 UTC
 - **V658 H1 local ML-admission probe completed and remained blocked.**
 - New execution record:
