@@ -4,15 +4,15 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
 
 ## 1. Snapshot Metadata
 
-- `updated_at_local`: 2026-03-10 08:14:00 +0000
-- `updated_at_utc`: 2026-03-10 08:14:00 +0000
+- `updated_at_local`: 2026-03-10 17:09:00 +0000
+- `updated_at_utc`: 2026-03-10 17:09:00 +0000
 - `updated_by`: Codex (GPT-5)
 
 ## 2. In-Flight Work
 
 ### Project: V659-FIXED-CONTRACT-REPLICATION-AUDIT
 
-- Status: `ACTIVE_REPLICATION_FORGE_PENDING`
+- Status: `REPLICATION_AUDIT_BLOCKED_ML_NOT_ADMITTED`
 - Hosts: `controller`, target `linux1-lx` for bounded non-ML replication run
 - Goal: keep forge, labels, barriers, V655A candidate stream, V655B amplitude fold, V656 transitions, and V657 threshold semantics frozen while changing only the evaluation sample to a disjoint replication block
 - Audit authority:
@@ -57,8 +57,50 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
 - Local verification:
   - `20 passed in 0.59s`
   - `py_compile` passed
-- Next runtime question:
-  - does the exact V657 winning contract replicate outside the H1 2023 selection slice under unchanged sign-aware threshold semantics?
+- Runtime root:
+  - `audit/runtime/v659_replication_linux_20230508_20230927_20260310_114408`
+- Forged replication matrix:
+  - `rows=271720`
+  - `symbols=5524`
+  - `l1_files=73`
+  - `l2_files=101`
+  - `min_date=20230508`
+  - `max_date=20230814`
+  - widened zero fractions:
+    - `5d = 0.0`
+    - `10d = 0.0`
+    - `20d = 0.0`
+- Negative-side universe:
+  - `n_rows_scored=13457`
+  - `n_dates_scored=52`
+  - `date_neutral_signed_return=-0.000932702001837508`
+  - `date_neutral_hazard_win_rate=0.6469217806341062`
+- Threshold summaries:
+  - `90.0`
+    - `n_rows_scored=1390`
+    - `signed_mean_excess_return=0.006726717157738988`
+    - `sign_aware_hazard_win_rate=0.6641637964153685`
+  - `95.0`
+    - `n_rows_scored=724`
+    - `signed_mean_excess_return=0.0025035579338235055`
+    - `sign_aware_hazard_win_rate=0.6771849450903277`
+  - `97.5`
+    - `n_rows_scored=385`
+    - `signed_mean_excess_return=0.010067510826228237`
+    - `sign_aware_hazard_win_rate=0.6902806595114286`
+- Frozen checks:
+  - `coverage_pass=true`
+  - `counts_non_increasing=true`
+  - `signed_return_non_decreasing=false`
+  - `hazard_non_decreasing=true`
+  - `strongest_threshold_beats_universe_on_both=true`
+  - `strongest_threshold_positive=true`
+- Frozen evidence:
+  - `audit/v659_replication_block_evidence.md`
+  - `handover/ai-direct/entries/20260310_170958_v659_replication_audit_blocked.md`
+- Operational consequence:
+  - V659 did not earn replication pass
+  - broader ML / Vertex / holdout remain closed
 
 ### Project: V658-NEGATIVE-TAIL-HAZARD-ADMISSION-PROBE
 

@@ -45,6 +45,64 @@
 ### Entries
 
 <!-- New session debriefs go here. Most recent on top. -->
+#### [2026-03-10 17:09] Agent: Codex | Session: V659 Fixed-Contract Replication Audit Blocked
+
+**What I did:**
+- Deployed the frozen V659 code from a clean worktree to `linux1-lx`.
+- Forged the replication matrix on the disjoint block:
+  - `20230508 -> 20230927`
+- Ran the fixed-contract replication audit on that forged matrix:
+  - signal:
+    - `dPsiAmpE_10d`
+  - side:
+    - `negative`
+  - thresholds:
+    - `90 / 95 / 97.5`
+- Froze the resulting evidence in:
+  - `audit/v659_replication_block_evidence.md`
+  - `handover/ai-direct/entries/20260310_170958_v659_replication_audit_blocked.md`
+
+**What I discovered:**
+- The replication forge itself completed cleanly:
+  - `rows=271720`
+  - `symbols=5524`
+  - `l1_files=73`
+  - `l2_files=101`
+  - widened zero fractions remained:
+    - `5d = 0.0`
+    - `10d = 0.0`
+    - `20d = 0.0`
+- The replication audit did not fail on coverage or hazard tightening:
+  - `coverage_pass=true`
+  - `counts_non_increasing=true`
+  - `hazard_non_decreasing=true`
+  - `strongest_threshold_beats_universe_on_both=true`
+  - `strongest_threshold_positive=true`
+- The single blocker was:
+  - `signed_return_non_decreasing=false`
+- Threshold signed returns were:
+  - `90.0 -> 0.006726717157738988`
+  - `95.0 -> 0.0025035579338235055`
+  - `97.5 -> 0.010067510826228237`
+- So the fixed V657 winner did not replicate strongly enough under the unchanged V659 ladder.
+
+**What confused me / blocked me:**
+- Early launch attempts hit shell/glob plumbing issues and one watcher false-stop after a transient SSH reset.
+- Those glue issues were resolved and do not affect the frozen V659 verdict.
+- The final blocker is statistical, not operational.
+
+**What the next agent should do:**
+- Treat `audit/v659_replication_block_evidence.md` as the frozen V659 runtime authority.
+- Keep broader ML / Vertex / holdout closed.
+- Wait for a new auditor / architect instruction before changing another axis.
+
+**Files I changed:**
+- `audit/v659_replication_block_evidence.md` — froze the V659 replication evidence.
+- `handover/ai-direct/entries/20260310_170958_v659_replication_audit_blocked.md` — recorded the blocked runtime checkpoint.
+- `handover/ai-direct/LATEST.md` — updated current operational truth with the blocked verdict.
+- `handover/ops/ACTIVE_PROJECTS.md` — updated V659 project state.
+- `handover/BOARD.md` — added this debrief.
+
 #### [2026-03-10 11:33] Agent: Codex | Session: V659 Fixed-Contract Replication Mission Open
 
 **What I did:**

@@ -35,6 +35,7 @@ For the V64 line, read in this order:
 27. [v658_negative_tail_hazard_admission_probe.md](/home/zephryj/projects/omega/audit/v658_negative_tail_hazard_admission_probe.md)
 28. [v658_h1_ml_admission_probe_block_evidence.md](/home/zephryj/projects/omega/audit/v658_h1_ml_admission_probe_block_evidence.md)
 29. [v659_fixed_contract_replication_audit.md](/home/zephryj/projects/omega/audit/v659_fixed_contract_replication_audit.md)
+30. [v659_replication_block_evidence.md](/home/zephryj/projects/omega/audit/v659_replication_block_evidence.md)
 
 ## Purpose of each file
 
@@ -67,3 +68,4 @@ For the V64 line, read in this order:
 - [v658_negative_tail_hazard_admission_probe.md](/home/zephryj/projects/omega/audit/v658_negative_tail_hazard_admission_probe.md): external audit authority that freezes the V657 sign-aware contract and narrows the next step to a local-only, trigger-conditioned hazard learner admission probe on the fixed negative tail of `dPsiAmpE_10d`
 - [v658_h1_ml_admission_probe_block_evidence.md](/home/zephryj/projects/omega/audit/v658_h1_ml_admission_probe_block_evidence.md): frozen runtime evidence showing that the narrow V658 admitted-set learner improved some same-count economics inside the fixed negative tail but still failed the constant-baseline logloss gate on both forward folds, leaving broader ML closed
 - [v659_fixed_contract_replication_audit.md](/home/zephryj/projects/omega/audit/v659_fixed_contract_replication_audit.md): external audit authority that treats post-selection replication as the next narrow blocker and freezes the next move to a non-ML replication audit on the exact V657 winning contract outside the original H1 2023 selection slice
+- [v659_replication_block_evidence.md](/home/zephryj/projects/omega/audit/v659_replication_block_evidence.md): frozen runtime evidence showing that the disjoint replication block kept the repaired data properties and the strongest threshold remained profitable, but the fixed V657 contract still failed the signed-return tightening ladder, so broader ML stayed closed

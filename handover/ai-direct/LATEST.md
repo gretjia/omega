@@ -8,6 +8,50 @@
 
 This file is the single source of current operational truth for all agents.
 
+## Update: 2026-03-10 17:09 UTC
+- **V659 fixed-contract replication audit completed and remained blocked.**
+- New execution record:
+  - `handover/ai-direct/entries/20260310_170958_v659_replication_audit_blocked.md`
+- New frozen evidence packet:
+  - `audit/v659_replication_block_evidence.md`
+- Runtime root:
+  - `audit/runtime/v659_replication_linux_20230508_20230927_20260310_114408`
+- Forged replication matrix:
+  - `rows=271720`
+  - `symbols=5524`
+  - `l1_files=73`
+  - `l2_files=101`
+  - `min_date=20230508`
+  - `max_date=20230814`
+  - widened zero fractions:
+    - `5d = 0.0`
+    - `10d = 0.0`
+    - `20d = 0.0`
+- Fixed replication contract:
+  - `dPsiAmpE_10d`
+  - `negative`
+  - thresholds `90 / 95 / 97.5`
+- Threshold summaries:
+  - `90.0`
+    - `signed_mean_excess_return=0.006726717157738988`
+    - `sign_aware_hazard_win_rate=0.6641637964153685`
+  - `95.0`
+    - `signed_mean_excess_return=0.0025035579338235055`
+    - `sign_aware_hazard_win_rate=0.6771849450903277`
+  - `97.5`
+    - `signed_mean_excess_return=0.010067510826228237`
+    - `sign_aware_hazard_win_rate=0.6902806595114286`
+- Frozen checks:
+  - `coverage_pass=true`
+  - `counts_non_increasing=true`
+  - `signed_return_non_decreasing=false`
+  - `hazard_non_decreasing=true`
+  - `strongest_threshold_beats_universe_on_both=true`
+  - `strongest_threshold_positive=true`
+- Operational consequence:
+  - `mission_pass=false`
+  - broader ML / Vertex / holdout remain closed
+
 ## Update: 2026-03-10 11:33 UTC
 - **V659 is now the active mission. It remains non-ML and changes only the evaluation sample.**
 - New authority:
