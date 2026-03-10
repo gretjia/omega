@@ -4,73 +4,70 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
 
 ## 1. Snapshot Metadata
 
-- `updated_at_local`: 2026-03-10 03:04:00 +0000
-- `updated_at_utc`: 2026-03-10 03:04:00 +0000
+- `updated_at_local`: 2026-03-10 03:42:00 +0000
+- `updated_at_utc`: 2026-03-10 03:42:00 +0000
 - `updated_by`: Codex (GPT-5)
 
 ## 2. In-Flight Work
 
-### Project: V654-IDENTITY-PRESERVING-PULSE-COMPRESSION
+### Project: V655A-SOFT-MASS-CAMPAIGN-ACCUMULATION
 
-- Status: `H1_PSI_PRIMARY_EVENT_STUDY_BLOCKED_ML_NOT_ADMITTED`
+- Status: `H1_FORGE_PROBE_INFLIGHT_AFTER_GEMINI_PASS_AND_DEPLOY`
 - Hosts: `controller`, target `linux1-lx` for first bounded probe
-- Goal: keep V653 daily spine / label / barrier stack frozen while replacing only the intraday-to-symbol-day aggregation math with identity-preserving pulse compression
+- Goal: keep the V654 daily spine / label / barrier / pulse-compression stack frozen while widening only the campaign accumulation candidate stream from hard `is_signal` gating to soft physics-valid gating
 - Audit authority:
-  - `audit/v654_identity_preserving_pulse_compression.md`
+  - `audit/v655_soft_mass_campaign_accumulation.md`
 - Draft spec:
-  - `handover/ai-direct/entries/20260310_012744_v654_identity_preserving_pulse_compression_spec_draft.md`
+  - `handover/ai-direct/entries/20260310_032850_v655a_soft_mass_campaign_accumulation_spec_draft.md`
 - Gemini review:
-  - `handover/ai-direct/entries/20260310_013420_v654_spec_draft_gemini_pass.md`
+  - `handover/ai-direct/entries/20260310_033545_v655a_spec_gemini_pass.md`
   - verdict:
     - `PASS`
 - Mission-open authority:
-  - `handover/ai-direct/entries/20260310_013500_v654_identity_preserving_pulse_compression_mission_open.md`
+  - `handover/ai-direct/entries/20260310_033700_v655a_soft_mass_mission_open.md`
 - Locked constraints:
   - keep daily spine frozen
   - keep `entry_open_t1`, `excess_ret_t1_to_Hd`, and triple-barrier semantics frozen
   - keep event-study gate unchanged
   - keep ML / Vertex / holdout closed
+  - keep same-sign pulse compression unchanged
   - keep `omega_core/*` math core unchanged in wave 1
 - Current first-wave implementation:
   - `tools/forge_campaign_state.py`
-    - event-level `E/T/Phi`
-    - same-sign pulse compression
-    - daily `F_epi/A_epi`, `F_topo/A_topo`, `F_phase/A_phase`
-    - `pulse_count`
-    - `pulse_concentration`
-    - `PsiE_*`, `PsiT_*`, `PsiStar_*`
-    - legacy `Psi_*` retained as baseline
+    - default `require_is_signal=0`
+    - preserved `E/T/Phi`
+    - preserved same-sign pulse compression
+    - preserved daily multi-channel fold and `PsiE_*`, `PsiT_*`, `PsiStar_*`
   - tests:
     - `tests/test_campaign_state_contract.py`
     - `tests/test_campaign_event_study.py`
 - Local verification:
   - `python3 -m py_compile` passed
-  - `15 passed in 0.81s`
-- Latest runtime root:
-  - `audit/runtime/v654_probe_linux_h1_2023_20260310_015200`
-- H1 forge facts:
-  - `rows=271447`
-  - `symbols=5448`
-  - `raw_candidates=3164`
-  - `kept_pulses=1449`
-  - `seconds=2052.6`
-- Zero-fraction facts:
-  - `excess_ret_t1_to_5d_zero_fraction = 0.0`
-  - `excess_ret_t1_to_10d_zero_fraction = 0.0`
-  - `excess_ret_t1_to_20d_zero_fraction = 0.0`
-- Primary event-study artifacts:
-  - `audit/runtime/v654_probe_linux_h1_2023_20260310_015200/event_study_v654_psi_primary.json`
-  - `audit/runtime/v654_probe_linux_h1_2023_20260310_015200/event_study_v654_psi_primary.out`
-- Event-study verdict:
-  - all tested `PsiE_*`, `PsiT_*`, and `PsiStar_*` signals returned:
-    - `monotonic_non_decreasing = false`
-  - `date_frac_flat_signal = 0.0` for all tested signals
-- Operational consequence:
-  - the V654 pure event-study gate is not passed
-  - ML / Vertex / holdout remain closed
+  - `17 passed in 0.94s`
+- Deploy status:
+  - remote synced to:
+    - `deploy_v655a_16b24dc_a@16b24dc`
+- Live runtime root:
+  - `audit/runtime/v655a_probe_linux_h1_2023_20260310_034020`
+- Live runtime state:
+  - active python PID:
+    - `655335`
+  - latest forge lines:
+    - `[V655A] matched L1 files=72 L2 files=72 horizons=[5, 10, 20] pulse_mode=sign_nms pulse_min_gap=30`
+    - `[V655A] phase 1/4 collecting daily spine from L1`
+- Comparison caveat:
+  - frozen V654 H1 evidence recorded:
+    - `l2_files=98`
+  - current V655A launch currently reports:
+    - `matched L2 files=72`
+  - read-only explanation so far:
+    - remote `glob_count=98`
+    - regex-kept file count:
+      - `72`
 - Current next step:
-  - freeze this runtime evidence
-  - wait for new architect / audit direction before any ML reopening
+  - wait for the V655A H1 forge to finish
+  - then open pure event study on the primary `Psi` families only
+  - keep ML closed until the unchanged gate is decided
 
 ### Project: V653-FRACTAL-CAMPAIGN-AWAKENING
 

@@ -45,6 +45,77 @@
 ### Entries
 
 <!-- New session debriefs go here. Most recent on top. -->
+#### [2026-03-10 03:42] Agent: Codex | Session: V655A Gemini Pass, Deploy, H1 Probe Live
+
+**What I did:**
+- Landed the new authority:
+  - `audit/v655_soft_mass_campaign_accumulation.md`
+- Wrote the V655A spec and passed it through Gemini math audit:
+  - `handover/ai-direct/entries/20260310_032850_v655a_soft_mass_campaign_accumulation_spec_draft.md`
+  - `handover/ai-direct/entries/20260310_033545_v655a_spec_gemini_pass.md`
+- Switched the active charter to V655A:
+  - `handover/ops/ACTIVE_MISSION_CHARTER.md`
+- Implemented the first wave:
+  - `tools/forge_campaign_state.py`
+    - default `require_is_signal` changed to `0`
+  - `tests/test_campaign_state_contract.py`
+    - added soft-mass candidate-stream coverage
+- Ran local verification:
+  - `17 passed`
+  - `py_compile` passed
+- Committed and pushed:
+  - `16b24dc`
+- Deployed from a clean worktree to `linux1-lx`.
+- Launched the first bounded V655A H1 probe:
+  - `audit/runtime/v655a_probe_linux_h1_2023_20260310_034020`
+
+**What I discovered:**
+- Gemini returned `PASS` with no required fixes; the active alignment is exactly:
+  - remove hard `is_signal` gating from campaign accumulation
+  - keep the entire V654 fold and gate frozen
+- The live V655A runtime currently reports:
+  - `matched L1 files=72`
+  - `matched L2 files=72`
+- Read-only inspection on linux shows:
+  - `glob_count=98`
+  - regex-kept L2 files:
+    - `72`
+- This is a comparison caveat against the frozen V654 H1 baseline, not yet a blocker.
+
+**What confused me / blocked me:**
+- No new code bug yet.
+- The only unresolved issue is whether the `98 -> 72` L2 input contraction materially affects comparability against V654.
+
+**What the next agent should do:**
+- Check whether:
+  - `audit/runtime/v655a_probe_linux_h1_2023_20260310_034020/campaign_matrix.parquet`
+  - and `.meta.json`
+  exist.
+- If forge completes, run pure event study only on:
+  - `PsiE_5d`
+  - `PsiT_5d`
+  - `PsiStar_5d`
+  - `PsiE_10d`
+  - `PsiT_10d`
+  - `PsiStar_10d`
+  - `PsiE_20d`
+  - `PsiT_20d`
+  - `PsiStar_20d`
+- Keep ML closed.
+- Record the `raw_candidates` / `kept_pulses` delta against the frozen V654 H1 baseline before drawing conclusions.
+
+**Files I changed:**
+- `audit/v655_soft_mass_campaign_accumulation.md` — landed the new external authority.
+- `handover/ai-direct/entries/20260310_032850_v655a_soft_mass_campaign_accumulation_spec_draft.md` — recorded the draft spec.
+- `handover/ai-direct/entries/20260310_033545_v655a_spec_gemini_pass.md` — recorded the Gemini pass.
+- `handover/ai-direct/entries/20260310_033700_v655a_soft_mass_mission_open.md` — recorded mission open.
+- `tools/forge_campaign_state.py` — changed default candidate-stream gating to soft-mass mode.
+- `tests/test_campaign_state_contract.py` — added coverage for `require_is_signal=False`.
+- `handover/ops/ACTIVE_MISSION_CHARTER.md` — switched active mission to V655A.
+- `handover/ai-direct/LATEST.md` — recorded the in-flight V655A state.
+- `handover/ops/ACTIVE_PROJECTS.md` — updated V655A project board.
+- `handover/BOARD.md` — added this debrief.
+
 #### [2026-03-10 03:04] Agent: Codex | Session: V654 H1 Forge Complete, Psi-Primary Event Study Blocked
 
 **What I did:**

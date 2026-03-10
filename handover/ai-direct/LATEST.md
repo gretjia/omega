@@ -8,6 +8,50 @@
 
 This file is the single source of current operational truth for all agents.
 
+## Update: 2026-03-10 03:42 UTC
+- **V655A is now the active mission, Gemini has passed the spec, deploy is complete, and the first H1 soft-mass forge probe is live on linux.**
+- New authority:
+  - `audit/v655_soft_mass_campaign_accumulation.md`
+- New spec:
+  - `handover/ai-direct/entries/20260310_032850_v655a_soft_mass_campaign_accumulation_spec_draft.md`
+- Gemini spec audit:
+  - `handover/ai-direct/entries/20260310_033545_v655a_spec_gemini_pass.md`
+  - verdict:
+    - `PASS`
+- Mission-open authority:
+  - `handover/ai-direct/entries/20260310_033700_v655a_soft_mass_mission_open.md`
+- New runtime record:
+  - `handover/ai-direct/entries/20260310_034248_v655a_gemini_pass_deploy_and_h1_probe_inflight.md`
+- Code commit pushed:
+  - `16b24dc`
+- Deploy status:
+  - clean-worktree deploy succeeded to `linux1-lx`
+  - remote synced to:
+    - `deploy_v655a_16b24dc_a@16b24dc`
+- Single active change axis:
+  - campaign accumulation no longer requires:
+    - `is_signal == 1`
+  - it still requires:
+    - `is_physics_valid == 1`
+    - pulse floor
+    - same-sign pulse compression
+- Live runtime root:
+  - `audit/runtime/v655a_probe_linux_h1_2023_20260310_034020`
+- Latest live state:
+  - active python PID:
+    - `655335`
+  - latest log lines:
+    - `[V655A] matched L1 files=72 L2 files=72 horizons=[5, 10, 20] pulse_mode=sign_nms pulse_min_gap=30`
+    - `[V655A] phase 1/4 collecting daily spine from L1`
+- Verification:
+  - local tests:
+    - `17 passed in 0.94s`
+  - `py_compile` passed
+- Current state:
+  - forge is in flight
+  - pure event study has not opened yet
+  - ML / Vertex / holdout remain closed
+
 ## Update: 2026-03-10 03:04 UTC
 - **V654 H1 forge finished and the primary `Psi` event-study family is now formally blocked. ML remains closed.**
 - New execution record:
