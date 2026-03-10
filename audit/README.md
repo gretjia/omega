@@ -27,6 +27,7 @@ For the V64 line, read in this order:
 19. [v655_soft_mass_campaign_accumulation.md](/home/zephryj/projects/omega/audit/v655_soft_mass_campaign_accumulation.md)
 20. [v655a_h1_soft_mass_block_evidence.md](/home/zephryj/projects/omega/audit/v655a_h1_soft_mass_block_evidence.md)
 21. [v655b_phase_amplitude_daily_fold.md](/home/zephryj/projects/omega/audit/v655b_phase_amplitude_daily_fold.md)
+22. [v655b_h1_amp_event_study_block_evidence.md](/home/zephryj/projects/omega/audit/v655b_h1_amp_event_study_block_evidence.md)
 
 ## Purpose of each file
 
@@ -51,3 +52,4 @@ For the V64 line, read in this order:
 - [v655_soft_mass_campaign_accumulation.md](/home/zephryj/projects/omega/audit/v655_soft_mass_campaign_accumulation.md): execution-grade override that widens campaign accumulation from trigger-level `is_signal` gating to soft physics-valid gating while freezing daily spine, labels, pulse compression, and event-study semantics
 - [v655a_h1_soft_mass_block_evidence.md](/home/zephryj/projects/omega/audit/v655a_h1_soft_mass_block_evidence.md): frozen runtime evidence showing that V655A materially increased candidate mass and preserved zero-fraction elimination but still failed the unchanged monotonic event-study gate
 - [v655b_phase_amplitude_daily_fold.md](/home/zephryj/projects/omega/audit/v655b_phase_amplitude_daily_fold.md): frozen external audit authority for the contingent V655B fallback, changing only the `E` / `T` daily fold from sign-only projection to phase-amplitude projection while preserving the V655A soft-mass stream and pre-ML gate
+- [v655b_h1_amp_event_study_block_evidence.md](/home/zephryj/projects/omega/audit/v655b_h1_amp_event_study_block_evidence.md): frozen runtime evidence showing that V655B preserved the V655A mass and zero-fraction fixes while still failing the unchanged monotonic event-study gate on the primary amplitude-aware `PsiAmp*` families

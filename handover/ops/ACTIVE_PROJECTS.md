@@ -10,9 +10,62 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
 
 ## 2. In-Flight Work
 
+### Project: V655B-PHASE-AMPLITUDE-DAILY-FOLD
+
+- Status: `H1_AMP_PRIMARY_EVENT_STUDY_BLOCKED_ML_NOT_ADMITTED`
+- Hosts: `controller`, target `linux1-lx` for bounded probe
+- Goal: keep the V655A soft-mass candidate stream, daily spine, label, barrier, pulse-compression stack, and unchanged event-study gate frozen while changing only the `E` / `T` daily fold from sign-only projection to phase-amplitude projection
+- Audit authority:
+  - `audit/v655b_phase_amplitude_daily_fold.md`
+- Draft spec:
+  - `handover/ai-direct/entries/20260310_045017_v655b_phase_amplitude_daily_fold_spec_draft.md`
+- Gemini review:
+  - `handover/ai-direct/entries/20260310_045808_v655b_spec_gemini_pass.md`
+  - verdict:
+    - `PASS`
+- Mission-open authority:
+  - `handover/ai-direct/entries/20260310_045900_v655b_phase_amplitude_mission_open.md`
+- Locked constraints:
+  - keep V655A soft-mass candidate stream frozen
+  - keep daily spine frozen
+  - keep `entry_open_t1`, `excess_ret_t1_to_Hd`, and triple-barrier semantics frozen
+  - keep event-study gate unchanged
+  - keep ML / Vertex / holdout closed
+  - keep same-sign pulse compression unchanged
+  - keep `omega_core/*` math core unchanged in wave 1
+- First-wave implementation:
+  - `tools/forge_campaign_state.py`
+    - preserved legacy `PsiE_*`, `PsiT_*`, `PsiStar_*`
+    - added `F_epi_amp/A_epi_amp`, `F_topo_amp/A_topo_amp`
+    - added `OmegaAmpE_*`, `OmegaAmpT_*`, `OmegaAmpStar_*`
+    - added `PsiAmpE_*`, `PsiAmpT_*`, `PsiAmpStar_*`
+  - tests:
+    - `tests/test_campaign_state_contract.py`
+    - `tests/test_campaign_event_study.py`
+- Local verification:
+  - `python3 -m py_compile` passed
+  - `18 passed in 0.56s`
+- Deploy status:
+  - remote synced to:
+    - `deploy_v655b_cf526db@cf526db`
+- Runtime root:
+  - `audit/runtime/v655b_probe_linux_h1_2023_20260310_050315`
+- H1 forge facts:
+  - `rows=271447`
+  - `symbols=5448`
+  - `raw_candidates=136439`
+  - `kept_pulses=30449`
+  - `seconds=2058.7`
+- Event-study verdict:
+  - all primary amplitude-aware `PsiAmp*` signals remained:
+    - `monotonic_non_decreasing=false`
+- Operational consequence:
+  - ML remains closed
+  - no V655B amplitude-aware family earned reopening
+
 ### Project: V655A-SOFT-MASS-CAMPAIGN-ACCUMULATION
 
-- Status: `H1_FORGE_PROBE_INFLIGHT_AFTER_GEMINI_PASS_AND_DEPLOY`
+- Status: `H1_PRIMARY_PSI_EVENT_STUDY_BLOCKED`
 - Hosts: `controller`, target `linux1-lx` for first bounded probe
 - Goal: keep the V654 daily spine / label / barrier / pulse-compression stack frozen while widening only the campaign accumulation candidate stream from hard `is_signal` gating to soft physics-valid gating
 - Audit authority:
@@ -47,14 +100,19 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
 - Deploy status:
   - remote synced to:
     - `deploy_v655a_16b24dc_a@16b24dc`
-- Live runtime root:
+- Runtime root:
   - `audit/runtime/v655a_probe_linux_h1_2023_20260310_034020`
-- Live runtime state:
-  - active python PID:
-    - `655335`
-  - latest forge lines:
-    - `[V655A] matched L1 files=72 L2 files=72 horizons=[5, 10, 20] pulse_mode=sign_nms pulse_min_gap=30`
-    - `[V655A] phase 1/4 collecting daily spine from L1`
+- H1 forge facts:
+  - `rows=271447`
+  - `symbols=5448`
+  - `raw_candidates=136439`
+  - `kept_pulses=30449`
+- Primary event-study verdict:
+  - all tested `PsiE_*`, `PsiT_*`, `PsiStar_*` signals remained:
+    - `monotonic_non_decreasing=false`
+- Frozen evidence:
+  - `audit/v655a_h1_soft_mass_block_evidence.md`
+  - `handover/ai-direct/entries/20260310_045700_v655a_h1_soft_mass_blocked.md`
 - Comparison caveat:
   - frozen V654 H1 evidence recorded:
     - `l2_files=98`
@@ -65,9 +123,9 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
     - regex-kept file count:
       - `72`
 - Current next step:
-  - wait for the V655A H1 forge to finish
-  - then open pure event study on the primary `Psi` families only
-  - keep ML closed until the unchanged gate is decided
+  - branch is now frozen as a no-go reference
+  - keep ML closed
+  - use it only as the comparison baseline for V655B
 
 ### Project: V653-FRACTAL-CAMPAIGN-AWAKENING
 

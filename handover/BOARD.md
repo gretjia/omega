@@ -45,6 +45,63 @@
 ### Entries
 
 <!-- New session debriefs go here. Most recent on top. -->
+#### [2026-03-10 05:42] Agent: Codex | Session: V655B H1 Forge Complete, Amp-Primary Event Study Blocked
+
+**What I did:**
+- Waited on the bounded `linux1-lx` V655B H1 forge until completion:
+  - `audit/runtime/v655b_probe_linux_h1_2023_20260310_050315`
+- Verified forge completion facts from:
+  - `campaign_matrix.parquet.meta.json`
+  - `forge.out`
+- Ran pure event study on the amplitude-aware primary families:
+  - `PsiAmpE_5d`
+  - `PsiAmpT_5d`
+  - `PsiAmpStar_5d`
+  - `PsiAmpE_10d`
+  - `PsiAmpT_10d`
+  - `PsiAmpStar_10d`
+  - `PsiAmpE_20d`
+  - `PsiAmpT_20d`
+  - `PsiAmpStar_20d`
+- Froze the resulting evidence in:
+  - `audit/v655b_h1_amp_event_study_block_evidence.md`
+  - `handover/ai-direct/entries/20260310_054208_v655b_h1_amp_primary_event_study_blocked.md`
+
+**What I discovered:**
+- V655B preserved the corrected no-zero-mass behavior:
+  - `excess_ret_t1_to_5d_zero_fraction = 0.0`
+  - `excess_ret_t1_to_10d_zero_fraction = 0.0`
+  - `excess_ret_t1_to_20d_zero_fraction = 0.0`
+- V655B kept the V655A mass characteristics:
+  - `raw_candidates=136439`
+  - `kept_pulses=30449`
+- The amplitude-aware primary families were non-flat:
+  - `date_frac_flat_signal=0.0`
+- Despite that, none of the tested `PsiAmpE_*`, `PsiAmpT_*`, or `PsiAmpStar_*` horizons achieved:
+  - `monotonic_non_decreasing = true`
+
+**What confused me / blocked me:**
+- One deployment-side bug appeared before the successful probe:
+  - remote non-interactive shell did not resolve `uv` on `PATH`
+  - fixed by relaunching with absolute path:
+    - `/home/zepher/.local/bin/uv`
+- No new mathematical or parsing bug blocked the completed V655B run.
+- The blocker remains purely statistical under the unchanged gate.
+
+**What the next agent should do:**
+- Do not reopen ML.
+- Treat:
+  - `audit/v655b_h1_amp_event_study_block_evidence.md`
+  as the frozen runtime authority for V655B.
+- Wait for a new architect / audit direction before changing another mathematical axis.
+
+**Files I changed:**
+- `audit/v655b_h1_amp_event_study_block_evidence.md` — froze the H1 forge + amp-primary event-study evidence.
+- `handover/ai-direct/entries/20260310_054208_v655b_h1_amp_primary_event_study_blocked.md` — recorded the V655B H1 checkpoint and block.
+- `handover/ai-direct/LATEST.md` — updated current operational truth.
+- `handover/ops/ACTIVE_PROJECTS.md` — updated V655A/V655B project states.
+- `handover/BOARD.md` — added this debrief.
+
 #### [2026-03-10 03:42] Agent: Codex | Session: V655A Gemini Pass, Deploy, H1 Probe Live
 
 **What I did:**

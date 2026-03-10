@@ -8,6 +8,39 @@
 
 This file is the single source of current operational truth for all agents.
 
+## Update: 2026-03-10 05:42 UTC
+- **V655B H1 forge completed, but the primary amplitude-aware `PsiAmp*` event-study family is now formally blocked. ML remains closed.**
+- New execution record:
+  - `handover/ai-direct/entries/20260310_054208_v655b_h1_amp_primary_event_study_blocked.md`
+- New frozen evidence packet:
+  - `audit/v655b_h1_amp_event_study_block_evidence.md`
+- Runtime root:
+  - `audit/runtime/v655b_probe_linux_h1_2023_20260310_050315`
+- H1 forge facts:
+  - `rows=271447`
+  - `symbols=5448`
+  - `min_date=20230103`
+  - `max_date=20230417`
+  - `raw_candidates=136439`
+  - `kept_pulses=30449`
+  - `seconds=2058.7`
+- Zero-fraction facts:
+  - `excess_ret_t1_to_5d_zero_fraction = 0.0`
+  - `excess_ret_t1_to_10d_zero_fraction = 0.0`
+  - `excess_ret_t1_to_20d_zero_fraction = 0.0`
+- Primary amplitude event-study artifacts:
+  - `audit/runtime/v655b_probe_linux_h1_2023_20260310_050315/event_study_v655b_amp_primary.json`
+  - `audit/runtime/v655b_probe_linux_h1_2023_20260310_050315/event_study_v655b_amp_primary.out`
+- Shared event-study coverage:
+  - `n_dates_scored=52`
+  - `date_frac_flat_signal=0.0` for all tested amplitude-aware signals
+- Gate verdict:
+  - all tested `PsiAmpE_*`, `PsiAmpT_*`, and `PsiAmpStar_*` signals returned:
+    - `monotonic_non_decreasing = false`
+- Operational consequence:
+  - V655B has not earned ML reopening
+  - ML / Vertex / holdout remain closed
+
 ## Update: 2026-03-10 03:42 UTC
 - **V655A is now the active mission, Gemini has passed the spec, deploy is complete, and the first H1 soft-mass forge probe is live on linux.**
 - New authority:
