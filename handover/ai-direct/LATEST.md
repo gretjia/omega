@@ -8,6 +8,35 @@
 
 This file is the single source of current operational truth for all agents.
 
+## Update: 2026-03-10 11:33 UTC
+- **V659 is now the active mission. It remains non-ML and changes only the evaluation sample.**
+- New authority:
+  - `audit/v659_fixed_contract_replication_audit.md`
+- New spec:
+  - `handover/ai-direct/entries/20260310_111517_v659_fixed_contract_replication_audit_spec_draft.md`
+- Gemini spec audit:
+  - `handover/ai-direct/entries/20260310_111755_v659_spec_gemini_pass.md`
+  - verdict:
+    - `PASS`
+- Gemini code-delta audit:
+  - `handover/ai-direct/entries/20260310_113335_v659_code_delta_gemini_pass.md`
+  - verdict:
+    - `PASS`
+- Mission-open authority:
+  - `handover/ai-direct/entries/20260310_113349_v659_fixed_contract_replication_mission_open.md`
+- Wave-1 replication block:
+  - `20230508 -> 20230927`
+- Observed source coverage for that block:
+  - `l1_count=73`
+  - `l2_count=101`
+- Fixed contract:
+  - `dPsiAmpE_10d`
+  - `negative`
+  - thresholds `90 / 95 / 97.5`
+- Operational consequence:
+  - broader ML / Vertex / holdout remain closed
+  - next step is unchanged forge on the replication block plus fixed-contract sign-aware replication audit
+
 ## Update: 2026-03-10 11:18 UTC
 - **V659 draft is ready for owner confirmation. Active execution remains blocked at V658 until confirmation.**
 - New authority:

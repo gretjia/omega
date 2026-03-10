@@ -45,6 +45,61 @@
 ### Entries
 
 <!-- New session debriefs go here. Most recent on top. -->
+#### [2026-03-10 11:33] Agent: Codex | Session: V659 Fixed-Contract Replication Mission Open
+
+**What I did:**
+- Landed the new audit authority:
+  - `audit/v659_fixed_contract_replication_audit.md`
+- Wrote the V659 spec and passed it through direct Gemini math audit:
+  - `handover/ai-direct/entries/20260310_111517_v659_fixed_contract_replication_audit_spec_draft.md`
+  - `handover/ai-direct/entries/20260310_111755_v659_spec_gemini_pass.md`
+- Implemented the thin fixed-contract wrapper:
+  - `tools/run_campaign_fixed_contract_replication_audit.py`
+  - `tests/test_campaign_fixed_contract_replication_audit.py`
+- Ran local verification:
+  - `20 passed`
+  - `py_compile` passed
+- Ran a second direct Gemini code-delta audit:
+  - `handover/ai-direct/entries/20260310_113335_v659_code_delta_gemini_pass.md`
+  - verdict:
+    - `PASS`
+- Switched the active charter to V659:
+  - `handover/ops/ACTIVE_MISSION_CHARTER.md`
+- Recorded mission-open authority:
+  - `handover/ai-direct/entries/20260310_113349_v659_fixed_contract_replication_mission_open.md`
+
+**What I discovered:**
+- The next honest move after V658 is indeed sample replication, not another ML tweak.
+- The first sufficiently long post-H1 disjoint block available on `linux1` is:
+  - `20230508 -> 20230927`
+- Recorded source coverage for that block:
+  - `l1_count=73`
+  - `l2_count=101`
+
+**What confused me / blocked me:**
+- Two reused child agents did not return useful summaries in time.
+- That did not affect correctness because both the spec and code delta were audited directly with `/usr/bin/gemini`.
+
+**What the next agent should do:**
+- Commit only the V659 mission-open files and wrapper.
+- Deploy from a clean worktree to `linux1-lx`.
+- Run unchanged forge on the `20230508 -> 20230927` block.
+- Then run the fixed-contract replication audit on that forged matrix.
+- Keep ML / Vertex / holdout closed regardless of intermediate signs until V659 resolves.
+
+**Files I changed:**
+- `audit/v659_fixed_contract_replication_audit.md` — landed the new external authority.
+- `handover/ai-direct/entries/20260310_111517_v659_fixed_contract_replication_audit_spec_draft.md` — recorded the V659 spec.
+- `handover/ai-direct/entries/20260310_111755_v659_spec_gemini_pass.md` — recorded the spec-level Gemini pass.
+- `tools/run_campaign_fixed_contract_replication_audit.py` — added the thin fixed-contract replication wrapper.
+- `tests/test_campaign_fixed_contract_replication_audit.py` — added replication-pass logic coverage.
+- `handover/ai-direct/entries/20260310_113335_v659_code_delta_gemini_pass.md` — recorded the code-level Gemini pass.
+- `handover/ai-direct/entries/20260310_113349_v659_fixed_contract_replication_mission_open.md` — recorded mission open and block choice.
+- `handover/ai-direct/LATEST.md` — updated current operational truth.
+- `handover/ops/ACTIVE_MISSION_CHARTER.md` — switched to V659.
+- `handover/ops/ACTIVE_PROJECTS.md` — updated V659 project state.
+- `handover/BOARD.md` — added this debrief.
+
 #### [2026-03-10 09:59] Agent: Codex | Session: V658 Local ML Admission Probe Blocked
 
 **What I did:**

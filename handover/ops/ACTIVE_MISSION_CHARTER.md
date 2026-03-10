@@ -1,29 +1,30 @@
 # OMEGA Active Mission Charter
 
-Status: Blocked
-Task Name: V658 Negative-Tail Hazard Admission Probe
+Status: In Progress
+Task Name: V659 Fixed-Contract Replication Audit
 Owner: Human Owner
 Commander: Codex
 Date: 2026-03-10
 
 ## 1. Objective
 
-- Preserve the corrected V655A soft-mass candidate stream, V655B amplitude-aware daily fold, V656 transition derivations, daily spine, tradable label stack, and same-sign pulse compression.
-- Repair only the admission protocol.
-- Replace raw threshold trigger-only usage with a trigger-conditioned hazard learner while leaving forge, thresholds, and signal logic frozen.
-- Run a narrow local-only ML-admission probe before any broader ML reopening.
+- Preserve the frozen V655A soft-mass candidate stream, V655B amplitude-aware daily fold, V656 transition derivations, V657 sign-aware threshold semantics, and V658 blocked admission result.
+- Change only the evaluation sample.
+- Replicate the exact V657 winning contract on a disjoint contiguous post-selection block before any broader ML reopening.
+- Keep the mission strictly non-ML.
 
 ## 2. Canonical Spec
 
 Primary task-level implementation authority:
 
-- `audit/v658_negative_tail_hazard_admission_probe.md`
+- `audit/v659_fixed_contract_replication_audit.md`
+- `audit/v658_h1_ml_admission_probe_block_evidence.md`
 - `audit/v657_h1_sign_aware_threshold_pass_evidence.md`
 - `audit/v657_sign_aware_threshold_hazard_audit.md`
-- `audit/v656_h1_transition_event_study_block_evidence.md`
-- `handover/ai-direct/entries/20260310_084200_v658_negative_tail_hazard_admission_probe_spec_draft.md`
-- `handover/ai-direct/entries/20260310_092918_v658_spec_gemini_pass.md`
-- `handover/ai-direct/entries/20260310_093000_v658_negative_tail_hazard_admission_mission_open.md`
+- `handover/ai-direct/entries/20260310_111517_v659_fixed_contract_replication_audit_spec_draft.md`
+- `handover/ai-direct/entries/20260310_111755_v659_spec_gemini_pass.md`
+- `handover/ai-direct/entries/20260310_113335_v659_code_delta_gemini_pass.md`
+- `handover/ai-direct/entries/20260310_113349_v659_fixed_contract_replication_mission_open.md`
 
 Supporting context:
 
@@ -31,7 +32,7 @@ Supporting context:
 - `tools/forge_campaign_state.py`
 - `tools/run_campaign_transition_event_study.py`
 - `tools/run_campaign_sign_aware_threshold_audit.py`
-- `tools/run_campaign_ml_admission_probe.py`
+- `tools/run_campaign_fixed_contract_replication_audit.py`
 
 If the canonical spec conflicts with `OMEGA_CONSTITUTION.md`, escalate to the Commander.
 
@@ -39,41 +40,41 @@ If the canonical spec conflicts with `OMEGA_CONSTITUTION.md`, escalate to the Co
 
 Writable files:
 
-- `tools/run_campaign_ml_admission_probe.py`
-- `tests/test_campaign_ml_admission_probe.py`
+- `tools/run_campaign_fixed_contract_replication_audit.py`
+- `tests/test_campaign_fixed_contract_replication_audit.py`
 - `handover/ops/ACTIVE_MISSION_CHARTER.md`
 - `handover/ops/ACTIVE_PROJECTS.md`
 - `handover/ai-direct/LATEST.md`
 - `handover/ai-direct/entries/*`
 - `handover/BOARD.md`
 - `audit/README.md`
-- `audit/v657_*`
+- `audit/v659_*`
 
 Read-only but relevant files:
 
-- `tools/run_campaign_event_study.py`
+- `tools/forge_campaign_state.py`
 - `tools/run_campaign_transition_event_study.py`
 - `tools/run_campaign_sign_aware_threshold_audit.py`
-- `tools/forge_campaign_state.py`
 - `omega_core/*`
-- frozen V64 / V643 / V653 / V654 / V655A / V655B / V656 / V657 audit canon
-- frozen V655B / V656 / V657 runtime evidence
+- frozen V64 / V643 / V653 / V654 / V655A / V655B / V656 / V657 / V658 audit canon
+- frozen V655B / V657 / V658 runtime evidence
 
-Explicitly out of scope before the admission probe passes:
+Explicitly out of scope before V659 passes:
 
 - reopening Path A
 - any Vertex / GCP launch
-- any Optuna or hyperparameter sweep
+- any learner / Optuna / hyperparameter sweep
 - `2025` / `2026-01` holdout consumption
-- changing the mathematical meaning of the frozen daily spine / label / barrier semantics
-- changing the same-sign pulse compression logic
-- changing the V655A soft-mass candidate stream
-- changing the V655B amplitude-aware daily fold
+- changing forge math
+- changing daily spine semantics
+- changing label or barrier semantics
+- changing same-sign pulse compression
+- changing the V655A candidate stream
+- changing the V655B amplitude-aware fold
 - changing the V656 transition derivation formulas
 - changing the V657 threshold semantics
-- changing forge math
-- changing `omega_core/*` math core unless a later truth-first escalation is explicitly opened
-- opening broader ML before V658 beats both constant-baseline logloss and raw same-count baseline economics
+- changing the V658 admission contract
+- opening broader ML before fixed-contract replication passes
 
 ## 4. Roles
 
@@ -86,47 +87,51 @@ Commander:
 Formula Integrity Auditor:
 
 - engine:
-  - `gemini -p`
+  - direct `/usr/bin/gemini`
 - model rule:
-  - default `gemini 3.1 pro preview` only
+  - `gemini 3.1 pro preview` only
 - responsibility:
-  - audit every formula-bearing diff against the frozen V658 override
+  - audit every formula-bearing diff against the frozen V659 authority
 
-Admission Probe Engineer:
-
-- responsibility:
-  - implement the fixed admitted-set learner without changing forge or signals
-
-Leakage Auditor:
+Replication Window Auditor:
 
 - responsibility:
-  - verify admitted-set-only training
-  - verify chronological forward folds
-  - verify raw same-count baseline is computed inside the admitted set only
+  - prove the selected replication window is contiguous enough operationally
+  - prove it does not overlap the H1 2023 selection slice
 
-Distribution Auditor:
+Campaign Forge Reuse Engineer:
 
 - responsibility:
-  - verify admission-mask coverage
-  - verify fold coverage and label balance
-  - verify model-vs-raw selection comparisons are valid
+  - rerun unchanged forge math on the replication block only
+
+Sign-Aware Evaluator Engineer:
+
+- responsibility:
+  - reuse the frozen V657 evaluator semantics on the fixed contract only
+
+Coverage Auditor:
+
+- responsibility:
+  - verify scored-date coverage
+  - verify threshold counts tighten monotonically
+  - verify strongest-threshold baseline comparisons
 
 Runtime Orchestrator:
 
 - responsibility:
   - keep outputs isolated
-  - enforce local-only / no-cloud / no-holdout sequencing
-  - use polling agents instead of watchdog/supervisor programs
+  - enforce local-only / no-ML / no-cloud sequencing
+  - monitor by actual process and artifact evidence only
 
 ML Readiness Gatekeeper:
 
 - responsibility:
-  - refuse any broader ML reopening unless V658 passes the narrow admission probe
+  - keep broader ML / Vertex / holdout closed unless V659 passes
 
 ## 5. Acceptance Criteria
 
-- V658 mission-open authority exists in handover
-- the active charter explicitly freezes the V658 single-axis repair boundary
+- V659 mission-open authority exists in handover
+- the active charter explicitly freezes the V659 single-axis repair boundary
 - implementation preserves:
   - daily spine
   - tradable return labels
@@ -136,63 +141,57 @@ ML Readiness Gatekeeper:
   - V656 transition derivations
   - V657 threshold semantics
 - implementation changes only:
-  - the admission protocol
-- admitted-set learner runs before any broader ML work
-- no cloud / holdout steps are opened before the admission probe passes
+  - replication sample
+- no learner / cloud / holdout steps are opened before V659 resolves
 
 ## 6. Runtime Preflight
 
 Required before execution:
 
+- replication block is disjoint from H1 2023 selection slice
+- replication block source coverage is recorded
 - local-only phase ordering
-- fresh isolated V658 output path under the existing V655B runtime authority
+- fresh isolated V659 output path
 - no cloud endpoints
 - no holdout paths
-- no forge rerun
-- no signal rewrite
-- fixed learner only
-- two forward folds only
+- unchanged forge math
+- fixed contract only
 
 ## 7. Fail-Fast Conditions
 
-- stop if any step changes the mathematical meaning of the frozen formulas
-- stop if any step opens broader ML before the admission gate
+- stop if any step changes the mathematical meaning of frozen formulas
+- stop if any step changes signal family, side, or threshold ladder
+- stop if any step opens ML before V659 resolves
 - stop if any step consumes `2025` / `2026-01` holdouts early
-- stop if a required formula-bearing diff has not been audited with `gemini -p`
-- stop if V658 rewrites forge math or signal derivation math
-- stop if V658 searches over signal family, side, horizon, or threshold
-- stop if V658 changes any axis beyond the admission protocol
+- stop if a required formula-bearing diff has not been audited with Gemini 3.1 Pro Preview
+- stop if the replication window overlaps the selection slice
 
 ## 8. Audits Required
 
 Math audit must verify:
 
-- the single change axis is exactly the admission protocol
-- V655B amplitude-aware level families remain intact
-- the V656 transition derivations remain intact
-- the V655A soft-mass candidate stream remains intact
-- the V657 threshold semantics remain intact
-- no forge rewrite occurs
-- label and barrier semantics remain unchanged
+- the single change axis is exactly the evaluation sample
+- V655B amplitude-aware forge semantics remain intact
+- V656 transition derivations remain intact
+- V657 threshold semantics remain intact
+- no learner or objective search is introduced
 
 Runtime audit must verify:
 
-- the admitted set is built only from the fixed V657 contract:
+- the replication block is disjoint from the V657/V658 H1 slice
+- the fixed contract is exactly:
   - `dPsiAmpE_10d`
   - `negative`
-  - `90th` threshold
-- training uses admitted rows only
-- folds are chronological
-- model-vs-raw same-count comparisons are emitted
-- constant-baseline logloss comparison is emitted
+  - `90 / 95 / 97.5`
+- coverage and threshold tightening metrics are emitted
+- negative-side universe baselines are emitted
 
 ## 9. Definition of Done
 
-- V658 mission is active in handover
-- first admission-probe code wave is implemented
-- local tests pass
-- first bounded admission probe is recorded
-- a go / no-go verdict for broader ML reopening remains explicit
+- V659 mission is active in handover
+- first replication-block forge is recorded
+- fixed-contract threshold audit on that block is recorded
+- a pass / block verdict is explicit
 - handover updated
 - Commander-only commit/push completed
 
@@ -201,15 +200,9 @@ Runtime audit must verify:
 Record after execution:
 
 - commit hash:
-  - `6603e72`
 - nodes used:
-  - `controller`
-  - `linux1-lx`
+- replication block:
 - output roots:
-  - `audit/runtime/v658_ml_admission_probe_h1_2023_20260310_094420`
 - math audit verdict:
-  - `PASS`
 - runtime audit verdict:
-  - `BLOCK`
-- admission-probe verdict:
-  - `mission_pass=false`
+- fixed-contract replication verdict:

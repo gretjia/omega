@@ -10,6 +10,56 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
 
 ## 2. In-Flight Work
 
+### Project: V659-FIXED-CONTRACT-REPLICATION-AUDIT
+
+- Status: `ACTIVE_REPLICATION_FORGE_PENDING`
+- Hosts: `controller`, target `linux1-lx` for bounded non-ML replication run
+- Goal: keep forge, labels, barriers, V655A candidate stream, V655B amplitude fold, V656 transitions, and V657 threshold semantics frozen while changing only the evaluation sample to a disjoint replication block
+- Audit authority:
+  - `audit/v659_fixed_contract_replication_audit.md`
+- Draft spec:
+  - `handover/ai-direct/entries/20260310_111517_v659_fixed_contract_replication_audit_spec_draft.md`
+- Gemini reviews:
+  - `handover/ai-direct/entries/20260310_111755_v659_spec_gemini_pass.md`
+  - `handover/ai-direct/entries/20260310_113335_v659_code_delta_gemini_pass.md`
+  - verdict:
+    - `PASS`
+- Mission-open authority:
+  - `handover/ai-direct/entries/20260310_113349_v659_fixed_contract_replication_mission_open.md`
+- Locked constraints:
+  - keep `tools/forge_campaign_state.py` frozen
+  - keep daily spine frozen
+  - keep `entry_open_t1`, `excess_ret_t1_to_Hd`, and triple-barrier semantics frozen
+  - keep same-sign pulse compression frozen
+  - keep the V655A soft-mass candidate stream frozen
+  - keep the V655B amplitude-aware daily fold frozen
+  - keep the V656 transition derivation formulas frozen
+  - keep the V657 threshold semantics frozen
+  - keep the V658 blocked admission contract frozen
+  - keep ML / Vertex / holdout closed
+- Fixed replication contract:
+  - signal:
+    - `dPsiAmpE_10d`
+  - side:
+    - `negative`
+  - thresholds:
+    - `90`
+    - `95`
+    - `97.5`
+- Wave-1 replication block:
+  - `20230508 -> 20230927`
+- Source coverage recorded:
+  - `l1_count=73`
+  - `l2_count=101`
+- First-wave implementation:
+  - `tools/run_campaign_fixed_contract_replication_audit.py`
+  - `tests/test_campaign_fixed_contract_replication_audit.py`
+- Local verification:
+  - `20 passed in 0.59s`
+  - `py_compile` passed
+- Next runtime question:
+  - does the exact V657 winning contract replicate outside the H1 2023 selection slice under unchanged sign-aware threshold semantics?
+
 ### Project: V658-NEGATIVE-TAIL-HAZARD-ADMISSION-PROBE
 
 - Status: `LOCAL_ADMISSION_PROBE_BLOCKED_ML_NOT_ADMITTED`
