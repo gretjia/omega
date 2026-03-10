@@ -45,6 +45,75 @@
 ### Entries
 
 <!-- New session debriefs go here. Most recent on top. -->
+#### [2026-03-10 08:35] Agent: Codex | Session: V657 Sign-Aware Threshold Gate Passed
+
+**What I did:**
+- Landed the new audit authority:
+  - `audit/v657_sign_aware_threshold_hazard_audit.md`
+- Wrote the V657 spec and passed it through direct Gemini math audit:
+  - `handover/ai-direct/entries/20260310_081031_v657_sign_aware_threshold_hazard_spec_draft.md`
+  - `handover/ai-direct/entries/20260310_081335_v657_spec_gemini_pass.md`
+- Switched the active charter to V657:
+  - `handover/ops/ACTIVE_MISSION_CHARTER.md`
+- Implemented the evaluator-only tool:
+  - `tools/run_campaign_sign_aware_threshold_audit.py`
+  - `tests/test_campaign_sign_aware_threshold_audit.py`
+- Ran local verification:
+  - `16 passed`
+  - `py_compile` passed
+- Ran a second direct Gemini code-delta audit:
+  - `handover/ai-direct/entries/20260310_082310_v657_code_delta_gemini_pass.md`
+  - verdict:
+    - `PASS`
+- Deployed from a clean worktree to `linux1-lx`.
+- Reused the frozen V655B campaign matrix and ran the bounded V657 sign-aware threshold audit:
+  - `audit/runtime/v657_sign_aware_threshold_h1_2023_20260310_082459`
+- Froze the resulting evidence in:
+  - `audit/v657_h1_sign_aware_threshold_pass_evidence.md`
+  - `handover/ai-direct/entries/20260310_083550_v657_h1_sign_aware_threshold_gate_passed.md`
+
+**What I discovered:**
+- V657 is the first post-V653 evaluator mission that did not end in `BLOCK`.
+- The cleanest passing pair is:
+  - `dPsiAmpE_10d`
+  - `negative`
+  - signed mean excess return tightened:
+    - `0.003238607335437723 -> 0.004486573885058402 -> 0.0079780357263173`
+  - sign-aware hazard win rate tightened:
+    - `0.6266216077815256 -> 0.6455278951688243 -> 0.650444762209468`
+- A second passing pair also exists:
+  - `FreshAmpStar_10d`
+  - `negative`
+- This indicates the remaining utility is more consistent with one-sided signed tails than with unconditional decile sorting.
+
+**What confused me / blocked me:**
+- One sidecar Runtime Watcher child did not return a usable summary inside the timeout window.
+- That did not affect execution correctness because the runtime completed quickly and I polled directly from:
+  - JSON artifact existence
+  - log output
+  - remote process state
+
+**What the next agent should do:**
+- Do not relitigate V657 by changing forge or signal formulas.
+- Treat:
+  - `audit/v657_h1_sign_aware_threshold_pass_evidence.md`
+  as the frozen runtime authority.
+- If the Owner wants to continue, open a new ML-admission mission that is explicitly aligned to the V657 sign-aware semantics instead of the old unconditional decile gate.
+
+**Files I changed:**
+- `audit/v657_sign_aware_threshold_hazard_audit.md` — landed the new external authority.
+- `handover/ai-direct/entries/20260310_081031_v657_sign_aware_threshold_hazard_spec_draft.md` — recorded the V657 spec.
+- `handover/ai-direct/entries/20260310_081335_v657_spec_gemini_pass.md` — recorded the spec-level Gemini pass.
+- `handover/ai-direct/entries/20260310_081400_v657_sign_aware_threshold_hazard_mission_open.md` — recorded mission open.
+- `tools/run_campaign_sign_aware_threshold_audit.py` — added the evaluator-only sign-aware threshold / hazard audit.
+- `tests/test_campaign_sign_aware_threshold_audit.py` — added threshold semantics coverage.
+- `handover/ai-direct/entries/20260310_082310_v657_code_delta_gemini_pass.md` — recorded code-level Gemini pass.
+- `audit/v657_h1_sign_aware_threshold_pass_evidence.md` — froze the runtime pass evidence.
+- `handover/ai-direct/entries/20260310_083550_v657_h1_sign_aware_threshold_gate_passed.md` — recorded the V657 pass checkpoint.
+- `handover/ai-direct/LATEST.md` — updated current operational truth.
+- `handover/ops/ACTIVE_PROJECTS.md` — updated V657 project state.
+- `handover/BOARD.md` — added this debrief.
+
 #### [2026-03-10 06:50] Agent: Codex | Session: V656 Transition Event Study Blocked
 
 **What I did:**

@@ -8,6 +8,34 @@
 
 This file is the single source of current operational truth for all agents.
 
+## Update: 2026-03-10 08:35 UTC
+- **V657 sign-aware threshold / hazard audit passed. The pre-ML evaluator is no longer blocked at unconditional decile monotonicity.**
+- New execution record:
+  - `handover/ai-direct/entries/20260310_083550_v657_h1_sign_aware_threshold_gate_passed.md`
+- New frozen evidence packet:
+  - `audit/v657_h1_sign_aware_threshold_pass_evidence.md`
+- Runtime basis:
+  - reused:
+    - `audit/runtime/v655b_probe_linux_h1_2023_20260310_050315/campaign_matrix.parquet`
+- V657 runtime artifacts:
+  - `audit/runtime/v657_sign_aware_threshold_h1_2023_20260310_082459/threshold_audit.json`
+  - `audit/runtime/v657_sign_aware_threshold_h1_2023_20260310_082459/threshold_audit.out`
+- Cleanest passing pair:
+  - `dPsiAmpE_10d`
+  - `negative`
+  - signed mean excess return:
+    - `90.0 -> 0.003238607335437723`
+    - `95.0 -> 0.004486573885058402`
+    - `97.5 -> 0.0079780357263173`
+  - sign-aware hazard win rate:
+    - `90.0 -> 0.6266216077815256`
+    - `95.0 -> 0.6455278951688243`
+    - `97.5 -> 0.650444762209468`
+- Operational consequence:
+  - V657 has earned the one-sided threshold gate
+  - ML was **not** reopened inside V657
+  - any ML reopening now requires a new mission/spec aligned to the sign-aware semantics
+
 ## Update: 2026-03-10 08:14 UTC
 - **V657 is now the active mission. It changes only evaluator semantics; forge, transitions, labels, and ML closure remain frozen.**
 - New authority:

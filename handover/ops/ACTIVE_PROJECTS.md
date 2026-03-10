@@ -12,7 +12,7 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
 
 ### Project: V657-SIGN-AWARE-THRESHOLD-HAZARD-AUDIT
 
-- Status: `SPEC_PASSED_IMPLEMENTED_LOCAL_PENDING_RUNTIME`
+- Status: `THRESHOLD_GATE_PASSED_ML_ADMISSION_REVIEW_PENDING`
 - Hosts: `controller`, target `linux1-lx` for bounded evaluator-only run
 - Goal: keep forge, daily spine, tradable labels, triple-barrier semantics, V655A soft-mass candidate stream, V655B amplitude-aware daily fold, and V656 transition derivations frozen while changing only the pre-ML evaluator semantics to sign-aware one-sided threshold / hazard scoring
 - Audit authority:
@@ -43,10 +43,28 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
 - Runtime basis:
   - reuse:
     - `audit/runtime/v655b_probe_linux_h1_2023_20260310_050315/campaign_matrix.parquet`
-- Current next step:
-  - deploy the evaluator-only tool to `linux1-lx`
-  - run the bounded sign-aware threshold / hazard audit
-  - keep ML closed until the one-sided threshold gate is explicitly earned
+- Runtime root:
+  - `audit/runtime/v657_sign_aware_threshold_h1_2023_20260310_082459`
+- Threshold-audit verdict:
+  - sign-aware one-sided threshold gate passed
+- Cleanest passing pair:
+  - `dPsiAmpE_10d`
+  - `negative`
+  - signed mean excess return tightened:
+    - `0.003238607335437723 -> 0.004486573885058402 -> 0.0079780357263173`
+  - sign-aware hazard win rate tightened:
+    - `0.6266216077815256 -> 0.6455278951688243 -> 0.650444762209468`
+- Secondary passing pair:
+  - `FreshAmpStar_10d`
+  - `negative`
+  - signed mean excess return tightened:
+    - `-0.006762673991573722 -> -0.0013526812097862273 -> 0.009178225074400428`
+  - sign-aware hazard win rate tightened:
+    - `0.5486666666666666 -> 0.5733333333333333 -> 0.5933333333333333`
+- Operational consequence:
+  - V657 no longer blocks at the evaluator stage
+  - ML remains unopened inside this mission
+  - next truthful step is an ML-admission mission aligned to the sign-aware semantics
 
 ### Project: V656-CAMPAIGN-TRANSITION-ENTRY-AUDIT
 
