@@ -8,6 +8,42 @@ OMEGA represents the convergence of **Universal Market Physics** (Sato 2025) and
 - **内存/吞吐换轨**：禁用 `to_dicts()` 行级展开；核心算子张量化/向量化；仅保留严格因果的轻量 IIR 递推。
 - **分布式执行换轨**：Mac 作为 **Controller（代码与配置权威）**；Windows1 + Linux 作为 **Workers（只拉代码、跑 framing）**；原始 `.7z` 数据不进 Git。
 
+## 当前权威状态（2026-03-10）
+
+这份根目录 `README.md` 仍保留大量历史架构说明，但**当前 live truth 不应从这里单独推断**。进入仓库后，请优先按下面顺序读：
+
+1. `AGENTS.md`
+2. `handover/README.md`
+3. `OMEGA_CONSTITUTION.md`
+4. `handover/ai-direct/LATEST.md`
+5. `handover/ops/ACTIVE_MISSION_CHARTER.md`
+6. `handover/ops/ACTIVE_PROJECTS.md`
+
+当前系统状态已经从早期 `v63/v64` 的“全截面 ranker / broad ML reopen”假设，收敛到更窄的 campaign-state 审计链：
+
+- `V657` 证明：
+  - 某些 OMEGA campaign-state 信号在 **one-sided, sign-aware threshold/hazard** 语义下具备下游经济效用。
+- `V658` 证明：
+  - 在固定 admitted set 内，窄 ML probe 仍**没有**打赢 constant-baseline logloss，因此 broader ML 不得重开。
+- `V659` 证明：
+  - 固定赢家 contract 在 disjoint replication block 上仍有局部 utility，但**未**满足冻结的 return-tightening replication gate。
+- `V660` 证明：
+  - 按月分段后也**没有**拿到足够强的 segmented replication pass。
+
+截至当前：
+
+- broad ML / Vertex / holdout **继续关闭**
+- 当前 frontier 是 **non-ML campaign-state replication / evaluator truth-finding**
+- 所有最终结论都以 `handover/ai-direct/LATEST.md` 和对应 `audit/*.md` 证据包为准
+
+如果你只是想知道“现在该看哪里”，不要直接从下面的历史章节开始推断当前策略状态；先看：
+
+- `handover/ai-direct/LATEST.md`
+- `audit/v657_h1_sign_aware_threshold_pass_evidence.md`
+- `audit/v658_h1_ml_admission_probe_block_evidence.md`
+- `audit/v659_replication_block_evidence.md`
+- `audit/v660_segmented_replication_block_evidence.md`
+
 ## 今日会话交接索引（v63 审计）
 
 - 事实汇总条目：`handover/ai-direct/entries/20260305_142336_v63_training_backtest_alignment_audit.md`
