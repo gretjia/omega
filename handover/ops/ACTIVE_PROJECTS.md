@@ -10,6 +10,47 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
 
 ## 2. In-Flight Work
 
+### Project: V660-REGIME-SEGMENTED-REPLICATION-AUDIT
+
+- Status: `ACTIVE_SEGMENTED_AUDIT_PENDING`
+- Hosts: `controller`, target `linux1-lx` for bounded non-ML segmented audit
+- Goal: keep forge, labels, barriers, V655A candidate stream, V655B amplitude fold, V656 transitions, V657 threshold semantics, and the frozen V659 replication block fixed while changing only the sample partition into deterministic month segments
+- Audit authority:
+  - `audit/v660_regime_segmented_replication_audit.md`
+- Draft spec:
+  - `handover/ai-direct/entries/20260310_171500_v660_regime_segmented_replication_spec_draft.md`
+- Gemini review:
+  - `handover/ai-direct/entries/20260310_174841_v660_spec_gemini_pass.md`
+  - `handover/ai-direct/entries/20260310_175353_v660_code_delta_gemini_pass.md`
+  - verdict:
+    - `PASS`
+- Mission-open authority:
+  - `handover/ai-direct/entries/20260310_175353_v660_regime_segmented_mission_open.md`
+- Locked constraints:
+  - keep `tools/forge_campaign_state.py` frozen
+  - keep daily spine frozen
+  - keep `entry_open_t1`, `excess_ret_t1_to_Hd`, and triple-barrier semantics frozen
+  - keep same-sign pulse compression frozen
+  - keep the V655A soft-mass candidate stream frozen
+  - keep the V655B amplitude-aware daily fold frozen
+  - keep the V656 transition derivation formulas frozen
+  - keep the V657 threshold semantics frozen
+  - keep the V658 blocked admission contract frozen
+  - keep the V659 fixed contract frozen
+  - keep the frozen V659 replication block frozen
+  - keep ML / Vertex / holdout closed
+- Frozen runtime basis:
+  - `audit/runtime/v659_replication_linux_20230508_20230927_20260310_114408/campaign_matrix.parquet`
+- First-wave implementation:
+  - `tools/run_campaign_segmented_replication_audit.py`
+  - `tests/test_campaign_segmented_replication_audit.py`
+- Local verification:
+  - `9 passed in 0.35s`
+  - `py_compile` passed
+- Operational consequence:
+  - next step is month-segment audit on the frozen V659 replication matrix
+  - broader ML / Vertex / holdout remain closed
+
 ### Project: V659-FIXED-CONTRACT-REPLICATION-AUDIT
 
 - Status: `REPLICATION_AUDIT_BLOCKED_ML_NOT_ADMITTED`

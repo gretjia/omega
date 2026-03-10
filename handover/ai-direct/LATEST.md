@@ -8,6 +8,30 @@
 
 This file is the single source of current operational truth for all agents.
 
+## Update: 2026-03-10 17:53 UTC
+- **V660 is now the active mission. It remains non-ML and changes only the sample partition inside the frozen V659 replication block.**
+- New authority:
+  - `audit/v660_regime_segmented_replication_audit.md`
+- New spec:
+  - `handover/ai-direct/entries/20260310_171500_v660_regime_segmented_replication_spec_draft.md`
+- Gemini spec audit:
+  - `handover/ai-direct/entries/20260310_174841_v660_spec_gemini_pass.md`
+  - verdict:
+    - `PASS`
+- Gemini code-delta audit:
+  - `handover/ai-direct/entries/20260310_175353_v660_code_delta_gemini_pass.md`
+  - verdict:
+    - `PASS`
+- Mission-open authority:
+  - `handover/ai-direct/entries/20260310_175353_v660_regime_segmented_mission_open.md`
+- Frozen runtime basis:
+  - `audit/runtime/v659_replication_linux_20230508_20230927_20260310_114408/campaign_matrix.parquet`
+- Single allowed change axis:
+  - deterministic calendar-month segmentation of the V659 replication sample
+- Operational consequence:
+  - forge, labels, barriers, signal family, side, threshold ladder, and ML closure remain frozen
+  - next step is segmented non-ML audit on the frozen V659 matrix
+
 ## Update: 2026-03-10 17:09 UTC
 - **V659 fixed-contract replication audit completed and remained blocked.**
 - New execution record:

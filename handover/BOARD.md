@@ -45,6 +45,63 @@
 ### Entries
 
 <!-- New session debriefs go here. Most recent on top. -->
+#### [2026-03-10 17:53] Agent: Codex | Session: V660 Regime-Segmented Replication Mission Open
+
+**What I did:**
+- Landed the new commander audit authority:
+  - `audit/v660_regime_segmented_replication_audit.md`
+- Wrote the V660 spec and passed it through direct Gemini math audit:
+  - `handover/ai-direct/entries/20260310_171500_v660_regime_segmented_replication_spec_draft.md`
+  - `handover/ai-direct/entries/20260310_174841_v660_spec_gemini_pass.md`
+- Implemented the month-segment audit wrapper:
+  - `tools/run_campaign_segmented_replication_audit.py`
+  - `tests/test_campaign_segmented_replication_audit.py`
+- Ran local verification:
+  - `9 passed`
+  - `py_compile` passed
+- Ran a second direct Gemini code-delta audit:
+  - `handover/ai-direct/entries/20260310_175353_v660_code_delta_gemini_pass.md`
+  - verdict:
+    - `PASS`
+- Switched the active charter to V660:
+  - `handover/ops/ACTIVE_MISSION_CHARTER.md`
+- Recorded mission-open authority:
+  - `handover/ai-direct/entries/20260310_175353_v660_regime_segmented_mission_open.md`
+
+**What I discovered:**
+- The strongest remaining narrow repair axis after V659 is not another evaluator rewrite.
+- Multi-agent review and Gemini both converged on:
+  - keep the fixed V659 contract frozen
+  - keep the V659 replication matrix frozen
+  - change only the evaluation-sample partition into deterministic month segments
+- Gemini caught one real drift during implementation:
+  - I initially inherited V659's `40`-date block coverage into month segments
+  - that would have made every month impossible to pass
+  - I fixed it by using the V660 segment eligibility rule (`>= 10` scored dates per threshold) plus the unchanged V659 shape checks
+
+**What confused me / blocked me:**
+- One existing child agent never returned a replication-window summary in time.
+- That did not affect correctness because the next mission no longer needs a new window; it reuses the frozen V659 matrix and changes only segmentation.
+
+**What the next agent should do:**
+- Commit only the V660 mission-open authority, code, tests, and doc updates.
+- Deploy from a clean worktree.
+- Run the segmented audit on:
+  - `audit/runtime/v659_replication_linux_20230508_20230927_20260310_114408/campaign_matrix.parquet`
+- Keep broader ML / Vertex / holdout closed until V660 resolves.
+
+**Files I changed:**
+- `audit/v660_regime_segmented_replication_audit.md` — landed the new commander audit authority.
+- `handover/ai-direct/entries/20260310_171500_v660_regime_segmented_replication_spec_draft.md` — recorded the V660 spec.
+- `handover/ai-direct/entries/20260310_175353_v660_code_delta_gemini_pass.md` — recorded the code-level Gemini pass.
+- `handover/ai-direct/entries/20260310_175353_v660_regime_segmented_mission_open.md` — recorded mission open.
+- `tools/run_campaign_segmented_replication_audit.py` — added the month-segment wrapper over frozen V659 logic.
+- `tests/test_campaign_segmented_replication_audit.py` — added segmentation and pass-logic coverage.
+- `handover/ai-direct/LATEST.md` — updated current operational truth.
+- `handover/ops/ACTIVE_MISSION_CHARTER.md` — switched to V660.
+- `handover/ops/ACTIVE_PROJECTS.md` — updated V660 project state.
+- `handover/BOARD.md` — added this debrief.
+
 #### [2026-03-10 17:09] Agent: Codex | Session: V659 Fixed-Contract Replication Audit Blocked
 
 **What I did:**
