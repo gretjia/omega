@@ -39,7 +39,7 @@ DEFAULT_WINDOW_LEN = int(L2PipelineConfig().epiplexity.min_trace_len)
 
 
 def _log(msg: str) -> None:
-    print(f"[V655A] {msg}", flush=True)
+    print(f"[V655B] {msg}", flush=True)
 
 
 def _parse_years(raw: str | None) -> set[str] | None:
@@ -395,8 +395,12 @@ def _pulse_compress_and_aggregate_daily(candidates: pl.DataFrame, pulse_min_gap:
                 "pure_date": pl.Utf8,
                 "F_epi": pl.Float64,
                 "A_epi": pl.Float64,
+                "F_epi_amp": pl.Float64,
+                "A_epi_amp": pl.Float64,
                 "F_topo": pl.Float64,
                 "A_topo": pl.Float64,
+                "F_topo_amp": pl.Float64,
+                "A_topo_amp": pl.Float64,
                 "F_phase": pl.Float64,
                 "A_phase": pl.Float64,
                 "pulse_count": pl.Int64,
@@ -424,8 +428,12 @@ def _pulse_compress_and_aggregate_daily(candidates: pl.DataFrame, pulse_min_gap:
             [
                 (pl.col("E") * sign_phi).sum().alias("F_epi"),
                 pl.col("E").sum().alias("A_epi"),
+                (pl.col("E") * pl.col("Phi")).sum().alias("F_epi_amp"),
+                (pl.col("E") * pl.col("Phi").abs()).sum().alias("A_epi_amp"),
                 (pl.col("T") * sign_phi).sum().alias("F_topo"),
                 pl.col("T").sum().alias("A_topo"),
+                (pl.col("T") * pl.col("Phi")).sum().alias("F_topo_amp"),
+                (pl.col("T") * pl.col("Phi").abs()).sum().alias("A_topo_amp"),
                 pl.col("Phi").sum().alias("F_phase"),
                 pl.col("Phi").abs().sum().alias("A_phase"),
                 pl.len().alias("pulse_count"),
@@ -507,8 +515,12 @@ def build_campaign_state_frame(
         "day_topo_integral": 0.0,
         "F_epi": 0.0,
         "A_epi": 0.0,
+        "F_epi_amp": 0.0,
+        "A_epi_amp": 0.0,
         "F_topo": 0.0,
         "A_topo": 0.0,
+        "F_topo_amp": 0.0,
+        "A_topo_amp": 0.0,
         "F_phase": 0.0,
         "A_phase": 0.0,
         "pulse_count": 0,
@@ -529,8 +541,12 @@ def build_campaign_state_frame(
                 pl.col("day_topo_integral").fill_null(0.0).fill_nan(0.0),
                 pl.col("F_epi").fill_null(0.0).fill_nan(0.0),
                 pl.col("A_epi").fill_null(0.0).fill_nan(0.0),
+                pl.col("F_epi_amp").fill_null(0.0).fill_nan(0.0),
+                pl.col("A_epi_amp").fill_null(0.0).fill_nan(0.0),
                 pl.col("F_topo").fill_null(0.0).fill_nan(0.0),
                 pl.col("A_topo").fill_null(0.0).fill_nan(0.0),
+                pl.col("F_topo_amp").fill_null(0.0).fill_nan(0.0),
+                pl.col("A_topo_amp").fill_null(0.0).fill_nan(0.0),
                 pl.col("F_phase").fill_null(0.0).fill_nan(0.0),
                 pl.col("A_phase").fill_null(0.0).fill_nan(0.0),
                 pl.col("pulse_count").fill_null(0).cast(pl.Int64, strict=False),
@@ -598,6 +614,22 @@ def build_campaign_state_frame(
                 .ewm_mean(alpha=alpha, adjust=False, ignore_nulls=False)
                 .over("symbol")
                 .alias(f"V_phase_{tau}d"),
+                pl.col("F_epi_amp")
+                .ewm_mean(alpha=alpha, adjust=False, ignore_nulls=False)
+                .over("symbol")
+                .alias(f"S_epi_amp_{tau}d"),
+                pl.col("A_epi_amp")
+                .ewm_mean(alpha=alpha, adjust=False, ignore_nulls=False)
+                .over("symbol")
+                .alias(f"V_epi_amp_{tau}d"),
+                pl.col("F_topo_amp")
+                .ewm_mean(alpha=alpha, adjust=False, ignore_nulls=False)
+                .over("symbol")
+                .alias(f"S_topo_amp_{tau}d"),
+                pl.col("A_topo_amp")
+                .ewm_mean(alpha=alpha, adjust=False, ignore_nulls=False)
+                .over("symbol")
+                .alias(f"V_topo_amp_{tau}d"),
             ]
         )
         raw_label_exprs.append(
@@ -616,11 +648,18 @@ def build_campaign_state_frame(
                 (pl.col(f"S_epi_{tau}d").abs() / (pl.col(f"V_epi_{tau}d") + float(eps))).alias(f"OmegaE_{tau}d"),
                 (pl.col(f"S_topo_{tau}d").abs() / (pl.col(f"V_topo_{tau}d") + float(eps))).alias(f"OmegaT_{tau}d"),
                 (pl.col(f"S_phase_{tau}d").abs() / (pl.col(f"V_phase_{tau}d") + float(eps))).alias(f"OmegaPhase_{tau}d"),
+                (pl.col(f"S_epi_amp_{tau}d").abs() / (pl.col(f"V_epi_amp_{tau}d") + float(eps))).alias(f"OmegaAmpE_{tau}d"),
+                (pl.col(f"S_topo_amp_{tau}d").abs() / (pl.col(f"V_topo_amp_{tau}d") + float(eps))).alias(f"OmegaAmpT_{tau}d"),
                 pl.min_horizontal(
                     pl.col(f"S_epi_{tau}d").abs() / (pl.col(f"V_epi_{tau}d") + float(eps)),
                     pl.col(f"S_topo_{tau}d").abs() / (pl.col(f"V_topo_{tau}d") + float(eps)),
                     pl.col(f"S_phase_{tau}d").abs() / (pl.col(f"V_phase_{tau}d") + float(eps)),
                 ).alias(f"OmegaStar_{tau}d"),
+                pl.min_horizontal(
+                    pl.col(f"S_epi_amp_{tau}d").abs() / (pl.col(f"V_epi_amp_{tau}d") + float(eps)),
+                    pl.col(f"S_topo_amp_{tau}d").abs() / (pl.col(f"V_topo_amp_{tau}d") + float(eps)),
+                    pl.col(f"S_phase_{tau}d").abs() / (pl.col(f"V_phase_{tau}d") + float(eps)),
+                ).alias(f"OmegaAmpStar_{tau}d"),
             ]
         )
         psi_exprs.append((pl.col(f"S_{tau}d") * pl.col(f"Omega_{tau}d")).alias(f"Psi_{tau}d"))
@@ -628,6 +667,8 @@ def build_campaign_state_frame(
             [
                 (pl.col(f"S_epi_{tau}d") * pl.col(f"OmegaE_{tau}d")).alias(f"PsiE_{tau}d"),
                 (pl.col(f"S_topo_{tau}d") * pl.col(f"OmegaT_{tau}d")).alias(f"PsiT_{tau}d"),
+                (pl.col(f"S_epi_amp_{tau}d") * pl.col(f"OmegaAmpE_{tau}d")).alias(f"PsiAmpE_{tau}d"),
+                (pl.col(f"S_topo_amp_{tau}d") * pl.col(f"OmegaAmpT_{tau}d")).alias(f"PsiAmpT_{tau}d"),
                 (
                     pl.when(pl.col(f"S_phase_{tau}d") > 0.0)
                     .then(pl.lit(1.0))
@@ -637,6 +678,15 @@ def build_campaign_state_frame(
                     * (pl.col(f"S_epi_{tau}d") * pl.col(f"S_topo_{tau}d")).abs().sqrt()
                     * pl.col(f"OmegaStar_{tau}d")
                 ).alias(f"PsiStar_{tau}d"),
+                (
+                    pl.when(pl.col(f"S_phase_{tau}d") > 0.0)
+                    .then(pl.lit(1.0))
+                    .when(pl.col(f"S_phase_{tau}d") < 0.0)
+                    .then(pl.lit(-1.0))
+                    .otherwise(pl.lit(0.0))
+                    * (pl.col(f"S_epi_amp_{tau}d") * pl.col(f"S_topo_amp_{tau}d")).abs().sqrt()
+                    * pl.col(f"OmegaAmpStar_{tau}d")
+                ).alias(f"PsiAmpStar_{tau}d"),
             ]
         )
 
@@ -791,7 +841,7 @@ def forge_campaign_state(
 
 
 def _parse_args() -> argparse.Namespace:
-    ap = argparse.ArgumentParser(description="Forge V655A campaign-state matrix from L1 daily spine plus Stage2 pulse source.")
+    ap = argparse.ArgumentParser(description="Forge V655B campaign-state matrix from L1 daily spine plus Stage2 pulse source.")
     ap.add_argument("--l1-input-pattern", action="append", required=True, help="Glob pattern(s) for raw L1 daily-spine source parquet files.")
     ap.add_argument("--l2-input-pattern", action="append", required=True, help="Glob pattern(s) for Stage2 pulse-source parquet files.")
     ap.add_argument("--output-path", required=True, help="Output campaign-state parquet path.")

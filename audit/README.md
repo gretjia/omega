@@ -24,6 +24,9 @@ For the V64 line, read in this order:
 16. [v653_h1_event_study_block_evidence.md](/home/zephryj/projects/omega/audit/v653_h1_event_study_block_evidence.md)
 17. [v654_identity_preserving_pulse_compression.md](/home/zephryj/projects/omega/audit/v654_identity_preserving_pulse_compression.md)
 18. [v654_h1_psi_event_study_block_evidence.md](/home/zephryj/projects/omega/audit/v654_h1_psi_event_study_block_evidence.md)
+19. [v655_soft_mass_campaign_accumulation.md](/home/zephryj/projects/omega/audit/v655_soft_mass_campaign_accumulation.md)
+20. [v655a_h1_soft_mass_block_evidence.md](/home/zephryj/projects/omega/audit/v655a_h1_soft_mass_block_evidence.md)
+21. [v655b_phase_amplitude_daily_fold.md](/home/zephryj/projects/omega/audit/v655b_phase_amplitude_daily_fold.md)
 
 ## Purpose of each file
 
@@ -45,3 +48,6 @@ For the V64 line, read in this order:
 - [v653_h1_event_study_block_evidence.md](/home/zephryj/projects/omega/audit/v653_h1_event_study_block_evidence.md): evidence-only packet for the widened H1 V653 forge and pure event-study block, with no opinions or next-step proposals
 - [v654_identity_preserving_pulse_compression.md](/home/zephryj/projects/omega/audit/v654_identity_preserving_pulse_compression.md): execution-grade override for the next repair axis, freezing daily spine / labels / event-study gates while moving the only allowed change to identity-preserving pulse compression inside the intraday-to-symbol-day aggregation path
 - [v654_h1_psi_event_study_block_evidence.md](/home/zephryj/projects/omega/audit/v654_h1_psi_event_study_block_evidence.md): frozen evidence packet for the widened V654 H1 forge plus primary `Psi`-family pure event-study block, recording only runtime facts and the exact gate failure
+- [v655_soft_mass_campaign_accumulation.md](/home/zephryj/projects/omega/audit/v655_soft_mass_campaign_accumulation.md): execution-grade override that widens campaign accumulation from trigger-level `is_signal` gating to soft physics-valid gating while freezing daily spine, labels, pulse compression, and event-study semantics
+- [v655a_h1_soft_mass_block_evidence.md](/home/zephryj/projects/omega/audit/v655a_h1_soft_mass_block_evidence.md): frozen runtime evidence showing that V655A materially increased candidate mass and preserved zero-fraction elimination but still failed the unchanged monotonic event-study gate
+- [v655b_phase_amplitude_daily_fold.md](/home/zephryj/projects/omega/audit/v655b_phase_amplitude_daily_fold.md): frozen external audit authority for the contingent V655B fallback, changing only the `E` / `T` daily fold from sign-only projection to phase-amplitude projection while preserving the V655A soft-mass stream and pre-ML gate

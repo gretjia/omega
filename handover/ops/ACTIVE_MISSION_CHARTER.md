@@ -1,29 +1,31 @@
 # OMEGA Active Mission Charter
 
 Status: In Progress
-Task Name: V655A Soft-Mass Campaign Accumulation Audit
+Task Name: V655B Phase-Amplitude Daily Fold
 Owner: Human Owner
 Commander: Codex
 Date: 2026-03-10
 
 ## 1. Objective
 
-- Preserve the corrected V654 daily spine, tradable label stack, same-sign pulse compression, and unchanged pure event-study gate.
-- Repair only the campaign accumulation candidate stream.
-- Widen the candidate stream from hard `is_signal` gating to soft physics-valid gating.
+- Preserve the corrected V655A daily spine, tradable label stack, soft-mass candidate stream, same-sign pulse compression, and unchanged pure event-study gate.
+- Repair only the daily fold for the `E` and `T` channels.
+- Replace sign-only directional projection with phase-amplitude directional projection while leaving the rest of the campaign-state pipeline frozen.
 - Re-run pure event study before any ML reopening.
 
 ## 2. Canonical Spec
 
 Primary task-level implementation authority:
 
+- `audit/v655b_phase_amplitude_daily_fold.md`
+- `audit/v655a_h1_soft_mass_block_evidence.md`
 - `audit/v655_soft_mass_campaign_accumulation.md`
 - `audit/v654_identity_preserving_pulse_compression.md`
 - `audit/v653_fractal_campaign_awakening.md`
 - `audit/v653_identity_preservation_gemini_verdict.md`
-- `handover/ai-direct/entries/20260310_032850_v655a_soft_mass_campaign_accumulation_spec_draft.md`
-- `handover/ai-direct/entries/20260310_033545_v655a_spec_gemini_pass.md`
-- `handover/ai-direct/entries/20260310_033700_v655a_soft_mass_mission_open.md`
+- `handover/ai-direct/entries/20260310_045017_v655b_phase_amplitude_daily_fold_spec_draft.md`
+- `handover/ai-direct/entries/20260310_045808_v655b_spec_gemini_pass.md`
+- `handover/ai-direct/entries/20260310_045900_v655b_phase_amplitude_mission_open.md`
 
 Supporting context:
 
@@ -64,10 +66,10 @@ Explicitly out of scope before the event-study gate passes:
 - `2025` / `2026-01` holdout consumption
 - changing the mathematical meaning of the frozen V654 daily spine / label / barrier semantics
 - changing the same-sign pulse compression logic
-- changing `PsiE_*`, `PsiT_*`, or `PsiStar_*` formulas
+- changing the V655A soft-mass candidate stream
 - changing `tools/run_campaign_event_study.py` gate semantics
 - changing `omega_core/*` math core unless a later truth-first escalation is explicitly opened
-- opening V655B before a separate explicit authority exists
+- opening ML before a V655B amplitude-aware family earns the pure event-study gate
 
 ## 4. Roles
 
@@ -84,17 +86,17 @@ Formula Integrity Auditor:
 - model rule:
   - default `gemini 3.1 pro preview` only
 - responsibility:
-  - audit every formula-bearing diff against the frozen V655A override
+  - audit every formula-bearing diff against the frozen V655B override
 
 Campaign Forge Engineer:
 
 - responsibility:
-  - implement the soft-mass candidate-stream widening without changing the V654 fold
+  - implement the amplitude-aware fold without changing the daily spine, labels, candidate stream, or same-sign compression
 
-Candidate-Flow Auditor:
+Fold-Delta Auditor:
 
 - responsibility:
-  - compare `raw_candidates` and `kept_pulses` against the frozen V654 H1 baseline
+  - verify the only mathematical delta is the `E` / `T` phase-amplitude fold
 
 Distribution Auditor:
 
@@ -122,21 +124,23 @@ ML Readiness Gatekeeper:
 
 ## 5. Acceptance Criteria
 
-- V655A mission-open authority exists in handover
-- the active charter explicitly freezes the V655A single-axis repair boundary
+- V655B mission-open authority exists in handover
+- the active charter explicitly freezes the V655B single-axis repair boundary
 - forge implementation preserves:
   - daily spine
   - tradable return labels
   - triple-barrier semantics
   - event-study gate
-  - V654 `E/T/Phi` identity
+  - V655A `E/T/Phi` identity
+  - V655A soft-mass candidate stream
   - same-sign pulse compression
   - daily `F_epi/A_epi`, `F_topo/A_topo`, `F_phase/A_phase`
+  - legacy `PsiE_*`, `PsiT_*`, `PsiStar_*`
   - `pulse_count`
   - `pulse_concentration`
-  - `PsiE_*`, `PsiT_*`, `PsiStar_*`
+  - amplitude-aware `PsiAmpE_*`, `PsiAmpT_*`, `PsiAmpStar_*`
 - forge implementation changes only:
-  - the live candidate-stream requirement for `is_signal`
+  - the daily fold for the `E` and `T` channels
 - pure event study runs before any ML work
 - no ML / cloud / holdout steps are opened before the event-study gate
 
@@ -157,14 +161,15 @@ Required before execution:
 - stop if any step consumes `2025` / `2026-01` holdouts early
 - stop if a required formula-bearing diff has not been audited with `gemini -p`
 - stop if the forge silently degrades to unordered or single-channel daily aggregation
-- stop if V655A changes any axis beyond the `is_signal` candidate-stream requirement
+- stop if V655B changes any axis beyond the `E` / `T` phase-amplitude daily fold
 
 ## 8. Audits Required
 
 Math audit must verify:
 
-- the single change axis is exactly the soft-mass candidate stream
+- the single change axis is exactly the phase-amplitude daily fold for `E` / `T`
 - event-level three-channel preservation remains intact
+- the V655A soft-mass candidate stream remains intact
 - pulse-compression semantics remain unchanged
 - cross-day recursion semantics remain unchanged
 - label and barrier semantics remain unchanged
@@ -175,11 +180,11 @@ Runtime audit must verify:
 - daily zero-fill continuity
 - zero-fraction stays `0.0`
 - directional signal families are emitted and scoreable
-- candidate mass rises relative to the frozen V654 H1 baseline
+- amplitude-aware signal families remain non-flat and scoreable under the unchanged gate
 
 ## 9. Definition of Done
 
-- V655A mission is active in handover
+- V655B mission is active in handover
 - first forge code wave is implemented
 - local tests pass
 - first local forge / event-study probe is recorded

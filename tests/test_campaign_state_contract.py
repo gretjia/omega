@@ -73,6 +73,29 @@ def test_opposite_sign_close_peaks_both_survive() -> None:
     assert row["A_phase"] == pytest.approx(2.0)
 
 
+def test_phase_amplitude_daily_fold_uses_phi_magnitude() -> None:
+    candidates = pl.DataFrame(
+        [
+            {"symbol": "AAA", "pure_date": "20240102", "__order_txt": "0001", "__singularity": 4.0, "__sv_sign": 1, "E": 2.0, "T": 1.0, "Phi": 2.0, "__ord": 0},
+            {"symbol": "AAA", "pure_date": "20240102", "__order_txt": "0002", "__singularity": -3.0, "__sv_sign": -1, "E": 1.0, "T": 2.0, "Phi": -0.5, "__ord": 40},
+        ]
+    )
+
+    out = campaign_state._pulse_compress_and_aggregate_daily(candidates, pulse_min_gap=30)
+    row = out.row(0, named=True)
+
+    assert row["F_epi"] == pytest.approx(1.0)
+    assert row["A_epi"] == pytest.approx(3.0)
+    assert row["F_epi_amp"] == pytest.approx(3.5)
+    assert row["A_epi_amp"] == pytest.approx(4.5)
+    assert row["F_topo"] == pytest.approx(-1.0)
+    assert row["A_topo"] == pytest.approx(3.0)
+    assert row["F_topo_amp"] == pytest.approx(1.0)
+    assert row["A_topo_amp"] == pytest.approx(3.0)
+    assert row["F_phase"] == pytest.approx(1.5)
+    assert row["A_phase"] == pytest.approx(2.5)
+
+
 def test_build_campaign_state_frame_zero_fills_no_signal_days() -> None:
     daily_spine = pl.DataFrame(
         [
@@ -138,8 +161,12 @@ def test_day_epi_and_day_topo_flow_into_campaign_state() -> None:
                 "day_topo_integral": 0.0,
                 "F_epi": 2.0,
                 "A_epi": 2.0,
+                "F_epi_amp": 4.0,
+                "A_epi_amp": 4.0,
                 "F_topo": 1.0,
                 "A_topo": 1.0,
+                "F_topo_amp": 1.5,
+                "A_topo_amp": 1.5,
                 "F_phase": 1.0,
                 "A_phase": 1.0,
                 "pulse_count": 1,
@@ -155,6 +182,9 @@ def test_day_epi_and_day_topo_flow_into_campaign_state() -> None:
     assert row["PsiE_1d"] > 0.0
     assert row["PsiT_1d"] > 0.0
     assert row["PsiStar_1d"] > 0.0
+    assert row["PsiAmpE_1d"] > 0.0
+    assert row["PsiAmpT_1d"] > 0.0
+    assert row["PsiAmpStar_1d"] > 0.0
 
 
 def test_missing_intraday_order_key_fails_fast(tmp_path: Path) -> None:

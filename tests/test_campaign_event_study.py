@@ -16,6 +16,8 @@ def test_new_signal_names_map_to_correct_horizon_labels() -> None:
     assert event_study._signal_to_label_columns("PsiE_10d") == ("excess_ret_t1_to_10d", "barrier_10d")
     assert event_study._signal_to_label_columns("PsiT_20d") == ("excess_ret_t1_to_20d", "barrier_20d")
     assert event_study._signal_to_label_columns("PsiStar_5d") == ("excess_ret_t1_to_5d", "barrier_5d")
+    assert event_study._signal_to_label_columns("PsiAmpE_10d") == ("excess_ret_t1_to_10d", "barrier_10d")
+    assert event_study._signal_to_label_columns("PsiAmpStar_20d") == ("excess_ret_t1_to_20d", "barrier_20d")
 
 
 def test_event_study_detects_positive_decile_spread() -> None:
