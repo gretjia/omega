@@ -12,6 +12,12 @@ if str(REPO_ROOT) not in sys.path:
 from tools import run_campaign_event_study as event_study
 
 
+def test_new_signal_names_map_to_correct_horizon_labels() -> None:
+    assert event_study._signal_to_label_columns("PsiE_10d") == ("excess_ret_t1_to_10d", "barrier_10d")
+    assert event_study._signal_to_label_columns("PsiT_20d") == ("excess_ret_t1_to_20d", "barrier_20d")
+    assert event_study._signal_to_label_columns("PsiStar_5d") == ("excess_ret_t1_to_5d", "barrier_5d")
+
+
 def test_event_study_detects_positive_decile_spread() -> None:
     rows = []
     for date_idx, pure_date in enumerate(["20240102", "20240103"]):
@@ -39,6 +45,23 @@ def test_event_study_detects_positive_decile_spread() -> None:
     assert summary["date_frac_lt10"] == 0.0
     assert summary["n_rows_before_signal_filter"] == 20
     assert summary["n_rows_after_signal_filter"] == 20
+
+
+def test_monotonic_gate_still_unchanged() -> None:
+    rows = []
+    for pure_date in ["20240102", "20240103"]:
+        for decile in range(1, 11):
+            rows.append(
+                {
+                    "pure_date": pure_date,
+                    "symbol": f"{pure_date}_{decile}",
+                    "PsiE_10d": float(decile),
+                    "excess_ret_t1_to_10d": float(decile) / 100.0 if decile != 6 else 0.0,
+                    "barrier_10d": 1 if decile >= 9 else 0,
+                }
+            )
+    summary = event_study.compute_event_study_for_signal(pl.DataFrame(rows), "PsiE_10d")
+    assert summary["monotonic_non_decreasing"] is False
 
 
 def test_event_study_rejects_missing_columns() -> None:
@@ -109,3 +132,21 @@ def test_event_study_filters_zero_signal_rows_before_deciling() -> None:
     assert summary["n_rows_after_signal_filter"] == 20
     assert summary["n_rows_scored"] == 20
     assert summary["d10_mean_excess_return"] > 0.0
+
+
+def test_psi_star_columns_can_be_scored_without_parser_breakage() -> None:
+    rows = []
+    for pure_date in ["20240102", "20240103"]:
+        for decile in range(1, 11):
+            rows.append(
+                {
+                    "pure_date": pure_date,
+                    "symbol": f"{pure_date}_{decile}",
+                    "PsiStar_10d": float(decile),
+                    "excess_ret_t1_to_10d": float(decile) / 100.0,
+                    "barrier_10d": 1 if decile >= 8 else 0,
+                }
+            )
+    summary = event_study.compute_event_study_for_signal(pl.DataFrame(rows), "PsiStar_10d")
+    assert summary["d10_mean_excess_return"] > 0.0
+    assert summary["monotonic_non_decreasing"] is True

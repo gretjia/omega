@@ -8,6 +8,40 @@
 
 This file is the single source of current operational truth for all agents.
 
+## Update: 2026-03-10 01:40 UTC
+- **V654 is now the active mission, and the first local contract wave has passed.**
+- New audit authority:
+  - `audit/v654_identity_preserving_pulse_compression.md`
+- New spec:
+  - `handover/ai-direct/entries/20260310_012744_v654_identity_preserving_pulse_compression_spec_draft.md`
+- Gemini spec audit:
+  - `handover/ai-direct/entries/20260310_013420_v654_spec_draft_gemini_pass.md`
+  - verdict:
+    - `PASS`
+- Mission-open authority:
+  - `handover/ai-direct/entries/20260310_013500_v654_identity_preserving_pulse_compression_mission_open.md`
+- Single allowed change axis:
+  - `Intraday -> Symbol-Day` aggregation math in `tools/forge_campaign_state.py`
+- Frozen:
+  - daily spine
+  - `entry_open_t1`
+  - `excess_ret_t1_to_Hd`
+  - triple-barrier semantics
+  - event-study gate
+  - ML / Vertex / holdout closure
+- First landed code wave:
+  - `tools/forge_campaign_state.py`
+  - `tests/test_campaign_state_contract.py`
+  - `tests/test_campaign_event_study.py`
+- Local verification:
+  - `python3 -m py_compile` passed
+  - `uv run --with pytest --with polars --with numpy pytest tests/test_campaign_state_contract.py tests/test_campaign_event_study.py -q`
+    - `15 passed in 0.81s`
+- Current next step:
+  - commit + push the V654 wave
+  - deploy to `linux1-lx`
+  - run a bounded V654 forge probe before reopening nothing else
+
 ## Update: 2026-03-09 22:54 UTC
 - **V653 widened H1 forge succeeded, but the pure event-study proof gate is now formally blocked. ML remains closed.**
 - New execution record:

@@ -4,11 +4,52 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
 
 ## 1. Snapshot Metadata
 
-- `updated_at_local`: 2026-03-09 17:42:39 +0000
-- `updated_at_utc`: 2026-03-09 17:42:39 +0000
+- `updated_at_local`: 2026-03-10 01:40:00 +0000
+- `updated_at_utc`: 2026-03-10 01:40:00 +0000
 - `updated_by`: Codex (GPT-5)
 
 ## 2. In-Flight Work
+
+### Project: V654-IDENTITY-PRESERVING-PULSE-COMPRESSION
+
+- Status: `MISSION_OPEN_LOCAL_CONTRACT_PASS_DEPLOY_PENDING`
+- Hosts: `controller`, target `linux1-lx` for first bounded probe
+- Goal: keep V653 daily spine / label / barrier stack frozen while replacing only the intraday-to-symbol-day aggregation math with identity-preserving pulse compression
+- Audit authority:
+  - `audit/v654_identity_preserving_pulse_compression.md`
+- Draft spec:
+  - `handover/ai-direct/entries/20260310_012744_v654_identity_preserving_pulse_compression_spec_draft.md`
+- Gemini review:
+  - `handover/ai-direct/entries/20260310_013420_v654_spec_draft_gemini_pass.md`
+  - verdict:
+    - `PASS`
+- Mission-open authority:
+  - `handover/ai-direct/entries/20260310_013500_v654_identity_preserving_pulse_compression_mission_open.md`
+- Locked constraints:
+  - keep daily spine frozen
+  - keep `entry_open_t1`, `excess_ret_t1_to_Hd`, and triple-barrier semantics frozen
+  - keep event-study gate unchanged
+  - keep ML / Vertex / holdout closed
+  - keep `omega_core/*` math core unchanged in wave 1
+- Current first-wave implementation:
+  - `tools/forge_campaign_state.py`
+    - event-level `E/T/Phi`
+    - same-sign pulse compression
+    - daily `F_epi/A_epi`, `F_topo/A_topo`, `F_phase/A_phase`
+    - `pulse_count`
+    - `pulse_concentration`
+    - `PsiE_*`, `PsiT_*`, `PsiStar_*`
+    - legacy `Psi_*` retained as baseline
+  - tests:
+    - `tests/test_campaign_state_contract.py`
+    - `tests/test_campaign_event_study.py`
+- Local verification:
+  - `python3 -m py_compile` passed
+  - `15 passed in 0.81s`
+- Current next step:
+  - commit + push
+  - deploy to `linux1-lx`
+  - run bounded V654 forge + pure event-study probe
 
 ### Project: V653-FRACTAL-CAMPAIGN-AWAKENING
 
