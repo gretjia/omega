@@ -44,6 +44,76 @@ OMEGA represents the convergence of **Universal Market Physics** (Sato 2025) and
 - `audit/v659_replication_block_evidence.md`
 - `audit/v660_segmented_replication_block_evidence.md`
 
+## 主类目导航（AI Agents 优先看这里）
+
+如果你是新醒来的 agent，不要在仓库里盲搜。先按下面四个主类目定位：
+
+### A. 数学核心看哪里
+
+先看这些文件，它们定义了 OMEGA 的物理身份，而不是某一轮 mission 的临时策略：
+
+- `OMEGA_CONSTITUTION.md`
+- `omega_core/kernel.py`
+- `omega_core/omega_math_core.py`
+- `omega_core/omega_etl.py`
+- `config.py`
+
+如果你要理解 `V64 -> V660` 的数学与审计演化，不要直接从单个 runtime 结果反推；先看：
+
+- `audit/README.md`
+- `audit/v64_audit_evolution.md`
+- `audit/v64.md`
+- `audit/v642.md`
+- `audit/v643.md`
+- `audit/v643_auditor_pass.md`
+
+### B. 当前执行入口看哪里
+
+当前 live frontier 不是 broad ML，而是 campaign-state 的非 ML 审计链。主入口是：
+
+- `tools/forge_campaign_state.py`
+- `tools/run_campaign_event_study.py`
+- `tools/run_campaign_transition_event_study.py`
+- `tools/run_campaign_sign_aware_threshold_audit.py`
+- `tools/run_campaign_fixed_contract_replication_audit.py`
+- `tools/run_campaign_segmented_replication_audit.py`
+- `tools/run_campaign_ml_admission_probe.py`
+
+### C. 当前状态与任务边界看哪里
+
+如果你只想知道“现在项目进行到哪一步”，优先看：
+
+- `handover/ai-direct/LATEST.md`
+- `handover/ops/ACTIVE_MISSION_CHARTER.md`
+- `handover/ops/ACTIVE_PROJECTS.md`
+- `handover/BOARD.md`
+
+### D. 证据类怎么分类
+
+当前证据不要混着读。按下面四层看：
+
+1. **审计总索引**
+   - `audit/README.md`
+   - 用来找到每一轮 authority / evidence packet 在哪里
+2. **版本与 mission authority**
+   - 例如：
+     - `audit/v657_sign_aware_threshold_hazard_audit.md`
+     - `audit/v658_negative_tail_hazard_admission_probe.md`
+     - `audit/v659_fixed_contract_replication_audit.md`
+     - `audit/v660_regime_segmented_replication_audit.md`
+   - 这些文件回答“这一轮允许改什么，不允许改什么”
+3. **冻结结果证据**
+   - 例如：
+     - `audit/v657_h1_sign_aware_threshold_pass_evidence.md`
+     - `audit/v658_h1_ml_admission_probe_block_evidence.md`
+     - `audit/v659_replication_block_evidence.md`
+     - `audit/v660_segmented_replication_block_evidence.md`
+   - 这些文件回答“这一轮最后为什么 pass / block”
+4. **原始 runtime 产物**
+   - `audit/runtime/`
+   - 这里放 `json / out / parquet / meta` 等第一手产物
+   - handover 中的 `handover/ai-direct/entries/*.md` 是这些 runtime 的人类可读摘要，不替代原始产物
+
 ## 今日会话交接索引（v63 审计）
 
 - 事实汇总条目：`handover/ai-direct/entries/20260305_142336_v63_training_backtest_alignment_audit.md`

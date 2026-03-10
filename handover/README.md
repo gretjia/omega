@@ -43,6 +43,80 @@ Therefore:
 - the current task-level source of truth remains `handover/ops/ACTIVE_MISSION_CHARTER.md`
 - the wider project context remains `handover/ops/ACTIVE_PROJECTS.md`
 
+## 1.2 Navigation By Category (for AI agents)
+
+If you are waking up cold, do not read `/handover` as one flat directory. Use these categories:
+
+### A. Current operational truth
+
+- `handover/ai-direct/LATEST.md`
+- `handover/ops/ACTIVE_MISSION_CHARTER.md`
+- `handover/ops/ACTIVE_PROJECTS.md`
+- `handover/BOARD.md`
+
+These answer:
+
+- what is active now
+- what is frozen now
+- what is blocked now
+- what changed most recently
+
+### B. Permanent governance
+
+- `handover/ops/MULTI_AGENT_OPERATING_SYSTEM.md`
+- `handover/ops/CHILD_AGENT_OPERATING_PROFILE.md`
+- `handover/ops/MISSION_CHARTER_TEMPLATE.md`
+- `handover/ops/HOSTS_REGISTRY.yaml`
+
+These answer:
+
+- how AgentOS is structured
+- when to delegate
+- how to open a new mission
+- how to address nodes and deploy safely
+
+### C. Math / audit canon
+
+The math itself is not owned by `/handover`; it lives under the repo root and `/audit`.
+Use these entrypoints:
+
+- `OMEGA_CONSTITUTION.md`
+- `audit/README.md`
+- `audit/v64_audit_evolution.md`
+- `audit/v64.md`
+- `audit/v642.md`
+- `audit/v643.md`
+- `audit/v643_auditor_pass.md`
+
+### D. Evidence classes
+
+The evidence stack is layered. Read in this order:
+
+1. **Authority / override files**
+   - stored under `audit/`
+   - examples:
+     - `audit/v657_sign_aware_threshold_hazard_audit.md`
+     - `audit/v658_negative_tail_hazard_admission_probe.md`
+     - `audit/v659_fixed_contract_replication_audit.md`
+     - `audit/v660_regime_segmented_replication_audit.md`
+2. **Frozen pass/block evidence packets**
+   - also under `audit/`
+   - examples:
+     - `audit/v657_h1_sign_aware_threshold_pass_evidence.md`
+     - `audit/v658_h1_ml_admission_probe_block_evidence.md`
+     - `audit/v659_replication_block_evidence.md`
+     - `audit/v660_segmented_replication_block_evidence.md`
+3. **Session summaries and mission checkpoints**
+   - `handover/ai-direct/entries/`
+4. **Raw runtime artifacts**
+   - `audit/runtime/`
+
+Rule of thumb:
+
+- `audit/*.md` explains the authority and the verdict
+- `handover/ai-direct/entries/*.md` explains what happened in a bounded session
+- `audit/runtime/*` contains the raw machine output
+
 ## 2. Project Identity
 
 | Key | Value |
