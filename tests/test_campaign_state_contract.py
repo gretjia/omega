@@ -184,6 +184,48 @@ def test_missing_intraday_order_key_fails_fast(tmp_path: Path) -> None:
         )
 
 
+def test_soft_mass_candidate_stream_ignores_is_signal_when_disabled(tmp_path: Path) -> None:
+    l2_path = tmp_path / "20240102_feedface.parquet"
+    pl.DataFrame(
+        [
+            {
+                "symbol": "AAA",
+                "date": "20240102",
+                "time_end": "093500000",
+                "singularity_vector": 1.25,
+                "epiplexity": 0.5,
+                "bits_topology": 0.25,
+                "srl_phase": 0.8,
+                "is_signal": False,
+                "is_physics_valid": True,
+            }
+        ]
+    ).write_parquet(l2_path)
+
+    strict = campaign_state._collect_intraday_candidates_from_l2(
+        l2_files=[str(l2_path)],
+        pulse_floor=1e-12,
+        require_is_signal=True,
+        require_is_physics_valid=True,
+        eps=1e-12,
+    )
+    soft = campaign_state._collect_intraday_candidates_from_l2(
+        l2_files=[str(l2_path)],
+        pulse_floor=1e-12,
+        require_is_signal=False,
+        require_is_physics_valid=True,
+        eps=1e-12,
+    )
+
+    assert strict.height == 0
+    assert soft.height == 1
+    row = soft.row(0, named=True)
+    assert row["symbol"] == "AAA"
+    assert row["E"] == pytest.approx(0.5)
+    assert row["T"] == pytest.approx(0.25)
+    assert row["Phi"] == pytest.approx(0.8)
+
+
 def test_zero_fraction_remains_zero_after_v654_forge() -> None:
     daily_spine = pl.DataFrame(
         [

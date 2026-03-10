@@ -39,7 +39,7 @@ DEFAULT_WINDOW_LEN = int(L2PipelineConfig().epiplexity.min_trace_len)
 
 
 def _log(msg: str) -> None:
-    print(f"[V653] {msg}", flush=True)
+    print(f"[V655A] {msg}", flush=True)
 
 
 def _parse_years(raw: str | None) -> set[str] | None:
@@ -791,7 +791,7 @@ def forge_campaign_state(
 
 
 def _parse_args() -> argparse.Namespace:
-    ap = argparse.ArgumentParser(description="Forge V653 campaign-state matrix from L1 daily spine plus Stage2 pulse source.")
+    ap = argparse.ArgumentParser(description="Forge V655A campaign-state matrix from L1 daily spine plus Stage2 pulse source.")
     ap.add_argument("--l1-input-pattern", action="append", required=True, help="Glob pattern(s) for raw L1 daily-spine source parquet files.")
     ap.add_argument("--l2-input-pattern", action="append", required=True, help="Glob pattern(s) for Stage2 pulse-source parquet files.")
     ap.add_argument("--output-path", required=True, help="Output campaign-state parquet path.")
@@ -801,7 +801,7 @@ def _parse_args() -> argparse.Namespace:
     ap.add_argument("--pulse-mode", default="sign_nms", help="Pulse compression mode. Default: sign_nms.")
     ap.add_argument("--pulse-min-gap", type=int, default=DEFAULT_PULSE_MIN_GAP, help="Same-sign pulse suppression gap in intraday bars.")
     ap.add_argument("--pulse-floor", type=float, default=DEFAULT_PULSE_FLOOR, help="Absolute singularity floor used before pulse compression.")
-    ap.add_argument("--require-is-signal", type=int, default=1, help="Require is_signal == 1 before pulse compression. Default: 1.")
+    ap.add_argument("--require-is-signal", type=int, default=0, help="Require is_signal == 1 before pulse compression. Default: 0 for V655A soft-mass accumulation.")
     ap.add_argument("--require-is-physics-valid", type=int, default=1, help="Require is_physics_valid == 1 before pulse compression. Default: 1.")
     return ap.parse_args()
 
