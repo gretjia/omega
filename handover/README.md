@@ -24,6 +24,25 @@ If no mission charter exists for substantial work, instantiate one from:
 
 Do not expand further until the task-level canonical spec is identified.
 
+## 1.1 Current Live Frontier (2026-03-10)
+
+The current live frontier is no longer “broad ML reopen” or “default Vertex training”.
+
+As of the latest frozen evidence:
+
+- `V657` passed a **one-sided, sign-aware threshold / hazard** gate.
+- `V658` kept broader ML blocked because the narrow admitted-set learner did not beat the constant-baseline logloss gate.
+- `V659` kept broader ML blocked because the fixed winning contract did not fully replicate its signed-return tightening on a disjoint replication block.
+- `V660` kept broader ML blocked because deterministic month-segment replication also failed to pass the frozen ladder.
+
+Therefore:
+
+- broad ML / Vertex / holdout remain closed
+- the active frontier is still **non-ML campaign-state truth-finding**
+- the single operational truth source remains `handover/ai-direct/LATEST.md`
+- the current task-level source of truth remains `handover/ops/ACTIVE_MISSION_CHARTER.md`
+- the wider project context remains `handover/ops/ACTIVE_PROJECTS.md`
+
 ## 2. Project Identity
 
 | Key | Value |
@@ -87,6 +106,7 @@ OMEGA now separates permanent governance from task-specific execution.
 | Child-agent operating profile | `handover/ops/CHILD_AGENT_OPERATING_PROFILE.md` |
 | Codex child-role registry (project-scoped) | `.codex/config.toml` |
 | Codex child-role configs | `.codex/agents/*.toml` |
+| Gemini sub-agent runbook | `handover/ops/GEMINI_SUBAGENT_BEST_PRACTICES.md` |
 | Mission charter template | `handover/ops/MISSION_CHARTER_TEMPLATE.md` |
 | Physics constitution | `OMEGA_CONSTITUTION.md` |
 | Machine-readable principles | `.agent/principles.yaml` |
@@ -110,8 +130,15 @@ OMEGA now separates permanent governance from task-specific execution.
 | Deploy code to workers | `python3 tools/deploy.py` |
 | Cluster health check | `python3 tools/cluster_health.py` |
 | Environment verification | `python3 tools/env_verify.py` |
-| Stage 1 ETL (Linux) | `tools/stage1_linux_base_etl.py` |
-| Stage 2 Physics (both) | `tools/stage2_physics_compute.py` |
+| Campaign-state forge (current default entry) | `tools/forge_campaign_state.py` |
+| Pure event study | `tools/run_campaign_event_study.py` |
+| Transition event study | `tools/run_campaign_transition_event_study.py` |
+| Sign-aware threshold audit | `tools/run_campaign_sign_aware_threshold_audit.py` |
+| Fixed-contract replication audit | `tools/run_campaign_fixed_contract_replication_audit.py` |
+| Segmented replication audit | `tools/run_campaign_segmented_replication_audit.py` |
+| Narrow ML-admission probe (currently blocked) | `tools/run_campaign_ml_admission_probe.py` |
+| Stage 1 ETL (base-chain rebuild) | `tools/stage1_linux_base_etl.py` |
+| Stage 2 Physics (base-chain rebuild) | `tools/stage2_physics_compute.py` |
 
 ### Handover & Memory
 
@@ -220,10 +247,24 @@ Read skill details: `.agent/skills/{name}/SKILL.md`
 For Codex CLI only:
 
 - OMEGA-specific child roles are configured at the repo level in `.codex/config.toml`
+- Repo-local `[features] child_agents_md = true` is required so delegated Codex children inherit the scoped `AGENTS.md` chain without depending on user-global config
 - Role-specific configs live in `.codex/agents/*.toml`
 - These roles are project-scoped and must not be copied into `~/.codex/config.toml` as global roles
 - The human-readable governance source remains `handover/ops/CHILD_AGENT_OPERATING_PROFILE.md`
 - The CLI-consumed role wiring remains `.codex/config.toml` + `.codex/agents/*.toml`
+
+## 9.2 Gemini Sub-Agent Invocation
+
+For Gemini CLI sub-agent calls:
+
+- Call `/usr/bin/gemini` directly from the parent agent or orchestrator, not through the user-local `gemini` shell wrapper and not through a repo-local Python wrapper
+- Prefer read-only math/audit mode (`--approval-mode plan`) when Gemini CLI has `experimental.plan` enabled; otherwise use `--approval-mode default`
+- Prefer `--output-format stream-json` so the parent agent can distinguish `init`/result events from a merely silent model turn
+- Use one fresh Gemini process per bounded role packet; keep prompts short and file-bounded
+- Use a long wall-clock budget for serious reasoning; `1800s` is the OMEGA default direct-call budget
+- Do not treat the first long silent window as failure; inspect `stream-json` events and `~/.gemini/tmp/<project>/chats/` before killing the run
+- On GCP VMs, prefer Vertex/ADC authentication if you want cloud-native auth behavior; running on GCP does not change Gemini CLI behavior when `~/.gemini/settings.json` still points at personal OAuth
+- Full runbook: `handover/ops/GEMINI_SUBAGENT_BEST_PRACTICES.md`
 
 ## 10. Audit Canon
 
@@ -239,7 +280,7 @@ Use `audit/v64_audit_evolution.md` as the narrative overview, then drill into th
 
 ---
 
-*Last updated: 2026-03-06*
+*Last updated: 2026-03-10*
 *This file is the unified `/handover` entrypoint. `handover/ENTRYPOINT.md` remains only as a compatibility shim.*
 
 ## Google Docs CLI Tool
