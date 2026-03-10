@@ -4,15 +4,15 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
 
 ## 1. Snapshot Metadata
 
-- `updated_at_local`: 2026-03-10 01:40:00 +0000
-- `updated_at_utc`: 2026-03-10 01:40:00 +0000
+- `updated_at_local`: 2026-03-10 01:53:00 +0000
+- `updated_at_utc`: 2026-03-10 01:53:00 +0000
 - `updated_by`: Codex (GPT-5)
 
 ## 2. In-Flight Work
 
 ### Project: V654-IDENTITY-PRESERVING-PULSE-COMPRESSION
 
-- Status: `MISSION_OPEN_LOCAL_CONTRACT_PASS_DEPLOY_PENDING`
+- Status: `H1_FORGE_PROBE_INFLIGHT_AFTER_FAILFAST_REPAIR`
 - Hosts: `controller`, target `linux1-lx` for first bounded probe
 - Goal: keep V653 daily spine / label / barrier stack frozen while replacing only the intraday-to-symbol-day aggregation math with identity-preserving pulse compression
 - Audit authority:
@@ -47,9 +47,12 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
   - `python3 -m py_compile` passed
   - `15 passed in 0.81s`
 - Current next step:
-  - commit + push
-  - deploy to `linux1-lx`
-  - run bounded V654 forge + pure event-study probe
+  - wait for the widened H1 linux forge probe to finish
+  - if forge succeeds, open pure event study on:
+    - `PsiE_*`
+    - `PsiT_*`
+    - `PsiStar_*`
+  - keep ML closed until that gate is decided
 
 ### Project: V653-FRACTAL-CAMPAIGN-AWAKENING
 

@@ -8,6 +8,62 @@
 
 This file is the single source of current operational truth for all agents.
 
+## Update: 2026-03-10 01:53 UTC
+- **The first small V654 Jan probe is now frozen as an insufficient-width sample, and the H1 2023 probe is live.**
+- New execution record:
+  - `handover/ai-direct/entries/20260310_015300_v654_small_probe_failfast_and_h1_probe_launch.md`
+- Small probe root:
+  - `audit/runtime/v654_probe_linux_20260310_014600`
+- Small probe facts:
+  - `matched L1 files=10`
+  - `matched L2 files=16`
+  - `phase 2/4 done rows=85711 total_events=3635714 raw_candidates=529 kept_pulses=238`
+  - post-trim matrix:
+    - `rows=0`
+- Repair:
+  - `2ccc9a2` `fix(v654): fail fast on empty horizon-trimmed forge`
+- New live runtime root:
+  - `audit/runtime/v654_probe_linux_h1_2023_20260310_015200`
+- H1 live state at latest sample:
+  - active python PID:
+    - `3710033`
+  - latest log lines:
+    - `matched L1 files=72 L2 files=98 horizons=[5, 10, 20] pulse_mode=sign_nms pulse_min_gap=30`
+    - `phase 1/4 collecting daily spine from L1`
+- Current state:
+  - H1 forge is in flight
+  - pure event study has not opened yet
+  - ML / Vertex / holdout remain closed
+
+## Update: 2026-03-10 01:49 UTC
+- **V654 first wave is deployed to linux, and the first bounded forge probe is in flight.**
+- New execution record:
+  - `handover/ai-direct/entries/20260310_014900_v654_first_wave_deployed_probe_inflight.md`
+- Commits:
+  - `74242d9` `feat(v654): land pulse-compression first wave`
+  - `244bde7` `fix(v654): add repo-root import path for forge`
+- Deploy status:
+  - clean-worktree deploy succeeded to `linux1-lx`
+  - remote synced to:
+    - `deploy_v654_244bde7@244bde7`
+- Runtime root:
+  - `audit/runtime/v654_probe_linux_20260310_014600`
+- Live probe status at latest sample:
+  - active python PID:
+    - `3680127`
+  - CPU:
+    - `~71.6%`
+  - RSS:
+    - `~14.6 GB`
+  - latest log lines:
+    - `matched L1 files=10 L2 files=16 horizons=[5, 10, 20] pulse_mode=sign_nms pulse_min_gap=30`
+    - `phase 1/4 collecting daily spine from L1`
+- Current interpretation:
+  - no new traceback after the import-path repair
+  - probe is still in forge phase
+  - event-study has not opened yet
+- ML / Vertex / holdout status:
+  - still closed
 ## Update: 2026-03-10 01:40 UTC
 - **V654 is now the active mission, and the first local contract wave has passed.**
 - New audit authority:

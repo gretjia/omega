@@ -45,6 +45,122 @@
 ### Entries
 
 <!-- New session debriefs go here. Most recent on top. -->
+#### [2026-03-10 01:53] Agent: Codex | Session: V654 Small Probe Guard Fix, H1 Probe Live
+
+**What I did:**
+- Let the first small Jan V654 linux probe complete:
+  - `audit/runtime/v654_probe_linux_20260310_014600`
+- Confirmed that the small sample forged successfully through phase 4 but collapsed to:
+  - `rows=0`
+  after horizon trimming.
+- Added a fail-fast guard in:
+  - `tools/forge_campaign_state.py`
+- Added coverage in:
+  - `tests/test_campaign_state_contract.py`
+- Re-ran local verification:
+  - `16 passed`
+- Deployed the repaired commit:
+  - `2ccc9a2`
+- Launched the widened H1 2023 V654 probe:
+  - `audit/runtime/v654_probe_linux_h1_2023_20260310_015200`
+
+**What I discovered:**
+- The first V654 runtime bug after import repair was not mathematical; it was a missing execution guard.
+- A short Jan sample with frozen `5/10/20d` horizons can produce an empty matrix after trimming.
+- That case must never be treated as a successful probe.
+- The widened H1 probe now has materially larger width:
+  - `L1 files=72`
+  - `L2 files=98`
+
+**What confused me / blocked me:**
+- Nothing new in the code path yet.
+- The only current blocker is elapsed runtime; the H1 forge is still in phase 1 at the latest sample.
+
+**What the next agent should do:**
+- Check whether:
+  - `audit/runtime/v654_probe_linux_h1_2023_20260310_015200/campaign_matrix.parquet`
+  - and `.meta.json`
+  exist.
+- If forge succeeds, immediately run pure event study on:
+  - `PsiE_10d`
+  - `PsiT_10d`
+  - `PsiStar_10d`
+  - `PsiE_20d`
+  - `PsiT_20d`
+  - `PsiStar_20d`
+- If forge fails, inspect:
+  - `audit/runtime/v654_probe_linux_h1_2023_20260310_015200/forge.out`
+- Do not reopen ML.
+
+**Files I changed:**
+- `tools/forge_campaign_state.py` — added fail-fast for empty post-trim campaign matrices.
+- `tests/test_campaign_state_contract.py` — added coverage for empty-after-trim rejection.
+- `handover/ai-direct/entries/20260310_015300_v654_small_probe_failfast_and_h1_probe_launch.md` — recorded the small-probe outcome and H1 launch.
+- `handover/ai-direct/LATEST.md` — updated live runtime state.
+- `handover/ops/ACTIVE_PROJECTS.md` — updated V654 project status.
+- `handover/BOARD.md` — added this debrief.
+
+#### [2026-03-10 01:49] Agent: Codex | Session: V654 First Wave Deployed, Probe In Flight
+
+**What I did:**
+- Landed the new V654 authority and spec:
+  - `audit/v654_identity_preserving_pulse_compression.md`
+  - `handover/ai-direct/entries/20260310_012744_v654_identity_preserving_pulse_compression_spec_draft.md`
+  - `handover/ai-direct/entries/20260310_013420_v654_spec_draft_gemini_pass.md`
+  - `handover/ai-direct/entries/20260310_013500_v654_identity_preserving_pulse_compression_mission_open.md`
+- Switched the active charter to V654.
+- Implemented the first forge wave in:
+  - `tools/forge_campaign_state.py`
+- Expanded tests in:
+  - `tests/test_campaign_state_contract.py`
+  - `tests/test_campaign_event_study.py`
+- Ran local verification:
+  - `15 passed`
+- Deployed V654 to `linux1-lx` from a clean worktree.
+- Caught and fixed one live deploy-time bug:
+  - `ModuleNotFoundError: No module named 'config'`
+- Relaunched the first bounded linux forge probe:
+  - `audit/runtime/v654_probe_linux_20260310_014600`
+
+**What I discovered:**
+- The clean-worktree deploy path is necessary because the main repo is full of untracked runtime artifacts.
+- `tools/deploy.py` behaves badly from a detached HEAD worktree because it tries to push `HEAD:<branch>`.
+- The first live V654 bug was execution glue, not math:
+  - direct script execution on worker needed repo-root insertion before `from config import L2PipelineConfig`
+- The current bounded probe is live and healthy after the repair, but still only in:
+  - `phase 1/4 collecting daily spine from L1`
+
+**What confused me / blocked me:**
+- The bounded forge is slower than the old V653 Jan probe at the same early phase.
+- There is no fresh event-study evidence yet; the probe has not crossed forge phase 1.
+
+**What the next agent should do:**
+- Check whether:
+  - `audit/runtime/v654_probe_linux_20260310_014600/campaign_matrix.parquet`
+  - and `.meta.json`
+  have appeared.
+- If forge completes, immediately run pure event study on:
+  - `PsiE_10d`
+  - `PsiT_10d`
+  - `PsiStar_10d`
+  - `PsiE_20d`
+  - `PsiT_20d`
+  - `PsiStar_20d`
+- Do not open ML.
+- If forge fails, read:
+  - `audit/runtime/v654_probe_linux_20260310_014600/forge.out`
+  and treat the next fix as a V654 execution-surface bugfix, not a spec rewrite.
+
+**Files I changed:**
+- `audit/v654_identity_preserving_pulse_compression.md` — froze the new execution-grade override.
+- `handover/ops/ACTIVE_MISSION_CHARTER.md` — switched active mission to V654.
+- `tools/forge_campaign_state.py` — added three-channel pulse compression, diagnostics, and V654 signal families.
+- `tests/test_campaign_state_contract.py` — added compression and contract tests.
+- `tests/test_campaign_event_study.py` — added V654 signal-name compatibility tests.
+- `handover/ai-direct/LATEST.md` — recorded V654 activation and the live probe state.
+- `handover/ops/ACTIVE_PROJECTS.md` — updated V654 project status.
+- `handover/BOARD.md` — added this debrief.
+
 #### [2026-03-09 22:54] Agent: Codex | Session: V653 H1 Event Study Blocked
 
 **What I did:**
