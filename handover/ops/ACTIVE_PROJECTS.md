@@ -10,6 +10,46 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
 
 ## 2. In-Flight Work
 
+### Project: V656-CAMPAIGN-TRANSITION-ENTRY-AUDIT
+
+- Status: `H1_TRANSITION_EVENT_STUDY_BLOCKED_ML_NOT_ADMITTED`
+- Hosts: `controller`, `linux1-lx`
+- Goal: keep V655A soft-mass candidate stream, V655B amplitude-aware daily fold, daily spine, labels, and the unchanged event-study gate frozen while changing only the scored signal semantics from level to transition
+- Audit authority:
+  - `audit/v656_campaign_transition_entry_audit.md`
+- Draft spec:
+  - `handover/ai-direct/entries/20260310_064256_v656_campaign_transition_entry_spec_draft.md`
+- Gemini review:
+  - `handover/ai-direct/entries/20260310_064500_v656_spec_gemini_pass.md`
+  - verdict:
+    - `PASS`
+- Mission-open authority:
+  - `handover/ai-direct/entries/20260310_064600_v656_campaign_transition_mission_open.md`
+- Locked constraints:
+  - keep forge frozen
+  - keep gate frozen
+  - keep V655A soft-mass candidate stream frozen
+  - keep V655B amplitude-aware daily fold frozen
+  - keep ML / Vertex / holdout closed
+- First-wave implementation:
+  - `tools/run_campaign_transition_event_study.py`
+  - `tests/test_campaign_transition_event_study.py`
+- Local verification:
+  - `11 passed in 0.46s`
+  - `py_compile` passed
+- Deploy status:
+  - remote synced to:
+    - `deploy_v656_efc0ce4@efc0ce4`
+- Runtime basis:
+  - reused:
+    - `audit/runtime/v655b_probe_linux_h1_2023_20260310_050315/campaign_matrix.parquet`
+- Event-study verdict:
+  - all tested transition families remained:
+    - `monotonic_non_decreasing=false`
+- Operational consequence:
+  - ML remains closed
+  - V656 did not earn reopening
+
 ### Project: V655B-PHASE-AMPLITUDE-DAILY-FOLD
 
 - Status: `H1_AMP_PRIMARY_EVENT_STUDY_BLOCKED_ML_NOT_ADMITTED`

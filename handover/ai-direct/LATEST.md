@@ -8,6 +8,27 @@
 
 This file is the single source of current operational truth for all agents.
 
+## Update: 2026-03-10 06:50 UTC
+- **V656 transition semantics are now formally blocked. ML remains closed.**
+- New execution record:
+  - `handover/ai-direct/entries/20260310_065045_v656_h1_transition_event_study_blocked.md`
+- New frozen evidence packet:
+  - `audit/v656_h1_transition_event_study_block_evidence.md`
+- Runtime basis:
+  - reused V655B campaign matrix:
+    - `audit/runtime/v655b_probe_linux_h1_2023_20260310_050315/campaign_matrix.parquet`
+- Transition event-study artifacts:
+  - `audit/runtime/v656_transition_event_study_h1_2023_20260310_065013.json`
+  - `audit/runtime/v656_transition_event_study_h1_2023_20260310_065013.out`
+- Gate verdict:
+  - all tested transition families returned:
+    - `monotonic_non_decreasing = false`
+- Shared transition coverage:
+  - `date_frac_flat_signal=0.0` for all tested transition families
+- Operational consequence:
+  - V656 has not earned ML reopening
+  - ML / Vertex / holdout remain closed
+
 ## Update: 2026-03-10 05:42 UTC
 - **V655B H1 forge completed, but the primary amplitude-aware `PsiAmp*` event-study family is now formally blocked. ML remains closed.**
 - New execution record:

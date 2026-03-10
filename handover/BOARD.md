@@ -45,6 +45,66 @@
 ### Entries
 
 <!-- New session debriefs go here. Most recent on top. -->
+#### [2026-03-10 06:50] Agent: Codex | Session: V656 Transition Event Study Blocked
+
+**What I did:**
+- Landed the new audit authority:
+  - `audit/v656_campaign_transition_entry_audit.md`
+- Wrote the V656 spec and passed it through Gemini math audit:
+  - `handover/ai-direct/entries/20260310_064256_v656_campaign_transition_entry_spec_draft.md`
+  - `handover/ai-direct/entries/20260310_064500_v656_spec_gemini_pass.md`
+- Switched the active charter to V656:
+  - `handover/ops/ACTIVE_MISSION_CHARTER.md`
+- Implemented the lightweight transition tool:
+  - `tools/run_campaign_transition_event_study.py`
+  - `tests/test_campaign_transition_event_study.py`
+- Ran local verification:
+  - `11 passed`
+  - `py_compile` passed
+- Fixed one runtime glue bug:
+  - added repo-root import bootstrap so the tool can run remotely as a script
+- Deployed to `linux1-lx`.
+- Reused the frozen V655B H1 campaign matrix and ran transition-only event study.
+- Froze the resulting evidence in:
+  - `audit/v656_h1_transition_event_study_block_evidence.md`
+  - `handover/ai-direct/entries/20260310_065045_v656_h1_transition_event_study_blocked.md`
+
+**What I discovered:**
+- V656 does not need a forge rerun; the existing V655B campaign matrix was sufficient.
+- All eight transition families were non-flat:
+  - `date_frac_flat_signal=0.0`
+- None of them passed the unchanged monotonic gate.
+- The least-bad positive `d10_minus_d1` examples were:
+  - `FreshAmpE_20d = 0.004375280933147704`
+  - `FreshAmpStar_10d = 0.0004144596430242656`
+  but both still failed `monotonic_non_decreasing`.
+
+**What confused me / blocked me:**
+- The first V656 runtime failed because I tried to run the new tool on linux before deploying it.
+- The second V656 runtime failed because the tool lacked the repo-root `sys.path` bootstrap.
+- Both were fixed as engineering glue without changing the V656 mathematical axis.
+- The final blocker remains purely statistical under the unchanged gate.
+
+**What the next agent should do:**
+- Do not reopen ML.
+- Treat:
+  - `audit/v656_h1_transition_event_study_block_evidence.md`
+  as the frozen runtime authority for V656.
+- Wait for a new architect / audit direction before changing another semantic axis.
+
+**Files I changed:**
+- `audit/v656_campaign_transition_entry_audit.md` — landed the new external authority.
+- `handover/ai-direct/entries/20260310_064256_v656_campaign_transition_entry_spec_draft.md` — recorded the draft spec.
+- `handover/ai-direct/entries/20260310_064500_v656_spec_gemini_pass.md` — recorded the Gemini pass.
+- `handover/ai-direct/entries/20260310_064600_v656_campaign_transition_mission_open.md` — recorded mission open.
+- `tools/run_campaign_transition_event_study.py` — added the V656 transition-only event-study tool.
+- `tests/test_campaign_transition_event_study.py` — added transition derivation and gate-reuse coverage.
+- `audit/v656_h1_transition_event_study_block_evidence.md` — froze the transition-only event-study evidence.
+- `handover/ai-direct/entries/20260310_065045_v656_h1_transition_event_study_blocked.md` — recorded the V656 block.
+- `handover/ai-direct/LATEST.md` — updated current operational truth.
+- `handover/ops/ACTIVE_PROJECTS.md` — updated V656 project state.
+- `handover/BOARD.md` — added this debrief.
+
 #### [2026-03-10 05:42] Agent: Codex | Session: V655B H1 Forge Complete, Amp-Primary Event Study Blocked
 
 **What I did:**
