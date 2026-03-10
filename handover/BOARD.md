@@ -45,6 +45,113 @@
 ### Entries
 
 <!-- New session debriefs go here. Most recent on top. -->
+#### [2026-03-10 03:04] Agent: Codex | Session: V654 H1 Forge Complete, Psi-Primary Event Study Blocked
+
+**What I did:**
+- Verified that the widened V654 H1 forge completed on:
+  - `audit/runtime/v654_probe_linux_h1_2023_20260310_015200`
+- Launched pure event study on the V654 primary directional families:
+  - `PsiE_5d`
+  - `PsiT_5d`
+  - `PsiStar_5d`
+  - `PsiE_10d`
+  - `PsiT_10d`
+  - `PsiStar_10d`
+  - `PsiE_20d`
+  - `PsiT_20d`
+  - `PsiStar_20d`
+- Used a polling child agent to monitor the remote event-study artifacts until completion.
+- Froze the resulting evidence in:
+  - `audit/v654_h1_psi_event_study_block_evidence.md`
+  - `handover/ai-direct/entries/20260310_030400_v654_h1_psi_primary_event_study_blocked.md`
+
+**What I discovered:**
+- The V654 H1 forge preserves the corrected no-zero-mass behavior:
+  - `excess_ret_t1_to_5d_zero_fraction = 0.0`
+  - `excess_ret_t1_to_10d_zero_fraction = 0.0`
+  - `excess_ret_t1_to_20d_zero_fraction = 0.0`
+- The primary V654 `Psi` family is not flat:
+  - `date_frac_flat_signal = 0.0` for all tested signals
+- Despite that, none of the tested `PsiE_*`, `PsiT_*`, or `PsiStar_*` horizons achieved:
+  - `monotonic_non_decreasing = true`
+
+**What confused me / blocked me:**
+- Nothing new in execution glue blocked this run.
+- The blocker is now purely statistical:
+  - the unchanged event-study gate is still not earned
+
+**What the next agent should do:**
+- Do not reopen ML.
+- Treat:
+  - `audit/v654_h1_psi_event_study_block_evidence.md`
+  as the current frozen runtime authority for V654.
+- Wait for a new architect / audit direction before changing the V654 mathematical axis again.
+
+**Files I changed:**
+- `audit/v654_h1_psi_event_study_block_evidence.md` — froze the H1 forge + primary event-study evidence.
+- `handover/ai-direct/entries/20260310_030400_v654_h1_psi_primary_event_study_blocked.md` — recorded the H1 V654 checkpoint and block.
+- `handover/ai-direct/LATEST.md` — updated current operational truth.
+- `handover/ops/ACTIVE_PROJECTS.md` — updated V654 project state.
+- `handover/BOARD.md` — added this debrief.
+
+#### [2026-03-10 02:55] Agent: Codex | Session: Codex Child-Agent + Gemini Direct-Call Policy
+
+**What I did:**
+- Verified OMEGA Codex child-role wiring and closed the repo-local self-containment gap by enabling:
+  - `.codex/config.toml` -> `[features] child_agents_md = true`
+- Researched the current Gemini CLI behavior on this VM and aligned OMEGA to the newer Groundhog operating pattern.
+- Reworked OMEGA Gemini invocation to:
+  - call `/usr/bin/gemini` directly
+  - prefer `--output-format stream-json`
+  - use longer outer budgets
+  - stop treating first long silence as immediate failure
+- Updated the agent governance and runbooks:
+  - `AGENTS.md`
+  - `handover/README.md`
+  - `handover/ops/CHILD_AGENT_OPERATING_PROFILE.md`
+  - `handover/ops/SKILLS_TOOLS_INDEX.md`
+  - `handover/ops/GEMINI_SUBAGENT_BEST_PRACTICES.md`
+  - `handover/turingclaw_delegates.json`
+- Updated the unattended Gemini call site in:
+  - `tools/stage3_full_supervisor.py`
+
+**What I discovered:**
+- OMEGA was already close to native Codex child-agent integration, but repo-local `child_agents_md` had not been declared.
+- The current `PATH` `gemini` command is a user-local shell wrapper that injects:
+  - `-y`
+  - `--model gemini-3.1-pro-preview`
+- Gemini auth on this VM is still:
+  - `oauth-personal`
+- The stronger timeout diagnosis on this VM is:
+  - long silent windows are often still alive
+  - silence alone is not enough evidence to kill Gemini
+
+**What confused me / blocked me:**
+- `/usr/bin/gemini` currently falls back from `--approval-mode plan` to `default` unless Gemini CLI experimental plan mode is enabled.
+- No blocker remains in the OMEGA side after switching to direct `/usr/bin/gemini`.
+
+**What the next agent should do:**
+- When using Gemini for math/audit roles, prefer:
+  - `/usr/bin/gemini --output-format stream-json --prompt "<bounded role packet>"`
+- Keep prompts short and file-bounded.
+- Inspect:
+  - `stream-json` init/result events
+  - `~/.gemini/tmp/<project>/chats/`
+  before declaring Gemini dead during a silent window.
+- If future work needs stronger cloud-native Gemini behavior, revisit auth mode:
+  - Vertex / ADC instead of personal OAuth
+
+**Files I changed:**
+- `.codex/config.toml` — enabled repo-local multi-agent feature flags for Codex child-agent self-containment.
+- `AGENTS.md` — documented repo-local `child_agents_md` usage in the OMEGA entrypoint.
+- `handover/README.md` — documented direct Gemini call policy and silence-handling rules.
+- `handover/ops/CHILD_AGENT_OPERATING_PROFILE.md` — recorded repo-local Codex child-agent inheritance requirement.
+- `handover/ops/SKILLS_TOOLS_INDEX.md` — updated the canonical Gemini invocation example.
+- `handover/ops/GEMINI_SUBAGENT_BEST_PRACTICES.md` — added the durable direct-call and long-silence runbook.
+- `handover/turingclaw_delegates.json` — wired Gemini delegates to direct `/usr/bin/gemini`.
+- `tools/stage3_full_supervisor.py` — switched the unattended Gemini call to direct `/usr/bin/gemini` with `stream-json` and a larger outer timeout.
+- `handover/ai-direct/entries/20260310_025501_codex_child_agents_and_gemini_direct_call_policy.md` — recorded the durable research outcome.
+
 #### [2026-03-10 01:53] Agent: Codex | Session: V654 Small Probe Guard Fix, H1 Probe Live
 
 **What I did:**

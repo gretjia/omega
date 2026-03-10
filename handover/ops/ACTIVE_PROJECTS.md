@@ -4,15 +4,15 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
 
 ## 1. Snapshot Metadata
 
-- `updated_at_local`: 2026-03-10 01:53:00 +0000
-- `updated_at_utc`: 2026-03-10 01:53:00 +0000
+- `updated_at_local`: 2026-03-10 03:04:00 +0000
+- `updated_at_utc`: 2026-03-10 03:04:00 +0000
 - `updated_by`: Codex (GPT-5)
 
 ## 2. In-Flight Work
 
 ### Project: V654-IDENTITY-PRESERVING-PULSE-COMPRESSION
 
-- Status: `H1_FORGE_PROBE_INFLIGHT_AFTER_FAILFAST_REPAIR`
+- Status: `H1_PSI_PRIMARY_EVENT_STUDY_BLOCKED_ML_NOT_ADMITTED`
 - Hosts: `controller`, target `linux1-lx` for first bounded probe
 - Goal: keep V653 daily spine / label / barrier stack frozen while replacing only the intraday-to-symbol-day aggregation math with identity-preserving pulse compression
 - Audit authority:
@@ -46,13 +46,31 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
 - Local verification:
   - `python3 -m py_compile` passed
   - `15 passed in 0.81s`
+- Latest runtime root:
+  - `audit/runtime/v654_probe_linux_h1_2023_20260310_015200`
+- H1 forge facts:
+  - `rows=271447`
+  - `symbols=5448`
+  - `raw_candidates=3164`
+  - `kept_pulses=1449`
+  - `seconds=2052.6`
+- Zero-fraction facts:
+  - `excess_ret_t1_to_5d_zero_fraction = 0.0`
+  - `excess_ret_t1_to_10d_zero_fraction = 0.0`
+  - `excess_ret_t1_to_20d_zero_fraction = 0.0`
+- Primary event-study artifacts:
+  - `audit/runtime/v654_probe_linux_h1_2023_20260310_015200/event_study_v654_psi_primary.json`
+  - `audit/runtime/v654_probe_linux_h1_2023_20260310_015200/event_study_v654_psi_primary.out`
+- Event-study verdict:
+  - all tested `PsiE_*`, `PsiT_*`, and `PsiStar_*` signals returned:
+    - `monotonic_non_decreasing = false`
+  - `date_frac_flat_signal = 0.0` for all tested signals
+- Operational consequence:
+  - the V654 pure event-study gate is not passed
+  - ML / Vertex / holdout remain closed
 - Current next step:
-  - wait for the widened H1 linux forge probe to finish
-  - if forge succeeds, open pure event study on:
-    - `PsiE_*`
-    - `PsiT_*`
-    - `PsiStar_*`
-  - keep ML closed until that gate is decided
+  - freeze this runtime evidence
+  - wait for new architect / audit direction before any ML reopening
 
 ### Project: V653-FRACTAL-CAMPAIGN-AWAKENING
 

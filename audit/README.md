@@ -23,6 +23,7 @@ For the V64 line, read in this order:
 15. [v653_identity_preservation_gemini_verdict.md](/home/zephryj/projects/omega/audit/v653_identity_preservation_gemini_verdict.md)
 16. [v653_h1_event_study_block_evidence.md](/home/zephryj/projects/omega/audit/v653_h1_event_study_block_evidence.md)
 17. [v654_identity_preserving_pulse_compression.md](/home/zephryj/projects/omega/audit/v654_identity_preserving_pulse_compression.md)
+18. [v654_h1_psi_event_study_block_evidence.md](/home/zephryj/projects/omega/audit/v654_h1_psi_event_study_block_evidence.md)
 
 ## Purpose of each file
 
@@ -43,3 +44,4 @@ For the V64 line, read in this order:
 - [v653_identity_preservation_gemini_verdict.md](/home/zephryj/projects/omega/audit/v653_identity_preservation_gemini_verdict.md): pre-execution Gemini clarification that V653 preserves Epiplexity, Topology, and the core compression insight, and that the system remains OMEGA while the downstream translation layer changes
 - [v653_h1_event_study_block_evidence.md](/home/zephryj/projects/omega/audit/v653_h1_event_study_block_evidence.md): evidence-only packet for the widened H1 V653 forge and pure event-study block, with no opinions or next-step proposals
 - [v654_identity_preserving_pulse_compression.md](/home/zephryj/projects/omega/audit/v654_identity_preserving_pulse_compression.md): execution-grade override for the next repair axis, freezing daily spine / labels / event-study gates while moving the only allowed change to identity-preserving pulse compression inside the intraday-to-symbol-day aggregation path
+- [v654_h1_psi_event_study_block_evidence.md](/home/zephryj/projects/omega/audit/v654_h1_psi_event_study_block_evidence.md): frozen evidence packet for the widened V654 H1 forge plus primary `Psi`-family pure event-study block, recording only runtime facts and the exact gate failure

@@ -8,6 +8,68 @@
 
 This file is the single source of current operational truth for all agents.
 
+## Update: 2026-03-10 03:04 UTC
+- **V654 H1 forge finished and the primary `Psi` event-study family is now formally blocked. ML remains closed.**
+- New execution record:
+  - `handover/ai-direct/entries/20260310_030400_v654_h1_psi_primary_event_study_blocked.md`
+- New frozen evidence packet:
+  - `audit/v654_h1_psi_event_study_block_evidence.md`
+- Runtime root:
+  - `audit/runtime/v654_probe_linux_h1_2023_20260310_015200`
+- H1 forge facts:
+  - `rows=271447`
+  - `symbols=5448`
+  - `min_date=20230103`
+  - `max_date=20230417`
+  - `raw_candidates=3164`
+  - `kept_pulses=1449`
+  - `seconds=2052.6`
+- Zero-fraction facts:
+  - `excess_ret_t1_to_5d_zero_fraction = 0.0`
+  - `excess_ret_t1_to_10d_zero_fraction = 0.0`
+  - `excess_ret_t1_to_20d_zero_fraction = 0.0`
+- Primary pure event-study artifacts:
+  - `audit/runtime/v654_probe_linux_h1_2023_20260310_015200/event_study_v654_psi_primary.json`
+  - `audit/runtime/v654_probe_linux_h1_2023_20260310_015200/event_study_v654_psi_primary.out`
+- Shared event-study coverage:
+  - `n_dates_input=52`
+  - `n_dates_scored=51`
+  - `date_frac_flat_signal=0.0` for all tested `Psi` signals
+- Gate verdict:
+  - all tested `PsiE_*`, `PsiT_*`, and `PsiStar_*` signals returned:
+    - `monotonic_non_decreasing = false`
+- Operational consequence:
+  - V654 has not earned ML reopening
+  - ML / Vertex / holdout remain closed
+
+## Update: 2026-03-10 02:55 UTC
+- **OMEGA agent tooling is now aligned to repo-local Codex child-agent inheritance and direct Gemini CLI invocation.**
+- New governance record:
+  - `handover/ai-direct/entries/20260310_025501_codex_child_agents_and_gemini_direct_call_policy.md`
+- Codex child-agent update:
+  - `.codex/config.toml` now declares:
+    - `[features] multi_agent = true`
+    - `[features] child_agents_md = true`
+- Gemini operating update:
+  - direct call target:
+    - `/usr/bin/gemini`
+  - preferred output mode:
+    - `stream-json`
+  - outer default budget in unattended OMEGA supervisor path:
+    - `1800s`
+  - long silence is **not** by itself failure evidence
+  - inspect:
+    - `stream-json` init/result events
+    - `~/.gemini/tmp/<project>/chats/`
+    before killing a quiet Gemini run
+- Current interpretation:
+  - OMEGA child-agent governance is now self-contained at the repo level for Codex
+  - OMEGA Gemini sub-agent policy now follows the newer Groundhog evidence:
+    - one role
+    - one fresh process
+    - short file-bounded prompt
+    - no premature kill on first long silent window
+
 ## Update: 2026-03-10 01:53 UTC
 - **The first small V654 Jan probe is now frozen as an insufficient-width sample, and the H1 2023 probe is live.**
 - New execution record:
