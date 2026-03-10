@@ -8,6 +8,44 @@
 
 This file is the single source of current operational truth for all agents.
 
+## Update: 2026-03-10 09:59 UTC
+- **V658 H1 local ML-admission probe completed and remained blocked.**
+- New execution record:
+  - `handover/ai-direct/entries/20260310_095900_v658_h1_ml_admission_probe_blocked.md`
+- New frozen evidence packet:
+  - `audit/v658_h1_ml_admission_probe_block_evidence.md`
+- Runtime root:
+  - `audit/runtime/v658_ml_admission_probe_h1_2023_20260310_094420`
+- Runtime basis:
+  - reused:
+    - `audit/runtime/v655b_probe_linux_h1_2023_20260310_050315/campaign_matrix.parquet`
+- Admission coverage:
+  - `n_rows_input=265999`
+  - `n_rows_negative_side=16117`
+  - `n_rows_admitted=1654`
+  - `n_dates_admitted=51`
+- Fold verdicts:
+  - `fold_a`
+    - `logloss_model=0.6873002195762993`
+    - `logloss_constant=0.6868685069000361`
+    - `fold_pass=false`
+  - `fold_b`
+    - `logloss_model=0.6552068498403909`
+    - `logloss_constant=0.6330215280784024`
+    - `fold_pass=false`
+- Important nuance:
+  - the learner did beat the raw same-count baseline on both signed return and hazard:
+    - `fold_a`, `alpha=0.50`
+    - `fold_b`, `alpha=0.50`
+    - `fold_b`, `alpha=0.25`
+  - but V658 required both:
+    - model economics improvement
+    - and logloss improvement over constant baseline
+  - that full condition was not met
+- Operational consequence:
+  - `mission_pass=false`
+  - broader ML / Vertex / holdout remain closed
+
 ## Update: 2026-03-10 09:37 UTC
 - **V658 is now the active mission. It opens only a narrow local ML-admission probe on the frozen V657 negative-tail contract.**
 - New authority:

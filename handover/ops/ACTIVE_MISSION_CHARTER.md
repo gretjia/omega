@@ -1,6 +1,6 @@
 # OMEGA Active Mission Charter
 
-Status: In Progress
+Status: Blocked
 Task Name: V658 Negative-Tail Hazard Admission Probe
 Owner: Human Owner
 Commander: Codex
@@ -201,8 +201,15 @@ Runtime audit must verify:
 Record after execution:
 
 - commit hash:
+  - `6603e72`
 - nodes used:
+  - `controller`
+  - `linux1-lx`
 - output roots:
+  - `audit/runtime/v658_ml_admission_probe_h1_2023_20260310_094420`
 - math audit verdict:
+  - `PASS`
 - runtime audit verdict:
+  - `BLOCK`
 - admission-probe verdict:
+  - `mission_pass=false`

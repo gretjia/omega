@@ -45,6 +45,59 @@
 ### Entries
 
 <!-- New session debriefs go here. Most recent on top. -->
+#### [2026-03-10 09:59] Agent: Codex | Session: V658 Local ML Admission Probe Blocked
+
+**What I did:**
+- Committed and pushed the V658 mission-open code/doc set:
+  - `6603e72`
+- Deployed from a clean worktree to `linux1-lx`:
+  - `deploy_v658_6603e72_a@6603e72`
+- Launched the bounded local admission probe on the frozen V655B H1 campaign matrix:
+  - `audit/runtime/v658_ml_admission_probe_h1_2023_20260310_094420`
+- Waited on actual runtime evidence only:
+  - remote process state
+  - `/proc` counters
+  - output file growth
+  - final JSON artifact
+- Froze the resulting evidence in:
+  - `audit/v658_h1_ml_admission_probe_block_evidence.md`
+  - `handover/ai-direct/entries/20260310_095900_v658_h1_ml_admission_probe_blocked.md`
+
+**What I discovered:**
+- V658 did not fail because the admitted-set economics were uniformly bad.
+- The learner beat the raw same-count baseline on both signed return and hazard in:
+  - `fold_a`, `alpha=0.50`
+  - `fold_b`, `alpha=0.50`
+  - `fold_b`, `alpha=0.25`
+- The hard blocker was the frozen calibration gate:
+  - `fold_a`
+    - `logloss_model=0.6873002195762993`
+    - `logloss_constant=0.6868685069000361`
+  - `fold_b`
+    - `logloss_model=0.6552068498403909`
+    - `logloss_constant=0.6330215280784024`
+- Since both folds lost to the constant baseline on logloss, `mission_pass=false`.
+
+**What confused me / blocked me:**
+- The first probe-launch SSH command had a shell-quoting bug.
+- I reran it successfully; that glue issue did not affect the frozen runtime result.
+- `linux1-lx` also had intermittent control-plane SSH timeouts during polling.
+- I did not treat those as task failure; I resumed polling once connectivity returned and waited for the final JSON artifact.
+
+**What the next agent should do:**
+- Treat:
+  - `audit/v658_h1_ml_admission_probe_block_evidence.md`
+  as the frozen V658 runtime authority.
+- Do not reopen broader ML / Vertex / holdout from V658.
+- Wait for a new auditor / architect instruction before changing another axis.
+
+**Files I changed:**
+- `audit/v658_h1_ml_admission_probe_block_evidence.md` — froze the V658 runtime evidence.
+- `handover/ai-direct/entries/20260310_095900_v658_h1_ml_admission_probe_blocked.md` — recorded the blocked runtime checkpoint.
+- `handover/ai-direct/LATEST.md` — updated current operational truth with the blocked verdict.
+- `handover/ops/ACTIVE_PROJECTS.md` — updated V658 project state.
+- `handover/BOARD.md` — added this debrief.
+
 #### [2026-03-10 09:37] Agent: Codex | Session: V658 Admission Probe Mission Open
 
 **What I did:**

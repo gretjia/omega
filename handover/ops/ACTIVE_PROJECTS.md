@@ -12,7 +12,7 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
 
 ### Project: V658-NEGATIVE-TAIL-HAZARD-ADMISSION-PROBE
 
-- Status: `LOCAL_ADMISSION_PROBE_PENDING_RUNTIME`
+- Status: `LOCAL_ADMISSION_PROBE_BLOCKED_ML_NOT_ADMITTED`
 - Hosts: `controller`, target `linux1-lx` for bounded local-only probe
 - Goal: keep the V655A soft-mass candidate stream, V655B amplitude-aware daily fold, V656 transition derivations, V657 sign-aware threshold semantics, daily spine, tradable labels, and triple-barrier stack frozen while changing only the admission protocol from raw threshold trigger to trigger-conditioned hazard learner
 - Audit authority:
@@ -57,8 +57,34 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
 - Runtime basis:
   - reuse:
     - `audit/runtime/v655b_probe_linux_h1_2023_20260310_050315/campaign_matrix.parquet`
-- Next runtime question:
-  - can a fixed low-capacity binary learner beat both constant-baseline logloss and the raw same-count baseline inside the admitted negative-tail set on both forward folds?
+- Runtime root:
+  - `audit/runtime/v658_ml_admission_probe_h1_2023_20260310_094420`
+- Coverage:
+  - `n_rows_input=265999`
+  - `n_rows_negative_side=16117`
+  - `n_rows_admitted=1654`
+  - `n_dates_admitted=51`
+- Fold verdicts:
+  - `fold_a`
+    - `logloss_model=0.6873002195762993`
+    - `logloss_constant=0.6868685069000361`
+    - `fold_pass=false`
+  - `fold_b`
+    - `logloss_model=0.6552068498403909`
+    - `logloss_constant=0.6330215280784024`
+    - `fold_pass=false`
+- Observed nuance:
+  - the learner still beat the raw same-count baseline on both signed return and hazard in:
+    - `fold_a`, `alpha=0.50`
+    - `fold_b`, `alpha=0.50`
+    - `fold_b`, `alpha=0.25`
+  - but it failed the constant-baseline logloss gate on both folds
+- Frozen evidence:
+  - `audit/v658_h1_ml_admission_probe_block_evidence.md`
+  - `handover/ai-direct/entries/20260310_095900_v658_h1_ml_admission_probe_blocked.md`
+- Operational consequence:
+  - V658 does not reopen broader ML
+  - Vertex / holdout remain closed
 
 ### Project: V657-SIGN-AWARE-THRESHOLD-HAZARD-AUDIT
 
