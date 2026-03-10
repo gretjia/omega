@@ -12,7 +12,7 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
 
 ### Project: V660-REGIME-SEGMENTED-REPLICATION-AUDIT
 
-- Status: `ACTIVE_SEGMENTED_AUDIT_PENDING`
+- Status: `SEGMENTED_AUDIT_BLOCKED_ML_NOT_ADMITTED`
 - Hosts: `controller`, target `linux1-lx` for bounded non-ML segmented audit
 - Goal: keep forge, labels, barriers, V655A candidate stream, V655B amplitude fold, V656 transitions, V657 threshold semantics, and the frozen V659 replication block fixed while changing only the sample partition into deterministic month segments
 - Audit authority:
@@ -47,8 +47,22 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
 - Local verification:
   - `9 passed in 0.35s`
   - `py_compile` passed
+- Runtime root:
+  - `audit/runtime/v660_segmented_replication_20260310_175918`
+- Segment summary:
+  - `n_segments_total=4`
+  - `n_segments_eligible=3`
+  - `n_segments_passing=0`
+  - `n_segments_failing=3`
+  - eligible months:
+    - `202305`
+    - `202306`
+    - `202307`
+- Frozen evidence:
+  - `audit/v660_segmented_replication_block_evidence.md`
+  - `handover/ai-direct/entries/20260310_180000_v660_segmented_replication_blocked.md`
 - Operational consequence:
-  - next step is month-segment audit on the frozen V659 replication matrix
+  - V660 did not earn segmented replication pass
   - broader ML / Vertex / holdout remain closed
 
 ### Project: V659-FIXED-CONTRACT-REPLICATION-AUDIT

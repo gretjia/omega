@@ -8,6 +8,30 @@
 
 This file is the single source of current operational truth for all agents.
 
+## Update: 2026-03-10 18:00 UTC
+- **V660 regime-segmented replication audit completed and remained blocked.**
+- New execution record:
+  - `handover/ai-direct/entries/20260310_180000_v660_segmented_replication_blocked.md`
+- New frozen evidence packet:
+  - `audit/v660_segmented_replication_block_evidence.md`
+- Runtime root:
+  - `audit/runtime/v660_segmented_replication_20260310_175918`
+- Frozen runtime basis:
+  - reused:
+    - `audit/runtime/v659_replication_linux_20230508_20230927_20260310_114408/campaign_matrix.parquet`
+- Segment summary:
+  - `n_segments_total=4`
+  - `n_segments_eligible=3`
+  - `n_segments_passing=0`
+  - `n_segments_failing=3`
+  - eligible months:
+    - `202305`
+    - `202306`
+    - `202307`
+- Operational consequence:
+  - `mission_pass=false`
+  - broader ML / Vertex / holdout remain closed
+
 ## Update: 2026-03-10 17:53 UTC
 - **V660 is now the active mission. It remains non-ML and changes only the sample partition inside the frozen V659 replication block.**
 - New authority:

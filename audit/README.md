@@ -37,6 +37,7 @@ For the V64 line, read in this order:
 29. [v659_fixed_contract_replication_audit.md](/home/zephryj/projects/omega/audit/v659_fixed_contract_replication_audit.md)
 30. [v659_replication_block_evidence.md](/home/zephryj/projects/omega/audit/v659_replication_block_evidence.md)
 31. [v660_regime_segmented_replication_audit.md](/home/zephryj/projects/omega/audit/v660_regime_segmented_replication_audit.md)
+32. [v660_segmented_replication_block_evidence.md](/home/zephryj/projects/omega/audit/v660_segmented_replication_block_evidence.md)
 
 ## Purpose of each file
 
@@ -71,3 +72,4 @@ For the V64 line, read in this order:
 - [v659_fixed_contract_replication_audit.md](/home/zephryj/projects/omega/audit/v659_fixed_contract_replication_audit.md): external audit authority that treats post-selection replication as the next narrow blocker and freezes the next move to a non-ML replication audit on the exact V657 winning contract outside the original H1 2023 selection slice
 - [v659_replication_block_evidence.md](/home/zephryj/projects/omega/audit/v659_replication_block_evidence.md): frozen runtime evidence showing that the disjoint replication block kept the repaired data properties and the strongest threshold remained profitable, but the fixed V657 contract still failed the signed-return tightening ladder, so broader ML stayed closed
 - [v660_regime_segmented_replication_audit.md](/home/zephryj/projects/omega/audit/v660_regime_segmented_replication_audit.md): commander audit authority that keeps the V659 contract and matrix frozen, changes only the evaluation-sample partition into deterministic month segments, and asks whether the V659 failure is regime-mixed inside the replication block
+- [v660_segmented_replication_block_evidence.md](/home/zephryj/projects/omega/audit/v660_segmented_replication_block_evidence.md): frozen runtime evidence showing that deterministic month segmentation still produced zero passing eligible segments, so the V659 failure did not resolve into a strong regime-mixed replication pass and broader ML stayed closed

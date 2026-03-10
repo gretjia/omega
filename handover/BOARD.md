@@ -45,6 +45,48 @@
 ### Entries
 
 <!-- New session debriefs go here. Most recent on top. -->
+#### [2026-03-10 18:00] Agent: Codex | Session: V660 Segmented Replication Audit Blocked
+
+**What I did:**
+- Deployed the frozen V660 code from a clean worktree to `linux1-lx`.
+- Reused the frozen V659 campaign matrix:
+  - `audit/runtime/v659_replication_linux_20230508_20230927_20260310_114408/campaign_matrix.parquet`
+- Ran the month-segment audit wrapper:
+  - `audit/runtime/v660_segmented_replication_20260310_175918`
+- Froze the resulting evidence in:
+  - `audit/v660_segmented_replication_block_evidence.md`
+  - `handover/ai-direct/entries/20260310_180000_v660_segmented_replication_blocked.md`
+
+**What I discovered:**
+- The V659 failure did not cleanly resolve into a regime-mixed pass/fail split under deterministic month segmentation.
+- Segment summary:
+  - `n_segments_total=4`
+  - `n_segments_eligible=3`
+  - `n_segments_passing=0`
+  - `n_segments_failing=3`
+- `202307` was the closest surviving month:
+  - hazard tightening passed
+  - strongest-threshold positivity passed
+  - strongest-threshold outperformance versus the within-side universe passed
+  - but signed-return tightening still failed
+- `202308` looked economically stronger, but it was ineligible under the frozen segment rule because it had only `6` scored dates.
+
+**What confused me / blocked me:**
+- No new engineering blocker remained after deploy.
+- The final blocker is statistical: zero eligible month segments fully passed the unchanged V659 ladder.
+
+**What the next agent should do:**
+- Treat `audit/v660_segmented_replication_block_evidence.md` as the frozen V660 runtime authority.
+- Keep broader ML / Vertex / holdout closed.
+- Wait for a new auditor / architect instruction before changing another axis.
+
+**Files I changed:**
+- `audit/v660_segmented_replication_block_evidence.md` — froze the V660 segmented-audit evidence.
+- `handover/ai-direct/entries/20260310_180000_v660_segmented_replication_blocked.md` — recorded the blocked runtime checkpoint.
+- `handover/ai-direct/LATEST.md` — updated current operational truth with the blocked verdict.
+- `handover/ops/ACTIVE_PROJECTS.md` — updated V660 project state.
+- `handover/BOARD.md` — added this debrief.
+
 #### [2026-03-10 17:53] Agent: Codex | Session: V660 Regime-Segmented Replication Mission Open
 
 **What I did:**
