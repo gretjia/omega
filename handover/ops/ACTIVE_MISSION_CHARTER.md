@@ -1,40 +1,38 @@
 # OMEGA Active Mission Charter
 
 Status: In Progress
-Task Name: V656 Campaign-Transition Entry Audit
+Task Name: V657 Sign-Aware Threshold Hazard Audit
 Owner: Human Owner
 Commander: Codex
 Date: 2026-03-10
 
 ## 1. Objective
 
-- Preserve the corrected V655A soft-mass candidate stream, V655B amplitude-aware daily fold, daily spine, tradable label stack, same-sign pulse compression, and unchanged pure event-study gate.
-- Repair only the scored signal semantics.
-- Replace campaign-state level scoring with campaign-state transition scoring while leaving forge and gate logic frozen.
-- Re-run pure event study before any ML reopening.
+- Preserve the corrected V655A soft-mass candidate stream, V655B amplitude-aware daily fold, V656 transition derivations, daily spine, tradable label stack, and same-sign pulse compression.
+- Repair only the evaluator semantics.
+- Replace unconditional cross-sectional decile monotonic ranking with sign-aware one-sided threshold / hazard evaluation while leaving forge and signal logic frozen.
+- Run evaluator-only scoring before any ML reopening.
 
 ## 2. Canonical Spec
 
 Primary task-level implementation authority:
 
+- `audit/v657_sign_aware_threshold_hazard_audit.md`
+- `audit/v656_h1_transition_event_study_block_evidence.md`
 - `audit/v656_campaign_transition_entry_audit.md`
 - `audit/v655b_h1_amp_event_study_block_evidence.md`
 - `audit/v655b_phase_amplitude_daily_fold.md`
-- `audit/v655a_h1_soft_mass_block_evidence.md`
-- `audit/v655_soft_mass_campaign_accumulation.md`
-- `audit/v654_identity_preserving_pulse_compression.md`
-- `audit/v653_fractal_campaign_awakening.md`
-- `audit/v653_identity_preservation_gemini_verdict.md`
-- `handover/ai-direct/entries/20260310_064256_v656_campaign_transition_entry_spec_draft.md`
-- `handover/ai-direct/entries/20260310_064500_v656_spec_gemini_pass.md`
-- `handover/ai-direct/entries/20260310_064600_v656_campaign_transition_mission_open.md`
+- `handover/ai-direct/entries/20260310_081031_v657_sign_aware_threshold_hazard_spec_draft.md`
+- `handover/ai-direct/entries/20260310_081335_v657_spec_gemini_pass.md`
+- `handover/ai-direct/entries/20260310_081400_v657_sign_aware_threshold_hazard_mission_open.md`
 
 Supporting context:
 
 - `OMEGA_CONSTITUTION.md`
 - `tools/forge_campaign_state.py`
-- `tools/run_campaign_event_study.py`
 - `tools/run_campaign_transition_event_study.py`
+- `tools/run_campaign_event_study.py`
+- `tools/run_campaign_sign_aware_threshold_audit.py`
 
 If the canonical spec conflicts with `OMEGA_CONSTITUTION.md`, escalate to the Commander.
 
@@ -42,25 +40,26 @@ If the canonical spec conflicts with `OMEGA_CONSTITUTION.md`, escalate to the Co
 
 Writable files:
 
-- `tools/run_campaign_transition_event_study.py`
-- `tests/test_campaign_transition_event_study.py`
+- `tools/run_campaign_sign_aware_threshold_audit.py`
+- `tests/test_campaign_sign_aware_threshold_audit.py`
 - `handover/ops/ACTIVE_MISSION_CHARTER.md`
 - `handover/ops/ACTIVE_PROJECTS.md`
 - `handover/ai-direct/LATEST.md`
 - `handover/ai-direct/entries/*`
 - `handover/BOARD.md`
 - `audit/README.md`
-- `audit/v655_*`
+- `audit/v657_*`
 
 Read-only but relevant files:
 
 - `tools/run_campaign_event_study.py`
+- `tools/run_campaign_transition_event_study.py`
 - `tools/forge_campaign_state.py`
 - `omega_core/*`
-- frozen V64 / V643 / V653 / V654 / V655A / V655B audit canon
-- frozen V655B runtime evidence
+- frozen V64 / V643 / V653 / V654 / V655A / V655B / V656 audit canon
+- frozen V655B / V656 runtime evidence
 
-Explicitly out of scope before the event-study gate passes:
+Explicitly out of scope before the sign-aware threshold gate passes:
 
 - reopening Path A
 - any Vertex / GCP launch
@@ -70,9 +69,10 @@ Explicitly out of scope before the event-study gate passes:
 - changing the same-sign pulse compression logic
 - changing the V655A soft-mass candidate stream
 - changing the V655B amplitude-aware daily fold
-- changing `tools/run_campaign_event_study.py` gate semantics
+- changing the V656 transition derivation formulas
+- changing forge math
 - changing `omega_core/*` math core unless a later truth-first escalation is explicitly opened
-- opening ML before a V656 transition family earns the pure event-study gate
+- opening ML before a V657 signal-side-threshold pair earns the one-sided threshold gate
 
 ## 4. Roles
 
@@ -89,30 +89,25 @@ Formula Integrity Auditor:
 - model rule:
   - default `gemini 3.1 pro preview` only
 - responsibility:
-  - audit every formula-bearing diff against the frozen V656 override
+  - audit every formula-bearing diff against the frozen V657 override
 
-Transition Semantics Engineer:
-
-- responsibility:
-  - implement the transition derivations without changing forge or gate
-
-Gate Reuse Auditor:
+Threshold Evaluator Engineer:
 
 - responsibility:
-  - verify the only mathematical delta is the level-to-transition semantic shift
-  - verify the event-study gate remains unchanged
-  - verify parser compatibility for the eight new signal names
+  - implement the sign-aware one-sided evaluator without changing forge or signals
+
+Evaluator Reuse Auditor:
+
+- responsibility:
+  - verify the only mathematical delta is the evaluator semantics
+  - verify the V656 transition derivations remain unchanged
+  - verify side handling and sign handling are correct
 
 Distribution Auditor:
 
 - responsibility:
-  - verify transition families remain non-flat
-  - verify symbol-boundary-safe lagging
-
-Event Study Auditor:
-
-- responsibility:
-  - verify monotonicity under the unchanged gate
+  - verify tails are non-empty and date-neutral
+  - verify threshold tightening comparisons are valid
 
 Runtime Orchestrator:
 
@@ -124,68 +119,68 @@ Runtime Orchestrator:
 ML Readiness Gatekeeper:
 
 - responsibility:
-  - block all ML until a new directional family earns the pure event-study gate
+  - refuse ML reopening unless a V657 signal-side-threshold pair passes the one-sided threshold gate
 
 ## 5. Acceptance Criteria
 
-- V656 mission-open authority exists in handover
-- the active charter explicitly freezes the V656 single-axis repair boundary
+- V657 mission-open authority exists in handover
+- the active charter explicitly freezes the V657 single-axis repair boundary
 - implementation preserves:
   - daily spine
   - tradable return labels
   - triple-barrier semantics
-  - event-study gate
   - V655A soft-mass candidate stream
   - V655B amplitude-aware daily fold
-  - same-sign pulse compression
-  - existing `PsiAmpE_*`, `PsiAmpStar_*`, `OmegaAmpE_*`, `OmegaAmpStar_*`
+  - V656 transition derivations
 - implementation changes only:
-  - the scored signal semantics derived from existing V655B level columns
-- pure event study runs before any ML work
-- no ML / cloud / holdout steps are opened before the event-study gate
+  - the evaluator semantics
+- sign-aware threshold audit runs before any ML work
+- no ML / cloud / holdout steps are opened before the sign-aware threshold gate
 
 ## 6. Runtime Preflight
 
 Required before execution:
 
 - local-only phase ordering
-- fresh isolated V656 output path under the existing V655B runtime authority
+- fresh isolated V657 output path under the existing V655B runtime authority
 - no cloud endpoints
 - no holdout paths
 - no forge rerun
+- no signal rewrite
 
 ## 7. Fail-Fast Conditions
 
 - stop if any step changes the mathematical meaning of the frozen formulas
-- stop if any step opens ML before the event-study gate
+- stop if any step opens ML before the threshold gate
 - stop if any step consumes `2025` / `2026-01` holdouts early
 - stop if a required formula-bearing diff has not been audited with `gemini -p`
-- stop if V656 rewrites forge math or gate math
-- stop if V656 changes any axis beyond the level-to-transition semantic shift
+- stop if V657 rewrites forge math or signal derivation math
+- stop if V657 changes any axis beyond the evaluator semantics
 
 ## 8. Audits Required
 
 Math audit must verify:
 
-- the single change axis is exactly the level-to-transition semantic shift
+- the single change axis is exactly the evaluator semantics
 - V655B amplitude-aware level families remain intact
+- the V656 transition derivations remain intact
 - the V655A soft-mass candidate stream remains intact
 - no forge rewrite occurs
-- no gate rewrite occurs
 - label and barrier semantics remain unchanged
 
 Runtime audit must verify:
 
-- transition families are emitted and scoreable
-- transition families remain non-flat and scoreable under the unchanged gate
-- symbol-boundary-safe lagging is preserved
+- sign-aware tails are emitted and scoreable
+- threshold ladder summaries are emitted
+- positive and negative sides are evaluated with the correct signed scoring
+- threshold tightening comparisons are present
 
 ## 9. Definition of Done
 
-- V656 mission is active in handover
-- first transition-tool code wave is implemented
+- V657 mission is active in handover
+- first threshold-audit code wave is implemented
 - local tests pass
-- first bounded transition event-study probe is recorded
+- first bounded sign-aware threshold audit is recorded
 - a go / no-go verdict for ML reopening remains explicit
 - handover updated
 - Commander-only commit/push completed
@@ -199,4 +194,4 @@ Record after execution:
 - output roots:
 - math audit verdict:
 - runtime audit verdict:
-- event-study verdict:
+- threshold-audit verdict:

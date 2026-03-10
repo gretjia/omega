@@ -4,11 +4,49 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
 
 ## 1. Snapshot Metadata
 
-- `updated_at_local`: 2026-03-10 03:42:00 +0000
-- `updated_at_utc`: 2026-03-10 03:42:00 +0000
+- `updated_at_local`: 2026-03-10 08:14:00 +0000
+- `updated_at_utc`: 2026-03-10 08:14:00 +0000
 - `updated_by`: Codex (GPT-5)
 
 ## 2. In-Flight Work
+
+### Project: V657-SIGN-AWARE-THRESHOLD-HAZARD-AUDIT
+
+- Status: `SPEC_PASSED_IMPLEMENTED_LOCAL_PENDING_RUNTIME`
+- Hosts: `controller`, target `linux1-lx` for bounded evaluator-only run
+- Goal: keep forge, daily spine, tradable labels, triple-barrier semantics, V655A soft-mass candidate stream, V655B amplitude-aware daily fold, and V656 transition derivations frozen while changing only the pre-ML evaluator semantics to sign-aware one-sided threshold / hazard scoring
+- Audit authority:
+  - `audit/v657_sign_aware_threshold_hazard_audit.md`
+- Draft spec:
+  - `handover/ai-direct/entries/20260310_081031_v657_sign_aware_threshold_hazard_spec_draft.md`
+- Gemini review:
+  - `handover/ai-direct/entries/20260310_081335_v657_spec_gemini_pass.md`
+  - verdict:
+    - `PASS`
+- Mission-open authority:
+  - `handover/ai-direct/entries/20260310_081400_v657_sign_aware_threshold_hazard_mission_open.md`
+- Locked constraints:
+  - keep `tools/forge_campaign_state.py` frozen
+  - keep daily spine frozen
+  - keep `entry_open_t1`, `excess_ret_t1_to_Hd`, and triple-barrier semantics frozen
+  - keep same-sign pulse compression frozen
+  - keep the V655A soft-mass candidate stream frozen
+  - keep the V655B amplitude-aware daily fold frozen
+  - keep the V656 transition derivation formulas frozen
+  - keep ML / Vertex / holdout closed
+- First-wave implementation:
+  - `tools/run_campaign_sign_aware_threshold_audit.py`
+  - `tests/test_campaign_sign_aware_threshold_audit.py`
+- Local verification:
+  - `16 passed in 0.46s`
+  - `py_compile` passed
+- Runtime basis:
+  - reuse:
+    - `audit/runtime/v655b_probe_linux_h1_2023_20260310_050315/campaign_matrix.parquet`
+- Current next step:
+  - deploy the evaluator-only tool to `linux1-lx`
+  - run the bounded sign-aware threshold / hazard audit
+  - keep ML closed until the one-sided threshold gate is explicitly earned
 
 ### Project: V656-CAMPAIGN-TRANSITION-ENTRY-AUDIT
 

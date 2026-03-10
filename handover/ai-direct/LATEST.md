@@ -8,6 +8,34 @@
 
 This file is the single source of current operational truth for all agents.
 
+## Update: 2026-03-10 08:14 UTC
+- **V657 is now the active mission. It changes only evaluator semantics; forge, transitions, labels, and ML closure remain frozen.**
+- New authority:
+  - `audit/v657_sign_aware_threshold_hazard_audit.md`
+- New spec:
+  - `handover/ai-direct/entries/20260310_081031_v657_sign_aware_threshold_hazard_spec_draft.md`
+- Gemini spec audit:
+  - `handover/ai-direct/entries/20260310_081335_v657_spec_gemini_pass.md`
+  - verdict:
+    - `PASS`
+- Mission-open authority:
+  - `handover/ai-direct/entries/20260310_081400_v657_sign_aware_threshold_hazard_mission_open.md`
+- Active change axis:
+  - replace unconditional cross-sectional decile monotonic evaluation
+  - with sign-aware one-sided threshold / hazard evaluation
+- Frozen runtime basis:
+  - reuse:
+    - `audit/runtime/v655b_probe_linux_h1_2023_20260310_050315/campaign_matrix.parquet`
+- Implementation wave:
+  - `tools/run_campaign_sign_aware_threshold_audit.py`
+  - `tests/test_campaign_sign_aware_threshold_audit.py`
+- Local verification:
+  - `16 passed in 0.46s`
+  - `py_compile` passed
+- Operational consequence:
+  - V657 has not run yet
+  - ML / Vertex / holdout remain closed
+
 ## Update: 2026-03-10 06:50 UTC
 - **V656 transition semantics are now formally blocked. ML remains closed.**
 - New execution record:
