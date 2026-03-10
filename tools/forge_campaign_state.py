@@ -680,6 +680,10 @@ def build_campaign_state_frame(
 
     max_horizon = max(horizons)
     df = df.drop_nulls(subset=[f"excess_ret_t1_to_{max_horizon}d"])
+    if df.height <= 0:
+        raise ValueError(
+            f"campaign_state frame is empty after horizon trimming; need a wider date window than max_horizon={max_horizon}"
+        )
     return df
 
 

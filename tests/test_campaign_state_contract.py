@@ -210,6 +210,26 @@ def test_zero_fraction_remains_zero_after_v654_forge() -> None:
     assert zero_frac == 0.0
 
 
+def test_build_campaign_state_frame_rejects_empty_after_horizon_trim() -> None:
+    daily_spine = pl.DataFrame(
+        [
+            {"symbol": "AAA", "pure_date": "20240102", "open": 100.0, "high": 101.0, "low": 99.0, "close": 100.0, "n_ticks_day": 10},
+            {"symbol": "AAA", "pure_date": "20240103", "open": 100.0, "high": 102.0, "low": 99.0, "close": 101.0, "n_ticks_day": 10},
+            {"symbol": "BBB", "pure_date": "20240102", "open": 50.0, "high": 51.0, "low": 49.0, "close": 50.0, "n_ticks_day": 10},
+            {"symbol": "BBB", "pure_date": "20240103", "open": 50.0, "high": 51.0, "low": 49.0, "close": 50.1, "n_ticks_day": 10},
+        ]
+    )
+    daily_events = pl.DataFrame(
+        [
+            {"symbol": "AAA", "pure_date": "20240102", "F_force": 1.0, "A_action": 1.0, "N_events": 1, "day_epi_integral": 1.0, "day_topo_integral": 1.0, "F_epi": 1.0, "A_epi": 1.0, "F_topo": 1.0, "A_topo": 1.0, "F_phase": 1.0, "A_phase": 1.0, "pulse_count": 1, "pulse_concentration": 1.0},
+            {"symbol": "BBB", "pure_date": "20240102", "F_force": -1.0, "A_action": 1.0, "N_events": 1, "day_epi_integral": 1.0, "day_topo_integral": 1.0, "F_epi": -1.0, "A_epi": 1.0, "F_topo": -1.0, "A_topo": 1.0, "F_phase": -1.0, "A_phase": 1.0, "pulse_count": 1, "pulse_concentration": 1.0},
+        ]
+    )
+
+    with pytest.raises(ValueError):
+        campaign_state.build_campaign_state_frame(daily_spine=daily_spine, daily_events=daily_events, horizons=(5, 10, 20), eps=1e-12)
+
+
 def test_assert_unique_symbol_date_rejects_duplicates() -> None:
     df = pl.DataFrame(
         [
