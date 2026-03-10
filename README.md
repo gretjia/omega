@@ -325,48 +325,124 @@ graph TD
 
 ---
 
-## 快速开始 (Quick Start - V62 Two-Stage Pipeline)
+## 快速开始 (Quick Start - Current Campaign-State Workflow)
 
-在 V62 架构中，数据提炼(Base Lake)与物理计算(Physics Engine)被严格正交解耦，以彻底消灭 Python GIL 与 ZFS 的读写死锁。所有的操作均已迁移至 `tools/` 目录下的剥离脚本。
+下面这套才是当前默认入口。旧的 `V62` 三阶段 `Stage1 -> Stage2 -> Vertex` 链路仍保留在仓库里，但**它已经不是当前 live quick start，也不是当前 active frontier**。
 
-### Stage 1: Base Lake (这辈子只跑一次)
+### 0. 先看权威状态
 
-将海量 `.7z` 压缩包提炼为只包含基础量价数据的 `Base_L1.parquet`。**绝对禁止在此阶段加入任何高阶数学**。依靠多节点哈希分片完成。
+先读这些文件，再决定要跑哪一层：
 
-**Linux 主节点 (75% 算力, 依托 4TB NVMe 缓存):**
+```text
+AGENTS.md
+handover/README.md
+OMEGA_CONSTITUTION.md
+handover/ai-direct/LATEST.md
+handover/ops/ACTIVE_MISSION_CHARTER.md
+handover/ops/ACTIVE_PROJECTS.md
+```
+
+截至当前，broad ML / Vertex / holdout 仍然关闭；默认工作流是 **campaign-state forge -> non-ML event study / threshold / replication audit**。
+
+### 1. 从 L1 + L2 熔铸 campaign-state matrix
+
+当前主入口是 [tools/forge_campaign_state.py](tools/forge_campaign_state.py)。它会：
+
+- 从 L1 建连续 daily spine
+- 从 L2 抽取 physics-valid pulse 流
+- 做 same-sign pulse compression
+- 生成 amplitude-aware campaign-state 列和 widened tradable labels
+
+典型命令：
 
 ```bash
-python3 tools/stage1_linux_base_etl.py --years 2023,2024,2025,2026 --total-shards 4 --shard 0,1,2 --workers 6
+python3 tools/forge_campaign_state.py \
+  --l1-input-pattern "/omega_pool/parquet_data/stage1_full_*/l1/host=linux1/20230*.parquet" \
+  --l2-input-pattern "/omega_pool/parquet_data/stage2_full_*/l2/host=linux1/20230*.parquet" \
+  --output-path "audit/runtime/campaign_probe/campaign_matrix.parquet" \
+  --years 2023 \
+  --horizons 5,10,20 \
+  --pulse-mode sign_nms \
+  --pulse-min-gap 30 \
+  --pulse-floor 1e-12 \
+  --require-is-signal 0 \
+  --require-is-physics-valid 1
 ```
 
-**Windows 辅助节点 (25% 算力, 防御 Swap 崩溃):**
+当前冻结语义下：
 
-```powershell
-python tools\stage1_windows_base_etl.py --years 2023,2024,2025,2026 --total-shards 4 --shard 3 --workers 2
-```
+- `require-is-signal=0`
+- `require-is-physics-valid=1`
+- horizons 固定先看 `5d / 10d / 20d`
 
-### Stage 2: Physics Engine & Numba Compute (高频迭代)
+### 2. 先做纯 event study，不开 ML
 
-这部分代码在每一次修改 `omega_core/` 的数学逻辑后都需要重新运行。它直接从高速内存中读取 `Base_L1.parquet`，然后将其灌入 `@numba.njit` 加速的内核中生成高维特征矩阵。
+在任何 learner / Vertex / holdout 之前，先跑纯 event study。
+
+基础 decile gate：
 
 ```bash
-python tools/stage2_physics_compute.py \
-  --input-dir /omega_pool/parquet_data/latest_base_l1 \
-  --output-dir /omega_pool/parquet_data/latest_feature_l2 \
-  --workers 4
+python3 tools/run_campaign_event_study.py \
+  --campaign-path "audit/runtime/campaign_probe/campaign_matrix.parquet" \
+  --signal-col PsiAmpE_10d \
+  --signal-col PsiAmpStar_10d \
+  --signal-col PsiAmpE_20d \
+  --signal-col PsiAmpStar_20d \
+  --output-json "audit/runtime/campaign_probe/event_study.json"
 ```
 
-### Stage 3: Vertex AI XGBoost Training & Backtest
+如果你在复核 transition 语义，可使用：
 
-所有生成好的特征最终会被统一打包，通过 `tools/gcp_upload.py` 提交至 Google Cloud Vertex AI 进行数千节点的无服务器模型训练。
+- [tools/run_campaign_transition_event_study.py](tools/run_campaign_transition_event_study.py)
+
+### 3. 对 one-sided trigger 做 sign-aware threshold 审计
+
+当全截面 monotonic ranker 假设失败后，当前更真实的 evaluator 是 sign-aware one-sided threshold / hazard audit：
 
 ```bash
-# 启动云端训练任务
-python tools/run_vertex_xgb_train.py
-
-# 在本地快速回测并验证结果
-python tools/run_local_backtest.py
+python3 tools/run_campaign_sign_aware_threshold_audit.py \
+  --campaign-path "audit/runtime/campaign_probe/campaign_matrix.parquet" \
+  --signal-col dPsiAmpE_10d \
+  --side negative \
+  --threshold-pct 90 \
+  --threshold-pct 95 \
+  --threshold-pct 97.5 \
+  --output-json "audit/runtime/campaign_probe/threshold_audit.json"
 ```
+
+这是 `V657` 通过的那类语义；它证明的是 **one-sided trigger utility**，不是 broad ranker reopening。
+
+### 4. 当前 active frontier：fixed-contract replication
+
+当前 active mission 是在冻结 contract 上做 non-ML replication / segmentation 复核，而不是训练模型。
+
+固定 contract replication：
+
+```bash
+python3 tools/run_campaign_fixed_contract_replication_audit.py \
+  --campaign-path "audit/runtime/campaign_probe/campaign_matrix.parquet" \
+  --output-json "audit/runtime/campaign_probe/replication_audit.json"
+```
+
+当前 active segmented replication：
+
+```bash
+python3 tools/run_campaign_segmented_replication_audit.py \
+  --campaign-path "audit/runtime/campaign_probe/campaign_matrix.parquet" \
+  --output-json "audit/runtime/campaign_probe/segmented_audit.json"
+```
+
+### 5. 什么时候才考虑 ML / Vertex
+
+只有当 `handover/ops/ACTIVE_MISSION_CHARTER.md` 明确放行时，才允许继续进入 learner admission、Vertex 或 holdout。
+
+当前不要把下面这些当成 quick start：
+
+- `tools/run_vertex_xgb_train.py`
+- `tools/run_local_backtest.py`
+- 任何 broad ML / Vertex reopen
+
+如果你需要重建历史 L1/L2 原始链路，相关脚本仍在 `tools/stage1_*`、`tools/stage2_physics_compute.py` 中，但那是**底层重算路径**，不是当前默认导读。
 
 ### 6. Mac 主控 SSH（Windows_1）
 
