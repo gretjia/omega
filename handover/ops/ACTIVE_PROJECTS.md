@@ -10,6 +10,56 @@ This file tracks in-flight initiatives. `handover/ai-direct/LATEST.md` remains t
 
 ## 2. In-Flight Work
 
+### Project: V658-NEGATIVE-TAIL-HAZARD-ADMISSION-PROBE
+
+- Status: `LOCAL_ADMISSION_PROBE_PENDING_RUNTIME`
+- Hosts: `controller`, target `linux1-lx` for bounded local-only probe
+- Goal: keep the V655A soft-mass candidate stream, V655B amplitude-aware daily fold, V656 transition derivations, V657 sign-aware threshold semantics, daily spine, tradable labels, and triple-barrier stack frozen while changing only the admission protocol from raw threshold trigger to trigger-conditioned hazard learner
+- Audit authority:
+  - `audit/v658_negative_tail_hazard_admission_probe.md`
+- Draft spec:
+  - `handover/ai-direct/entries/20260310_084200_v658_negative_tail_hazard_admission_probe_spec_draft.md`
+- Gemini review:
+  - `handover/ai-direct/entries/20260310_092918_v658_spec_gemini_pass.md`
+  - verdict:
+    - `PASS`
+- Mission-open authority:
+  - `handover/ai-direct/entries/20260310_093000_v658_negative_tail_hazard_admission_mission_open.md`
+- Code-delta Gemini review:
+  - `handover/ai-direct/entries/20260310_093716_v658_code_delta_gemini_pass.md`
+  - verdict:
+    - `PASS`
+- Locked constraints:
+  - keep `tools/forge_campaign_state.py` frozen
+  - keep daily spine frozen
+  - keep `entry_open_t1`, `excess_ret_t1_to_Hd`, and triple-barrier semantics frozen
+  - keep same-sign pulse compression frozen
+  - keep the V655A soft-mass candidate stream frozen
+  - keep the V655B amplitude-aware daily fold frozen
+  - keep the V656 transition derivation formulas frozen
+  - keep the V657 threshold semantics frozen
+  - keep Vertex / holdout / Optuna closed
+- Fixed admission contract:
+  - signal:
+    - `dPsiAmpE_10d`
+  - side:
+    - `negative`
+  - threshold:
+    - negative-side `90th` percentile absolute tail
+  - shadow control:
+    - `FreshAmpStar_10d`
+- First-wave implementation:
+  - `tools/run_campaign_ml_admission_probe.py`
+  - `tests/test_campaign_ml_admission_probe.py`
+- Local verification:
+  - `20 passed in 0.59s`
+  - `py_compile` passed
+- Runtime basis:
+  - reuse:
+    - `audit/runtime/v655b_probe_linux_h1_2023_20260310_050315/campaign_matrix.parquet`
+- Next runtime question:
+  - can a fixed low-capacity binary learner beat both constant-baseline logloss and the raw same-count baseline inside the admitted negative-tail set on both forward folds?
+
 ### Project: V657-SIGN-AWARE-THRESHOLD-HAZARD-AUDIT
 
 - Status: `THRESHOLD_GATE_PASSED_ML_ADMISSION_REVIEW_PENDING`

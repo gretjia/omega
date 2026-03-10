@@ -8,6 +8,48 @@
 
 This file is the single source of current operational truth for all agents.
 
+## Update: 2026-03-10 09:37 UTC
+- **V658 is now the active mission. It opens only a narrow local ML-admission probe on the frozen V657 negative-tail contract.**
+- New authority:
+  - `audit/v658_negative_tail_hazard_admission_probe.md`
+- New spec:
+  - `handover/ai-direct/entries/20260310_084200_v658_negative_tail_hazard_admission_probe_spec_draft.md`
+- Gemini spec audit:
+  - `handover/ai-direct/entries/20260310_092918_v658_spec_gemini_pass.md`
+  - verdict:
+    - `PASS`
+- Mission-open authority:
+  - `handover/ai-direct/entries/20260310_093000_v658_negative_tail_hazard_admission_mission_open.md`
+- Gemini code-delta audit:
+  - `handover/ai-direct/entries/20260310_093716_v658_code_delta_gemini_pass.md`
+  - verdict:
+    - `PASS`
+- First-wave implementation:
+  - `tools/run_campaign_ml_admission_probe.py`
+  - `tests/test_campaign_ml_admission_probe.py`
+- Local verification:
+  - `20 passed in 0.59s`
+  - `py_compile` passed
+- Frozen runtime basis:
+  - reuse:
+    - `audit/runtime/v655b_probe_linux_h1_2023_20260310_050315/campaign_matrix.parquet`
+- Fixed V658 contract:
+  - signal:
+    - `dPsiAmpE_10d`
+  - side:
+    - `negative`
+  - admission threshold:
+    - `90th` percentile of negative-side absolute magnitude
+  - learner:
+    - fixed `binary:logistic`
+  - folds:
+    - `60/20`
+    - `80/20`
+- Operational consequence:
+  - forge, thresholds, labels, barriers, and signal formulas remain frozen
+  - no Vertex / holdout / Optuna opens in V658
+  - next step is bounded local runtime only
+
 ## Update: 2026-03-10 08:35 UTC
 - **V657 sign-aware threshold / hazard audit passed. The pre-ML evaluator is no longer blocked at unconditional decile monotonicity.**
 - New execution record:

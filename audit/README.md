@@ -32,6 +32,7 @@ For the V64 line, read in this order:
 24. [v656_h1_transition_event_study_block_evidence.md](/home/zephryj/projects/omega/audit/v656_h1_transition_event_study_block_evidence.md)
 25. [v657_sign_aware_threshold_hazard_audit.md](/home/zephryj/projects/omega/audit/v657_sign_aware_threshold_hazard_audit.md)
 26. [v657_h1_sign_aware_threshold_pass_evidence.md](/home/zephryj/projects/omega/audit/v657_h1_sign_aware_threshold_pass_evidence.md)
+27. [v658_negative_tail_hazard_admission_probe.md](/home/zephryj/projects/omega/audit/v658_negative_tail_hazard_admission_probe.md)
 
 ## Purpose of each file
 
@@ -61,3 +62,4 @@ For the V64 line, read in this order:
 - [v656_h1_transition_event_study_block_evidence.md](/home/zephryj/projects/omega/audit/v656_h1_transition_event_study_block_evidence.md): frozen runtime evidence showing that V656 reused the V655B campaign matrix, kept all transition families non-flat, but still failed the unchanged monotonic event-study gate across all eight transition signals
 - [v657_sign_aware_threshold_hazard_audit.md](/home/zephryj/projects/omega/audit/v657_sign_aware_threshold_hazard_audit.md): external audit authority that keeps forge and transition derivations frozen, reinterprets the remaining blocker as evaluator semantics, and restricts the next move to sign-aware one-sided threshold / hazard scoring on the frozen V655B matrix
 - [v657_h1_sign_aware_threshold_pass_evidence.md](/home/zephryj/projects/omega/audit/v657_h1_sign_aware_threshold_pass_evidence.md): frozen runtime evidence showing that V657 reused the frozen V655B matrix, changed only evaluator semantics, and earned the one-sided threshold gate via negative-tail sign-aware pairs such as `dPsiAmpE_10d`
+- [v658_negative_tail_hazard_admission_probe.md](/home/zephryj/projects/omega/audit/v658_negative_tail_hazard_admission_probe.md): external audit authority that freezes the V657 sign-aware contract and narrows the next step to a local-only, trigger-conditioned hazard learner admission probe on the fixed negative tail of `dPsiAmpE_10d`

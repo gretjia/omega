@@ -45,6 +45,61 @@
 ### Entries
 
 <!-- New session debriefs go here. Most recent on top. -->
+#### [2026-03-10 09:37] Agent: Codex | Session: V658 Admission Probe Mission Open
+
+**What I did:**
+- Landed the new audit authority:
+  - `audit/v658_negative_tail_hazard_admission_probe.md`
+- Wrote the V658 spec and passed it through direct Gemini math audit:
+  - `handover/ai-direct/entries/20260310_084200_v658_negative_tail_hazard_admission_probe_spec_draft.md`
+  - `handover/ai-direct/entries/20260310_092918_v658_spec_gemini_pass.md`
+- Switched the active charter to V658:
+  - `handover/ops/ACTIVE_MISSION_CHARTER.md`
+- Implemented the fixed admitted-set learner:
+  - `tools/run_campaign_ml_admission_probe.py`
+  - `tests/test_campaign_ml_admission_probe.py`
+- Ran local verification:
+  - `20 passed`
+  - `py_compile` passed
+- Ran a second direct Gemini code-delta audit:
+  - `handover/ai-direct/entries/20260310_093716_v658_code_delta_gemini_pass.md`
+  - verdict:
+    - `PASS`
+
+**What I discovered:**
+- V658 remains narrow by construction:
+  - one fixed signal:
+    - `dPsiAmpE_10d`
+  - one fixed side:
+    - `negative`
+  - one fixed threshold:
+    - negative-side `90th` percentile absolute tail
+- The mission does not change forge, signal formulas, label semantics, or threshold semantics.
+- The only live question now is whether a fixed low-capacity learner can sharpen the already-proven raw trigger inside the admitted set.
+
+**What confused me / blocked me:**
+- Two child-agent read-only reviews timed out and produced no usable summaries.
+- That did not affect correctness because the mission authority, formulas, and code delta were all audited directly with `/usr/bin/gemini`.
+
+**What the next agent should do:**
+- Do not widen the search surface.
+- Commit only the V658 mission-open authority, code, tests, and doc updates.
+- Deploy from a clean worktree to `linux1-lx`.
+- Run the bounded local admission probe on the frozen V655B H1 campaign matrix.
+- Poll by output growth and artifacts only; do not use elapsed-time heuristics.
+
+**Files I changed:**
+- `audit/v658_negative_tail_hazard_admission_probe.md` — landed the new external authority.
+- `handover/ai-direct/entries/20260310_084200_v658_negative_tail_hazard_admission_probe_spec_draft.md` — recorded the V658 spec.
+- `handover/ai-direct/entries/20260310_092918_v658_spec_gemini_pass.md` — recorded the spec-level Gemini pass.
+- `handover/ai-direct/entries/20260310_093000_v658_negative_tail_hazard_admission_mission_open.md` — recorded mission open.
+- `handover/ai-direct/entries/20260310_093716_v658_code_delta_gemini_pass.md` — recorded code-level Gemini pass.
+- `tools/run_campaign_ml_admission_probe.py` — added the fixed admitted-set learner probe.
+- `tests/test_campaign_ml_admission_probe.py` — added admission-mask, fold, and baseline checks.
+- `handover/ai-direct/LATEST.md` — updated current operational truth.
+- `handover/ops/ACTIVE_PROJECTS.md` — updated V658 project state.
+- `handover/BOARD.md` — added this debrief.
+
 #### [2026-03-10 08:35] Agent: Codex | Session: V657 Sign-Aware Threshold Gate Passed
 
 **What I did:**
